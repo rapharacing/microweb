@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="/" />
+		<title>Microcosm</title>
+		<link rel="shortcut icon" href="/static/img/favico.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link href="/static/themes/1/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+		<!-- Source Sans Pro -->
+		<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600,400italic,600italic" rel="stylesheet" type="text/css">
+
+		<link href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.min.css" rel="stylesheet" type="text/css" />
+		<!--[if lte IE 8]>
+			<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.ie.css" />
+		<![endif]-->
+
+		<style>
+			.headBand {
+				background-image: url('/static/themes/1/background.png');
+				background-position: center center;
+				margin: 24px 0;
+				min-height: 96px;
+			}
+			.margin-top-half {
+				margin-top: 12px;
+			}
+			.margin-top {
+				margin-top: 24px;
+			}
+			.buffer-right {
+				margin-right: 10px;
+			}
+			.glyphicon {
+				font-family: 'Glyphicons Halflings';
+				font-style: normal;
+				font-weight: normal;
+				line-height: 1;
+				vertical-align: middle;
+			}
+		</style>
+
+
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+		  <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<!--[endif]-->
+	</head>
+<body>
+	<div class="headBand">
+		<div class="container">
+			<header class="row">
+				<div class="col-span-16">
+					<div class="row">
+						<div id="logo" class="col-span-3 margin-top-half">	
+							<a href="/"><img src="/static/themes/1/logo.png" alt="Microcosm - Powered by Microcosm" width="320" height="96" /></a>
+						</div>
+						<div class="col-span-3 pull-right">
+							<div class="row margin-top">
+								<div class="col-span-4">
+									<a href="/profiles/3/edit/"><img src="https://secure.gravatar.com/avatar/18da12b86c5bb5d8af61b3c93cdc8bc3" alt="Avatar for david" title="Edit your profile" /></a>
+								</div>
+								<div class="col-span-12">
+									<a href="/profiles/3/" id="profile_name">david</a><br />
+									<a href="/logout/">Log out</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+		</div>
+	</div>
+
+	<div class="container">
+		
+
+		<div class="row">
+			<section id="content" class="col-span-12">
+			<!-- START :: CONTENT -->
+
+
+
+<div class="row">
+	<div class="col-span-16">
+		<h4>Title</h4>
+		<p><input id="id_title" type="text" name="title" maxlength="150"></p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-span-8">
+		<h4>Where</h4>
+		<p><input id="id_title" type="text" name="title" maxlength="150"></p>
+	</div>
+	<div id="map" class="col-span-8 pull-right" style="height:292px"></div>
+
+	<div class="col-span-8">
+		<h4>From</h4>
+		<p><input id="id_title" type="text" name="title" maxlength="150"></p>
+	</div>
+
+	<div class="col-span-8">
+		<h4>To</h4>
+		<p><input id="id_title" type="text" name="title" maxlength="150"></p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-span-8">
+		<h4>Attendee Limit</h4>
+		<p><input id="id_title" type="text" name="title" maxlength="150"></p>
+	</div>
+</div>
+
+<div><input class="btn btn-primary" type="submit" value="Save Event"></div>
+
+
+
+			<!-- END :: CONTENT -->
+			</section>
+
+			<section id="sidebar" class="col-offset-1 col-span-3">
+				<p><a class="btn btn-primary col-span-16" id="create_microcosm" href="/microcosms/create/">Placeholder</a></p>
+			</section>
+		</div>
+
+		<footer class="row">
+			<div class="col-offset-13 col-span-3">
+				<small>Powered by <a href="http://microco.sm/" title="Microcosm is powered by Microcosm">Microcosm</a></small>
+			</div>
+		</footer>
+
+	</div>
+
+	<!-- jQuery and Bootstrap -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<script src="/static/js/bootstrap.min.js"></script>
+
+	<!-- Leaflet -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.min.js"></script>
+
+	<script type="text/javascript">
+		var map = L.map('map').setView([51.505, -0.12], 12);
+		L.tileLayer(
+			'https://d1qte70nkdppk5.cloudfront.net/d6f1a0c60e9746faa7cbfaec4b92dff3/997/256/{z}/{x}/{y}.png',
+			{
+				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+				maxZoom: 16
+			}
+		).addTo(map);
+	</script>
+
+</body>
+</html>

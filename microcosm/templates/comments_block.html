@@ -1,0 +1,95 @@
+<section id ="comments_list">
+
+	{% if content.comments.total > 0 %}
+
+		{% for comment in content.comments.items %}
+			<article id="comment{{ comment.id }}" class="row">
+				
+				<div class="col-span-4">
+					<img src="{{ comment.meta.createdBy.gravatar }}" alt="Avatar for {{ comment.meta.createdBy.profileName }}" align="left" class="buffer-right" />
+					<a href="/profiles/{{ comment.meta.createdBy.id }}/">{{ comment.meta.createdBy.profileName }}</a>
+				</div>
+
+				<div class="col-span-12">
+					<div class="row">
+						<section class="col-span-16" id="comment{{ comment.id }}body">
+							{{ comment.html|safe }}
+						</section>
+					</div>
+					<div class="row">
+						<div class="col-span-4 pull-left">
+							<small class="text-muted">{{ comment.meta.created|date:"jS M Y" }} at {{ comment.meta.created|date:"H:i" }}</small>
+						</div>
+
+						<section class="pull-right" id="comment{{ comment.id }}controls">
+							{% if comment.meta.createdBy.id == user.id or user.admin or user.moderator %}
+								<a class="btn btn-small" href="/comments/{{comment.id}}/delete?targetUrl={{request.path}}">Delete</a>
+								<a class="btn btn-small" href="/comments/{{comment.id}}/edit?targetUrl={{request.path}}">Edit</a>
+							{% endif %}
+							<a class="btn btn-small btn-primary" href="/comments/create?targetUrl={{request.path}}&itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}">Reply</a>
+						</section>
+					</div>
+				</div>
+			</article>
+			<hr />
+		{% endfor %}
+
+
+
+			<div class="row">
+				<div class="pull-right">
+					<ul class="pagination">
+                            {% if prev %}
+							<li><a href="{{prev}}">Previous</a></li>
+                            {% endif %}
+                            {% if next %}
+							<li><a href="{{next}}">Next</a></li>
+                            {% endif %}
+
+
+					</ul>
+				</div>
+			</div>
+
+
+	{% endif %}
+
+</section>
+
+<section id="quick_reply">
+	{% if user %}
+		<div id="comment{{ comment.id }}" class="row">
+			
+			<div class="col-span-4">
+				<img src="{{ user.gravatar }}" alt="Avatar for {{ user.profileName }}" align="left" class="buffer-right" />
+				{{ user.profileName }}
+			</div>
+
+			<form action="/comments/create/" method="POST" id="commentForm">{% csrf_token %}
+				<div class="col-span-12">
+					<div class="row">
+						<section class="col-span-16" id="comment{{ comment.id }}body">
+							{{ comment_form.inReplyTo }}
+							{{ comment_form.itemId }}
+							{{ comment_form.itemType }}
+							{{ comment_form.markdown }}
+							{{ comment_form.targetUrl }}
+						</section>
+					</div>
+					<br />
+					<div class="row">
+						<div class="pull-left muted">
+							<small><a href="http://en.wikipedia.org/wiki/Markdown#Syntax_examples" target="_blank">Formatting help</a></small>
+						</div>
+						<section class="pull-right" id="comment{{ comment.id }}controls">
+							<input class="btn btn-primary" id="submit_comment" type="submit" value="Add comment">
+						</section>
+					</div>
+				</div>				
+			</form>
+		</div>
+	{% else %}
+		<a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Signup or login to post a comment</a>
+	{% endif %}
+
+</section>

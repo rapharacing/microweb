@@ -1,0 +1,6 @@
+*.pyc
+.idea
+*.iml
+local_settings.py
+microweb/local_settings.py
+microweb/application.log

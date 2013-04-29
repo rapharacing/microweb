@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	{% if not content.microcosms.items %}
+		<p>This is such a new site that there are no Microcosms at the moment.</p>
+		{% if content.meta.permissions.create %}
+			<p>Create your first Microcosm using the button on the right.</p>
+		{% endif %}
+
+	{% else %}
+		{% for item in content.microcosms.items %}
+			<section id="microcosm{{item.id}}" class="row">
+				<div class="col-span-16">
+					<a href="/microcosms/{{ item.id }}/">
+						<h1>{{ item.title }}</h1>
+					</a>
+				</div>
+				<div>
+					<div class="col-span-10 text-muted">
+						{{ item.description }}
+					</div>
+					<div class="col-span-2 small text-muted">
+						<small><i class="glyphicon glyphicon-list buffer-right"></i>17,886</small></br>
+						<small><i class="glyphicon glyphicon-comment buffer-right"></i>356,098</small>
+					</div>
+					<div class="col-span-4">
+						{% if item.mostRecentUpdate %}
+							<a href="/{{item.mostRecentUpdate.itemType}}s/{{item.mostRecentUpdate.id}}/">{{item.mostRecentUpdate.title}}</a><br />
+							{{item.mostRecentUpdate.lastCommentCreated|date:"H:i, jS M y"}}
+						{% endif %}
+					</div>
+				</div>
+			</section>
+			<hr />
+		{% endfor %}
+	{% endif %}
+
+{% endblock %}
+
+{% block sidebar%}
+	{% if content.meta.permissions.create %}
+		<p><a class="btn btn-primary col-span-16" id="create_microcosm" href="{% url create-microcosm %}">Create Microcosm</a></p>
+	{% endif %}
+
+{% endblock%}

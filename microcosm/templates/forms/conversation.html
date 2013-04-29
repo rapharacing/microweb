@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+	{% if form.id > 0 %}
+		<h3>Edit conversation</h3>
+	{% else %}
+		<h3>New conversation</h3>
+	{% endif %}
+
+	<form action="" method="POST" id="conversationForm">
+		{% csrf_token %}
+		{{ form.microcosmId }}
+		{{ form.id }}
+		{{ form.sticky }}
+		{{ form.moderated }}
+		{{ form.visible }}
+		{{ form.deleted }}
+
+		<h4>{{ form.title.label }}</h4>
+		<p>{{ form.title }}</p>
+
+		{% if form.id > 0 %}
+			<h4>{{ form.editReason.label }}</h4>
+			<div>{{ form.editReason }}</div>
+			{% if form.errors.editReason %}
+				<div class="text-error"><ul>{{ form.errors.editReason }}</ul></div>
+			{% endif %}
+		{% endif %}
+
+		<input class="btn btn-primary" id="submit" type="submit" value="Save Conversation" />
+
+	</form>
+
+{% endblock %}

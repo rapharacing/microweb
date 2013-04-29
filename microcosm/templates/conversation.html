@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block notifications %}
+	<h2><a href='{{ content.meta.links.1.href|slice:"7:" }}/'>{{ content.meta.links.1.title}}</a></h2>
+{% endblock %}
+
+{% block content %}
+	<h1 id="conversation_title">{{ content.title }}</h1>
+
+	<br />
+
+	{% include "comments_block.html" %}
+
+{% endblock %}
+
+{% block sidebar %}
+	<p class="muted">
+		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName }}</a><br />
+		{{ content.meta.created|date:"jS M Y" }}
+	</p>
+
+	{% if content.meta.permissions.update %}
+		<p><a href="edit/" id="edit_conversation">Edit conversation</a></p>
+	{% endif %}
+
+	{% if content.meta.permissions.delete %}
+		<p><a href="{% url delete-conversation content.id %}?targetUrl={% url single-microcosm content.microcosmId %}" id="delete_conversation">Delete conversation</a></p>
+	{% endif %}
+
+{% endblock %}

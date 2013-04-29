@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	{% if form.id > 0 %}
+		<h1>Edit this microcosm</h1>
+	{% else %}
+		<h1>Create a microcosm</h1>
+	{% endif %}
+
+	<form action="" method="POST" id="microcosm-form">{% csrf_token %}
+		{{ form.siteId.value }}
+		{{ form.id }}
+		
+
+		<div>{{ form.title.label }}</div>
+		<div>{{ form.title }}</div>
+		{% if form.errors.title %}
+			<div class="text-error"><ul>{{ form.errors.title|safe }}</ul></div>
+		{% endif %}
+
+		<div>{{ form.description.label }}</div>
+		<div>{{ form.description }}</div>
+		{% if form.errors.description %}
+			<div class="text-error"><ul>{{ form.errors.description|safe }}</ul></div>
+		{% endif %}
+		
+
+		<div>{{ form.visibility.label }}</div>
+		<div>{{ form.visibility }}</div>
+
+		{% if form.id > 0 %}
+			<div>{{ form.editReason.label }}</div>
+			<div>{{ form.editReason }}</div>
+			{% if form.errors.editReason %}
+				<div class="text-error"><ul>{{ form.errors.editReason|safe }}</ul></div>
+			{% endif %}
+		{% endif %}
+
+		<div>
+			<input class="btn btn-primary pull-right" id="submit" type="submit" value="Save Microcosm">
+		</div>
+	</form>
+{% endblock %}

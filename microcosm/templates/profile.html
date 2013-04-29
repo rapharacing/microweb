@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1 id="profile_name">{{user.profileName}}</h1>
+    <img src="{{user.gravatar}}">
+
+    <h3>Statistics</h3>
+    <ul>
+    	<li>Created: {{user.created}}</li>
+    	<li>Last active: {{user.lastActive}} </li>
+    	<li>Comment count: {{user.commentCount}}</li>
+    </ul>
+
+{% endblock %}

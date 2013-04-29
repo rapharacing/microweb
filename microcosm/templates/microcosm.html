@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+	<a id="microcosm_title" href="/microcosms/{{content.id}}/"><h1>{{ content.title }}</h1></a>
+	<p id="microcosm_description" class="text-muted">{{ content.description }}</p>
+
+	{% for item in content.items.items %}
+		<section id="{{ item.itemType }}{{ item.id }}" class="row">
+			<div class="col-span-1">
+				{% ifequal item.itemType "conversation" %}<span class="glyphicon text-muted" style="font-size:36px;line-height:48px;">&#57617;</span>{% endifequal %}
+				{% ifequal item.itemType "event" %}<span class="glyphicon text-muted" style="font-size:36px;line-height:48px;">&#57609;</span>{% endifequal %}
+			</div>
+
+			<div class="col-span-9">
+				<strong><a href="/{{ item.itemType }}s/{{ item.id }}/">{{ item.title }}</a></strong><br />
+				started by <a href="/profiles/{{ item.meta.createdBy.id }}/">{{ item.meta.createdBy.profileName }}</a> on {{ item.meta.created|date:"jS M Y"  }}
+			</div>
+
+			<div class="col-span-2 small text-muted">
+				<small><i class="glyphicon glyphicon-comment buffer-right"></i> 32</small><br />
+				<small><i class="glyphicon glyphicon-eye-open buffer-right"></i> 874</small>
+			</div>
+
+			<div class="col-span-4">
+				{% if item.lastCommentCreated %}
+				<a href="/profiles/{{item.lastCommentCreatedBy.id}}/"><img src="{{ item.lastCommentCreatedBy.gravatar }}" alt="Avatar for {{item.lastCommentCreatedBy.profileName }}" height="48" width="48" align="left" class="buffer-right" /></a>
+				<small>{{ item.lastCommentCreatedBy.profileName }}</small><br />
+				<small>{{ item.lastCommentCreated|date:"jS M Y" }}</small>
+				{% endif %}
+			</div>
+		</section>
+
+		<hr class="col-offset-1 col-span-15" />
+	{% endfor %}
+
+{% endblock %}
+
+{% block sidebar%}
+	<p class="muted">
+		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName }}</a><br />
+		{{ content.meta.created|date:"jS M Y" }}
+	</p>
+
+	{% if content.meta.permissions.create %}
+		<p><a class="btn btn-primary col-span-16" id="create_item" href="{% url item-choice content.id %}">Create item</a></p>
+	{% endif %}
+
+	{% if content.meta.permissions.update %}
+		<p><a id="edit_microcosm" href="{% url edit-microcosm content.id %}">Edit Microcosm</a></p>
+	{% endif %}
+
+	{% if content.meta.permissions.delete %}
+		<p><a href="{% url delete-microcosm content.id %}?targetUrl={% url list-microcosms %}">Delete Microcosm</a></p>
+	{% endif %}
+
+{% endblock%}

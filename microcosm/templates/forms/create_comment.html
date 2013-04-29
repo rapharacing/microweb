@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section id="reply">
+        {% if user %}
+            <div id="comment{{ comment.id }}" class="row">
+                
+                <div class="col-span-4">
+                    <img src="{{ user.gravatar }}" alt="Avatar for {{ user.profileName }}" align="left" class="buffer-right" />
+                    {{ user.profileName }}
+                </div>
+
+
+                <form action="?targetUrl={{targetUrl}}" method="POST" id="commentForm">{% csrf_token %}
+                    <div class="col-span-12">
+                        <div class="row">
+                            <section class="col-span-16" id="comment{{ comment.id }}body">
+                                {{ form.id }}
+                                {{ form.inReplyTo }}
+                                {{ form.itemId }}
+                                {{ form.itemType }}
+                                {{ form.markdown }}
+                                {{ form.targetUrl }}
+                            </section>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="pull-left muted">
+                                <small><a href="http://en.wikipedia.org/wiki/Markdown#Syntax_examples" target="_blank">Formatting help</a></small>
+                            </div>
+                            <section class="pull-right" id="comment{{ comment.id }}controls">
+                                <input class="btn btn-primary" type="submit" value="Save comment">
+                            </section>
+                        </div>
+                    </div>              
+                </form>
+            </div>
+        {% else %}
+            <a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Signup or login to post a comment</a>
+        {% endif %}
+
+    </section>
+{% endblock %}

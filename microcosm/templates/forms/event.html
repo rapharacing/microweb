@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	{% if form.id > 0 %}
+		<h1>Edit this event</h1>
+	{% else %}
+		<h1>Create a new event in {{ content.title }}</h1>
+	{% endif %}
+
+	<form action="" method="POST" id="eventForm">{% csrf_token %}
+		{{ form.microcosmId }}
+		{{ form.id }}
+		{{ form.sticky }}{{ form.moderated }}{{ form.visible }}{{ form.deleted }}
+		{{ form.lat }}{{ form.lon }}
+		
+		<h4>{{ form.title.label }}</h4>
+		<p>{{ form.title }}</p>
+		{% if form.errors.title %}
+			<div class="text-danger"><ul>{{ form.errors.title.as_text }}</ul></div>
+		{% endif %}
+		
+		<h4>{{ form.when.label }}</h4>
+		<p>{{ form.when }}</p>
+		{% if form.errors.when %}
+			<div class="text-danger"><ul>{{ form.errors.when.as_text }}</ul></div>
+		{% endif %}
+		
+		<h4>{{ form.where.label }}</h4>
+		<p>{{ form.where }}</p>
+		{% if form.errors.where %}
+			<div class="text-danger"><ul>{{ form.errors.where.as_text }}</ul></div>
+		{% endif %}
+		
+		<h4>{{ form.duration.label }}</h4>
+		<p>{{ form.duration }}</p>
+		{% if form.errors.duration %}
+			<div class="text-danger"><ul>{{ form.errors.duration.as_text }}</ul></div>
+		{% endif %}
+		
+		<h4>{{ form.rsvpLimit.label }}</h4>
+		<p>{{ form.rsvpLimit }}</p>
+		{% if form.errors.rsvpLimit %}
+			<div class="text-danger"><ul>{{ form.errors.rsvpLimit.as_text }}</ul></div>
+		{% endif %}
+		
+		{% if form.id > 0 %}
+			<h4>{{ form.editReason.label }}</h4>
+			<div>{{ form.editReason }}</div>
+			{% if form.errors.editReason %}
+				<div class="text-danger">{{ form.errors.editReason.as_text }}</div>
+			{% endif %}
+		{% endif %}
+		<input id="submit" type="submit" value="Save now">
+	</form>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.min.css" />
+<!--[if lte IE 8]>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.ie.min.css" />
+<![endif]-->
+{% endblock %}
+
+{% block js %}
+	<!-- Leaflet (maps) -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.js"></script>
+{% endblock %}

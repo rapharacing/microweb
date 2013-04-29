@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <p><a href='{{content.meta.links.1.href|slice:"7:"}}/'>parent microcosm</a></p>
+
+    <h1 id="event_title">{{content.title}}</h1>
+    <p><img src="{{content.meta.createdBy.gravatar}}">Created by {{content.meta.createdBy.profileName}} on {{content.meta.created}}</p>
+    {% if content.meta.edited %}
+    <p><img src="{{content.meta.editedBy.gravatar}}">Edited by {{content.meta.editedBy.profileName}} on {{content.meta.edited}} Reason: {{content.meta.editReason}}</p>
+    {% endif %}
+
+    <h3>Event details</h3>
+    <p>Where</p>
+    <p id="where">{{content.where}}</p>
+    <p>When</p>
+    <p id="when">{{content.when}}</p>
+    <p>Duration</p>
+    <p id="duration">{{content.duration}}</p>
+    <p>Space left</p>
+    <p id="spaces_left">{{content.rsvpSpaces}}</p>
+
+    <h3>Who's going?</h3>
+    {# Iterating the attendees four times is only temporary, they'll be split into different collections in future. #}
+    <p><strong>Confirmed</strong></p>
+    {% for item in attendees.attendees.items %}{% if item.rsvp == "yes" %}<p>{{ item.attendee.profileName }}</p>{% endif %}{% endfor %}
+    <p><strong>Maybe</strong></p>
+    {% for item in attendees.attendees.items %}{% if item.rsvp == "maybe" %}<p>{{ item.attendee.profileName }}</p>{% endif %}{% endfor %}
+    <p><strong>Yet to reply</strong></p>
+    {% for item in attendees.attendees.items %}{% if item.rsvp == "invited" %}<p>{{ item.attendee.profileName }}</p>{% endif %}{% endfor %}
+    <p><strong>Nope</strong></p>
+    {% for item in attendees.attendees.items %}{% if item.rsvp == "no" %}<p>{{ item.attendee.profileName }}</p>{% endif %}{% endfor %}
+
+    <h3>RSVP for this event</h3>
+
+    <form method="POST" action="{% url rsvp-event content.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="rsvp" value="yes" />
+        <input id="rsvp_yes" type="submit" value="Count me in">
+    </form>
+
+    <form method="POST" action="{% url rsvp-event content.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="rsvp" value="maybe" />
+        <input id="rsvp_maybe" type="submit" value="Maybe">
+    </form>
+
+    <form method="POST" action="{% url rsvp-event content.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="rsvp" value="no" />
+        <input id="rsvp_no" type="submit" value="Can't make it">
+    </form>
+
+    {% include "comments_block.html" %}
+{% endblock %}
+
+{% block sidebar %}
+    {% if content.meta.permissions.update %}
+    <a href="{% url edit-event content.id %}"><h3>Edit event</h3></a>
+    {% endif %}
+    {% if content.meta.permissions.delete %}
+    <a href="{% url delete-event content.id %}?targetUrl={% url single-microcosm content.microcosmId %}"><h3>Delete event</h3></a>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>{{ site.title }}</title>
+		<link rel="shortcut icon" href="/static/img/favico.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link href="{{ STATIC_URL }}themes/{{ site.themeId }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+		<!-- Source Sans Pro -->
+		<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600,400italic,600italic" rel="stylesheet" type="text/css">
+
+		<style>
+			.headBand {
+				background-image: url('{{ site.headerBackgroundUrl }}');
+				background-position: center center;
+				margin: 24px 0;
+				min-height: 96px;
+			}
+			.margin-top-half {
+				margin-top: 12px;
+			}
+			.margin-top {
+				margin-top: 24px;
+			}
+			.buffer-right {
+				margin-right: 10px;
+			}
+			.glyphicon {
+				font-family: 'Glyphicons Halflings';
+				font-style: normal;
+				font-weight: normal;
+				line-height: 1;
+				vertical-align: middle;
+			}
+		</style>
+
+		{% block css %}{% endblock %}
+
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+		  <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<!--[endif]-->
+	</head>
+<body>
+	<div class="headBand">
+		<div class="container">
+			<header class="row">
+				<div class="col-span-16">
+					<div class="row">
+						<div id="logo" class="col-span-3 margin-top-half">	
+							<a href="/">{% if site.logoUrl != "" %}<img src="{{ site.logoUrl }}" alt="{{ site.title }} - Powered by Microcosm" width="320" height="96" />{% else %}{{ site.title }}{% endif %}</a>
+						</div>
+
+						{% block whoami %}
+							{% if user %}
+								<div class="col-span-3 pull-right">
+									<div class="row margin-top">
+										<div class="col-span-4">
+											<a href="{% url edit-profile user.id %}" id="edit_profile"><img src="{{ user.gravatar }}" alt="Avatar for {{ user.profileName }}" title="Edit your profile" /></a>
+										</div>
+										<div class="col-span-12">
+											<a href="{% url single-profile user.id %}" id="profile_name">{{ user.profileName }}</a><br />
+											<a href="{% url logout %}">Log out</a>
+										</div>
+									</div>
+								</div>
+
+							{%  else %}
+								<div class="col-span-3 pull-right">
+									Browsing as a guest.
+									<a class="btn btn-primary buffer-right" id="login_link" href="javascript:login()">Log in with Mozilla Persona</a><br />
+									<a href="https://login.persona.org/about">What is Persona?</a>
+								</div>
+							{% endif %}
+
+						{% endblock %}
+					</div>
+				</div>
+			</header>
+		</div>
+	</div>
+
+	<div class="container">
+		{% block notifications %}{% endblock %}
+
+		<div class="row">
+			<section id="content" class="col-span-12">
+				{% block content %}{% endblock %}
+			</section>
+
+			<section id="sidebar" class="col-offset-1 col-span-3">
+				{% block sidebar %}{% endblock %}
+			</section>
+		</div>
+
+		<footer class="row">
+			<div class="col-offset-13 col-span-3">
+				<small>Powered by <a href="http://microco.sm/" title="{{ site.title }} is powered by Microcosm">Microcosm</a></small>
+			</div>
+		</footer>
+
+	</div>
+
+	{% if not user %}
+		<!-- Persona Login Form -->
+		<form id="login-form" method="POST" action="{% url login %}">
+			{% csrf_token %}
+			<input id="Assertion" type="hidden" name="Assertion" value="" />
+			<input id="target_url" type="hidden" name="target_url" value="{{ request.path }}" />
+		</form>
+
+		<!-- Mozilla Persona -->
+		<script src="https://login.persona.org/include.js"></script>
+		<script>
+			function login() {
+				navigator.id.get(function(assertion) {
+					if (assertion) {
+						var assertion_field = document.getElementById("Assertion");
+						assertion_field.value = assertion;
+						var login_form = document.getElementById("login-form");
+						login_form.submit();
+					}
+				});
+			}
+		</script>
+	{% endif %}
+
+	<!-- jQuery and Bootstrap -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+
+	{% block js %}{% endblock %}
+
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-36931318-3', 'microco.sm');
+		ga('send', 'pageview');
+	</script>
+
+</body>
+</html>
