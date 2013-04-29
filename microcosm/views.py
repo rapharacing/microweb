@@ -163,7 +163,7 @@ class ItemView(object):
             offset = 0
 
         if content.has_key('comments'):
-            if content['comments']['total'] >= offset + 25:
+            if content['comments']['total'] > offset + 25:
                 next = request.path + '?offset=' + str(offset + 25)
                 view_data['next'] = next
 
