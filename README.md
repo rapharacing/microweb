@@ -1,6 +1,8 @@
 # Microweb
 
-Microcosm is a new platform for discussion forums, founded by David Kitchen and Matt Cottingham. You can [read more about the project here](http://microco.sm).
+Microcosm is a new platform for discussion forums, founded by David Kitchen and Matt Cottingham.
+
+We have a live (alpha-quality) site where you can [see the microcosm platform in action](https://sandbox.microco.sm). You can also [read more about the project here](http://microco.sm).
 
 Microweb is the official web client for the Microcosm API, written in Django. If you're not familiar with the Microcosm API, you should start by reading the [API documentation](http://microcosm-cc.github.io/) (it's up-to-date and readable, we promise).
 
