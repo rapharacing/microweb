@@ -144,9 +144,12 @@ class ItemView(object):
         Generic method for displaying a single item.
         """
 
+        # Offset for paging of item comments
+        offset = int(request.GET.get('offset', 0))
+
         content = cls.resource_cls.retrieve(
             id=item_id,
-            offset=request.GET.get('offset', None),
+            offset=offset,
             access_token=request.access_token
         )
 
@@ -155,20 +158,11 @@ class ItemView(object):
             'site': request.site,
             'item_type': cls.item_type,
             'content': content,
+            'pagination': {},
         }
 
-        if request.GET.get('offset', None):
-            offset = int(request.GET.get('offset', None))
-        else:
-            offset = 0
-
         if content.has_key('comments'):
-            if content['comments']['total'] > offset + 25:
-                next = request.path + '?offset=' + str(offset + 25)
-                view_data['next'] = next
-
-            if offset != 0:
-                view_data['prev'] = request.path + '?offset=' + str(offset-25)
+            ItemView.build_pagination_nav(request.path, content['comments'], view_data, offset)
 
         # Provide a comment form for items that allow comments
         if cls.commentable:
@@ -198,14 +192,18 @@ class ItemView(object):
         Generic method for displaying a list of items.
         """
 
-        list = cls.resource_cls.retrieve(offset=request.GET.get('offset', None),
-            access_token=request.access_token)
+        # Pagination offset
+        offset = int(request.GET.get('offset', 0))
+
+        list = cls.resource_cls.retrieve(offset, access_token=request.access_token)
 
         view_data = {
             'user': request.whoami,
             'site': request.site,
             'content': list,
         }
+
+        ItemView.build_pagination_nav(request.path, list, view_data, offset)
 
         return render(request, cls.many_template, view_data)
 
@@ -222,6 +220,23 @@ class ItemView(object):
             return HttpResponseRedirect(redirect)
         else:
             return HttpResponseNotAllowed()
+
+    @staticmethod
+    def build_pagination_nav(path, collection, view_data, offset):
+
+        # Maximum record offset is (no. of pages - 1) multiplied by page size
+        # TODO: this will be unecessary when max_offset is added to responses
+        max_offset = (collection['pages'] - 1) * collection['limit']
+
+        # TODO: remove implicit dependency on linkmap transformer
+        if collection['linkmap'].has_key('first'):
+            view_data['pagination']['first'] = path
+        if collection['linkmap'].has_key('prev'):
+            view_data['pagination']['prev'] = path + '?offset=%d' % (offset - settings.PAGE_SIZE)
+        if collection['linkmap'].has_key('next'):
+            view_data['pagination']['next'] = path + '?offset=%d' % (offset + settings.PAGE_SIZE)
+        if collection['linkmap'].has_key('last'):
+            view_data['pagination']['last'] = path + '?offset=%d' % max_offset
 
 
 class ConversationView(ItemView):

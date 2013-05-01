@@ -167,6 +167,8 @@ PERSONA_PASS = ''
 PERSONA_ADMIN = ''
 PERSONA_ADMIN_PASS = ''
 
+PAGE_SIZE = 25
+
 # Clobber any settings with those defined in local_settings.py
 try:
     from local_settings import *
