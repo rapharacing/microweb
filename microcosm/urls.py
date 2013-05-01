@@ -1,7 +1,7 @@
 from django.conf.urls import patterns
 from django.conf.urls import url
 
-from microcosm.views import MicrocosmView, EventView, ConversationView, CommentView, ProfileView, AuthenticationView
+from microcosm.views import MicrocosmView, EventView, ConversationView, CommentView, ProfileView, AuthenticationView, GeoView
 
 urlpatterns = patterns('',
 
@@ -48,6 +48,10 @@ urlpatterns = patterns('',
     url(r'^profiles/(?P<item_id>\d+)/$', ProfileView.single, name='single-profile'),
     url(r'^profiles/(?P<item_id>\d+)/edit/$', ProfileView.edit, name='edit-profile'),
 
+    # Proxy geocoding requests to the backend
+    url(r'^geocode/$', GeoView.geocode, name='geocode'),
+
+    # Echoes request headers
     url(r'^headers/', 'microcosm.views.echo_headers'),
 )
 

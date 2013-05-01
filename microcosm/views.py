@@ -7,14 +7,14 @@ from microweb import settings
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from microcosm.api.exceptions import APIException
-from microcosm.api.resources import Microcosm, User
+from microcosm.api.resources import Microcosm, User, GeoCode
 from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
@@ -522,6 +522,20 @@ class AuthenticationView():
             requests.post(url, params={'method': 'DELETE', 'access_token': request.access_token})
 
         return response
+
+
+class GeoView():
+
+    @staticmethod
+    @exception_handler
+    def geocode(request):
+        if request.access_token is None:
+            raise PermissionDenied
+        if request.GET.has_key('q'):
+            response = GeoCode.retrieve(request.GET['q'], request.access_token)
+            return HttpResponse(response, content_type='application/json')
+        else:
+            return HttpResponseBadRequest()
 
 
 def echo_headers(request):
