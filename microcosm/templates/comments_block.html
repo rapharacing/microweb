@@ -23,7 +23,10 @@
 
 						<section class="pull-right" id="comment{{ comment.id }}controls">
 							{% if comment.meta.createdBy.id == user.id or user.admin or user.moderator %}
-								<a class="btn btn-small" href="/comments/{{comment.id}}/delete?targetUrl={{request.path}}">Delete</a>
+                                <form method="POST" action="{% url delete-comment comment.id %}">{% csrf_token %}
+                                    <input type="hidden" name="targetUrl" value="{{request.path}}" />
+                                    <input type="submit" value="Delete Comment">
+                                </form>
 								<a class="btn btn-small" href="/comments/{{comment.id}}/edit?targetUrl={{request.path}}">Edit</a>
 							{% endif %}
 							<a class="btn btn-small btn-primary" href="/comments/create?targetUrl={{request.path}}&itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}">Reply</a>

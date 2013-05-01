@@ -369,3 +369,20 @@ class Comment(APIResource):
         resource = super(Comment, cls).retrieve(id, offset, access_token)
         resource = super(Comment, cls).create_linkmap(resource)
         return APIResource.process_timestamp(resource)
+
+
+class GeoCode():
+    """
+    This is simply request proxying, so don't attempt formatting
+    or error recovery.
+    """
+
+    @classmethod
+    def retrieve(cls, q, access_token):
+        """
+        Forward a geocode request (q) to the API.
+        """
+        params = {'q': q}
+        headers = {'Authorization': 'Bearer %s' % access_token}
+        response = requests.get(API_ROOT + 'geocode', params=params, headers=headers)
+        return response.content
