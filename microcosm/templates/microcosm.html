@@ -51,7 +51,10 @@
 	{% endif %}
 
 	{% if content.meta.permissions.delete %}
-		<p><a href="{% url delete-microcosm content.id %}?targetUrl={% url list-microcosms %}">Delete Microcosm</a></p>
+        <form method="POST" action="{% url delete-microcosm content.id %}">{% csrf_token %}
+            <input type="hidden" name="targetUrl" value="{% url list-microcosms %}" />
+            <input type="submit" value="Delete Microcosm">
+        </form>
 	{% endif %}
 
 {% endblock%}

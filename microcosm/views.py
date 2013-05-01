@@ -216,9 +216,12 @@ class ItemView(object):
         Generic method for deleting a single item (deletion of a list is not yet implemented).
         """
 
-        cls.resource_cls.delete(item_id, request.access_token)
-        redirect = request.GET.get('targetUrl', None) or reverse(MicrocosmView.list)
-        return HttpResponseRedirect(redirect)
+        if request.method == 'POST':
+            cls.resource_cls.delete(item_id, request.access_token)
+            redirect = request.POST.get('targetUrl', None) or reverse(MicrocosmView.list)
+            return HttpResponseRedirect(redirect)
+        else:
+            return HttpResponseNotAllowed()
 
 
 class ConversationView(ItemView):

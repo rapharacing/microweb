@@ -58,6 +58,9 @@
     <a href="{% url edit-event content.id %}"><h3>Edit event</h3></a>
     {% endif %}
     {% if content.meta.permissions.delete %}
-    <a href="{% url delete-event content.id %}?targetUrl={% url single-microcosm content.microcosmId %}"><h3>Delete event</h3></a>
+    <form method="POST" action="{% url delete-event content.id %}">{% csrf_token %}
+        <input type="hidden" name="targetUrl" value="{% url single-microcosm content.microcosmId %}" />
+        <input type="submit" value="Delete Event">
+    </form>
     {% endif %}
 {% endblock %}
