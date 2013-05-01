@@ -1,66 +1,148 @@
 {% extends 'base.html' %}
 
+{% block css %}
+		<!-- Leaflet -->
+		<link href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.min.css" rel="stylesheet" type="text/css" />
+		<!--[if lte IE 8]>
+			<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.ie.css" />
+		<![endif]-->
+{% endblock %}
+
+{% block notifications %}
+	<h2><a href='{{ content.meta.links.1.href|slice:"7:" }}/'>{{ content.meta.links.1.title}}</a></h2>
+{% endblock %}
+
 {% block content %}
-    <p><a href='{{content.meta.links.1.href|slice:"7:"}}/'>parent microcosm</a></p>
+	<h1 id="event_title">{{content.title}}</h1>
 
-    <h1 id="event_title">{{content.title}}</h1>
-    <p><img src="{{content.meta.createdBy.gravatar}}">Created by {{content.meta.createdBy.profileName}} on {{content.meta.created}}</p>
-    {% if content.meta.edited %}
-    <p><img src="{{content.meta.editedBy.gravatar}}">Edited by {{content.meta.editedBy.profileName}} on {{content.meta.edited}} Reason: {{content.meta.editReason}}</p>
-    {% endif %}
 
-    <h3>Event details</h3>
-    <p>Where</p>
-    <p id="where">{{content.where}}</p>
-    <p>When</p>
-    <p id="when">{{content.when}}</p>
-    <p>Duration</p>
-    <p id="duration">{{content.duration}}</p>
-    <p>Space left</p>
-    <p id="spaces_left">{{content.rsvpSpaces}}</p>
+	<div class="row">
+		<div class="col-span-8">
+			<h4>Where</h4>
+			<div id="where">{% if content.where %}{{ content.where }}{% else %}To be determined.{% endif %}</div>
+		</div>
+		<div id="map" class="col-span-8 pull-right" style="height:366px"></div>
 
-    <h3>Who's going?</h3>
-    {# Iterating the attendees four times is only temporary, they'll be split into different collections in future. #}
-    <p><strong>Confirmed</strong></p>
-    {% for item in attendees.attendees.items %}{% if item.rsvp == "yes" %}<p>{{ item.attendee.profileName }}</p>{% endif %}{% endfor %}
-    <p><strong>Maybe</strong></p>
-    {% for item in attendees.attendees.items %}{% if item.rsvp == "maybe" %}<p>{{ item.attendee.profileName }}</p>{% endif %}{% endfor %}
-    <p><strong>Yet to reply</strong></p>
-    {% for item in attendees.attendees.items %}{% if item.rsvp == "invited" %}<p>{{ item.attendee.profileName }}</p>{% endif %}{% endfor %}
-    <p><strong>Nope</strong></p>
-    {% for item in attendees.attendees.items %}{% if item.rsvp == "no" %}<p>{{ item.attendee.profileName }}</p>{% endif %}{% endfor %}
+		<div class="col-span-8">
+			<h4>From</h4>
+			<div><time id="when" datetime="{{ content.when|date:"c\Z" }}" duration="{{content.duration}}">{{content.when}}</time></div>
+		</div>
 
-    <h3>RSVP for this event</h3>
+		<div class="col-span-8">
+			<h4>To</h4>
+			<div id="ends"></div>
+		</div>
 
-    <form method="POST" action="{% url rsvp-event content.id %}">
-        {% csrf_token %}
-        <input type="hidden" name="rsvp" value="yes" />
-        <input id="rsvp_yes" type="submit" value="Count me in">
-    </form>
+		<div class="col-span-8">
+			<h4>Attendee Limit</h4>
+			<div id="rsvp_limit">{{ content.rsvpLimit }}</div>
+		</div>
+		<div class="col-span-8">
+			<h4>Spaces Left</h4>
+			<div id="spaces_left">{{ content.rsvpSpaces }}</div>
+		</div>
+	</div>
 
-    <form method="POST" action="{% url rsvp-event content.id %}">
-        {% csrf_token %}
-        <input type="hidden" name="rsvp" value="maybe" />
-        <input id="rsvp_maybe" type="submit" value="Maybe">
-    </form>
-
-    <form method="POST" action="{% url rsvp-event content.id %}">
-        {% csrf_token %}
-        <input type="hidden" name="rsvp" value="no" />
-        <input id="rsvp_no" type="submit" value="Can't make it">
-    </form>
-
-    {% include "comments_block.html" %}
+	{% include "comments_block.html" %}
 {% endblock %}
 
 {% block sidebar %}
-    {% if content.meta.permissions.update %}
-    <a href="{% url edit-event content.id %}"><h3>Edit event</h3></a>
-    {% endif %}
-    {% if content.meta.permissions.delete %}
-    <form method="POST" action="{% url delete-event content.id %}">{% csrf_token %}
-        <input type="hidden" name="targetUrl" value="{% url single-microcosm content.microcosmId %}" />
-        <input type="submit" value="Delete Event">
-    </form>
-    {% endif %}
+	<p class="muted">
+		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName }}</a><br />
+		{{ content.meta.created|date:"jS M Y" }}
+	</p>
+
+	{% if content.meta.permissions.update %}
+		<p>
+			<a href="{% url edit-event content.id %}" class="btn btn-primary col-span-16">Edit event</a>
+		</p>
+	{% endif %}
+	{% if content.meta.permissions.delete %}
+		<form method="POST" action="{% url delete-event content.id %}">
+			{% csrf_token %}
+			<input type="hidden" name="targetUrl" value="{% url single-microcosm content.microcosmId %}" />
+			<input type="submit" value="Delete Event" class="btn btn-danger col-span-16" style="width:100%; margin-top:12px;">
+		</form>
+	{% endif %}
+
+	<h4>Are you coming?</h4>
+
+	<form method="POST" action="{% url rsvp-event content.id %}">
+		{% csrf_token %}
+		<input type="hidden" name="rsvp" value="yes" />
+		<input id="rsvp_yes" type="submit" value="Count me in" class="btn btn-primary col-span-16" style="width:100%;">
+	</form>
+
+	<form method="POST" action="{% url rsvp-event content.id %}">
+		{% csrf_token %}
+		<input type="hidden" name="rsvp" value="maybe" />
+		<input id="rsvp_maybe" type="submit" value="Maybe" class="btn col-span-16" style="width:100%; margin-top:12px;">
+	</form>
+
+	<form method="POST" action="{% url rsvp-event content.id %}">
+		{% csrf_token %}
+		<input type="hidden" name="rsvp" value="no" />
+		<input id="rsvp_no" type="submit" value="Can't make it" class="btn col-span-16" style="width:100%; margin-top:12px;">
+	</form>
+
+	<h4>Who's going?</h4>
+	{# Iterating the attendees four times is only temporary, they'll be split into different collections in future. #}
+	<p><strong>Confirmed</strong></p>
+	{% for item in attendees.attendees.items %}
+		<ul>
+			{% if item.rsvp == "yes" %}
+				<li>{{ item.attendee.profileName }}</li>
+			{% endif %}
+		</ul>
+	{% endfor %}
+	<p><strong>Maybe</strong></p>
+	{% for item in attendees.attendees.items %}
+		<ul>
+			{% if item.rsvp == "maybe" %}
+				<li>{{ item.attendee.profileName }}</li>
+			{% endif %}
+		</ul>
+	{% endfor %}
+	<p><strong>Yet to reply</strong></p>
+	{% for item in attendees.attendees.items %}
+		<ul>
+			{% if item.rsvp == "invited" %}
+				<li>{{ item.attendee.profileName }}</li>
+			{% endif %}
+		</ul>
+	{% endfor %}
+	<p><strong>Nope</strong></p>
+	{% for item in attendees.attendees.items %}
+		<ul>
+			{% if item.rsvp == "no" %}
+				<li>{{ item.attendee.profileName }}</li>
+			{% endif %}
+		</ul>
+	{% endfor %}
+
+{% endblock %}
+
+{% block js %}
+	<!-- Leaflet -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.min.js"></script>
+
+	<!-- Microcosm event -->
+	<script src="/static/js/m-event.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			console.log($('#when').attr('datetime'))
+			console.log($('#when').attr('duration'))
+			showEndDate($('#when').attr('datetime'), $('#when').attr('duration'));
+
+			restoreLocationState(
+				Number('{{ content.lat }}'),
+				Number('{{ content.lon }}'),
+				[
+					[Number('{{ content.north }}'), Number('{{ content.west }}')],
+					[Number('{{ content.south }}'), Number('{{ content.east }}')]
+				]
+			);
+		});
+	</script>
 {% endblock %}

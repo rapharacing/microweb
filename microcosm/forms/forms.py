@@ -61,7 +61,8 @@ class EventCreate(ItemForm):
         }
     )
 
-    isoFormat =  ('%Y-%m-%dT%H:%M:%SZ','%Y-%m-%dT%H:%M:%S.%fZ',) + formats.get_format('DATETIME_INPUT_FORMATS')
+    isoFormat = ('%Y-%m-%dT%H:%M:%SZ','%Y-%m-%dT%H:%M:%S.%fZ','%Y-%m-%dT%H:%M:%S.%f',) + \
+        formats.get_format('DATETIME_INPUT_FORMATS')
     when = django.forms.DateTimeField(
         input_formats=isoFormat,
         error_messages={
