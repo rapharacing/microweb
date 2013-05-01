@@ -31,14 +31,15 @@
 		
 		<!-- Hidden fields hard-coded for integration with the JavaScript UI.
 			Check /microcosm/forms/forms.py for what fields should exist. -->
-		<input type="hidden" name="lat" id="id_lat" value="{{ form.lat.value }}" />
-		<input type="hidden" name="lon" id="id_lon" value="{{ form.lon.value }}" />
-		<input type="hidden" name="when" id="id_when" value="{{ form.when.value }}" />
-		<input type="hidden" name="duration" id="id_duration" value="{{ form.lon.value }}" />
-		<input type="hidden" name="north" id="id_north" value="" />
-		<input type="hidden" name="east" id="id_east" value="" />
-		<input type="hidden" name="south" id="id_south" value="" />
-		<input type="hidden" name="west" id="id_west" value="" />
+		<input type="hidden" name="lat"      id="id_lat"      value="{{ form.lat.value }}" />
+		<input type="hidden" name="lon"      id="id_lon"      value="{{ form.lon.value }}" />
+		<input type="hidden" name="north"    id="id_north"    value="{{ form.north.value }}" />
+		<input type="hidden" name="east"     id="id_east"     value="{{ form.east.value }}" />
+		<input type="hidden" name="south"    id="id_south"    value="{{ form.south.value }}" />
+		<input type="hidden" name="west"     id="id_west"     value="{{ form.west.value }}" />
+
+		<input type="hidden" name="when"     id="id_when"     value="{{ form.when.value|date:"Y-m-d H:i:00" }}" />
+		<input type="hidden" name="duration" id="id_duration" value="{{ form.duration.value }}" />
 
 		<div class="row">
 			<div class="col-span-16 {% if form.errors.title %} has-errors{% endif %}" style="padding-right:0px;">
@@ -53,6 +54,9 @@
 						value="{{ form.title.value }}"
 					/>
 				</p>
+				{% if form.errors.title %}
+					<p class="text-danger">What is the event called?</p>
+				{% endif %}
 			</div>
 		</div>
 
@@ -72,6 +76,9 @@
 						<button class="btn btn-info" type="button" id="locate">Locate</button>
 					</span>
 				</div>
+				{% if form.errors.where %}
+					<p class="text-danger">Where is the event going to be held?</p>
+				{% endif %}
 			</div>
 			<div id="map" class="col-span-8 pull-right" style="height:366px"></div>
 
@@ -85,6 +92,10 @@
 						<input id="id_from_time" type="text" value="" />
 					</div>
 				</div>
+				{% if form.errors.when %}
+					<p class="text-danger">The event start time must be in the future.</p>
+					<p class="text-danger">{{ field.errors.when|safe }}</p>
+				{% endif %}
 			</div>
 
 			<div class="col-span-8">
@@ -101,7 +112,7 @@
 
 			<div class="col-span-8">
 				<h4>Attendee Limit (0 for unlimited)</h4>
-				<div id="control_rsvp" class="input-group{% if form.rsvpLimit.title %} has-errors{% endif %}">
+				<div id="control_rsvp" class="input-group">
 					<input
 						id="id_rsvpLimit"
 						type="text"
@@ -111,12 +122,15 @@
 						value="{{ form.rsvpLimit.value }}"
 					/>
 				</div>
+				{% if form.errors.rsvpLimit %}
+					<p class="text-danger">Attendee limit should be 0 for unlimited, or a whole number representing the maximum number of people that may attend the event.</p>
+				{% endif %}
 			</div>
 		</div>
 
 		{% if form.id > 0 %}
 			<div class="row">
-				<div class="col-span-16 input-group{% if form.editReason.title %} has-errors{% endif %}">
+				<div class="col-span-16 input-group">
 					<h4>Edit reason</h4>
 					<p>
 						<input
@@ -128,20 +142,14 @@
 							value="{{ form.editReason.value }}"
 						/>
 					</p>
+					{% if form.errors.editReason %}
+						<p class="text-danger">What did you change?.</p>
+					{% endif %}
 				</div>
 			</div>
 		{% endif %}
 
 		<input class="btn btn-primary" id="submit" type="submit" value="Save Event" />
-
-		<!-- TODO: Errors -->
-		{% if form.errors %}
-			<ol>
-				{% for error in form.errors %}
-					<li><strong>{{ error|escape }}</strong></li>
-				{% endfor %}
-			</ol>
-		{% endif %}
 
 	</form>
 {% endblock %}
@@ -200,7 +208,7 @@
 			if (place == '') {return;}
 
 			// TODO: Put a real access_token in this request or proxy via Django
-			var geoCodeUrl = 'https://dev1.microco.sm/api/v1/geocode?access_token=user&q=' + place;
+			var geoCodeUrl = '/geocode/?q=' + place;
 			$.getJSON(geoCodeUrl, function(data) {
 				if (!data.found) {
 					$('#control_where').addClass('has-error');
@@ -238,12 +246,12 @@
 			var ne = b.getNorthEast();
 			
 			// Save these things
-			$('id_lat').val(latLng.lat);
-			$('id_lon').val(latLng.lng);
-			$('id_north').val(ne.lat);
-			$('id_east').val(ne.lng);
-			$('id_south').val(sw.lat);
-			$('id_west').val(sw.lng);
+			$('#id_lat').val(latLng.lat);
+			$('#id_lon').val(latLng.lng);
+			$('#id_north').val(ne.lat);
+			$('#id_east').val(ne.lng);
+			$('#id_south').val(sw.lat);
+			$('#id_west').val(sw.lng);
 		}
 
 		function restoreLocationState(lat, lng, bounds) {
@@ -264,36 +272,40 @@
 		function getDateFromIsoString(d) {
 			if (d.match(dateReg)) {
 				var ds = d.split("-");
-				return new Date(ds[0],ds[1]-1,ds[2]);
+				return new Date(Date.UTC(ds[0],ds[1]-1,ds[2]));
 			} else {
 				return false;
 			}
 		}
 
 		function getIsoStringFromDate(d) {
-			var dd = d.getDate();
-			var mm = d.getMonth() + 1;
-			return '' + d.getFullYear() + '-' +
+			var dd = d.getUTCDate();
+			var mm = d.getUTCMonth() + 1;
+			return '' + d.getUTCFullYear() + '-' +
 				(mm <= 9 ? '0' + mm : mm) + '-' +
 				(dd <= 9 ? '0' + dd : dd);
 		}
 
 		function setStartDate(d) {
 			if (!d) {
-				$('#id_from_date').val('')
+				$('#id_from_date').val('');
 				startDate = false;
 				return;
 			}
+			$('#id_from_date').val(getIsoStringFromDate(d));
 			startDate = d;
+			validateDateTimes();
 		}
 
 		function setEndDate(d) {
 			if (!d) {
-				$('#id_to_date').val('')
+				$('#id_to_date').val('');
 				endDate = false;
 				return;
 			}
+			$('#id_to_date').val(getIsoStringFromDate(d));
 			endDate = d;
+			validateDateTimes();
 		}
 
 		$('#id_from_date')
@@ -350,24 +362,32 @@
 
 		function setTime(d, ts) {
 			if (!d) {d = new Date()}
-			var time = ts.match(/(\d\d):(\d\d)\s(P?)/);
+			var time = ts.match(/(\d?\d):(\d\d)\s(P?)/);
 			d.setHours( parseInt(time[1]) + ( ( parseInt(time[1]) < 12 && time[3] ) ? 12 : 0) );
 			d.setMinutes( parseInt(time[2]) || 0 );
 		}
 
-		// Not all browsers know how to do toISOString()
-		if (!Date.prototype.toISOString) {
-			Date.prototype.toISOString = function() {
-				function pad(n) { return n < 10 ? '0' + n : n }
-				return this.getUTCFullYear() + '-'
-					+ pad(this.getUTCMonth() + 1) + '-'
-					+ pad(this.getUTCDate()) + 'T'
-					+ pad(this.getUTCHours()) + ':'
-					+ pad(this.getUTCMinutes()) + ':'
-					+ pad(this.getUTCSeconds()) + 'Z';
-			};
+		function getTimeStringFromDate(d) {
+			var hh = d.getUTCHours();
+			var mi = d.getUTCMinutes();
+			var pm = (hh > 12);
+			return '' + (hh <= 9 ? '0' + hh : (hh > 12 ? hh - 12: hh)) + ':' + 
+				(mi <= 9 ? '0' + mi : mi) + ' ' +
+				(pm ? 'PM' : 'AM');
 		}
 
+		// Not all browsers know how to do toISOString() and Django doesn't like T and Z in ISO8601
+		function dateToUtcString(d) {
+			function pad(n) { return n < 10 ? '0' + n : n }
+			return d.getUTCFullYear() + '-'
+				+ pad(d.getUTCMonth() + 1) + '-'
+				+ pad(d.getUTCDate()) + 'T'
+				+ pad(d.getUTCHours()) + ':'
+				+ pad(d.getUTCMinutes()) + ':'
+				+ pad(d.getUTCSeconds()) + 'Z';
+		}
+
+		var duration = 0;
 		function validateDateTimes() {
 			var startTime = $('#id_from_time').val().trim();
 			var endTime = $('#id_to_time').val().trim();
@@ -381,15 +401,11 @@
 			var endDateTime = endDate;
 			setTime(endDateTime, endTime);
 
-			if (endDateTime.valueOf() <= startDateTime.valueOf()) {
-				return false;
-			}
-
 			// We need the start date and time in ISO8601
-			$('#id_when').val(startDateTime.toISOString())
+			$('#id_when').val(dateToUtcString(startDateTime));
 
 			// And we need duration in minutes
-			var duration = (endDateTime.valueOf() / 60000) - (startDateTime.valueOf() / 60000);
+			duration = (endDateTime.valueOf() / 60000) - (startDateTime.valueOf() / 60000);
 			if (!duration) {duration = 60;}
 			$('#id_duration').val(duration);
 
@@ -420,9 +436,18 @@
 			if ($('#id_lat').val().trim() != '' && $('#id_lon').val().trim() != '') {
 				// When loading a page and needing to default the map to a specific set of values.
 				restoreLocationState(
-					$('#id_lat').val().trim(),
-					$('#id_lon').val().trim(),
-					[[51.47860327187397,-0.16805648803710938],[51.5177162373547,-0.0926971435546875]]
+					Number($('#id_lat').val().trim()),
+					Number($('#id_lon').val().trim()),
+					[
+						[
+							Number($('#id_north').val()),
+							Number($('#id_west').val())
+						],
+						[
+							Number($('#id_south').val()),
+							Number($('#id_east').val())
+						]
+					]
 				);
 			} else {
 				// When loading a page with no location information we just default to show London, UK
@@ -432,6 +457,25 @@
 			}
 
 			// Dates
+			if ($('#id_when').val().trim() != '') {
+				// Restore fields
+				// We have a date in Django format: 2013-05-02 15:15:00
+				var parts = $('#id_when').val().trim().match(/(\d+)/g);
+
+				if (parts.length == 6) {
+					tStartDate = new Date(Date.UTC(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]));
+					$('#id_from_date').val(getIsoStringFromDate(tStartDate));
+					$('#id_from_time').val(getTimeStringFromDate(tStartDate));
+
+					if ($('#id_duration').val().trim() != '') {
+						duration = Number($('#id_duration').val().trim()) * 60000;
+						tEndDate = new Date(tStartDate.valueOf() + duration);
+						$('#id_to_date').val(getIsoStringFromDate(tEndDate));
+						$('#id_to_time').val(getTimeStringFromDate(tEndDate));
+					}
+				}
+			}
+
 			if ($('#id_from_date').val().trim() != "" && $('#id_from_date').val().trim().match(dateReg)) {
 				setStartDate(getDateFromIsoString($('#id_from_date').val()));
 				$('#id_to_date').datepicker('setStartDate', $('#id_from_date').val());
@@ -444,15 +488,14 @@
 			} else {
 				// Blank form, we can default date pickers to only pick future dates
 				var now = new Date()
-				var dd = now.getDate();
-				var mm = now.getMonth() + 1;
-				var today = '' + now.getFullYear() + '-' + (mm <= 9 ? '0' + mm : mm) + '-' + (dd <= 9 ? '0' + dd : dd);
-				$('#id_from_date').datepicker('setStartDate', today);
-				$('#id_to_date').datepicker('setStartDate', today);
-				$('#id_from_date').val(today);
-				$('#id_to_date').val(today);
-				setStartDate(getDateFromIsoString($('#id_from_date').val()));
-				setEndDate(getDateFromIsoString($('#id_to_date').val()));
+				now.setDate(now.getDate() + 1);
+				var tomorrow = getIsoStringFromDate(now);
+				$('#id_from_date').datepicker('setStartDate', tomorrow);
+				$('#id_to_date').datepicker('setStartDate', tomorrow);
+				$('#id_from_date').val(tomorrow);
+				$('#id_to_date').val(tomorrow);
+				setStartDate(getDateFromIsoString(tomorrow));
+				setEndDate(getDateFromIsoString(tomorrow));
 			}
 
 			// Times
@@ -465,7 +508,8 @@
 					$('#id_from_time').timepicker('showWidget');
 				})
 				.on('change', function() {
-					if (!validateDateTimes()) {
+					validateDateTimes();
+					if (duration<0) {
 						$('#id_to_time').val($('#id_from_time').val());
 					}
 				});
@@ -476,20 +520,18 @@
 					$('#id_to_time').timepicker('showWidget');
 				})
 				.on('change', function() {
-					if (!validateDateTimes()) {
+					validateDateTimes();
+					if (duration<0) {
 						$('#id_from_time').val($('#id_to_time').val());
 					}
 				});
+
+			validateDateTimes();
 		}
 		loadForm();
 
-		///////////////////////
-		// VALIDATE AND SAVE //
-		///////////////////////
 		$('#eventForm').submit(function() {
-
-
-			return false;
+			validateDateTimes();
 		});
 	</script>
 {% endblock %}

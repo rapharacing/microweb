@@ -1,5 +1,6 @@
 import django.forms
 from django.core.exceptions import ValidationError
+from django.utils import formats
 
 longTextInput=django.forms.TextInput(attrs={'size':'80'})
 
@@ -60,7 +61,9 @@ class EventCreate(ItemForm):
         }
     )
 
+    isoFormat =  ('%Y-%m-%dT%H:%M:%SZ','%Y-%m-%dT%H:%M:%S.%fZ',) + formats.get_format('DATETIME_INPUT_FORMATS')
     when = django.forms.DateTimeField(
+        input_formats=isoFormat,
         error_messages={
             'required' : 'Please add a time and date for this event',
             'invalid' : 'Please check the date and time formatting'
@@ -87,6 +90,10 @@ class EventCreate(ItemForm):
     rsvpLimit = django.forms.IntegerField(label='RSVP limit', required=False)
     lat = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
     lon = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
+    north = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
+    east = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
+    south = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
+    west = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
 
 
 class EventEdit(EventCreate):
