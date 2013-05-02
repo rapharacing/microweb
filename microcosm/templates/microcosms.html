@@ -4,29 +4,11 @@
 	{% if not content.microcosms.items %}
 		<p>This is such a new site that there are no Microcosms at the moment.</p>
 		{% if content.meta.permissions.create %}
-			<p>Create your first Microcosm using the button on the right.</p>
+	    <p>Create your first Microcosm using the button on the right.</p>
 		{% endif %}
-
 	{% else %}
 
-            <div class="row">
-                <div class="pull-right">
-                    <ul class="pagination">
-                        {% if pagination.first %}
-                        <li><a href="{{ pagination.first }}">First</a></li>
-                        {% endif %}
-                        {% if pagination.prev %}
-                        <li><a href="{{ pagination.prev }}">Previous</a></li>
-                        {% endif %}
-                        {% if pagination.next %}
-                        <li><a href="{{ pagination.next }}">Next</a></li>
-                        {% endif %}
-                        {% if pagination.last %}
-                        <li><a href="{{ pagination.last }}">Last</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
+        {% include "pagination_nav.html" %}
 
 		{% for item in content.microcosms.items %}
 			<section id="microcosm{{item.id}}" class="row">
@@ -54,26 +36,9 @@
 			<hr />
 		{% endfor %}
 
-            <div class="row">
-                <div class="pull-right">
-                    <ul class="pagination">
-                        {% if pagination.first %}
-                        <li><a href="{{ pagination.first }}">First</a></li>
-                        {% endif %}
-                        {% if pagination.prev %}
-                        <li><a href="{{ pagination.prev }}">Previous</a></li>
-                        {% endif %}
-                        {% if pagination.next %}
-                        <li><a href="{{ pagination.next }}">Next</a></li>
-                        {% endif %}
-                        {% if pagination.last %}
-                        <li><a href="{{ pagination.last }}">Last</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
+        {% include "pagination_nav.html" %}
 
-{% endif %}
+    {% endif %}
 
 {% endblock %}
 

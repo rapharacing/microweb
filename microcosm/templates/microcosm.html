@@ -5,6 +5,8 @@
 	<a id="microcosm_title" href="/microcosms/{{content.id}}/"><h1>{{ content.title }}</h1></a>
 	<p id="microcosm_description" class="text-muted">{{ content.description }}</p>
 
+    {% include "pagination_nav.html" %}
+
 	{% for item in content.items.items %}
 		<section id="{{ item.itemType }}{{ item.id }}" class="row">
 			<div class="col-span-1">
@@ -33,6 +35,8 @@
 
 		<hr class="col-offset-1 col-span-15" />
 	{% endfor %}
+
+    {% include "pagination_nav.html" %}
 
 {% endblock %}
 
