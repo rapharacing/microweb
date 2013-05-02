@@ -161,8 +161,8 @@ class ItemView(object):
             'pagination': {},
         }
 
-        if content.has_key('comments'):
-            ItemView.build_pagination_nav(request.path, content['comments'], view_data, offset)
+        if content.has_key('comments') or content.has_key('items'):
+            cls.build_pagination_nav(request.path, content, view_data, offset)
 
         # Provide a comment form for items that allow comments
         if cls.commentable:
@@ -195,15 +195,16 @@ class ItemView(object):
         # Pagination offset
         offset = int(request.GET.get('offset', 0))
 
-        list = cls.resource_cls.retrieve(offset, access_token=request.access_token)
+        list = cls.resource_cls.retrieve(offset=offset, access_token=request.access_token)
 
         view_data = {
             'user': request.whoami,
             'site': request.site,
             'content': list,
+            'pagination': {},
         }
 
-        ItemView.build_pagination_nav(request.path, list, view_data, offset)
+        cls.build_pagination_nav(request.path, list, view_data, offset)
 
         return render(request, cls.many_template, view_data)
 
@@ -221,21 +222,36 @@ class ItemView(object):
         else:
             return HttpResponseNotAllowed()
 
-    @staticmethod
-    def build_pagination_nav(path, collection, view_data, offset):
+    @classmethod
+    def build_pagination_nav(cls, path, resource, view_data, offset):
+
+        paginated_list = None
+
+        # Single item, which has comments or microcosms
+        if resource.has_key('id'):
+            if resource.get('comments', None):
+                paginated_list = resource['comments']
+            elif resource.get('items', None):
+                paginated_list = resource['items']
+        # Collection of items
+        elif resource.has_key(cls.item_plural):
+            if resource.get(cls.item_plural, None):
+                paginated_list = resource.get(cls.item_plural)
+        else:
+            return
 
         # Maximum record offset is (no. of pages - 1) multiplied by page size
         # TODO: this will be unecessary when max_offset is added to responses
-        max_offset = (collection['pages'] - 1) * collection['limit']
+        max_offset = (paginated_list['pages'] - 1) * paginated_list['limit']
 
         # TODO: remove implicit dependency on linkmap transformer
-        if collection['linkmap'].has_key('first'):
+        if paginated_list['linkmap'].has_key('first'):
             view_data['pagination']['first'] = path
-        if collection['linkmap'].has_key('prev'):
+        if paginated_list['linkmap'].has_key('prev'):
             view_data['pagination']['prev'] = path + '?offset=%d' % (offset - settings.PAGE_SIZE)
-        if collection['linkmap'].has_key('next'):
+        if paginated_list['linkmap'].has_key('next'):
             view_data['pagination']['next'] = path + '?offset=%d' % (offset + settings.PAGE_SIZE)
-        if collection['linkmap'].has_key('last'):
+        if paginated_list['linkmap'].has_key('last'):
             view_data['pagination']['last'] = path + '?offset=%d' % max_offset
 
 
