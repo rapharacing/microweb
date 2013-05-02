@@ -17,31 +17,52 @@
 
 
 	<div class="row">
-		<div class="col-span-8">
-			<h4>Where</h4>
-			<div id="where">{% if content.where %}{{ content.where }}{% else %}To be determined.{% endif %}</div>
+		<div class="col-span-4">
+			<p class="text-muted">Where</p>
+		</div>
+		<div class="col-span-4">
+			<p id="where">{% if content.where %}{{ content.where }}{% else %}To be determined.{% endif %}</p>
 		</div>
 		<div id="map" class="col-span-8 pull-right" style="height:366px"></div>
 
-		<div class="col-span-8">
-			<h4>From</h4>
-			<div><time id="when" datetime="{{ content.when|date:"c\Z" }}" duration="{{content.duration}}">{{content.when}}</time></div>
+		<div class="row col-span-8">
+			<div class="col-span-8">
+				<p class="text-muted">From</p>
+			</div>
+			<div class="col-span-8">
+				<p style="padding-left:6px;"><time id="when" datetime="{{ content.when|date:"c\Z" }}" duration="{{content.duration}}">{{content.when}}</time></p>
+			</div>
 		</div>
 
-		<div class="col-span-8">
-			<h4>To</h4>
-			<div id="ends"></div>
+		<div class="row col-span-8">
+			<div class="col-span-8">
+				<p class="text-muted">To</p>
+			</div>
+			<div class="col-span-8">
+				<p id="ends" style="padding-left:6px;"></p>
+			</div>
 		</div>
 
-		<div class="col-span-8">
-			<h4>Attendee Limit</h4>
-			<div id="rsvp_limit">{{ content.rsvpLimit }}</div>
+		<div class="row col-span-8">
+			<div class="col-span-8">
+				<p class="text-muted">Attendee Limit</p>
+			</div>
+			<div class="col-span-8">
+				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvpLimit }}</p>
+			</div>
 		</div>
-		<div class="col-span-8">
-			<h4>Spaces Left</h4>
-			<div id="spaces_left">{{ content.rsvpSpaces }}</div>
+
+		<div class="row col-span-8">
+			<div class="col-span-8">
+				<p class="text-muted">Spaces Left</p>
+			</div>
+			<div class="col-span-8">
+				<p id="spaces_left" style="padding-left:6px;">{{ content.rsvpSpaces }}</p>
+			</div>
 		</div>
 	</div>
+
+	<hr />
 
 	{% include "comments_block.html" %}
 {% endblock %}
