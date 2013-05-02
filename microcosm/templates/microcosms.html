@@ -4,10 +4,12 @@
 	{% if not content.microcosms.items %}
 		<p>This is such a new site that there are no Microcosms at the moment.</p>
 		{% if content.meta.permissions.create %}
-			<p>Create your first Microcosm using the button on the right.</p>
+	    <p>Create your first Microcosm using the button on the right.</p>
 		{% endif %}
-
 	{% else %}
+
+        {% include "pagination_nav.html" %}
+
 		{% for item in content.microcosms.items %}
 			<section id="microcosm{{item.id}}" class="row">
 				<div class="col-span-16">
@@ -33,7 +35,10 @@
 			</section>
 			<hr />
 		{% endfor %}
-	{% endif %}
+
+        {% include "pagination_nav.html" %}
+
+    {% endif %}
 
 {% endblock %}
 

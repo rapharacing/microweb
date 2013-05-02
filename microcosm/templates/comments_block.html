@@ -2,6 +2,8 @@
 
 	{% if content.comments.total > 0 %}
 
+        {% include "pagination_nav.html" %}
+
 		{% for comment in content.comments.items %}
 			<article id="comment{{ comment.id }}" class="row">
 				
@@ -37,23 +39,7 @@
 			<hr />
 		{% endfor %}
 
-
-
-			<div class="row">
-				<div class="pull-right">
-					<ul class="pagination">
-                            {% if prev %}
-							<li><a href="{{prev}}">Previous</a></li>
-                            {% endif %}
-                            {% if next %}
-							<li><a href="{{next}}">Next</a></li>
-                            {% endif %}
-
-
-					</ul>
-				</div>
-			</div>
-
+        {% include "pagination_nav.html" %}
 
 	{% endif %}
 

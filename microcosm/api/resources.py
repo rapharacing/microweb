@@ -55,7 +55,6 @@ class APIResource(object):
 
         return resource['data']
 
-
     @classmethod
     def create(cls, data, access_token=None, headers=None):
         """
@@ -93,7 +92,6 @@ class APIResource(object):
 
         return resource['data']
 
-
     @classmethod
     def update(cls, data, id, access_token):
         """
@@ -130,7 +128,6 @@ class APIResource(object):
             raise APIException('No data returned at: %s' % resource_url)
 
         return resource['data']
-
 
     @classmethod
     def delete(cls, id, access_token):
@@ -197,27 +194,47 @@ class APIResource(object):
                     APIResource.process_timestamp(resource[key])
             return resource
 
-
-    @staticmethod
-    def create_linkmap(resource):
+    @classmethod
+    def create_linkmap(cls, resource):
         """
         Mutate a list of links into a dictionary for easy access
         in templates. This will stop working if 'href' attributes
         are returned as a list as per spec.
         """
 
-        if resource.has_key('meta') and resource['meta'].has_key('links'):
-            resource['meta']['linkmap'] = {}
-            for link in resource['meta']['links']:
-                resource['meta']['linkmap'][link['rel']]= link['href']
+        # Applies to all resources
+        if resource.has_key('meta') and resource['meta'].get('links', None):
+            resource['meta']['linkmap'] = APIResource.list_to_map(resource['meta']['links'])
 
-        comments = resource.get('comments', None)
-        if comments and comments.has_key('links'):
-            comments['linkmap'] = {}
-            for link in comments['links']:
-                comments['linkmap'][link['rel']]= link['href']
+        inner_list = None
+        # Applies only to single items
+        if resource.has_key('id'):
+            if resource.get('comments', None):
+                inner_list = resource['comments']
+            elif resource.get('items', None):
+                inner_list = resource['items']
+        # Applies to collections
+        elif resource.get(cls.resource_fragment, None):
+            inner_list = resource[cls.resource_fragment]
+
+        # Transform the outer 'links' array, and the links array on every list item
+        if inner_list:
+            if inner_list.get('links', None):
+                inner_list['linkmap'] = APIResource.list_to_map(inner_list['links'])
+
+            if inner_list['items']:
+                for item in inner_list['items']:
+                    if item.has_key('meta') and item['meta'].has_key('links'):
+                        item['meta']['linkmap'] = APIResource.list_to_map(item['meta']['links'])
 
         return resource
+
+    @staticmethod
+    def list_to_map(links):
+        linkmap = {}
+        for link in links:
+            linkmap[link['rel']]= link['href']
+        return linkmap
 
 
 class Site(APIResource):
@@ -243,6 +260,7 @@ class WhoAmI(APIResource):
     @classmethod
     def retrieve(cls, access_token):
         resource = super(WhoAmI, cls).retrieve(access_token=access_token)
+        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
 
@@ -252,6 +270,7 @@ class Profile(APIResource):
     @classmethod
     def retrieve(cls, id, offset=None, access_token=None):
         resource = super(Profile, cls).retrieve(id, access_token=access_token)
+        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
 
@@ -261,7 +280,7 @@ class Microcosm(APIResource):
     @classmethod
     def retrieve(cls, id=None, offset=None, access_token=None):
         resource = super(Microcosm, cls).retrieve(id, offset, access_token)
-        resource = super(Microcosm, cls).create_linkmap(resource)
+        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
 
@@ -271,7 +290,7 @@ class Conversation(APIResource):
     @classmethod
     def retrieve(cls, id=None, offset=None, access_token=None):
         resource = super(Conversation, cls).retrieve(id, offset, access_token)
-        resource = super(Conversation, cls).create_linkmap(resource)
+        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
 
@@ -281,7 +300,7 @@ class Event(APIResource):
     @classmethod
     def retrieve(cls, id=None, offset=None, access_token=None):
         resource = super(Event, cls).retrieve(id, offset, access_token)
-        resource = super(Event, cls).create_linkmap(resource)
+        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
     @classmethod
@@ -293,6 +312,7 @@ class Event(APIResource):
 
         resource_url = urljoin(API_ROOT, cls.resource_fragment) + ''.join(['/', id, '/attendees'])
         resource = APIResource.retrieve(id=id, access_token=access_token, url_override=resource_url)
+        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
     @classmethod
@@ -357,17 +377,17 @@ class Poll(APIResource):
     @classmethod
     def retrieve(cls, id=None, offset=None, access_token=None):
         resource = super(Poll, cls).retrieve(id, offset, access_token)
-        resource = super(Poll, cls).create_linkmap(resource)
+        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
 
 class Comment(APIResource):
-    resource_fragment='comments'
+    resource_fragment = 'comments'
 
     @classmethod
     def retrieve(cls, id=None, offset=None, access_token=None):
         resource = super(Comment, cls).retrieve(id, offset, access_token)
-        resource = super(Comment, cls).create_linkmap(resource)
+        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
 
