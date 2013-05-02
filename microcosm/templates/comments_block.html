@@ -23,10 +23,11 @@
 
 						<section class="pull-right" id="comment{{ comment.id }}controls">
 							{% if comment.meta.createdBy.id == user.id or user.admin or user.moderator %}
-                                <form method="POST" action="{% url delete-comment comment.id %}">{% csrf_token %}
-                                    <input type="hidden" name="targetUrl" value="{{request.path}}" />
-                                    <input type="submit" value="Delete Comment">
-                                </form>
+								<form method="POST" action="{% url delete-comment comment.id %}" style="display:inline;">
+									{% csrf_token %}
+									<input type="hidden" name="targetUrl" value="{{request.path}}" />
+									<input type="submit" value="Delete Comment" class="btn btn-small btn-danger" />
+								</form>
 								<a class="btn btn-small" href="/comments/{{comment.id}}/edit?targetUrl={{request.path}}">Edit</a>
 							{% endif %}
 							<a class="btn btn-small btn-primary" href="/comments/create?targetUrl={{request.path}}&itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}">Reply</a>
@@ -37,23 +38,18 @@
 			<hr />
 		{% endfor %}
 
-
-
-			<div class="row">
-				<div class="pull-right">
-					<ul class="pagination">
-                            {% if prev %}
-							<li><a href="{{prev}}">Previous</a></li>
-                            {% endif %}
-                            {% if next %}
-							<li><a href="{{next}}">Next</a></li>
-                            {% endif %}
-
-
-					</ul>
-				</div>
+		<div class="row">
+			<div class="pull-right">
+				<ul class="pagination">
+					{% if prev %}
+						<li><a href="{{prev}}">Previous</a></li>
+					{% endif %}
+					{% if next %}
+						<li><a href="{{next}}">Next</a></li>
+					{% endif %}
+				</ul>
 			</div>
-
+		</div>
 
 	{% endif %}
 
