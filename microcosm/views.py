@@ -242,7 +242,7 @@ class ItemView(object):
 
         # Maximum record offset is (no. of pages - 1) multiplied by page size
         # TODO: this will be unecessary when max_offset is added to responses
-        max_offset = (paginated_list['pages'] - 1) * paginated_list['limit']
+        max_offset = (paginated_list['totalPages'] - 1) * paginated_list['limit']
 
         # TODO: remove implicit dependency on linkmap transformer
         if paginated_list['linkmap'].has_key('first'):
