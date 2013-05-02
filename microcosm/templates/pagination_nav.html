@@ -1,0 +1,20 @@
+{% if pagination %}
+<div class="row">
+    <div class="pull-right">
+        <ul class="pagination">
+            {% if pagination.first %}
+            <li><a href="{{ pagination.first }}">First</a></li>
+            {% endif %}
+            {% if pagination.prev %}
+            <li><a href="{{ pagination.prev }}">Previous</a></li>
+            {% endif %}
+            {% if pagination.next %}
+            <li><a href="{{ pagination.next }}">Next</a></li>
+            {% endif %}
+            {% if pagination.last %}
+            <li><a href="{{ pagination.last }}">Last</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endif %}
