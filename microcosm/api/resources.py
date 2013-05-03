@@ -188,7 +188,7 @@ class APIResource(object):
         else:
             for key in resource.keys():
                 if isinstance(resource[key], unicode):
-                    if bool(VALID_DATETIME.search(str(resource[key]))):
+                    if bool(VALID_DATETIME.search(resource[key])):
                         resource[key] = parse_timestamp(resource[key])
                 elif isinstance(resource[key], list) or isinstance(resource[key], dict):
                     APIResource.process_timestamp(resource[key])
