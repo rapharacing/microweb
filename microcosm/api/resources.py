@@ -45,7 +45,7 @@ class APIResource(object):
         try:
             resource = response.json()
         except ValueError:
-            raise APIException('The API has returned invalid json', 500)
+            raise APIException('The API has returned invalid json: %s' % response.content, 500)
 
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
@@ -82,7 +82,7 @@ class APIResource(object):
         try:
             resource = response.json()
         except ValueError:
-            raise APIException('The API has returned invalid json', 500)
+            raise APIException('The API has returned invalid json: %s' % response.content, 500)
 
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
@@ -119,7 +119,7 @@ class APIResource(object):
         try:
             resource = response.json()
         except ValueError:
-            raise APIException('The API has returned invalid json', 500)
+            raise APIException('The API has returned invalid json: %s' % response.content, 500)
 
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
@@ -160,7 +160,7 @@ class APIResource(object):
         try:
             resource = response.json()
         except ValueError:
-            raise APIException('The API has returned invalid json', 500)
+            raise APIException('The API has returned invalid json: %s' % response.content, 500)
 
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
