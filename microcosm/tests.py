@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.test import LiveServerTestCase
+from django.utils import unittest
 from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,6 +8,7 @@ from selenium.webdriver.common.by import By
 from microcosm.views import MicrocosmView, ConversationView, CommentView
 
 from microweb import settings
+from microweb.helpers import build_url
 
 class SeleniumAsUser(LiveServerTestCase):
 
@@ -256,3 +258,37 @@ class SeleniumAsUser(LiveServerTestCase):
         assert 'On the track' == self.selenium.find_element_by_id('where').text
         assert '3600' == self.selenium.find_element_by_id('duration').text
         assert '10' == self.selenium.find_element_by_id('spaces_left').text
+
+
+class BuildURLTests(unittest.TestCase):
+    """
+    Verify that helpers.build_url() builds valid URLs.
+    """
+
+    def testWithTrailingSeparator(self):
+        url = build_url('a.microco.sm', ['resource/', '1/', 'extra/'])
+        assert url == 'https://a.microco.sm/resource/1/extra'
+
+    def testWithPrependedSeparator(self):
+        url = build_url('a.microco.sm', ['/resource', '/1', '/extra'])
+        assert url == 'https://a.microco.sm/resource/1/extra'
+
+    def testWithDuplicateSeparator(self):
+        url = build_url('a.microco.sm', ['resource/', '/1/', '/extra/'])
+        assert url == 'https://a.microco.sm/resource/1/extra'
+
+    def testWithNoSeparator(self):
+        url = build_url('a.microco.sm', ['resource', '1', 'extra'])
+        assert url == 'https://a.microco.sm/resource/1/extra'
+
+    def testEmptyFragments(self):
+        url = build_url('a.microco.sm', [])
+        assert url == 'https://a.microco.sm'
+
+    def testInvalidFragment(self):
+        with self.assertRaises(AssertionError):
+            build_url('a.microco.sm', ['resource', '1', 'ex/tra'])
+
+    def testFailCustomDomains(self):
+        with self.assertRaises(AssertionError):
+            build_url('a.example.org', ['resource', '1', 'ex/tra'])
