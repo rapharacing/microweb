@@ -15,13 +15,13 @@
 		<div>{{ form.title.label }}</div>
 		<div>{{ form.title }}</div>
 		{% if form.errors.title %}
-			<div class="text-error"><ul>{{ form.errors.title|safe }}</ul></div>
+			<div class="text-error">{{ form.errors.title.as_text }}</div>
 		{% endif %}
 
 		<div>{{ form.description.label }}</div>
 		<div>{{ form.description }}</div>
 		{% if form.errors.description %}
-			<div class="text-error"><ul>{{ form.errors.description|safe }}</ul></div>
+			<div class="text-error">{{ form.errors.description.as_text }}</div>
 		{% endif %}
 		
 
@@ -32,7 +32,7 @@
 			<div>{{ form.editReason.label }}</div>
 			<div>{{ form.editReason }}</div>
 			{% if form.errors.editReason %}
-				<div class="text-error"><ul>{{ form.errors.editReason|safe }}</ul></div>
+				<div class="text-error">{{ form.errors.editReason.as_text }}</div>
 			{% endif %}
 		{% endif %}
 
@@ -40,4 +40,46 @@
 			<input class="btn btn-primary pull-right" id="submit" type="submit" value="Save Microcosm">
 		</div>
 	</form>
+{% endblock %}
+
+{% block js %}
+	<script type="text/javascript">
+		function isEmpty(e) {
+			return (e.val().trim() == '');
+		}
+		function checkEmpty(e) {
+			if (isEmpty($(e))) {
+				addError($(e))
+			} else {
+				removeError($(e))
+			}
+		}
+		function addError(e) {
+			e.parent().addClass('has-error')
+		}
+		function removeError(e) {
+			e.parent().removeClass('has-error')
+		}
+
+		$('#id_title,#id_description').on('change', function() {
+			checkEmpty(this);
+		}).on('blur', function() {
+			checkEmpty(this);
+		});
+
+		$('#microcosm-form').submit(function() {
+			if (isEmpty($('#id_title'))) {
+				addError($('#id_title'))
+				return false;
+			}
+			if (isEmpty($('#id_description'))) {
+				addError($('#id_description'))
+				return false;
+			}
+		});
+
+		$(document).ready(function() {
+			$('#id_title,#id_description').addClass('input-with-feedback').parent().addClass('control-group');
+		});
+	</script>
 {% endblock %}

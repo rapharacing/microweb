@@ -32,3 +32,41 @@
 	{% endif %}
 
 {% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        function isEmpty(e) {
+            return (e.val().trim() == '');
+        }
+        function checkEmpty(e) {
+            if (isEmpty($(e))) {
+                addError($(e))
+            } else {
+                removeError($(e))
+            }
+        }
+        function addError(e) {
+            e.parent().addClass('has-error')
+        }
+        function removeError(e) {
+            e.parent().removeClass('has-error')
+        }
+
+        $('#id_markdown').on('change', function() {
+            checkEmpty(this);
+        }).on('blur', function() {
+            checkEmpty(this);
+        });
+
+        $('#commentForm').submit(function() {
+            if (isEmpty($('#id_markdown'))) {
+                addError($('#id_markdown'))
+                return false;
+            }
+        });
+
+        $(document).ready(function() {
+            $('#id_markdown').addClass('input-with-feedback').parent().addClass('control-group');
+        });
+    </script>
+{% endblock %}

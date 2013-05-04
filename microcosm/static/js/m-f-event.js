@@ -506,7 +506,34 @@ function loadForm() {
 	validateDateTimes();
 }
 
+function isEmpty(e) {
+	return (e.val().trim() == '');
+}
+function checkEmpty(e) {
+	if (isEmpty($(e))) {
+		addError($(e))
+	} else {
+		removeError($(e))
+	}
+}
+function addError(e) {
+	e.parent().addClass('has-error')
+}
+function removeError(e) {
+	e.parent().removeClass('has-error')
+}
+
+$('#id_title').on('change', function() {
+	checkEmpty(this);
+}).on('blur', function() {
+	checkEmpty(this);
+});
+
 // A last catch... on submit just double check those date fields
 $('#eventForm').submit(function() {
+	if (isEmpty($('#id_title'))) {
+		addError($('#id_title'))
+		return false;
+	}
 	validateDateTimes();
 });
