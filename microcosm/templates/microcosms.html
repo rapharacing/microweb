@@ -25,7 +25,7 @@
 						<small><i class="glyphicon glyphicon-list buffer-right"></i> {{ item.totalItems }}</small></br>
 						<small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.totalComments }}</small>
 					</div>
-					<div class="col-span-4">
+					<div class="col-span-4 recent">
 						{% if item.mostRecentUpdate %}
 							<a href="/{{item.mostRecentUpdate.itemType}}s/{{item.mostRecentUpdate.id}}/">{{item.mostRecentUpdate.title}}</a><br />
 							{{item.mostRecentUpdate.lastCommentCreated|date:"H:i, jS M y"}}
