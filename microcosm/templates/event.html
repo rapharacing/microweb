@@ -78,7 +78,7 @@
 
 {% block sidebar %}
 	<p class="muted">
-		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:20 }}</a><br />
+		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:25 }}</a><br />
 		{{ content.meta.created|date:"jS M Y" }}
 	</p>
 
@@ -121,7 +121,7 @@
 	{% for item in attendees.attendees.items %}
 		<ul>
 			{% if item.rsvp == "yes" %}
-				<li>{{ item.attendee.profileName|truncatechars:20 }}</li>
+				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}
@@ -129,7 +129,7 @@
 	{% for item in attendees.attendees.items %}
 		<ul>
 			{% if item.rsvp == "maybe" %}
-				<li>{{ item.attendee.profileName|truncatechars:20 }}</li>
+				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}
@@ -137,7 +137,7 @@
 	{% for item in attendees.attendees.items %}
 		<ul>
 			{% if item.rsvp == "invited" %}
-				<li>{{ item.attendee.profileName|truncatechars:20 }}</li>
+				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}
@@ -145,7 +145,7 @@
 	{% for item in attendees.attendees.items %}
 		<ul>
 			{% if item.rsvp == "no" %}
-				<li>{{ item.attendee.profileName|truncatechars:20 }}</li>
+				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}

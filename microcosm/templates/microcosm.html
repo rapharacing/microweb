@@ -16,7 +16,7 @@
 
 			<div class="col-span-9">
 				<strong><a href="/{{ item.itemType }}s/{{ item.id }}/">{{ item.title }}</a></strong><br />
-				started by <a href="/profiles/{{ item.meta.createdBy.id }}/">{{ item.meta.createdBy.profileName|truncatechars:20 }}</a> on {{ item.meta.created|date:"jS M Y"  }}
+				started by <a href="/profiles/{{ item.meta.createdBy.id }}/">{{ item.meta.createdBy.profileName|truncatechars:25 }}</a> on {{ item.meta.created|date:"jS M Y"  }}
 			</div>
 
 			<div class="col-span-2 small text-muted">
@@ -27,7 +27,7 @@
 			<div class="col-span-4">
 				{% if item.lastCommentCreated %}
 				<a href="/profiles/{{item.lastCommentCreatedBy.id}}/"><img src="{{ item.lastCommentCreatedBy.gravatar }}" alt="Avatar for {{item.lastCommentCreatedBy.profileName }}" align="left" class="gravatar-small" /></a>
-				<small>{{ item.lastCommentCreatedBy.profileName|truncatechars:20 }}</small><br />
+				<small>{{ item.lastCommentCreatedBy.profileName|truncatechars:25 }}</small><br />
 				<small>{{ item.lastCommentCreated|date:"jS M Y" }}</small>
 				{% endif %}
 			</div>
@@ -42,7 +42,7 @@
 
 {% block sidebar%}
 	<p class="muted">
-		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:20 }}</a><br />
+		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:25 }}</a><br />
 		{{ content.meta.created|date:"jS M Y" }}
 	</p>
 

@@ -9,7 +9,7 @@
 				
 				<div class="col-span-4">
 					<a href="{% if user.id == comment.meta.createdBy.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.createdBy.id }}/{% endif %}"><img src="{{ comment.meta.createdBy.gravatar }}" alt="Avatar for {{ comment.meta.createdBy.profileName }}" align="left" class="gravatar" /></a>
-					<div class="h4"><a href="{% if user.id == comment.meta.createdBy.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.createdBy.id }}/{% endif %}">{{ comment.meta.createdBy.profileName|truncatechars:20 }}</a></div>
+					<div class="h4"><a href="{% if user.id == comment.meta.createdBy.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.createdBy.id }}/{% endif %}">{{ comment.meta.createdBy.profileName|truncatechars:25 }}</a></div>
 				</div>
 
 				<div class="col-span-12">
@@ -51,8 +51,8 @@
 		<div id="comment{{ comment.id }}" class="row">
 			
 			<div class="col-span-4">
-				<img src="{{ user.gravatar }}" alt="Avatar for {{ user.profileName|truncatechars:20 }}" align="left" class="gravatar" />
-				<div class="h4">{{ user.profileName|truncatechars:20 }}</div>
+				<img src="{{ user.gravatar }}" alt="Avatar for {{ user.profileName|truncatechars:25 }}" align="left" class="gravatar" />
+				<div class="h4">{{ user.profileName|truncatechars:25 }}</div>
 			</div>
 
 			<form action="/comments/create/" method="POST" id="commentForm">{% csrf_token %}
