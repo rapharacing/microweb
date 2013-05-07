@@ -1,8 +1,8 @@
 CLIENT_ID = '1'
 CLIENT_SECRET = 'ABCDE12345'
-API_ROOT = 'https://dev1.microco.sm/api/v1/'
-RIEMANN_ENABLED = False
+API_SCHEME = 'https://'
+API_DOMAIN_NAME = 'microco.sm'
+API_PATH = 'api'
+API_VERSION = 'v1'
 
-# HOST is forwarded as the Host header to the API. It needs to match the website hostname exactly (including port,
-# it is not 80, or persona login will fail (as it should).
-HOST = 'dev1.microco.sm'
+RIEMANN_ENABLED = False
