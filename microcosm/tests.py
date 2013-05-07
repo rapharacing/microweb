@@ -6,11 +6,7 @@ from django.utils import unittest
 from django.test.client import RequestFactory
 
 from microcosm.views import MicrocosmView
-
 from microweb.helpers import build_url
-from microweb.settings import API_SCHEME
-from microweb.settings import API_DOMAIN_NAME
-
 
 class BuildURLTests(unittest.TestCase):
     """
