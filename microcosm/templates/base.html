@@ -118,7 +118,7 @@
 		<form id="login-form" method="POST" action="{% url login %}">
 			{% csrf_token %}
 			<input id="Assertion" type="hidden" name="Assertion" value="" />
-			<input id="target_url" type="hidden" name="target_url" value="{{ request.path }}" />
+			<input id="target_url" type="hidden" name="target_url" value="{{ request.get_full_path }}" />
 		</form>
 
 		<!-- Mozilla Persona -->
