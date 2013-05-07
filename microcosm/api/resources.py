@@ -1,11 +1,11 @@
 import json
-from urlparse import urljoin
 from dateutil.parser import parse as parse_timestamp
 import requests
 from requests import RequestException
 from microcosm.api.exceptions import APIException
-from microweb.helpers import DateTimeEncoder, VALID_DATETIME
-from microweb.settings import API_ROOT
+from microweb.helpers import DateTimeEncoder
+from microweb.helpers import VALID_DATETIME
+from microweb.helpers import build_url
 
 
 class APIResource(object):
@@ -15,32 +15,33 @@ class APIResource(object):
     """
 
     @classmethod
-    def retrieve(cls, id=None, offset=None, access_token=None, url_override=None):
+    def retrieve(cls, host, id=None, offset=None, access_token=None, url_override=None):
         """
         GET an API resource. If resource ID is omitted, returns a list. Appends access_token
         and offset (for paging) if provided.
         """
 
+        headers = {'Host': host}
+
         if url_override:
             resource_url = url_override
         else:
-            resource_url = urljoin(API_ROOT, cls.resource_fragment)
+            path_fragments = [cls.resource_fragment]
+            if id:
+                id = int(id)
+                assert id > 0, 'Resource ID must be greater than zero'
+                path_fragments.append(id)
+            resource_url = build_url(host, path_fragments)
 
         params = {}
         if access_token:
             params['access_token'] = access_token
-
         if offset:
             offset = int(offset)
             assert offset % 25 == 0, 'Offset must be a multiple of 25'
             params['offset'] = offset
 
-        if id and not url_override:
-            id = int(id)
-            assert id > 0, 'Resource ID must be greater than zero'
-            resource_url += '/%d' % id
-
-        response = requests.get(resource_url, params=params)
+        response = requests.get(resource_url, params=params, headers=headers)
 
         try:
             resource = response.json()
@@ -56,21 +57,22 @@ class APIResource(object):
         return resource['data']
 
     @classmethod
-    def create(cls, data, access_token=None, headers=None):
+    def create(cls, host, data, access_token, headers=None):
         """
         Create an API resource with POST.
         """
 
-        resource_url = urljoin(API_ROOT, cls.resource_fragment)
-
-        params = {}
-        if access_token:
-            params['access_token'] = access_token
+        resource_url = build_url(host, [cls.resource_fragment])
+        params = {'access_token': access_token}
 
         if headers:
             headers['Content-Type'] = 'application/json'
+            headers['Host'] = host
         else:
-            headers = {'Content-Type': 'application/json'}
+            headers = {
+                'Content-Type': 'application/json',
+                'Host': host
+            }
 
         response = requests.post(
             resource_url,
@@ -93,21 +95,24 @@ class APIResource(object):
         return resource['data']
 
     @classmethod
-    def update(cls, data, id, access_token):
+    def update(cls, host, data, id, access_token):
         """
         Update an API resource with PUT.
         """
 
-        resource_url = urljoin(API_ROOT, cls.resource_fragment)
-        headers = {'Content-Type': 'application/json'}
-        params = {'method' : 'PUT'}
-
-        if access_token:
-            params['access_token'] = access_token
-
         id = int(id)
         assert id > 0, 'Resource ID must be greater than zero'
-        resource_url += '/%d' % id
+        path_fragments = [cls.resource_fragment, id]
+        resource_url = build_url(host, path_fragments)
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Host': host,
+        }
+        params = {
+            'method': 'PUT',
+            'access_token': access_token,
+        }
 
         response = requests.post(
             resource_url,
@@ -130,7 +135,7 @@ class APIResource(object):
         return resource['data']
 
     @classmethod
-    def delete(cls, id, access_token):
+    def delete(cls, host, id, access_token):
         """
         DELETE an API resource. ID must be supplied.
 
@@ -139,23 +144,25 @@ class APIResource(object):
         operation the method simply returns.
         """
 
-        resource_url = urljoin(API_ROOT, cls.resource_fragment)
-        params = {
-            'method': 'DELETE',
-            'access_token': access_token,
-        }
+        path_fragments = [cls.resource_fragment]
 
         if id:
             id = int(id)
             assert id > 0, 'Resource ID must be greater than zero'
-            resource_url += '/%d' % id
+            path_fragments.append(id)
         elif access_token:
-            resource_url += '/%s' % access_token
+            path_fragments.append(access_token)
         else:
             raise AssertionError, 'You must supply either an id or '\
                                   'an access_token to delete'
 
-        response = requests.post(resource_url, params=params)
+        resource_url = build_url(host, path_fragments)
+        params = {
+            'method': 'DELETE',
+            'access_token': access_token,
+        }
+        headers = {'Host': host}
+        response = requests.post(resource_url, params=params, headers=headers)
 
         try:
             resource = response.json()
@@ -241,8 +248,8 @@ class Site(APIResource):
     resource_fragment = 'site'
 
     @classmethod
-    def retrieve(cls):
-        resource = super(Site, cls).retrieve()
+    def retrieve(cls, host):
+        resource = super(Site, cls).retrieve(host)
         return APIResource.process_timestamp(resource)
 
 
@@ -258,8 +265,8 @@ class WhoAmI(APIResource):
     resource_fragment = 'whoami'
 
     @classmethod
-    def retrieve(cls, access_token):
-        resource = super(WhoAmI, cls).retrieve(access_token=access_token)
+    def retrieve(cls, host, access_token):
+        resource = super(WhoAmI, cls).retrieve(host, access_token=access_token)
         resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
@@ -268,8 +275,8 @@ class Profile(APIResource):
     resource_fragment = 'profiles'
 
     @classmethod
-    def retrieve(cls, id, offset=None, access_token=None):
-        resource = super(Profile, cls).retrieve(id, access_token=access_token)
+    def retrieve(cls, host, id, offset=None, access_token=None):
+        resource = super(Profile, cls).retrieve(host, id, access_token=access_token)
         resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
@@ -278,8 +285,8 @@ class Microcosm(APIResource):
     resource_fragment = 'microcosms'
 
     @classmethod
-    def retrieve(cls, id=None, offset=None, access_token=None):
-        resource = super(Microcosm, cls).retrieve(id, offset, access_token)
+    def retrieve(cls, host, id=None, offset=None, access_token=None):
+        resource = super(Microcosm, cls).retrieve(host, id, offset, access_token)
         resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
@@ -288,8 +295,8 @@ class Conversation(APIResource):
     resource_fragment = 'conversations'
 
     @classmethod
-    def retrieve(cls, id=None, offset=None, access_token=None):
-        resource = super(Conversation, cls).retrieve(id, offset, access_token)
+    def retrieve(cls, host, id=None, offset=None, access_token=None):
+        resource = super(Conversation, cls).retrieve(host, id, offset, access_token)
         resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
@@ -298,32 +305,31 @@ class Event(APIResource):
     resource_fragment = 'events'
 
     @classmethod
-    def retrieve(cls, id=None, offset=None, access_token=None):
-        resource = super(Event, cls).retrieve(id, offset, access_token)
+    def retrieve(cls, host, id=None, offset=None, access_token=None):
+        resource = super(Event, cls).retrieve(host, id, offset, access_token)
         resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
     @classmethod
-    def retrieve_attendees(cls, id, access_token=None):
+    def retrieve_attendees(cls, host, id, access_token=None):
         """
         Retrieve a list of attendees for an event.
         TODO: pagination support
         """
 
-        resource_url = urljoin(API_ROOT, cls.resource_fragment) + ''.join(['/', id, '/attendees'])
-        resource = APIResource.retrieve(id=id, access_token=access_token, url_override=resource_url)
+        resource_url = build_url(host, [cls.resource_fragment, id, 'attendees'])
+        resource = APIResource.retrieve(host, id=id, access_token=access_token, url_override=resource_url)
         resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
     @classmethod
-    def rsvp(cls, event_id, profile_id, attendance_data, access_token):
+    def rsvp(cls, host, event_id, profile_id, attendance_data, access_token):
         """
         Create or update attendance to an event.
         TODO: This is obviously pretty nasty but it'll be changed soon.
         """
 
-        collection_url = urljoin(API_ROOT, cls.resource_fragment) + \
-                       ''.join(['/', event_id, '/attendees'])
+        collection_url = build_url(host, [cls.resource_fragment, event_id, 'attendees'])
         item_url = collection_url + '/' + str(profile_id)
 
         # See if there is an attendance entry for this profile
@@ -375,8 +381,8 @@ class Poll(APIResource):
     resource_fragment = 'polls'
 
     @classmethod
-    def retrieve(cls, id=None, offset=None, access_token=None):
-        resource = super(Poll, cls).retrieve(id, offset, access_token)
+    def retrieve(cls, host, id=None, offset=None, access_token=None):
+        resource = super(Poll, cls).retrieve(host, id, offset, access_token)
         resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
@@ -385,8 +391,8 @@ class Comment(APIResource):
     resource_fragment = 'comments'
 
     @classmethod
-    def retrieve(cls, id=None, offset=None, access_token=None):
-        resource = super(Comment, cls).retrieve(id, offset, access_token)
+    def retrieve(cls, host, id=None, offset=None, access_token=None):
+        resource = super(Comment, cls).retrieve(host, id, offset, access_token)
         resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
@@ -398,11 +404,11 @@ class GeoCode():
     """
 
     @classmethod
-    def retrieve(cls, q, access_token):
+    def retrieve(cls, host, q, access_token):
         """
         Forward a geocode request (q) to the API.
         """
         params = {'q': q}
         headers = {'Authorization': 'Bearer %s' % access_token}
-        response = requests.get(API_ROOT + 'geocode', params=params, headers=headers)
+        response = requests.get(build_url(host, ['geocode']), params=params, headers=headers)
         return response.content

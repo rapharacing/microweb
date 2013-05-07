@@ -158,7 +158,8 @@ LOGGING = {
 # Populate the settings below in local_settings.py (see the README for example values).
 CLIENT_ID = ''
 CLIENT_SECRET = ''
-API_ROOT = ''
+API_SCHEME = ''
+API_DOMAIN_NAME = ''
 RIEMANN_ENABLED = False
 
 # Persona test data
@@ -174,3 +175,6 @@ try:
     from local_settings import *
 except ImportError:
     pass
+
+if API_SCHEME == '' or API_DOMAIN_NAME == '' or API_PATH == '' or API_VERSION == '':
+    raise AssertionError('Please define API settings in local_settings.py')

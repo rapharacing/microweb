@@ -19,7 +19,6 @@ from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Profile
-from microcosm.api.resources import Authentication
 
 from microcosm.forms.forms import EventCreate
 from microcosm.forms.forms import EventEdit
@@ -29,6 +28,7 @@ from microcosm.forms.forms import ConversationCreate
 from microcosm.forms.forms import ConversationEdit
 from microcosm.forms.forms import CommentForm
 from microcosm.forms.forms import ProfileEdit
+from microweb.helpers import build_url
 
 
 def exception_handler(view_func):
@@ -84,7 +84,11 @@ class ItemView(object):
         if request.method == 'POST':
             form = cls.create_form(request.POST)
             if form.is_valid():
-                item = cls.resource_cls.create(form.cleaned_data, request.access_token)
+                item = cls.resource_cls.create(
+                    request.META['HTTP_HOST'],
+                    form.cleaned_data,
+                    request.access_token
+                )
                 return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
             else:
                 view_data['form'] = form
@@ -122,7 +126,7 @@ class ItemView(object):
                 # API expects editReason wrapped in a 'meta' object
                 if form_data.has_key('editReason'):
                     form_data['meta'] =  {'editReason': form_data['editReason']}
-                item = cls.resource_cls.update(form_data, item_id, request.access_token)
+                item = cls.resource_cls.update(request.META['HTTP_HOST'], form_data, item_id, request.access_token)
                 return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
             else:
                 view_data['form'] = form
@@ -130,7 +134,7 @@ class ItemView(object):
 
         # Populate form with item data
         elif request.method == 'GET':
-            item = cls.resource_cls.retrieve(id=item_id, access_token=request.access_token)
+            item = cls.resource_cls.retrieve(request.META['HTTP_HOST'], id=item_id, access_token=request.access_token)
             view_data['form'] = cls.edit_form(item)
             return render(request, cls.form_template, view_data)
 
@@ -148,6 +152,7 @@ class ItemView(object):
         offset = int(request.GET.get('offset', 0))
 
         content = cls.resource_cls.retrieve(
+            request.META['HTTP_HOST'],
             id=item_id,
             offset=offset,
             access_token=request.access_token
@@ -178,6 +183,7 @@ class ItemView(object):
         # Composition of any other elements, e.g. attendees or poll choices
         if hasattr(cls, 'extra_item_data') and callable(cls.extra_item_data):
             view_data = cls.extra_item_data(
+                request.META['HTTP_HOST'],
                 item_id,
                 view_data,
                 request.access_token
@@ -195,7 +201,7 @@ class ItemView(object):
         # Pagination offset
         offset = int(request.GET.get('offset', 0))
 
-        list = cls.resource_cls.retrieve(offset=offset, access_token=request.access_token)
+        list = cls.resource_cls.retrieve(request.META['HTTP_HOST'], offset=offset, access_token=request.access_token)
 
         view_data = {
             'user': request.whoami,
@@ -216,7 +222,7 @@ class ItemView(object):
         """
 
         if request.method == 'POST':
-            cls.resource_cls.delete(item_id, request.access_token)
+            cls.resource_cls.delete(request.META['HTTP_HOST'], item_id, request.access_token)
             redirect = request.POST.get('targetUrl', None) or reverse(MicrocosmView.list)
             return HttpResponseRedirect(redirect)
         else:
@@ -296,7 +302,12 @@ class ProfileView(ItemView):
             form = cls.edit_form(request.POST)
             if form.is_valid():
                 form_data = form.cleaned_data
-                item = cls.resource_cls.update(form_data, item_id, request.access_token)
+                item = cls.resource_cls.update(
+                    request.META['HTTP_HOST'],
+                    form_data,
+                    item_id,
+                    request.access_token
+                )
                 return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
             else:
                 view_data['form'] = form
@@ -304,8 +315,16 @@ class ProfileView(ItemView):
 
         # Populate form with item data
         elif request.method == 'GET':
-            user_private_details = User.retrieve(request.whoami['id'], access_token=request.access_token)
-            user_profile = cls.resource_cls.retrieve(id=item_id, access_token=request.access_token)
+            user_private_details = User.retrieve(
+                request.META['HTTP_HOST'],
+                request.whoami['id'],
+                access_token=request.access_token
+            )
+            user_profile = cls.resource_cls.retrieve(
+                request.META['HTTP_HOST'],
+                id=item_id,
+                access_token=request.access_token
+            )
             if user_private_details.has_key('email'):
                 user_profile['gravatar'] = user_private_details['email']
             view_data['form'] = cls.edit_form(user_profile)
@@ -333,7 +352,11 @@ class MicrocosmView(ItemView):
         Interstitial page for creating an item (e.g. Event) belonging to a microcosm.
         """
 
-        microcosm = cls.resource_cls.retrieve(microcosm_id, access_token=request.access_token)
+        microcosm = cls.resource_cls.retrieve(
+            request.META['HTTP_HOST'],
+            microcosm_id,
+            access_token=request.access_token
+        )
 
         view_data = {
             'user' : request.whoami,
@@ -356,9 +379,12 @@ class EventView(ItemView):
     commentable = True
 
     @classmethod
-    def extra_item_data(cls, event_id, view_data, access_token=None):
+    def extra_item_data(cls, request, event_id, view_data, access_token=None):
         view_data['attendees'] = cls.resource_cls.retrieve_attendees(
-            event_id, access_token)
+            request.META['HTTP_HOST'],
+            event_id,
+            access_token
+        )
         return view_data
 
     @classmethod
@@ -374,7 +400,13 @@ class EventView(ItemView):
                     'RSVP' : request.POST['rsvp'],
                     'AttendeeId' : request.whoami['id']
                 }
-                cls.resource_cls.rsvp(event_id, request.whoami['id'], attendee, access_token=request.access_token)
+                cls.resource_cls.rsvp(
+                    request.META['HTTP_HOST'],
+                    event_id,
+                    request.whoami['id'],
+                    attendee,
+                    access_token=request.access_token
+                )
                 return HttpResponseRedirect('/events/%s' % event_id)
             else:
                 raise PermissionDenied
@@ -425,7 +457,11 @@ class CommentView(ItemView):
         if request.method == 'POST':
             form = cls.create_form(request.POST)
             if form.is_valid():
-                item = cls.resource_cls.create(data=form.cleaned_data, access_token=request.access_token)
+                item = cls.resource_cls.create(
+                    request.META['HTTP_HOST'],
+                    data=form.cleaned_data,
+                    access_token=request.access_token
+                )
                 # If a targetUrl has not been provided, redirect to /comments/{id}
                 if request.POST['targetUrl'] != '':
                     return HttpResponseRedirect(request.POST['targetUrl'])
@@ -461,7 +497,12 @@ class CommentView(ItemView):
         if request.method == 'POST':
             form = cls.create_form(request.POST)
             if form.is_valid():
-                item = cls.resource_cls.update(form.cleaned_data, item_id, request.access_token)
+                item = cls.resource_cls.update(
+                    request.META['HTTP_HOST'],
+                    form.cleaned_data,
+                    item_id,
+                    request.access_token
+                )
                 # If a targetUrl has not been provided, redirect to /comments/{id}
                 if request.POST['targetUrl'] != '':
                     return HttpResponseRedirect(request.POST['targetUrl'])
@@ -474,7 +515,11 @@ class CommentView(ItemView):
                 return render(request, cls.form_template, view_data)
 
         elif request.method == 'GET':
-            comment = cls.resource_cls.retrieve(item_id, access_token=request.access_token)
+            comment = cls.resource_cls.retrieve(
+                request.META['HTTP_HOST'],
+                item_id,
+                access_token=request.access_token
+            )
             initial = CommentView.fill_from_get(request, {})
             if initial.has_key('targetUrl'): comment['targetUrl'] = initial['targetUrl']
             view_data['form'] = cls.edit_form(comment)
@@ -527,8 +572,9 @@ class AuthenticationView():
         }
         headers= {'Host': request.META.get('HTTP_HOST')}
 
-        access_token = Authentication.create(data, headers=headers)
-        response = HttpResponseRedirect(target_url)
+        access_token = requests.post(build_url(request.META['HTTP_HOST'], ['auth']), data=data, headers=headers).json()['data']
+
+        response = HttpResponseRedirect(target_url if target_url != '' else '/')
         response.set_cookie('access_token', access_token, httponly=True)
         return response
 
@@ -549,7 +595,7 @@ class AuthenticationView():
 
         if request.COOKIES.has_key('access_token'):
             response.delete_cookie('access_token')
-            url = settings.API_ROOT + 'auth/%s' % request.access_token
+            url = build_url(request.META['HTTP_HOST'], ['auth',request.access_token])
             requests.post(url, params={'method': 'DELETE', 'access_token': request.access_token})
 
         return response
@@ -563,13 +609,19 @@ class GeoView():
         if request.access_token is None:
             raise PermissionDenied
         if request.GET.has_key('q'):
-            response = GeoCode.retrieve(request.GET['q'], request.access_token)
+            response = GeoCode.retrieve(
+                request.META['HTTP_HOST'],
+                request.GET['q'],
+                request.access_token
+            )
             return HttpResponse(response, content_type='application/json')
         else:
             return HttpResponseBadRequest()
 
 
 def echo_headers(request):
-
-    view_data = request.META
-    return HttpResponse(str(view_data))
+    view_data = '<html><body><table>'
+    for key in request.META.keys():
+        view_data += '<tr><td>%s</td><td>%s</td></tr>' % (key, request.META[key])
+    view_data += '</table></body></html>'
+    return HttpResponse(view_data, content_type='text/html')

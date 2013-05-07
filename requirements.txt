@@ -8,5 +8,5 @@ gunicorn==0.17.2
 # Riemann client
 bernhard==0.0.3
 
-# Live integration tests
-selenium==2.32.0
+# Mock python objects for testing
+mock==1.0.1
