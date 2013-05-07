@@ -15,7 +15,7 @@
 
 {% block sidebar %}
 	<p class="muted">
-		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName }}</a><br />
+		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:20 }}</a><br />
 		{{ content.meta.created|date:"jS M Y" }}
 	</p>
 

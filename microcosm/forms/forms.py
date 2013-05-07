@@ -179,11 +179,11 @@ class ProfileEdit(django.forms.Form):
     # This is the email address a user supplies associated with their gravatar.
     gravatar = django.forms.EmailField(widget=django.forms.HiddenInput, required=False)
     profileName = django.forms.CharField(
-        max_length='150',
+        max_length='20',
         label='Profile Name',
         error_messages = {
             'required' : 'Please add a username',
-            'max_length' : 'Username may not be longer than 150 characters'
+            'max_length' : 'Username may not be longer than 20 characters'
         },
         validators=[validate_no_spaces]
     )
