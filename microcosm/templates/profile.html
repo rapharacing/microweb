@@ -3,7 +3,7 @@
 {% block content %}
 
     <h1 id="profile_name">{{user.profileName}}</h1>
-    <img src="{{user.gravatar}}">
+    <img src="{{user.gravatar}}" class="gravatar" alt="Avatar for {{ user.profileName }}" />
 
     <h3>Statistics</h3>
     <ul>

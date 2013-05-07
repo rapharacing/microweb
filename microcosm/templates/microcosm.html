@@ -26,7 +26,7 @@
 
 			<div class="col-span-4">
 				{% if item.lastCommentCreated %}
-				<a href="/profiles/{{item.lastCommentCreatedBy.id}}/"><img src="{{ item.lastCommentCreatedBy.gravatar }}" alt="Avatar for {{item.lastCommentCreatedBy.profileName }}" height="48" width="48" align="left" class="buffer-right" /></a>
+				<a href="/profiles/{{item.lastCommentCreatedBy.id}}/"><img src="{{ item.lastCommentCreatedBy.gravatar }}" alt="Avatar for {{item.lastCommentCreatedBy.profileName }}" align="left" class="gravatar-small" /></a>
 				<small>{{ item.lastCommentCreatedBy.profileName }}</small><br />
 				<small>{{ item.lastCommentCreated|date:"jS M Y" }}</small>
 				{% endif %}
