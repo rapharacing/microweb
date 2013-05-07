@@ -183,7 +183,7 @@ class ItemView(object):
         # Composition of any other elements, e.g. attendees or poll choices
         if hasattr(cls, 'extra_item_data') and callable(cls.extra_item_data):
             view_data = cls.extra_item_data(
-                request.META['HTTP_HOST'],
+                request,
                 item_id,
                 view_data,
                 request.access_token
