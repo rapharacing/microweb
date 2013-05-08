@@ -234,6 +234,7 @@ class ItemView(object):
         paginated_list = None
 
         # Single item, which has comments or microcosms
+        # TODO: move this logic out
         if resource.has_key('id'):
             if resource.get('comments', None):
                 paginated_list = resource['comments']
