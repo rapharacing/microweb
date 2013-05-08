@@ -459,11 +459,16 @@ class CommentView(ItemView):
                     data=form.cleaned_data,
                     access_token=request.access_token
                 )
-                # If a targetUrl has not been provided, redirect to /comments/{id}
-                if request.POST['targetUrl'] != '':
-                    return HttpResponseRedirect(request.POST['targetUrl'])
-                if request.GET['targetUrl'] != '':
-                    return HttpResponseRedirect(request.GET['targetUrl'])
+
+                # If a 'via' link is returned, go to that page and comment fragment
+                if item['meta'].has_key('linkmap') and item['meta']['linkmap'].has_key('via'):
+                    if 'offset' in item['meta']['linkmap']['via']:
+                        offset = item['meta']['linkmap']['via'].split('offset=')[1]
+                        return HttpResponseRedirect('/%s/%d?offset=%d#comment%d' %
+                            (cls.item_plural, item['id'], offset, item['id']))
+                    else:
+                        return HttpResponseRedirect('/%s/%d#comment%d' % (cls.item_plural, item['id'], item['id']))
+                # Otherwise, redirect to the single comment view
                 else:
                     return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
             else:
@@ -500,11 +505,16 @@ class CommentView(ItemView):
                     item_id,
                     request.access_token
                 )
-                # If a targetUrl has not been provided, redirect to /comments/{id}
-                if request.POST['targetUrl'] != '':
-                    return HttpResponseRedirect(request.POST['targetUrl'])
-                if request.GET['targetUrl'] != '':
-                    return HttpResponseRedirect(request.GET['targetUrl'])
+
+                # If a 'via' link is returned, go to that page and comment fragment
+                if item['meta'].has_key('linkmap') and item['meta']['linkmap'].has_key('via'):
+                    if 'offset' in item['meta']['linkmap']['via']:
+                        offset = item['meta']['linkmap']['via'].split('offset=')[1]
+                        return HttpResponseRedirect('/%s/%d?offset=%d#comment%d' %
+                            (cls.item_plural, item['id'], offset, item['id']))
+                    else:
+                        return HttpResponseRedirect('/%s/%d#comment%d' % (cls.item_plural, item['id'], item['id']))
+                # Otherwise, redirect to the single comment view
                 else:
                     return HttpResponseRedirect(''.join(['/', cls.item_plural, '/', str(item['id'])]))
             else:

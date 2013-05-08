@@ -396,6 +396,18 @@ class Comment(APIResource):
         resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
+    @classmethod
+    def create(cls, host, data, access_token):
+        resource = super(Comment, cls).create(host, data, access_token)
+        resource = cls.create_linkmap(resource)
+        return resource
+
+    @classmethod
+    def update(cls, host, data, id, access_token):
+        resource = super(Comment, cls).update(host, data, id, access_token)
+        resource = cls.create_linkmap(resource)
+        return resource
+
 
 class GeoCode():
     """
