@@ -96,7 +96,7 @@
 	{% endif %}
 
 	<h4>Are you coming?</h4>
-
+	{% if user %}
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="yes" />
@@ -114,6 +114,9 @@
 		<input type="hidden" name="rsvp" value="no" />
 		<input id="rsvp_no" type="submit" value="Can't make it" class="btn col-span-16" style="width:100%; margin-top:12px;">
 	</form>
+	{% else %}
+	<a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Signup or login to attend</a>
+	{% endif %}
 
 	<h4>Who's going?</h4>
 	{# Iterating the attendees four times is only temporary, they'll be split into different collections in future. #}
