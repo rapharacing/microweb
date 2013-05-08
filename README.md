@@ -122,31 +122,31 @@ We also see `cls.many_template` being used, which is the template the class uses
 The `request` object is being used quite a bit here, which is possible because of `middleware/context.py`:
 
 ```python
-    def process_request(self, request):
-        """
-        Checks for access_token cookie and appends it to the request object
-        if it exists. If the access token is invalid, flags it for deletion.
+def process_request(self, request):
+    """
+    Checks for access_token cookie and appends it to the request object
+    if it exists. If the access token is invalid, flags it for deletion.
 
-        Populates request.whoami with the result of the whoami API call.
-        """
+    Populates request.whoami with the result of the whoami API call.
+    """
 
-        request.access_token = None
-        request.delete_token = False
-        request.whoami = None
-        request.site = None
-        request.create_profile = False
+    request.access_token = None
+    request.delete_token = False
+    request.whoami = None
+    request.site = None
+    request.create_profile = False
 
-        if request.COOKIES.has_key('access_token'):
-            request.access_token = request.COOKIES['access_token']
+    if request.COOKIES.has_key('access_token'):
+        request.access_token = request.COOKIES['access_token']
 
-            # if a bad access token is provided, flag for deletion
-            try:
-                request.whoami = WhoAmI.retrieve(request.access_token)
-            except APIException, e:
-                if e.status_code == 401:
-                    request.delete_token = True
+        # if a bad access token is provided, flag for deletion
+        try:
+            request.whoami = WhoAmI.retrieve(request.access_token)
+        except APIException, e:
+            if e.status_code == 401:
+                request.delete_token = True
                     
-        ...
+    ...
 
 ```
 
