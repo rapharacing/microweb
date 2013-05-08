@@ -69,7 +69,7 @@
 					<br />
 					<div class="row">
 						<div class="pull-left muted">
-							<small><a href="http://en.wikipedia.org/wiki/Markdown#Syntax_examples" target="_blank">Formatting help</a></small>
+							<small><a data-toggle="modal" data-target="#markdownModal">Formatting help</a></small>
 						</div>
 						<section class="pull-right" id="comment{{ comment.id }}controls">
 							<input class="btn btn-primary" id="submit_comment" type="submit" value="Add comment">
@@ -78,8 +78,81 @@
 				</div>				
 			</form>
 		</div>
+
 	{% else %}
 		<a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Signup or login to post a comment</a>
 	{% endif %}
 
 </section>
+
+<!-- Markdown Modal -->
+<div id="markdownModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Markdown Cheat Sheet</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-span-8">
+						<strong>Links</strong>
+<pre>http://www.google.com - automatic!
+[Google](http://www.google.com)
+</pre>
+						<strong>Images</strong>
+<pre>![Microcosm Logo](/static/themes/1/logo.png)
+Format: ![Alt Text](url)
+</pre>
+						<strong>Emphasis</strong>
+<pre>*This text will be italic*
+_This will also be italic_
+**This text will be bold**
+__This will also be bold__
+
+*You **can** combine them*
+</pre>
+						<strong>Headers</strong>
+<pre># Main Header
+## Header
+### Sub Header
+</pre>
+						<strong>Mentioning people</strong>
+<pre>@user +user</pre>
+					</div>
+					<div class="col-span-8">
+						<strong>Unordered Lists</strong>
+<pre>* fruits
+    + apples
+        - macintosh
+        - red delicious
+    + pears
+    + peaches
+* vegetables
+    + brocolli
+</pre>
+<p>Sub-lists are indented by 4 spaces.</p>
+						<strong>Ordered Lists</strong>
+<pre>1. fruits
+    a. apples
+        - macintosh
+        - red delicious
+    b. pears
+    c. peaches
+1. vegetables
+    a. brocolli
+</pre>
+						<strong>Quotes</strong>
+<pre>As Octocat said:
+
+> We're living the future so
+> the present is our past.
+</pre>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dalog -->
+</div><!-- /.modal -->

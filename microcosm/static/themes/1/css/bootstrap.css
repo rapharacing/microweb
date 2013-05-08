@@ -4407,12 +4407,11 @@ button.close {
 
 @media screen and (min-width: 768px) {
   .modal-dialog {
-    right: auto;
-    left: 50%;
-    width: 560px;
+    right: 15%;
+    left: 15%;
+    width: 70%;
     padding-top: 30px;
     padding-bottom: 30px;
-    margin-left: -280px;
   }
   .modal-content {
     -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
