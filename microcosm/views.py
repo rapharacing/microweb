@@ -246,10 +246,6 @@ class ItemView(object):
         else:
             return
 
-        # Maximum record offset is (no. of pages - 1) multiplied by page size
-        # TODO: this will be unecessary when max_offset is added to responses
-        max_offset = (paginated_list['totalPages'] - 1) * paginated_list['limit']
-
         # TODO: remove implicit dependency on linkmap transformer
         if paginated_list['linkmap'].has_key('first'):
             view_data['pagination']['first'] = path
@@ -258,7 +254,7 @@ class ItemView(object):
         if paginated_list['linkmap'].has_key('next'):
             view_data['pagination']['next'] = path + '?offset=%d' % (offset + settings.PAGE_SIZE)
         if paginated_list['linkmap'].has_key('last'):
-            view_data['pagination']['last'] = path + '?offset=%d' % max_offset
+            view_data['pagination']['last'] = path + '?offset=%d' % paginated_list['maxOffset']
 
 
 class ConversationView(ItemView):
