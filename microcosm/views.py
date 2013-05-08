@@ -464,11 +464,10 @@ class CommentView(ItemView):
                 if item['meta'].has_key('linkmap') and item['meta']['linkmap'].has_key('via'):
                     if 'offset' in item['meta']['linkmap']['via']:
                         offset = item['meta']['linkmap']['via'].split('offset=')[1]
-                        return HttpResponseRedirect('/%s/%d?offset=%d#comment%d' %
-                            (cls.item_plural, item['id'], offset, item['id']))
+                        return HttpResponseRedirect('/%ss/%d?offset=%s#comment%d' %
+                            (item['itemType'], item['itemId'], offset, item['id']))
                     else:
-                        return HttpResponseRedirect('/%s/%d#comment%d' % (cls.item_plural, item['id'], item['id']))
-                # Otherwise, redirect to the single comment view
+                        return HttpResponseRedirect('/%ss/%d#comment%d' % (item['itemType'], item['itemId'], item['id']))
                 else:
                     return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
             else:
@@ -510,11 +509,10 @@ class CommentView(ItemView):
                 if item['meta'].has_key('linkmap') and item['meta']['linkmap'].has_key('via'):
                     if 'offset' in item['meta']['linkmap']['via']:
                         offset = item['meta']['linkmap']['via'].split('offset=')[1]
-                        return HttpResponseRedirect('/%s/%d?offset=%d#comment%d' %
-                            (cls.item_plural, item['id'], offset, item['id']))
+                        return HttpResponseRedirect('/%ss/%d?offset=%s#comment%d' %
+                            (item['itemType'], item['itemId'], offset, item['id']))
                     else:
-                        return HttpResponseRedirect('/%s/%d#comment%d' % (cls.item_plural, item['id'], item['id']))
-                # Otherwise, redirect to the single comment view
+                        return HttpResponseRedirect('/%ss/%d#comment%d' % (item['itemType'], item['itemId'], item['id']))
                 else:
                     return HttpResponseRedirect(''.join(['/', cls.item_plural, '/', str(item['id'])]))
             else:
