@@ -234,6 +234,7 @@ class ItemView(object):
         paginated_list = None
 
         # Single item, which has comments or microcosms
+        # TODO: move this logic out
         if resource.has_key('id'):
             if resource.get('comments', None):
                 paginated_list = resource['comments']
@@ -246,10 +247,6 @@ class ItemView(object):
         else:
             return
 
-        # Maximum record offset is (no. of pages - 1) multiplied by page size
-        # TODO: this will be unecessary when max_offset is added to responses
-        max_offset = (paginated_list['totalPages'] - 1) * paginated_list['limit']
-
         # TODO: remove implicit dependency on linkmap transformer
         if paginated_list['linkmap'].has_key('first'):
             view_data['pagination']['first'] = path
@@ -258,7 +255,7 @@ class ItemView(object):
         if paginated_list['linkmap'].has_key('next'):
             view_data['pagination']['next'] = path + '?offset=%d' % (offset + settings.PAGE_SIZE)
         if paginated_list['linkmap'].has_key('last'):
-            view_data['pagination']['last'] = path + '?offset=%d' % max_offset
+            view_data['pagination']['last'] = path + '?offset=%d' % paginated_list['maxOffset']
 
 
 class ConversationView(ItemView):
@@ -462,11 +459,15 @@ class CommentView(ItemView):
                     data=form.cleaned_data,
                     access_token=request.access_token
                 )
-                # If a targetUrl has not been provided, redirect to /comments/{id}
-                if request.POST['targetUrl'] != '':
-                    return HttpResponseRedirect(request.POST['targetUrl'])
-                if request.GET['targetUrl'] != '':
-                    return HttpResponseRedirect(request.GET['targetUrl'])
+
+                # If a 'via' link is returned, go to that page and comment fragment
+                if item['meta'].has_key('linkmap') and item['meta']['linkmap'].has_key('via'):
+                    if 'offset' in item['meta']['linkmap']['via']:
+                        offset = item['meta']['linkmap']['via'].split('offset=')[1]
+                        return HttpResponseRedirect('/%ss/%d?offset=%s#comment%d' %
+                            (item['itemType'], item['itemId'], offset, item['id']))
+                    else:
+                        return HttpResponseRedirect('/%ss/%d#comment%d' % (item['itemType'], item['itemId'], item['id']))
                 else:
                     return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
             else:
@@ -503,11 +504,15 @@ class CommentView(ItemView):
                     item_id,
                     request.access_token
                 )
-                # If a targetUrl has not been provided, redirect to /comments/{id}
-                if request.POST['targetUrl'] != '':
-                    return HttpResponseRedirect(request.POST['targetUrl'])
-                if request.GET['targetUrl'] != '':
-                    return HttpResponseRedirect(request.GET['targetUrl'])
+
+                # If a 'via' link is returned, go to that page and comment fragment
+                if item['meta'].has_key('linkmap') and item['meta']['linkmap'].has_key('via'):
+                    if 'offset' in item['meta']['linkmap']['via']:
+                        offset = item['meta']['linkmap']['via'].split('offset=')[1]
+                        return HttpResponseRedirect('/%ss/%d?offset=%s#comment%d' %
+                            (item['itemType'], item['itemId'], offset, item['id']))
+                    else:
+                        return HttpResponseRedirect('/%ss/%d#comment%d' % (item['itemType'], item['itemId'], item['id']))
                 else:
                     return HttpResponseRedirect(''.join(['/', cls.item_plural, '/', str(item['id'])]))
             else:
