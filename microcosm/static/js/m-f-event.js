@@ -455,7 +455,7 @@ function loadForm() {
 		var s = getIsoStringFromDate(d);
 
 		$('#id_from_date').val(s);
-		$('#id_to_date').val(s);
+		$('#id_to_date').val(s).datepicker('setStartDate', $('#id_from_date').val());
 		
 		// Remember to update the global vars whenever we manually touch the
 		// form values
