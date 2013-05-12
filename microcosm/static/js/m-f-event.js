@@ -328,7 +328,7 @@ function loadForm() {
 			// So that if they nuke the field, we put in tomorrow's date
 			if ($('#id_from_date').val().trim() == '') {
 				var d = new Date()
-				d.setDate(d.getDate() + 1);
+				d.setDate(d.getDate());
 				setStartDate(d);
 			}
 		});
@@ -426,8 +426,8 @@ function loadForm() {
 
 	// It is a good idea to not let the user plan an event in the past
 	var d = new Date();
-	$('#id_from_date').datepicker('setStartDate', d);
-	$('#id_to_date').datepicker('setStartDate', d);
+	$('#id_from_date').datepicker('setStartDate', d + 1);
+	$('#id_to_date').datepicker('setStartDate', d + 1);
 
 	// And if we have primed our interface
 	if ($('#id_from_date').val().trim() != "" && $('#id_from_date').val().trim().match(dateReg)) {
