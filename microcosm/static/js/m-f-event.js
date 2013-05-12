@@ -211,6 +211,7 @@ function validateDateTimes() {
 
 	// By which we mean, if we have all of the values
 	if (!startDate || !endDate || !startTime || !endTime) {
+		console.log('validation fails')
 		return false;
 	}
 
@@ -231,6 +232,7 @@ function validateDateTimes() {
 	// Save all the things!
 	$('#id_duration').val(duration);
 	$('#id_when').val(dateToUtcString(startDateTime));
+	console.log('set when to ' + dateToUtcString(startDateTime) + ' ' + $('#id_from_time').val().trim())
 
 	if ($('#id_where').val().trim() != '' && $('#id_lat').val().trim() == '') {
 		// where text without pinned location
@@ -425,9 +427,12 @@ function loadForm() {
 
 
 	// It is a good idea to not let the user plan an event in the past
-	var d = new Date();
-	$('#id_from_date').datepicker('setStartDate', d + 1);
-	$('#id_to_date').datepicker('setStartDate', d + 1);
+	var tomorrow = new Date();
+	tomorrow.setDate(tomorrow.getDate() + 1)
+	$('#id_from_date').datepicker('setStartDate', tomorrow);
+	setStartDate(tomorrow);
+	$('#id_to_date').datepicker('setStartDate', tomorrow);
+	setEndDate(tomorrow);
 
 	// And if we have primed our interface
 	if ($('#id_from_date').val().trim() != "" && $('#id_from_date').val().trim().match(dateReg)) {
@@ -451,16 +456,15 @@ function loadForm() {
 	} else {
 		// But if we don't have a primed form, then it's a blank form and we
 		// should do something useful, like putting in tomorrow's date
-		d.setDate(d.getDate() + 1);
-		var s = getIsoStringFromDate(d);
+		var s = getIsoStringFromDate(tomorrow);
 
 		$('#id_from_date').val(s);
 		$('#id_to_date').val(s).datepicker('setStartDate', $('#id_from_date').val());
 		
 		// Remember to update the global vars whenever we manually touch the
 		// form values
-		setStartDate(d);
-		setEndDate(d);
+		setStartDate(tomorrow);
+		setEndDate(tomorrow);
 	}
 
 	// Need to determine whether we have a fromTime, and if we do we can
@@ -471,8 +475,6 @@ function loadForm() {
 		'current';
 
 	$('#id_from_time')
-		// Create the time picker and set the time
-		.timepicker({"disableFocus": true, "defaultTime": fromTime})
 		// When a user goes into the field show the picker
 		.on('focus', function() {
 			$('#id_from_time').timepicker('showWidget');
@@ -487,7 +489,9 @@ function loadForm() {
 			if (duration < 0) {
 				$('#id_to_time').val($('#id_from_time').val());
 			}
-		});
+		})
+		// Create the time picker and set the time
+		.timepicker({"disableFocus": true, "defaultTime": fromTime});
 
 	// As above, use the form or use the clock
 	var toTime = ($('#id_to_time').val().trim() != "") ?
