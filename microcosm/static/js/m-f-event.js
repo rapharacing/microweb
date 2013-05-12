@@ -232,6 +232,16 @@ function validateDateTimes() {
 	$('#id_duration').val(duration);
 	$('#id_when').val(dateToUtcString(startDateTime));
 
+	if ($('#id_where').val().trim() != '' && $('#id_lat').val().trim() == '') {
+		// where text without pinned location
+		return false;
+	}
+
+	if ($('#id_where').val().trim() == '' && $('#id_lat').val().trim() != '') {
+		// pinned location without where text
+		return false;
+	}
+
 	return true;
 }
 
@@ -535,5 +545,5 @@ $('#eventForm').submit(function() {
 		addError($('#id_title'))
 		return false;
 	}
-	validateDateTimes();
+	return validateDateTimes();
 });
