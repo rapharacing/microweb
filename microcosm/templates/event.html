@@ -136,14 +136,14 @@
 			{% endif %}
 		</ul>
 	{% endfor %}
-	<p><strong>Yet to reply</strong></p>
+	<!--<p><strong>Yet to reply</strong></p>
 	{% for item in attendees.attendees.items %}
 		<ul>
 			{% if item.rsvp == "invited" %}
 				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
-	{% endfor %}
+	{% endfor %}-->
 	<p><strong>Nope</strong></p>
 	{% for item in attendees.attendees.items %}
 		<ul>

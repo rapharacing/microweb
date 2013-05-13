@@ -1,6 +1,5 @@
 import random
 import string
-import datetime
 from mock import patch
 
 from django.utils import unittest

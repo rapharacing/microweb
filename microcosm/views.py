@@ -282,7 +282,6 @@ class ProfileView(ItemView):
     @classmethod
     @exception_handler
     def edit(cls, request, item_id):
-
         """
         We need to fetch a 'user' object to edit their profile, since the
         user's email is submitted as 'gravatar'. This won't be needed when
@@ -314,7 +313,7 @@ class ProfileView(ItemView):
         elif request.method == 'GET':
             user_private_details = User.retrieve(
                 request.META['HTTP_HOST'],
-                request.whoami['id'],
+                request.whoami['userId'],
                 access_token=request.access_token
             )
             user_profile = cls.resource_cls.retrieve(
