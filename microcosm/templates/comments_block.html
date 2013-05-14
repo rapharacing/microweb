@@ -7,19 +7,19 @@
 		{% for comment in content.comments.items %}
 			<article id="comment{{ comment.id }}" class="row">
 				
-				<div class="col-span-4">
+				<div class="col col-lg-4">
 					<a href="{% if user.id == comment.meta.createdBy.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.createdBy.id }}/{% endif %}"><img src="{{ comment.meta.createdBy.gravatar }}" alt="Avatar for {{ comment.meta.createdBy.profileName }}" align="left" class="gravatar" /></a>
 					<div class="h4"><a href="{% if user.id == comment.meta.createdBy.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.createdBy.id }}/{% endif %}">{{ comment.meta.createdBy.profileName|truncatechars:25 }}</a></div>
 				</div>
 
-				<div class="col-span-12">
+				<div class="col col-lg-12">
 					<div class="row">
-						<section class="col-span-16" id="comment{{ comment.id }}body">
+						<section class="col col-lg-16" id="comment{{ comment.id }}body">
 							{{ comment.html|safe }}
 						</section>
 					</div>
 					<div class="row">
-						<div class="col-span-4 pull-left">
+						<div class="col col-lg-4 pull-left">
 							<small class="text-muted">{{ comment.meta.created|date:"jS M Y" }} at {{ comment.meta.created|date:"H:i" }}</small>
 						</div>
 
@@ -50,15 +50,15 @@
 	{% if user %}
 		<div id="comment{{ comment.id }}" class="row">
 			
-			<div class="col-span-4">
+			<div class="col col-lg-4">
 				<img src="{{ user.gravatar }}" alt="Avatar for {{ user.profileName|truncatechars:25 }}" align="left" class="gravatar" />
 				<div class="h4">{{ user.profileName|truncatechars:25 }}</div>
 			</div>
 
 			<form action="/comments/create/" method="POST" id="commentForm">{% csrf_token %}
-				<div class="col-span-12">
+				<div class="col col-lg-12">
 					<div class="row">
-						<section class="col-span-16" id="comment{{ comment.id }}body">
+						<section class="col col-lg-16" id="comment{{ comment.id }}body">
 							{{ comment_form.inReplyTo }}
 							{{ comment_form.itemId }}
 							{{ comment_form.itemType }}
@@ -94,7 +94,7 @@
 			</div>
 			<div class="modal-body">
 				<div class="row">
-					<div class="col-span-8">
+					<div class="col col-lg-8">
 						<strong>Links</strong>
 <pre>http://www.google.com - automatic!
 [Google](http://www.google.com)
@@ -119,7 +119,7 @@ __This will also be bold__
 						<strong>Mentioning people</strong>
 <pre>@user +user</pre>
 					</div>
-					<div class="col-span-8">
+					<div class="col col-lg-8">
 						<strong>Unordered Lists</strong>
 <pre>* fruits
     + apples

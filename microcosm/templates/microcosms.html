@@ -12,20 +12,20 @@
 
 		{% for item in content.microcosms.items %}
 			<section id="microcosm{{item.id}}" class="row">
-				<div class="col-span-16">
+				<div class="col col-lg-16">
 					<a href="/microcosms/{{ item.id }}/">
 						<h1>{{ item.title }}</h1>
 					</a>
 				</div>
 				<div>
-					<div class="col-span-10 text-muted">
+					<div class="col col-lg-10 text-muted">
 						{{ item.description }}
 					</div>
-					<div class="col-span-2 small text-muted">
+					<div class="col col-lg-2 small text-muted">
 						<small><i class="glyphicon glyphicon-list buffer-right"></i> {{ item.totalItems }}</small></br>
 						<small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.totalComments }}</small>
 					</div>
-					<div class="col-span-4 recent">
+					<div class="col col-lg-4 recent">
 						{% if item.mostRecentUpdate %}
 							<a href="/{{item.mostRecentUpdate.itemType}}s/{{item.mostRecentUpdate.id}}/">{{item.mostRecentUpdate.title}}</a><br />
 							{{item.mostRecentUpdate.lastCommentCreated|date:"H:i, jS M y"}}
@@ -44,7 +44,7 @@
 
 {% block sidebar%}
 	{% if content.meta.permissions.create %}
-		<p><a class="btn btn-primary col-span-16" id="create_microcosm" href="{% url create-microcosm %}">Create Microcosm</a></p>
+		<p><a class="btn btn-primary col col-lg-16" id="create_microcosm" href="{% url create-microcosm %}">Create Microcosm</a></p>
 	{% endif %}
 
 {% endblock%}

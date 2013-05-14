@@ -5,16 +5,16 @@
         {% if user %}
             <div id="comment{{ comment.id }}" class="row">
                 
-                <div class="col-span-4">
+                <div class="col col-lg-4">
                     <img src="{{ user.gravatar }}" alt="Avatar for {{ user.profileName }}" align="left" class="gravatar" />
                     <div class="h4">{{ user.profileName }}</div>
                 </div>
 
 
                 <form action="?targetUrl={{targetUrl}}" method="POST" id="commentForm">{% csrf_token %}
-                    <div class="col-span-12">
+                    <div class="col col-lg-12">
                         <div class="row">
-                            <section class="col-span-16" id="comment{{ comment.id }}body">
+                            <section class="col col-lg-16" id="comment{{ comment.id }}body">
                                 {{ form.id }}
                                 {{ form.inReplyTo }}
                                 {{ form.itemId }}
@@ -51,7 +51,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-span-8">
+                    <div class="col col-lg-8">
                         <strong>Links</strong>
 <pre>http://www.google.com - automatic!
 [Google](http://www.google.com)
@@ -76,7 +76,7 @@ __This will also be bold__
                         <strong>Mentioning people</strong>
 <pre>@user +user</pre>
                     </div>
-                    <div class="col-span-8">
+                    <div class="col col-lg-8">
                         <strong>Unordered Lists</strong>
 <pre>* fruits
     + apples

@@ -17,55 +17,55 @@
 
 
 	<div class="row">
-		<div class="col-span-4">
+		<div class="col col-lg-4">
 			<p class="text-muted">Where</p>
 		</div>
-		<div class="col-span-4">
+		<div class="col col-lg-4">
 			<p id="where">{% if content.where %}{{ content.where }}{% else %}To be determined.{% endif %}</p>
 		</div>
-		<div id="map" class="col-span-8 pull-right" style="height:366px"></div>
+		<div id="map" class="col col-lg-8 pull-right" style="height:366px"></div>
 
-		<div class="row col-span-8">
-			<div class="col-span-8">
+		<div class="row col col-lg-8">
+			<div class="col col-lg-8">
 				<p class="text-muted">From</p>
 			</div>
-			<div class="col-span-8">
+			<div class="col col-lg-8">
 				<p style="padding-left:6px;"><time id="when" datetime="{{ content.when|date:"c\Z" }}" duration="{{content.duration}}">{{content.when}}</time></p>
 			</div>
 		</div>
 
-		<div class="row col-span-8">
-			<div class="col-span-8">
+		<div class="row col col-lg-8">
+			<div class="col col-lg-8">
 				<p class="text-muted">To</p>
 			</div>
-			<div class="col-span-8">
+			<div class="col col-lg-8">
 				<p id="ends" style="padding-left:6px;"></p>
 			</div>
 		</div>
 
-		<div class="row col-span-8">
-			<div class="col-span-8">
+		<div class="row col col-lg-8">
+			<div class="col col-lg-8">
 				<p class="text-muted">Attendees</p>
 			</div>
-			<div class="col-span-8">
+			<div class="col col-lg-8">
 				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvpAttend }}</p>
 			</div>
 		</div>
 
-		<div class="row col-span-8">
-			<div class="col-span-8">
+		<div class="row col col-lg-8">
+			<div class="col col-lg-8">
 				<p class="text-muted">Attendee Limit</p>
 			</div>
-			<div class="col-span-8">
+			<div class="col col-lg-8">
 				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvpLimit }}</p>
 			</div>
 		</div>
 
-		<div class="row col-span-8">
-			<div class="col-span-8">
+		<div class="row col col-lg-8">
+			<div class="col col-lg-8">
 				<p class="text-muted">Spaces Left</p>
 			</div>
-			<div class="col-span-8">
+			<div class="col col-lg-8">
 				<p id="spaces_left" style="padding-left:6px;">{{ content.rsvpSpaces }}</p>
 			</div>
 		</div>
@@ -84,14 +84,14 @@
 
 	{% if content.meta.permissions.update %}
 		<p>
-			<a href="{% url edit-event content.id %}" id="edit-event" class="btn col-span-16">Edit event</a>
+			<a href="{% url edit-event content.id %}" id="edit-event" class="btn col col-lg-16">Edit event</a>
 		</p>
 	{% endif %}
 	{% if content.meta.permissions.delete %}
 		<form method="POST" action="{% url delete-event content.id %}">
 			{% csrf_token %}
 			<input type="hidden" name="targetUrl" value="{% url single-microcosm content.microcosmId %}" />
-			<input type="submit" value="Delete Event" id="delete-event" class="btn btn-danger col-span-16" style="width:100%; margin-top:12px;" />
+			<input type="submit" value="Delete Event" id="delete-event" class="btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
 		</form>
 	{% endif %}
 
@@ -100,19 +100,19 @@
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="yes" />
-		<input id="rsvp_yes" type="submit" value="Count me in" class="btn btn-primary col-span-16" style="width:100%;">
+		<input id="rsvp_yes" type="submit" value="Count me in" class="btn btn-primary col col-lg-16" style="width:100%;">
 	</form>
 
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="maybe" />
-		<input id="rsvp_maybe" type="submit" value="Maybe" class="btn col-span-16" style="width:100%; margin-top:12px;">
+		<input id="rsvp_maybe" type="submit" value="Maybe" class="btn col col-lg-16" style="width:100%; margin-top:12px;">
 	</form>
 
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="no" />
-		<input id="rsvp_no" type="submit" value="Can't make it" class="btn col-span-16" style="width:100%; margin-top:12px;">
+		<input id="rsvp_no" type="submit" value="Can't make it" class="btn col col-lg-16" style="width:100%; margin-top:12px;">
 	</form>
 	{% else %}
 	<a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Signup or login to attend</a>

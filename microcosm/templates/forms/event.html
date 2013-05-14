@@ -43,7 +43,7 @@
 		<input type="hidden" name="duration" id="id_duration" value="{{ form.duration.value }}" />
 
 		<div class="row">
-			<div class="col-span-16 {% if form.errors.title %} has-errors{% endif %}" style="padding-right:0px;">
+			<div class="col col-lg-16 {% if form.errors.title %} has-errors{% endif %}" style="padding-right:0px;">
 				<h4>Title</h4>
 				<p class="control-group">
 					<input
@@ -62,7 +62,7 @@
 		</div>
 
 		<div class="row">
-			<div class="col-span-8">
+			<div class="col col-lg-8">
 				<h4>Where</h4>
 				<div id="control_where" class="input-group">
 					<input
@@ -81,15 +81,15 @@
 					<p class="text-danger">Where is the event going to be held?</p>
 				{% endif %}
 			</div>
-			<div id="map" class="col-span-8 pull-right" style="height:366px"></div>
+			<div id="map" class="col col-lg-8 pull-right" style="height:366px"></div>
 
-			<div class="col-span-8">
+			<div class="col col-lg-8">
 				<h4>From</h4>
 				<div id="control_from_date" class="control-group">
-					<div class="controls col-span-8" style="padding-left:0px">
+					<div class="controls col col-lg-8" style="padding-left:0px">
 						<input id="id_from_date" name="from_date" type="text" class="input-with-feedback" value="" />
 					</div>
-					<div class="input-group col-span-8 bootstrap-timepicker">
+					<div class="input-group col col-lg-8 bootstrap-timepicker">
 						<input id="id_from_time" type="text" value="" />
 					</div>
 				</div>
@@ -99,19 +99,19 @@
 				{% endif %}
 			</div>
 
-			<div class="col-span-8">
+			<div class="col col-lg-8">
 				<h4>To</h4>
 				<div id="control_to_date" class="control-group">
-					<div class="controls col-span-8" style="padding-left:0px">
+					<div class="controls col col-lg-8" style="padding-left:0px">
 						<input id="id_to_date" name="to_date" type="text" class="input-with-feedback" value="" />
 					</div>
-					<div class="input-group col-span-8 bootstrap-timepicker">
+					<div class="input-group col col-lg-8 bootstrap-timepicker">
 						<input id="id_to_time" type="text" value="" />
 					</div>
 				</div>
 			</div>
 
-			<div class="col-span-8">
+			<div class="col col-lg-8">
 				<h4>Attendee Limit (0 for unlimited)</h4>
 				<div id="control_rsvp" class="input-group">
 					<input
@@ -131,7 +131,7 @@
 
 		{% if form.id > 0 %}
 			<div class="row">
-				<div class="col-span-16 input-group">
+				<div class="col col-lg-16 input-group">
 					<h4>Edit reason</h4>
 					<p>
 						<input
