@@ -619,8 +619,8 @@ blockquote {
 
 blockquote p {
   font-size: 20px;
-  font-weight: 300;
-  line-height: 1.25;
+  font-weight: 200;
+  line-height: 1.2;
 }
 
 blockquote p:last-child {
