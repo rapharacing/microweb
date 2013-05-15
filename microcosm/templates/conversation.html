@@ -24,49 +24,62 @@
 	{% endif %}
 
 	{% if content.meta.permissions.delete %}
-        <form method="POST" action="{% url delete-conversation content.id %}">
-        	{% csrf_token %}
-            <input type="hidden" name="targetUrl" value="{% url single-microcosm content.microcosmId %}" />
-            <input type="submit" value="Delete Conversation" class="btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
-        </form>
+		<form method="POST" action="{% url delete-conversation content.id %}">
+			{% csrf_token %}
+			<input type="hidden" name="targetUrl" value="{% url single-microcosm content.microcosmId %}" />
+			<input type="submit" value="Delete Conversation" class="btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
+		</form>
 	{% endif %}
 
 {% endblock %}
 
 {% block js %}
-    <script type="text/javascript">
-        function isEmpty(e) {
-            return (e.val().trim() == '');
-        }
-        function checkEmpty(e) {
-            if (isEmpty($(e))) {
-                addError($(e))
-            } else {
-                removeError($(e))
-            }
-        }
-        function addError(e) {
-            e.parent().addClass('has-error')
-        }
-        function removeError(e) {
-            e.parent().removeClass('has-error')
-        }
 
-        $('#id_markdown').on('change', function() {
-            checkEmpty(this);
-        }).on('blur', function() {
-            checkEmpty(this);
-        });
+	{% if user %}
+	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
+	<script type="text/javascript">
+		function isEmpty(e) {
+			return (e.val().trim() == '');
+		}
+		function checkEmpty(e) {
+			if (isEmpty($(e))) {
+				addError($(e))
+			} else {
+				removeError($(e))
+			}
+		}
+		function addError(e) {
+			e.parent().addClass('has-error')
+		}
+		function removeError(e) {
+			e.parent().removeClass('has-error')
+		}
 
-        $('#commentForm').submit(function() {
-            if (isEmpty($('#id_markdown'))) {
-                addError($('#id_markdown'))
-                return false;
-            }
-        });
+		$('#id_markdown').on('change', function() {
+			checkEmpty(this);
+		}).on('blur', function() {
+			checkEmpty(this);
+		});
 
-        $(document).ready(function() {
-            $('#id_markdown').addClass('input-with-feedback').parent().addClass('control-group');
-        });
-    </script>
+		$('#commentForm').submit(function() {
+			if (isEmpty($('#id_markdown'))) {
+				addError($('#id_markdown'))
+				return false;
+			}
+
+			// Client-side dupe check
+			md5 = hex_md5($('#id_markdown').val())
+			if (this.md5 && this.md5 == md5) {
+				return false
+			}
+			this.md5 = md5;
+
+			return true;
+		});
+
+		$(document).ready(function() {
+			$('#id_markdown').addClass('input-with-feedback').parent().addClass('control-group');
+		});
+	</script>
+	{% endif %}
 {% endblock %}

@@ -43,6 +43,7 @@
 {% endblock %}
 
 {% block js %}
+	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
 	<script type="text/javascript">
 		function isEmpty(e) {
 			return (e.val().trim() == '');
@@ -76,6 +77,16 @@
 				addError($('#id_description'))
 				return false;
 			}
+
+			// Client-side dupe check
+			md5 = hex_md5($('#id_title').val() + $('#id_description').val())
+			if (this.md5 && this.md5 == md5) {
+				return false
+			}
+			this.md5 = md5;
+
+			return true;
+
 		});
 
 		$(document).ready(function() {

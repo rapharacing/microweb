@@ -549,5 +549,28 @@ $('#eventForm').submit(function() {
 		addError($('#id_title'))
 		return false;
 	}
-	return validateDateTimes();
+
+	if (!validateDateTimes()) {
+		return false;
+	}
+
+	// Client-side dupe check
+	md5 = hex_md5(
+		$('#id_title').val() +
+		$('#id_where').val() +
+		$('#id_when').val() +
+		$('#id_duration').val() +
+		$('#id_lat').val() +
+		$('#id_lon').val() +
+		$('#id_north').val() +
+		$('#id_east').val() +
+		$('#id_south').val() +
+		$('#id_west').val()
+	)
+	if (this.md5 && this.md5 == md5) {
+		return false
+	}
+	this.md5 = md5;
+
+	return true;
 });

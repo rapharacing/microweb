@@ -92,6 +92,15 @@ $('#commentForm').submit(function() {
 		addError($('#id_markdown'))
 		return false;
 	}
+
+	// Client-side dupe check
+	md5 = hex_md5($('#id_markdown').val())
+	if (this.md5 && this.md5 == md5) {
+		return false
+	}
+	this.md5 = md5;
+
+	return true;
 });
 
 $(document).ready(function() {
