@@ -8,55 +8,16 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 
 		<link href="{{ STATIC_URL }}themes/{{ site.themeId }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-
-		<!-- Source Sans Pro -->
+		<link href="{{ STATIC_URL }}base.css" rel="stylesheet" type="text/css" />
 		<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600,400italic,600italic" rel="stylesheet" type="text/css" />
 
-		<style>
-			.headBand {
-				background-image: url('{{ site.headerBackgroundUrl }}');
-				background-position: center center;
-				margin: 24px 0;
-				min-height: 96px;
-			}
-			#logo {
-				max-height: 72px;
-			}
-			.margin-top-half {
-				margin-top: 12px;
-			}
-			.margin-top {
-				margin-top: 24px;
-			}
-			.buffer-right {
-				margin-right: 10px;
-			}
-			.glyphicon {
-				font-family: 'Glyphicons Halflings';
-				font-style: normal;
-				font-weight: normal;
-				line-height: 1;
-				vertical-align: middle;
-			}
-			.gravatar {
-				height: auto;
-				width: 72px;
-				margin-right: 10px;
-			}
-			.gravatar-small {
-				height: auto;
-				width: 48px;
-				margin-right: 10px;
-			}
-			p, a, h1, h2, h3, h4, h5, h6, .h1,
-			.h2, .h3, .h4, .h5, .h6 {
-				word-wrap: break-word;
-			}
-			.recent {
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
+		<style type="text/css">
+		.headBand {
+			background-image: url('{{ site.headerBackgroundUrl }}');
+			background-position: center center;
+			margin: 24px 0;
+			min-height: 96px;
+		}
 		</style>
 
 		{% block css %}{% endblock %}
@@ -146,10 +107,9 @@
 		</script>
 	{% endif %}
 
-	<!-- jQuery and Bootstrap -->
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
-	<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+	<script async="true" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script async="true" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<script async="true" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 
 	{% block js %}{% endblock %}
 
@@ -160,7 +120,10 @@
 		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
 		ga('create', 'UA-36931318-3', 'microco.sm');
-		ga('send', 'pageview');
+		ga('send', 'pageview', {
+			'dimension1':  '{{ site.subdomainKey }}',
+			'dimension2':  '{% if user %}user{% else %}guest{% endif %}'
+		});
 	</script>
 
 </body>
