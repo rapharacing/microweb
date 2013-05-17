@@ -120,10 +120,9 @@
 		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
 		ga('create', 'UA-36931318-3', 'microco.sm');
-		ga('send', 'pageview', {
-			'dimension1':  '{{ site.subdomainKey }}',
-			'dimension2':  '{% if user %}user{% else %}guest{% endif %}'
-		});
+		ga('set', 'dimension1', '{{ site.subdomainKey }}');
+		ga('set', 'dimension2', '{% if user %}user{% else %}guest{% endif %}');
+		ga('send', 'pageview');
 	</script>
 
 </body>
