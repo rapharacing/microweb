@@ -5,30 +5,30 @@
 	<a id="microcosm_title" href="/microcosms/{{content.id}}/"><h1>{{ content.title }}</h1></a>
 	<p id="microcosm_description" class="text-muted">{{ content.description }}</p>
 
-    {% include "pagination_nav.html" %}
+	{% include "pagination_nav.html" %}
 
 	{% for item in content.items.items %}
 		<section id="{{ item.itemType }}{{ item.id }}" class="row">
-			<div class="col col-lg-1">
+			<div class="col col-lg-1 col-sm-2">
 				{% ifequal item.itemType "conversation" %}<span class="glyphicon text-muted" style="font-size:36px;line-height:48px;">&#57617;</span>{% endifequal %}
 				{% ifequal item.itemType "event" %}<span class="glyphicon text-muted" style="font-size:36px;line-height:48px;">&#57609;</span>{% endifequal %}
 			</div>
 
-			<div class="col col-lg-9">
+			<div class="col col-lg-9 col-sm-14">
 				<strong><a href="/{{ item.itemType }}s/{{ item.id }}/">{{ item.title }}</a></strong><br />
-				started by <a href="/profiles/{{ item.meta.createdBy.id }}/">{{ item.meta.createdBy.profileName|truncatechars:25 }}</a> on {{ item.meta.created|date:"jS M Y"  }}
+				<small class="text-muted">started by <a href="/profiles/{{ item.meta.createdBy.id }}/">{{ item.meta.createdBy.profileName|truncatechars:25 }}</a> <time datetime="{{ item.meta.created|date:"c" }}"></time></small>
 			</div>
 
-			<div class="col col-lg-2 small text-muted">
-				<small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.totalComments }}</small><br />
-				<small><i class="glyphicon glyphicon-eye-open buffer-right"></i> {{ item.totalViews }}</small>
+			<div class="col col-lg-2 col-sm-2 small text-muted">
+				<small class="nowrap"><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.totalComments }}</small><br />
+				<small class="nowrap"><i class="glyphicon glyphicon-eye-open buffer-right"></i> {{ item.totalViews }}</small>
 			</div>
 
-			<div class="col col-lg-4">
+			<div class="col col-lg-4 col-sm-14">
 				{% if item.lastCommentCreated %}
 				<a href="/profiles/{{item.lastCommentCreatedBy.id}}/"><img src="{{ item.lastCommentCreatedBy.gravatar }}" alt="Avatar for {{item.lastCommentCreatedBy.profileName }}" align="left" class="gravatar-small" /></a>
-				<small>{{ item.lastCommentCreatedBy.profileName|truncatechars:25 }}</small><br />
-				<small>{{ item.lastCommentCreated|date:"jS M Y" }}</small>
+				<small><a href="/profiles/{{item.lastCommentCreatedBy.id}}/">{{ item.lastCommentCreatedBy.profileName|truncatechars:25 }}</a></small><br />
+				<small class="text-muted"><time datetime="{{ item.lastCommentCreated|date:"c" }}"></time></small>
 				{% endif %}
 			</div>
 		</section>
@@ -36,28 +36,26 @@
 		<hr class="col-offset-1 col col-lg-15" />
 	{% endfor %}
 
-    {% include "pagination_nav.html" %}
+	{% include "pagination_nav.html" %}
 
 {% endblock %}
 
 {% block sidebar%}
 	<p class="muted">
 		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:25 }}</a><br />
-		{{ content.meta.created|date:"jS M Y" }}
+		<time datetime="{{ content.meta.created|date:"c" }}"></time>
 	</p>
 
 	{% if content.meta.permissions.update %}
-		<p><a id="edit_microcosm" href="{% url edit-microcosm content.id %}" class="btn col col-lg-16">Edit Microcosm</a></p>
+		<p><a id="edit_microcosm" href="{% url edit-microcosm content.id %}" class="btn btn-default col col-lg-16">Edit Microcosm</a></p>
 	{% endif %}
 
 	{% if content.meta.permissions.delete %}
-        <form method="POST" action="{% url delete-microcosm content.id %}">{% csrf_token %}
-            <input type="hidden" name="targetUrl" value="{% url list-microcosms %}" />
-            <input type="submit" value="Delete Microcosm" class="btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
-        </form>
-	{% endif %}
-	{% if content.meta.permissions.update or content.meta.permissions.delete %}
-		<hr />
+		<form method="POST" action="{% url delete-microcosm content.id %}">
+			{% csrf_token %}
+			<input type="hidden" name="targetUrl" value="{% url list-microcosms %}" />
+			<input type="submit" value="Delete Microcosm" class="btn-as-p btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
+		</form>
 	{% endif %}
 
 	{% if content.meta.permissions.create %}

@@ -56,9 +56,11 @@ function showEndDate(startDate, duration) {
 			// To figure out the millisecond difference
 			dur = dur * 60000;
 			// And create a date object representing that end point in time
-			var ed = new Date(sd.valueOf() + dur);
+			var ed = moment(new Date(sd.valueOf() + dur));
 			// And update the fields for the end info
-			$('#ends').text(formatDate(ed));
+			$('#ends').attr('datetime', ed.utc().format());
+			// This is in base.js
+			updateTimes();
 		}
 	}
 }

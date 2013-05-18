@@ -21,14 +21,18 @@
 					<div class="col col-lg-10 text-muted">
 						{{ item.description }}
 					</div>
-					<div class="col col-lg-2 small text-muted">
+					<div class="col col-lg-2 col-sm-4 small text-muted">
 						<small><i class="glyphicon glyphicon-list buffer-right"></i> {{ item.totalItems }}</small></br>
 						<small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.totalComments }}</small>
 					</div>
-					<div class="col col-lg-4 recent">
+					<div class="col col-lg-4 col-sm-12 recent">
 						{% if item.mostRecentUpdate %}
 							<a href="/{{item.mostRecentUpdate.itemType}}s/{{item.mostRecentUpdate.id}}/">{{item.mostRecentUpdate.title}}</a><br />
-							{{item.mostRecentUpdate.lastCommentCreated|date:"H:i, jS M y"}}
+							{% if item.mostRecentUpdate.totalComments %}
+								<small class="text-muted"><time datetime="{{item.mostRecentUpdate.lastCommentCreated|date:"c"}}"></time> by <a href="/profiles/{{ item.mostRecentUpdate.lastCommentCreatedBy.id }}/">{{ item.mostRecentUpdate.lastCommentCreatedBy.profileName }}</a></small>
+							{% else%}
+								<small class="text-muted"><time datetime="{{item.mostRecentUpdate.meta.created|date:"c"}}"></time> by <a href="/profiles/{{ item.mostRecentUpdate.meta.createdBy.id }}/">{{ item.mostRecentUpdate.meta.createdBy.profileName }}</a></small>
+							{% endif %}
 						{% endif %}
 					</div>
 				</div>

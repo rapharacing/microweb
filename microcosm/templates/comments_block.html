@@ -20,7 +20,7 @@
 					</div>
 					<div class="row">
 						<div class="col col-lg-4 pull-left">
-							<small class="text-muted">{{ comment.meta.created|date:"jS M Y" }} at {{ comment.meta.created|date:"H:i" }}</small>
+							<small class="text-muted"><time datetime="{{ comment.meta.created|date:"c" }}"></time></small>
 						</div>
 
 						<section class="pull-right" id="comment{{ comment.id }}controls">
@@ -30,7 +30,7 @@
 									<input type="hidden" name="targetUrl" value="{{request.path}}" />
 									<input type="submit" value="Delete Comment" class="btn btn-small btn-danger" />
 								</form>
-								<a class="btn btn-small" href="/comments/{{comment.id}}/edit?targetUrl={{request.path}}">Edit</a>
+								<a class="btn btn-default btn-small" href="/comments/{{comment.id}}/edit?targetUrl={{request.path}}">Edit</a>
 							{% endif %}
 							<a class="btn btn-small btn-primary" href="/comments/create?targetUrl={{request.path}}&itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}">Reply</a>
 						</section>

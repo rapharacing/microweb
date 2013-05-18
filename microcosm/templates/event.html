@@ -27,19 +27,19 @@
 
 		<div class="row col col-lg-8">
 			<div class="col col-lg-8">
-				<p class="text-muted">From</p>
+				<p class="text-muted">Starts</p>
 			</div>
 			<div class="col col-lg-8">
-				<p style="padding-left:6px;"><time id="when" datetime="{{ content.when|date:"c\Z" }}" duration="{{content.duration}}">{{content.when}}</time></p>
+				<p style="padding-left:6px;"><time id="when" format="LLL" datetime="{{ content.when|date:"c\Z" }}" duration="{{content.duration}}">{{content.when}}</time></p>
 			</div>
 		</div>
 
 		<div class="row col col-lg-8">
 			<div class="col col-lg-8">
-				<p class="text-muted">To</p>
+				<p class="text-muted">Ends</p>
 			</div>
 			<div class="col col-lg-8">
-				<p id="ends" style="padding-left:6px;"></p>
+				<p style="padding-left:6px;"><time id="ends" format="LLL"></time></p>
 			</div>
 		</div>
 
@@ -79,12 +79,12 @@
 {% block sidebar %}
 	<p class="muted">
 		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:25 }}</a><br />
-		{{ content.meta.created|date:"jS M Y" }}
+		<time datetime="{{ content.meta.created|date:"c" }}"></time>
 	</p>
 
 	{% if content.meta.permissions.update %}
 		<p>
-			<a href="{% url edit-event content.id %}" id="edit_event" class="btn col col-lg-16">Edit event</a>
+			<a href="{% url edit-event content.id %}" id="edit_event" class="btn btn-default col col-lg-16">Edit event</a>
 		</p>
 	{% endif %}
 	{% if content.meta.permissions.delete %}
@@ -106,13 +106,13 @@
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="maybe" />
-		<input id="rsvp_maybe" type="submit" value="Maybe" class="btn col col-lg-16" style="width:100%; margin-top:12px;">
+		<input id="rsvp_maybe" type="submit" value="Maybe" class="btn btn-default col col-lg-16" style="width:100%; margin-top:12px;">
 	</form>
 
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="no" />
-		<input id="rsvp_no" type="submit" value="Can't make it" class="btn col col-lg-16" style="width:100%; margin-top:12px;">
+		<input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default col col-lg-16" style="width:100%; margin-top:12px;">
 	</form>
 	{% else %}
 	<a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Signup or login to attend</a>
