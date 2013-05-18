@@ -19,6 +19,9 @@ function updateTimes() {
 		}
 	});
 }
+if (jQuery && moment) {
+	updateTimes();
+}
 
 $('document').ready(function() {
 	updateTimes();
