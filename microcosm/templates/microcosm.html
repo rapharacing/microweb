@@ -10,8 +10,8 @@
 	{% for item in content.items.items %}
 		<section id="{{ item.itemType }}{{ item.id }}" class="row">
 			<div class="col col-lg-1 col-sm-2">
-				{% ifequal item.itemType "conversation" %}<span class="glyphicon text-muted" style="font-size:36px;line-height:48px;">&#57617;</span>{% endifequal %}
-				{% ifequal item.itemType "event" %}<span class="glyphicon text-muted" style="font-size:36px;line-height:48px;">&#57609;</span>{% endifequal %}
+				{% ifequal item.itemType "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;"></span>{% endifequal %}
+				{% ifequal item.itemType "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;"></span>{% endifequal %}
 			</div>
 
 			<div class="col col-lg-9 col-sm-14">

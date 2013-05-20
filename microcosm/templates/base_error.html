@@ -1,109 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>Error</title>
-    <link rel="shortcut icon" href="/static/img/favico.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta charset="utf-8" />
+	<title>Error</title>
+	<link rel="shortcut icon" href="/static/img/favico.png" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 
-    <link href="/static/themes/1/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="{{ STATIC_URL }}themes/1/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="{{ STATIC_URL }}base.css" rel="stylesheet" type="text/css" />
+	<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600,400italic,600italic" rel="stylesheet" type="text/css" />
 
-    <!-- Source Sans Pro -->
-    <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600,400italic,600italic" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+	.headBand {
+		background-image: url('/static/themes/1/background.png');
+		background-position: center center;
+		margin: 24px 0;
+		min-height: 96px;
+	}
+	</style>
 
-    <style>
-        .headBand {
-            background-image: url('/static/themes/1/background.png');
-            background-position: center center;
-            margin: 24px 0;
-            min-height: 96px;
-        }
-        .margin-top-half {
-            margin-top: 12px;
-        }
-        .margin-top {
-            margin-top: 24px;
-        }
-        .buffer-right {
-            margin-right: 10px;
-        }
-        .glyphicon {
-            font-family: 'Glyphicons Halflings';
-            font-style: normal;
-            font-weight: normal;
-            line-height: 1;
-            vertical-align: middle;
-        }
-        .gravatar {
-            height: 72px;
-            width: 72px;
-            margin-right: 10px;
-        }
-        .gravatar-small {
-            height: 48px;
-            width: 48px;
-            margin-right: 10px;
-        }
-    </style>
-
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+	<!--[if lt IE 9]>   
+	  <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.1.0/respond.min.js"></script>
+	  <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
 </head>
 <body>
-<div class="headBand">
-    <div class="container">
-        <header class="row">
-            <div class="col col-lg-16">
-                <div class="row">
-                    <div id="logo" class="col col-lg-3 margin-top-half">
-                        <a href="/"><img src="/static/themes/1/logo.png" alt="Powered by Microcosm" width="320" height="96" /></a>
-                    </div>
-                </div>
-            </div>
-        </header>
-    </div>
-</div>
+	<div class="headBand">
+		<div class="container">
+			<header class="row">
+				<div class="col col-lg-16">
+					<div class="row">
+						<div id="logo" class="col col-lg-3 margin-top-half">
+							<a href="/"><img src="/static/themes/1/logo.png" alt="Powered by Microcosm" width="320" height="96" /></a>
+						</div>
+					</div>
+				</div>
+			</header>
+		</div>
+	</div>
 
-<div class="container">
-    {% block notifications %}{% endblock %}
+	<div class="container">
+		{% block notifications %}{% endblock %}
 
-    <div class="row">
-        <section id="content" class="col col-lg-12">
-            {% block content %}{% endblock %}
-        </section>
+		<div class="row">
+			<section id="content" class="col col-lg-12">
+				{% block content %}{% endblock %}
+			</section>
 
-        <section id="sidebar" class="col-offset-1 col col-lg-3">
-            {% block sidebar %}{% endblock %}
-        </section>
-    </div>
+			<section id="sidebar" class="col-offset-1 col col-lg-3">
+				{% block sidebar %}{% endblock %}
+			</section>
+		</div>
 
-    <footer class="row">
-        <div class="col-offset-13 col col-lg-3">
-            <small>Powered by <a href="http://microco.sm/" title="Powered by Microcosm">Microcosm</a></small>
-        </div>
-    </footer>
+		<footer class="row">
+			<div class="col-offset-13 col col-lg-3">
+				<small>Powered by <a href="http://microco.sm/" title="Powered by Microcosm">Microcosm</a></small>
+			</div>
+		</footer>
 
-</div>
+	</div>
 
-<!-- jQuery and Bootstrap -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
+	<!-- jQuery and Bootstrap -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
+	<script src="/static/js/bootstrap.min.js"></script>
+	<script src="{{ STATIC_URL }}js/base.js"></script>
 
-{% block js %}{% endblock %}
+	{% block js %}{% endblock %}
 
-<script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-36931318-3', 'microco.sm');
-    ga('send', 'pageview');
-</script>
+		ga('create', 'UA-36931318-3', 'microco.sm');
+		ga('send', 'pageview');
+	</script>
 
 </body>
 </html>
