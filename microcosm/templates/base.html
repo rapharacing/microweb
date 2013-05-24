@@ -92,7 +92,7 @@
 		</form>
 
 		<!-- Mozilla Persona -->
-		<script src="https://login.persona.org/include.js"></script>
+		<script src="{{ STATIC_URL }}js/persona.js"></script>
 		<script>
 			function login() {
 				navigator.id.get(function(assertion) {
