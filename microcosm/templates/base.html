@@ -7,19 +7,21 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 
-		<link href="{{ STATIC_URL }}themes/{{ site.themeId }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		<!-- Default site theme ID is 1 -->
+		<link href="{{ STATIC_URL }}themes/{% if site.themeId %}{{ site.themeId }}{% else %}1{% endif %}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 		<link href="{{ STATIC_URL }}base.css" rel="stylesheet" type="text/css" />
 		<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600,400italic,600italic" rel="stylesheet" type="text/css" />
 
 		<style type="text/css">
 		.headBand {
-			background-image: url('{{ site.headerBackgroundUrl }}');
+			background-image: url('{% if site.headerBackgroundUrl %}{{ site.headerBackgroundUrl }}{% else %}{{ STATIC_URL }}themes/1/background.png{% endif %}');
 			background-position: center center;
 			margin: 24px 0;
 			min-height: 96px;
 		}
 		</style>
 
+		<!-- For custom page css (e.g. event.html) -->
 		{% block css %}{% endblock %}
 
 		<!--[if lt IE 9]>	
@@ -28,13 +30,15 @@
 		<![endif]-->
 	</head>
 <body>
+
+	<!-- Site banner and user module -->
 	<div class="headBand">
 		<div class="container">
 			<header class="row">
 				<div class="col col-lg-16">
 					<div class="row">
 						<div id="logo" class="col col-lg-6 col-md-6 col-sm-8 margin-top-half">	
-							<a href="/">{% if site.logoUrl != "" %}<img src="{{ site.logoUrl }}" alt="{{ site.title }} - Powered by Microcosm" id="logo" />{% else %}{{ site.title }}{% endif %}</a>
+							<a href="/"><img src="{% if site.logoUrl %}{{ site.logoUrl }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" /></a>
 						</div>
 
 						{% block whoami %}
@@ -62,6 +66,7 @@
 		</div>
 	</div>
 
+	<!-- Container for main page content -->
 	<div class="container">
 		{% block notifications %}{% endblock %}
 
@@ -84,7 +89,7 @@
 	</div>
 
 	{% if not user %}
-		<!-- Persona Login Form -->
+		<!-- Persona Login Form (submitted by persona login action, not directly by user) -->
 		<form id="login-form" method="POST" action="{% url login %}">
 			{% csrf_token %}
 			<input id="Assertion" type="hidden" name="Assertion" value="" />
@@ -113,8 +118,10 @@
 	<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 	<script src="{{ STATIC_URL }}js/base.js"></script>
 
+	<!-- For custom page js (e.g. event.html) -->
 	{% block js %}{% endblock %}
 
+	<!-- Google Analytics -->
 	<script>
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
