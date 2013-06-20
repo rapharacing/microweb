@@ -47,7 +47,6 @@ def exception_handler(view_func):
         try:
             return view_func(request, *args, **kwargs)
         except APIException as e:
-            logging.error(traceback.format_exc())
             if e.status_code == 401:
                 raise PermissionDenied
             elif e.status_code == 404:
