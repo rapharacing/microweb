@@ -1,5 +1,3 @@
-import traceback
-import logging
 import requests
 
 from functools import wraps
@@ -12,6 +10,8 @@ from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 from microcosm.api.exceptions import APIException
 from microcosm.api.resources import Microcosm, User, GeoCode
@@ -546,6 +546,12 @@ class ErrorView():
             'user' : request.whoami,
         }
         return render(request, '403.html', view_data)
+
+    @staticmethod
+    def server_error(request):
+        return render_to_response('500.html',
+            context_instance = RequestContext(request)
+        )
 
 
 class AuthenticationView():
