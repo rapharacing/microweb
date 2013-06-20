@@ -5,7 +5,7 @@ from microweb import settings
 from microweb.helpers import build_url
 
 from django.core.urlresolvers import reverse
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import Http404
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
@@ -225,7 +225,18 @@ class ItemView(object):
 
         if request.method == 'POST':
             cls.resource_cls.delete(request.META['HTTP_HOST'], item_id, request.access_token)
-            redirect = reverse(MicrocosmView.list)
+            # item deletion
+            if request.POST.has_key('microcosm_id') and request.POST['microcosm_id'] != "":
+                microcosm_id = int(request.POST['microcosm_id'])
+                redirect = reverse(MicrocosmView.single, args=(microcosm_id,))
+            # comment deletion
+            # TODO: to be replaced with item mappings
+            elif request.POST.has_key('item_type'):
+                if request.POST['item_type'] not in ['event', 'conversation']:
+                    raise SuspiciousOperation
+                redirect = '/%ss/%d' % (request.POST['item_type'], int(request.POST['item_id']))
+            else:
+                redirect = reverse(MicrocosmView.list)
             return HttpResponseRedirect(redirect)
         else:
             return HttpResponseNotAllowed()
