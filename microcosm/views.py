@@ -23,6 +23,7 @@ from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Profile
+from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
 
 from microcosm.forms.forms import EventCreate
 from microcosm.forms.forms import EventEdit
@@ -430,7 +431,9 @@ class CommentView(ItemView):
         if request.GET.has_key('itemId'):
             initial['itemId'] = int(request.GET.get('itemId', None))
         if request.GET.has_key('itemType'):
-            initial['itemType'] = int(request.GET.get('itemType', None))
+            if request.GET['itemType'] not in COMMENTABLE_ITEM_TYPES:
+                raise ValueError
+            initial['itemType'] = request.GET.get('itemType', None)
         if request.GET.has_key('inReplyTo'):
             initial['inReplyTo'] = int(request.GET.get('inReplyTo', None))
 
