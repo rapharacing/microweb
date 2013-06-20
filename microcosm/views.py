@@ -421,15 +421,15 @@ class CommentView(ItemView):
     @staticmethod
     def fill_from_get(request, initial):
         """
-        Utility for populating form fields from GET parameters
+        Populating comment form fields from GET parameters
         """
 
         if request.GET.has_key('itemId'):
-            initial['itemId'] = request.GET.get('itemId', None)
+            initial['itemId'] = int(request.GET.get('itemId', None))
         if request.GET.has_key('itemType'):
-            initial['itemType'] = request.GET.get('itemType', None)
+            initial['itemType'] = int(request.GET.get('itemType', None))
         if request.GET.has_key('inReplyTo'):
-            initial['inReplyTo'] = request.GET.get('inReplyTo', None)
+            initial['inReplyTo'] = int(request.GET.get('inReplyTo', None))
 
         return initial
 
