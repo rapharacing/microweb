@@ -6,7 +6,6 @@ from settings import API_VERSION
 from settings import API_PATH
 from settings import API_SCHEME
 from settings import API_DOMAIN_NAME
-from settings import DEBUG
 
 # A hack used when converting timestamp strings to datetime.datetime instances
 VALID_DATETIME = re.compile(r'^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}.?\d{0,6}Z$')
