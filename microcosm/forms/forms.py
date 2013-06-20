@@ -43,9 +43,6 @@ class CommentForm(django.forms.Form):
     # TODO: why is initial=0 ?
     inReplyTo = django.forms.IntegerField(required=False, initial=0, widget=django.forms.HiddenInput)
 
-    # Optional redirect path.
-    targetUrl = django.forms.CharField(required=False, widget=django.forms.HiddenInput)
-
 
 class EventCreate(ItemForm):
     """
