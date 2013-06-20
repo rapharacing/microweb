@@ -1,7 +1,14 @@
-from django.conf.urls import patterns
 from django.conf.urls import url
+from django.conf.urls import patterns
 
-from microcosm.views import MicrocosmView, EventView, ConversationView, CommentView, ProfileView, AuthenticationView, GeoView
+from microcosm.views import MicrocosmView
+from microcosm.views import EventView
+from microcosm.views import ConversationView
+from microcosm.views import CommentView
+from microcosm.views import ProfileView
+from microcosm.views import AuthenticationView
+from microcosm.views import GeoView
+
 
 urlpatterns = patterns('',
 
@@ -54,6 +61,3 @@ urlpatterns = patterns('',
     # Echoes request headers
     url(r'^headers/', 'microcosm.views.echo_headers'),
 )
-
-handler403 = 'microcosm.views.forbidden'
-handler404 = 'microcosm.views.not_found'
