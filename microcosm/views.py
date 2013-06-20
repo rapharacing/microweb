@@ -175,7 +175,6 @@ class ItemView(object):
                 initial = {
                     'itemId': item_id,
                     'itemType': cls.item_type,
-                    'targetUrl': '/%s/%s' % (cls.item_plural, item_id),
                 }
             )
             view_data['comment_form'] = comment_form
@@ -223,7 +222,7 @@ class ItemView(object):
 
         if request.method == 'POST':
             cls.resource_cls.delete(request.META['HTTP_HOST'], item_id, request.access_token)
-            redirect = request.POST.get('targetUrl', None) or reverse(MicrocosmView.list)
+            redirect = reverse(MicrocosmView.list)
             return HttpResponseRedirect(redirect)
         else:
             return HttpResponseNotAllowed()
@@ -426,8 +425,6 @@ class CommentView(ItemView):
         Utility for populating form fields from GET parameters
         """
 
-        if request.GET.has_key('targetUrl'):
-            initial['targetUrl'] = request.GET.get('targetUrl', None)
         if request.GET.has_key('itemId'):
             initial['itemId'] = request.GET.get('itemId', None)
         if request.GET.has_key('itemType'):
@@ -524,8 +521,6 @@ class CommentView(ItemView):
                 item_id,
                 access_token=request.access_token
             )
-            initial = CommentView.fill_from_get(request, {})
-            if initial.has_key('targetUrl'): comment['targetUrl'] = initial['targetUrl']
             view_data['form'] = cls.edit_form(comment)
             return render(request, cls.form_template, view_data)
 
