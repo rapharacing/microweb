@@ -2,10 +2,12 @@ import requests
 
 from functools import wraps
 from microweb import settings
+from microweb.helpers import build_url
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404
+from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
@@ -14,7 +16,9 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from microcosm.api.exceptions import APIException
-from microcosm.api.resources import Microcosm, User, GeoCode
+from microcosm.api.resources import Microcosm
+from microcosm.api.resources import User
+from microcosm.api.resources import GeoCode
 from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
@@ -28,7 +32,6 @@ from microcosm.forms.forms import ConversationCreate
 from microcosm.forms.forms import ConversationEdit
 from microcosm.forms.forms import CommentForm
 from microcosm.forms.forms import ProfileEdit
-from microweb.helpers import build_url
 
 
 def exception_handler(view_func):
