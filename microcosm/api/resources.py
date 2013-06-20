@@ -7,6 +7,12 @@ from microweb.helpers import DateTimeEncoder
 from microweb.helpers import VALID_DATETIME
 from microweb.helpers import build_url
 
+# Item types that can have comments
+COMMENTABLE_ITEM_TYPES = [
+    'event',
+    'conversation',
+    'poll'
+]
 
 class APIResource(object):
     """
