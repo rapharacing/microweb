@@ -29,11 +29,11 @@
 									{% csrf_token %}
 									<input type="hidden" name="item_id" value="{{comment.itemId}}"/>
 									<input type="hidden" name="item_type" value="{{comment.itemType}}"/>
-									<input type="submit" value="Delete Comment" class="btn btn-small btn-danger" />
+									<input type="submit" value="Delete Comment" class="btn btn-small btn-danger" id="comment{{ comment.id }}delete"/>
 								</form>
-								<a class="btn btn-default btn-small" href="/comments/{{comment.id}}/edit">Edit</a>
+								<a class="btn btn-default btn-small" href="/comments/{{comment.id}}/edit" id="comment{{ comment.id }}edit">Edit</a>
 							{% endif %}
-							<a class="btn btn-small btn-primary" href="/comments/create?itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}">Reply</a>
+							<a class="btn btn-small btn-primary" href="/comments/create?itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}" id="comment{{ comment.id }}reply">Reply</a>
 						</section>
 					</div>
 				</div>
