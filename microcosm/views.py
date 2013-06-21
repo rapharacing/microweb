@@ -1,24 +1,29 @@
-import traceback
-import logging
 import requests
 
 from functools import wraps
 from microweb import settings
+from microweb.helpers import build_url
 
 from django.core.urlresolvers import reverse
-from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseBadRequest
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.http import Http404
+from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 from microcosm.api.exceptions import APIException
-from microcosm.api.resources import Microcosm, User, GeoCode
+from microcosm.api.resources import Microcosm
+from microcosm.api.resources import User
+from microcosm.api.resources import GeoCode
 from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Profile
+from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
 
 from microcosm.forms.forms import EventCreate
 from microcosm.forms.forms import EventEdit
@@ -28,7 +33,6 @@ from microcosm.forms.forms import ConversationCreate
 from microcosm.forms.forms import ConversationEdit
 from microcosm.forms.forms import CommentForm
 from microcosm.forms.forms import ProfileEdit
-from microweb.helpers import build_url
 
 
 def exception_handler(view_func):
@@ -47,7 +51,6 @@ def exception_handler(view_func):
         try:
             return view_func(request, *args, **kwargs)
         except APIException as e:
-            logging.error(traceback.format_exc())
             if e.status_code == 401:
                 raise PermissionDenied
             elif e.status_code == 404:
@@ -175,7 +178,6 @@ class ItemView(object):
                 initial = {
                     'itemId': item_id,
                     'itemType': cls.item_type,
-                    'targetUrl': '/%s/%s' % (cls.item_plural, item_id),
                 }
             )
             view_data['comment_form'] = comment_form
@@ -223,7 +225,18 @@ class ItemView(object):
 
         if request.method == 'POST':
             cls.resource_cls.delete(request.META['HTTP_HOST'], item_id, request.access_token)
-            redirect = request.POST.get('targetUrl', None) or reverse(MicrocosmView.list)
+            # item deletion
+            if request.POST.has_key('microcosm_id') and request.POST['microcosm_id'] != "":
+                microcosm_id = int(request.POST['microcosm_id'])
+                redirect = reverse(MicrocosmView.single, args=(microcosm_id,))
+            # comment deletion
+            # TODO: to be replaced with item mappings
+            elif request.POST.has_key('item_type'):
+                if request.POST['item_type'] not in ['event', 'conversation']:
+                    raise SuspiciousOperation
+                redirect = '/%ss/%d' % (request.POST['item_type'], int(request.POST['item_id']))
+            else:
+                redirect = reverse(MicrocosmView.list)
             return HttpResponseRedirect(redirect)
         else:
             return HttpResponseNotAllowed()
@@ -423,17 +436,17 @@ class CommentView(ItemView):
     @staticmethod
     def fill_from_get(request, initial):
         """
-        Utility for populating form fields from GET parameters
+        Populating comment form fields from GET parameters
         """
 
-        if request.GET.has_key('targetUrl'):
-            initial['targetUrl'] = request.GET.get('targetUrl', None)
         if request.GET.has_key('itemId'):
-            initial['itemId'] = request.GET.get('itemId', None)
+            initial['itemId'] = int(request.GET.get('itemId', None))
         if request.GET.has_key('itemType'):
+            if request.GET['itemType'] not in COMMENTABLE_ITEM_TYPES:
+                raise ValueError
             initial['itemType'] = request.GET.get('itemType', None)
         if request.GET.has_key('inReplyTo'):
-            initial['inReplyTo'] = request.GET.get('inReplyTo', None)
+            initial['inReplyTo'] = int(request.GET.get('inReplyTo', None))
 
         return initial
 
@@ -524,8 +537,6 @@ class CommentView(ItemView):
                 item_id,
                 access_token=request.access_token
             )
-            initial = CommentView.fill_from_get(request, {})
-            if initial.has_key('targetUrl'): comment['targetUrl'] = initial['targetUrl']
             view_data['form'] = cls.edit_form(comment)
             return render(request, cls.form_template, view_data)
 
@@ -552,6 +563,12 @@ class ErrorView():
             'user' : request.whoami,
         }
         return render(request, '403.html', view_data)
+
+    @staticmethod
+    def server_error(request):
+        return render_to_response('500.html',
+            context_instance = RequestContext(request)
+        )
 
 
 class AuthenticationView():

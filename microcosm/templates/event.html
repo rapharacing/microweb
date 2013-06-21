@@ -90,7 +90,7 @@
 	{% if content.meta.permissions.delete %}
 		<form method="POST" action="{% url delete-event content.id %}">
 			{% csrf_token %}
-			<input type="hidden" name="targetUrl" value="{% url single-microcosm content.microcosmId %}" />
+			<input type="hidden" name="microcosm_id" value="{{content.microcosmId}}" />
 			<input type="submit" value="Delete Event" id="delete-event" class="btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
 		</form>
 	{% endif %}

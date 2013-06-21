@@ -27,12 +27,13 @@
 							{% if comment.meta.createdBy.id == user.id or user.admin or user.moderator %}
 								<form method="POST" action="{% url delete-comment comment.id %}" style="display:inline;">
 									{% csrf_token %}
-									<input type="hidden" name="targetUrl" value="{{request.path}}" />
-									<input type="submit" value="Delete Comment" class="btn btn-small btn-danger" id="comment{{ comment.id }}delete" />
+									<input type="hidden" name="item_id" value="{{comment.itemId}}"/>
+									<input type="hidden" name="item_type" value="{{comment.itemType}}"/>
+									<input type="submit" value="Delete Comment" class="btn btn-small btn-danger" id="comment{{ comment.id }}delete"/>
 								</form>
-								<a class="btn btn-default btn-small" href="/comments/{{comment.id}}/edit?targetUrl={{request.path}}" id="comment{{ comment.id }}edit">Edit</a>
+								<a class="btn btn-default btn-small" href="/comments/{{comment.id}}/edit" id="comment{{ comment.id }}edit">Edit</a>
 							{% endif %}
-							<a class="btn btn-small btn-primary" href="/comments/create?targetUrl={{request.path}}&itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}" id="comment{{ comment.id }}reply">Reply</a>
+							<a class="btn btn-small btn-primary" href="/comments/create?itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}" id="comment{{ comment.id }}reply">Reply</a>
 						</section>
 					</div>
 				</div>
@@ -63,7 +64,6 @@
 							{{ comment_form.itemId }}
 							{{ comment_form.itemType }}
 							<div>{{ comment_form.markdown }}</div>
-							{{ comment_form.targetUrl }}
 						</section>
 					</div>
 					<br />
