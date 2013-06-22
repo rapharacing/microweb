@@ -32,26 +32,19 @@ class APIResource(object):
             resource_url = url_override
         else:
             path_fragments = [cls.resource_fragment]
-            if id:
-                id = int(id)
-                assert id > 0, 'Resource ID must be greater than zero'
-                path_fragments.append(id)
+            if id: path_fragments.append(id)
             resource_url = build_url(host, path_fragments)
 
         params = {}
-        if access_token:
-            params['access_token'] = access_token
-        if offset:
-            offset = int(offset)
-            assert offset % 25 == 0, 'Offset must be a multiple of 25'
-            params['offset'] = offset
+        if access_token: params['access_token'] = access_token
+        if offset: params['offset'] = offset
 
         response = requests.get(resource_url, params=params, headers=headers)
 
         try:
             resource = response.json()
         except ValueError:
-            raise APIException('The API has returned invalid json: %s' % response.content, 500)
+            raise APIException('Response not valid json: %s' % response.content, 500)
 
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
@@ -89,7 +82,7 @@ class APIResource(object):
         try:
             resource = response.json()
         except ValueError:
-            raise APIException('The API has returned invalid json: %s' % response.content, 500)
+            raise APIException('Response not valid json: %s' % response.content, 500)
 
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
@@ -105,10 +98,7 @@ class APIResource(object):
         Update an API resource with PUT.
         """
 
-        id = int(id)
-        assert id > 0, 'Resource ID must be greater than zero'
-        path_fragments = [cls.resource_fragment, id]
-        resource_url = build_url(host, path_fragments)
+        resource_url = build_url(host, [cls.resource_fragment, id])
 
         headers = {
             'Content-Type': 'application/json',
@@ -152,8 +142,6 @@ class APIResource(object):
         path_fragments = [cls.resource_fragment]
 
         if id:
-            id = int(id)
-            assert id > 0, 'Resource ID must be greater than zero'
             path_fragments.append(id)
         elif access_token:
             path_fragments.append(access_token)
