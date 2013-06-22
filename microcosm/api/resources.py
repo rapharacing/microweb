@@ -4,7 +4,6 @@ import requests
 from requests import RequestException
 from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
-from microweb.helpers import VALID_DATETIME
 from microweb.helpers import build_url
 
 # Item types that can have comments
@@ -178,89 +177,38 @@ class APIResource(object):
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
 
-    @staticmethod
-    def process_timestamp(resource):
-        """
-        Recurse over unmarshalled json and convert
-        any strings that are ISO8601-like into python
-        datetime objects. This is far from ideal and will be replaced
-        in future with xpath-like notation for visiting specific
-        attributes.
-
-        Args:
-            resource: an JSON API response that has been deserialized. This will
-            usually be a dictionary but could also be a list.
-
-        Returns:
-            the same resource, but with timestamp strings as datetime objects.
-        """
-
-        if isinstance(resource, list):
-            for item in resource:
-                APIResource.process_timestamp(item)
-        else:
-            for key in resource.keys():
-                if isinstance(resource[key], unicode):
-                    if bool(VALID_DATETIME.search(resource[key])):
-                        resource[key] = parse_timestamp(resource[key])
-                elif isinstance(resource[key], list) or isinstance(resource[key], dict):
-                    APIResource.process_timestamp(resource[key])
-            return resource
-
-    @classmethod
-    def create_linkmap(cls, resource):
-        """
-        Mutate a list of links into a dictionary for easy access
-        in templates. This will stop working if 'href' attributes
-        are returned as a list as per spec.
-        """
-
-        # Applies to all resources
-        if resource.has_key('meta') and resource['meta'].get('links', None):
-            resource['meta']['linkmap'] = APIResource.list_to_map(resource['meta']['links'])
-
-        inner_list = None
-        # Applies only to single items
-        if resource.has_key('id'):
-            if resource.get('comments', None):
-                inner_list = resource['comments']
-            elif resource.get('items', None):
-                inner_list = resource['items']
-        # Applies to collections
-        elif resource.get(cls.resource_fragment, None):
-            inner_list = resource[cls.resource_fragment]
-
-        # Transform the outer 'links' array, and the links array on every list item
-        if inner_list:
-            if inner_list.get('links', None):
-                inner_list['linkmap'] = APIResource.list_to_map(inner_list['links'])
-
-            if inner_list['items']:
-                for item in inner_list['items']:
-                    if item.has_key('meta') and item['meta'].has_key('links'):
-                        item['meta']['linkmap'] = APIResource.list_to_map(item['meta']['links'])
-
-        return resource
-
-    @staticmethod
-    def list_to_map(links):
-        linkmap = {}
-        for link in links:
-            linkmap[link['rel']]= link['href']
-        return linkmap
-
 
 class Site(APIResource):
+    item_type = 'site'
     resource_fragment = 'site'
 
     @classmethod
     def retrieve(cls, host):
         resource = super(Site, cls).retrieve(host)
-        return APIResource.process_timestamp(resource)
+        return Site(resource)
+
+    def __init__(self, data):
+        self.site_id = data['siteId']
+        self.title = data['title']
+        self.description = data['description']
+        self.subdomain_key = data['subdomainKey']
+        self.domain = data['domain']
+        self.owned_by = Profile(data['ownedBy'])
+        self.logo_url = data['logo_url']
 
 
 class User(APIResource):
+    item_type = 'user'
     resource_fragment = 'users'
+
+    @classmethod
+    def retrieve(cls, host, id, access_token):
+        resource = super(User, cls).retrieve(host, id=id, access_token=access_token)
+        return User(resource)
+
+    # Currently only 'email is used on User objects
+    def __init__(self, data):
+        self.email_address = data['email']
 
 
 class Authentication(APIResource):
@@ -268,26 +216,44 @@ class Authentication(APIResource):
 
 
 class WhoAmI(APIResource):
+    item_type = 'whoami'
     resource_fragment = 'whoami'
 
     @classmethod
     def retrieve(cls, host, access_token):
         resource = super(WhoAmI, cls).retrieve(host, access_token=access_token)
-        resource = cls.create_linkmap(resource)
-        return APIResource.process_timestamp(resource)
+        return Profile(resource)
 
 
 class Profile(APIResource):
+    item_type = 'profile'
     resource_fragment = 'profiles'
 
     @classmethod
-    def retrieve(cls, host, id, offset=None, access_token=None):
+    def retrieve(cls, host, id, access_token=None):
         resource = super(Profile, cls).retrieve(host, id, access_token=access_token)
-        resource = cls.create_linkmap(resource)
-        return APIResource.process_timestamp(resource)
+        return Profile(resource)
+
+    def __init__(self, data):
+        self.id = data['id']
+        self.site_id = data['siteId']
+        self.user_id = data['userId']
+        self.profile_name = data['profileName']
+        self.visible = data['visible']
+        self.style_id = data['styleId']
+        self.item_count = data['itemCount']
+        self.comment_count = data['commentCount']
+        self.created = parse_timestamp(data['created'])
+        self.last_active = parse_timestamp(data['lastActive'])
+        self.gravatar = data['gravatar']
+        self.banned = data['banned']
+        self.admin = data['admin']
+        # Profile meta contains links and permissions
+        self.meta = Meta(data['meta'])
 
 
 class Microcosm(APIResource):
+    item_type = 'microcosm'
     resource_fragment = 'microcosms'
 
     @classmethod
