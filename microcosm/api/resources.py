@@ -343,10 +343,9 @@ class PaginatedList():
         self.page = list['page']
         self.type = list['type']
         self.items = [list_item_cls(item) for item in list['items']]
-        self.linkmap = {}
+        self.links = {}
         for item in list['links']:
-            self.linkmap[item['rel']] = item['href']
-
+            self.links[item['rel']] = item['href']
 
 
 class Meta():
@@ -362,8 +361,11 @@ class Meta():
         if data.has_key('edited'): self.created = (data['edited'])
         if data.has_key('editedBy'): self.created_by = Profile(data['editedBy'])
         if data.has_key('flags'): self.flags = data['flags']
-        if data.has_key('links'): self.links = data['links']
         if data.has_key('permissions'): self.permissions = PermissionSet(data['permissions'])
+        if data.has_key('links'):
+            self.links = {}
+            for item in list['links']:
+                self.links[item['rel']] = item['href']
 
 
 class PermissionSet():
@@ -393,12 +395,12 @@ class Conversation(APIResource):
         self.microcosm_id = data['microcosmId']
         self.title = data['title']
         self.meta = Meta(data['meta'])
-        self.comments = PaginatedList(data['comments'], None)
+        self.comments = PaginatedList(data['comments'], Comment)
 
     @classmethod
     def retrieve(cls, host, id=None, offset=None, access_token=None):
         resource = super(Conversation, cls).retrieve(host, id, offset, access_token)
-        return APIResource.process_timestamp(resource)
+        return Conversation(resource)
 
 
 class Event(APIResource):
@@ -407,6 +409,28 @@ class Event(APIResource):
     """
 
     resource_fragment = 'events'
+
+    def __init__(self, data):
+        self.id = data['id']
+        self.microcosm_id = data['microcosmId']
+        self.title = data['title']
+        self.when = parse_timestamp(data['when'])
+        self.duration = data['duration']
+        self.where = data['where']
+        self.status = data['status']
+        self.comments = PaginatedList(data['comments'], Comment)
+
+        if data.has_key('rsvpAttend'): self.rsvp_attend = data['rsvpAttend']
+        if data.has_key('rsvpLimit'): self.rsvp_attend = data['rsvpLimit']
+        if data.has_key('rsvpSpaces'): self.rsvp_attend = data['rsvpSpaces']
+
+        self.lat = data['lat']
+        self.lat = data['lon']
+        if data.has_key('north'): self.north = data['north']
+        if data.has_key('east'): self.east = data['east']
+        if data.has_key('south'): self.south = data['south']
+        if data.has_key('west'): self.west = data['west']
+
 
     @classmethod
     def retrieve(cls, host, id=None, offset=None, access_token=None):
@@ -486,10 +510,22 @@ class Comment(APIResource):
 
     resource_fragment = 'comments'
 
+    def __init__(self, data):
+        self.id = data['id']
+        self.item_type = data['itemType']
+        self.item_id = data['itemId']
+        self.revisions = data['revisions']
+        self.in_reply_to = data['inReplyTo']
+        self.attachments = data['attachments']
+        self.first_line = data['firstLine']
+        self.markdown = data['markdown']
+        self.html = data['html']
+        self.meta = Meta(data['meta'])
+
     @classmethod
     def retrieve(cls, host, id, offset=None, access_token=None):
         resource = super(Comment, cls).retrieve(host, id, offset, access_token)
-        return APIResource.process_timestamp(resource)
+        return Comment(resource)
 
     @classmethod
     def create(cls, host, data, access_token):
