@@ -189,11 +189,21 @@ class Site(APIResource):
         self.subdomain_key = data['subdomainKey']
         self.domain = data['domain']
         self.owned_by = Profile(data['ownedBy'])
-        self.logo_url = data['logo_url']
+
+        # Site themes are optional
+        if data.has_key('logoUrl'): self.logo_url = data['logoUrl']
+        if data.has_key('themeId'): self.theme_id = data['themeId']
+        if data.has_key('headerBackgroundUrl'):
+            self.header_background_url = data['headerBackgroundUrl']
 
 
 class User(APIResource):
-    item_type = 'user'
+    """
+    User API resource. A user is only defined once across the platform
+    (and is thus multi-site). A Profile is site specific, and associates
+    a given user and site.
+    """
+
     resource_fragment = 'users'
 
     @classmethod
