@@ -222,52 +222,173 @@ class Profile(APIResource):
         resource = super(Profile, cls).retrieve(host, id, access_token=access_token)
         return Profile(resource)
 
-    def __init__(self, data):
+    def __init__(self, data, summary=True):
         self.id = data['id']
         self.site_id = data['siteId']
         self.user_id = data['userId']
         self.profile_name = data['profileName']
         self.visible = data['visible']
-        self.style_id = data['styleId']
-        self.item_count = data['itemCount']
-        self.comment_count = data['commentCount']
-        self.created = parse_timestamp(data['created'])
-        self.last_active = parse_timestamp(data['lastActive'])
         self.gravatar = data['gravatar']
-        self.banned = data['banned']
-        self.admin = data['admin']
-        # Profile meta contains links and permissions
         self.meta = Meta(data['meta'])
+
+        if not summary:
+            self.style_id = data['styleId']
+            self.item_count = data['itemCount']
+            self.comment_count = data['commentCount']
+            self.created = parse_timestamp(data['created'])
+            self.last_active = parse_timestamp(data['lastActive'])
+            self.banned = data['banned']
+            self.admin = data['admin']
 
 
 class Microcosm(APIResource):
-    item_type = 'microcosm'
+    """
+    Represents a single microcosm, containing items (conversations, events, ...)
+    """
+
     resource_fragment = 'microcosms'
 
     @classmethod
-    def retrieve(cls, host, id=None, offset=None, access_token=None):
+    def retrieve(cls, host, id, offset=None, access_token=None):
         resource = super(Microcosm, cls).retrieve(host, id, offset, access_token)
-        resource = cls.create_linkmap(resource)
-        return APIResource.process_timestamp(resource)
+        return Microcosm(resource, summary=False)
+
+    def __init__(self, data, summary=True):
+        self.id = data['id']
+        self.site_id = data['siteId']
+        self.visibility = data['visibility']
+        self.title = data['title']
+        self.description = data['description']
+        self.moderators = data['moderators']
+        self.meta = Meta(data['meta'])
+
+        if summary:
+            if data.has_key('mostRecentUpdate') \
+            and data['mostRecentUpdate'] is not None:
+                self.most_recent_update = Item(data['mostRecentUpdate'])
+            self.total_items = data['totalItems']
+            self.total_comments = data['totalComments']
+        else:
+            self.items = PaginatedList(data['items'], Item)
+
+
+class MicrocosmList(APIResource):
+    """
+    Represents a list of microcosms for a given site.
+    """
+
+    resource_fragment = 'microcosms'
+
+    @classmethod
+    def retrieve(cls, host, offset=None, access_token=None):
+        resource = super(MicrocosmList, cls).retrieve(host, offset=offset, access_token=access_token)
+        return MicrocosmList(resource)
+
+    def __init__(self, data):
+        self.microcosms = PaginatedList(data['microcosms'], Microcosm)
+        self.meta = Meta(data['meta'])
+
+
+class Item():
+
+    """
+    Represents an item contained within a microcosm. Only used when
+    fetching a single microcosm to represent the list of items
+    contained within.
+    """
+
+    def __init__(self, data):
+        self.id = data['id']
+        self.item_type = data['itemType']
+        self.microcosm_id = data['microcosmId']
+        self.title = data['title']
+        self.total_comments = data['totalComments']
+        self.total_views = data['totalViews']
+        self.last_comment_id = data['lastCommentId']
+        self.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
+        self.last_comment_created = parse_timestamp(data['lastCommentCreated'])
+        self.meta = Meta(data['meta'])
+
+
+class PaginatedList():
+
+    """
+    Generic list of items and pagination metadata (total, number of pages, etc.).
+    """
+
+    def __init__(self, list, list_item_cls):
+        self.total = list['total']
+        self.limit = list['limit']
+        self.offset = list['offset']
+        self.max_offset = list['maxOffset']
+        self.total_pages = list['totalPages']
+        self.page = list['page']
+        self.type = list['type']
+        self.items = [list_item_cls(item) for item in list['items']]
+
+
+class Meta():
+
+    """
+    Represents a resource 'meta' type, including creation time/user,
+    flags, links, and permissions.
+    """
+
+    def __init__(self, data):
+        if data.has_key('created'): self.created = (data['created'])
+        if data.has_key('createdBy'): self.created_by = Profile(data['createdBy'])
+        if data.has_key('edited'): self.created = (data['edited'])
+        if data.has_key('editedBy'): self.created_by = Profile(data['editedBy'])
+        if data.has_key('flags'): self.flags = data['flags']
+        if data.has_key('links'): self.links = data['links']
+        if data.has_key('permissions'): self.permissions = PermissionSet(data['permissions'])
+
+
+class PermissionSet():
+
+    """
+    Represents user permissions on a resource.
+    """
+
+    def __init__(self, data):
+        self.create = data['create']
+        self.read = data['read']
+        self.update = data['update']
+        self.delete = data['delete']
+        self.guest = data['guest']
+        self.super_user = data['superUser']
 
 
 class Conversation(APIResource):
+    """
+    Represents a conversation (title and list of comments).
+    """
+
     resource_fragment = 'conversations'
 
     @classmethod
     def retrieve(cls, host, id=None, offset=None, access_token=None):
         resource = super(Conversation, cls).retrieve(host, id, offset, access_token)
-        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
+
+    def __init__(self, data):
+        self.id = data['id']
+        self.microcosm_id = data['microcosmId']
+        self.title = data['title']
+        self.meta = Meta(data['meta'])
+        self.comments = PaginatedList(data['comments'], None)
 
 
 class Event(APIResource):
+    """
+    Represents an event (event details and list of comments).
+    """
+
     resource_fragment = 'events'
 
     @classmethod
     def retrieve(cls, host, id=None, offset=None, access_token=None):
         resource = super(Event, cls).retrieve(host, id, offset, access_token)
-        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
     @classmethod
