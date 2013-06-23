@@ -16,7 +16,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from microcosm.api.exceptions import APIException
-from microcosm.api.resources import Microcosm
+from microcosm.api.resources import Microcosm, MicrocosmList
 from microcosm.api.resources import User
 from microcosm.api.resources import GeoCode
 from microcosm.api.resources import Event
@@ -339,6 +339,22 @@ class MicrocosmView(ItemView):
         }
 
         return render(request, 'create_item_choice.html', view_data)
+
+    @staticmethod
+    def list(request):
+
+        # Pagination offset
+        offset = int(request.GET.get('offset', 0))
+
+        microcosms = MicrocosmList.retrieve(request.META['HTTP_HOST'], offset=offset, access_token=request.access_token)
+
+        view_data = {
+            'user': request.whoami,
+            'site': request.site,
+            'content': microcosms,
+        }
+
+        return render(request, MicrocosmView.many_template, view_data)
 
 
 class EventView(ItemView):
