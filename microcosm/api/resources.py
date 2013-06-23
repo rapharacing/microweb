@@ -1,7 +1,10 @@
 import json
-from dateutil.parser import parse as parse_timestamp
+
 import requests
 from requests import RequestException
+
+from dateutil.parser import parse as parse_timestamp
+
 from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
 from microweb.helpers import build_url
@@ -12,6 +15,7 @@ COMMENTABLE_ITEM_TYPES = [
     'conversation',
     'poll'
 ]
+
 
 class APIResource(object):
     """
@@ -167,7 +171,10 @@ class APIResource(object):
 
 
 class Site(APIResource):
-    item_type = 'site'
+    """
+    Represents the current site (title, logo, etc.).
+    """
+
     resource_fragment = 'site'
 
     @classmethod
