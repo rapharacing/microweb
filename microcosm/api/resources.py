@@ -211,17 +211,16 @@ class User(APIResource):
         resource = super(User, cls).retrieve(host, id=id, access_token=access_token)
         return User(resource)
 
-    # Currently only 'email is used on User objects
+    # Only email address is used on User objects
     def __init__(self, data):
-        self.email_address = data['email']
-
-
-class Authentication(APIResource):
-    resource_fragment = 'auth'
+        self.email = data['email']
 
 
 class WhoAmI(APIResource):
-    item_type = 'whoami'
+    """
+    WhoAmI returns the profile of the currently logged-in user.
+    """
+
     resource_fragment = 'whoami'
 
     @classmethod
@@ -231,7 +230,10 @@ class WhoAmI(APIResource):
 
 
 class Profile(APIResource):
-    item_type = 'profile'
+    """
+    Represents a user profile belonging to a specific site.
+    """
+
     resource_fragment = 'profiles'
 
     @classmethod
@@ -417,7 +419,6 @@ class Event(APIResource):
 
         resource_url = build_url(host, [cls.resource_fragment, id, 'attendees'])
         resource = APIResource.retrieve(host, id=id, access_token=access_token, url_override=resource_url)
-        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
     @classmethod
@@ -475,42 +476,32 @@ class Event(APIResource):
             raise APIException(response.content)
 
 
-class Poll(APIResource):
-    resource_fragment = 'polls'
-
-    @classmethod
-    def retrieve(cls, host, id=None, offset=None, access_token=None):
-        resource = super(Poll, cls).retrieve(host, id, offset, access_token)
-        resource = cls.create_linkmap(resource)
-        return APIResource.process_timestamp(resource)
-
-
 class Comment(APIResource):
+    """
+    Represents a single comment.
+    """
+
     resource_fragment = 'comments'
 
     @classmethod
-    def retrieve(cls, host, id=None, offset=None, access_token=None):
+    def retrieve(cls, host, id, offset=None, access_token=None):
         resource = super(Comment, cls).retrieve(host, id, offset, access_token)
-        resource = cls.create_linkmap(resource)
         return APIResource.process_timestamp(resource)
 
     @classmethod
     def create(cls, host, data, access_token):
         resource = super(Comment, cls).create(host, data, access_token)
-        resource = cls.create_linkmap(resource)
         return resource
 
     @classmethod
     def update(cls, host, data, id, access_token):
         resource = super(Comment, cls).update(host, data, id, access_token)
-        resource = cls.create_linkmap(resource)
         return resource
 
 
 class GeoCode():
     """
-    This is simply request proxying, so don't attempt formatting
-    or error recovery.
+    Used for proxying geocode requests to the backend.
     """
 
     @classmethod
@@ -522,3 +513,13 @@ class GeoCode():
         headers = {'Authorization': 'Bearer %s' % access_token}
         response = requests.get(build_url(host, ['geocode']), params=params, headers=headers)
         return response.content
+
+
+class Authentication(APIResource):
+
+    """
+    Stub for making calls to /auth for creating and destroying access tokens.
+    TODO: shift the access_token/id logic in APIResource.delete to here.
+    """
+
+    resource_fragment = 'auth'
