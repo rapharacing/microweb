@@ -177,11 +177,6 @@ class Site(APIResource):
 
     resource_fragment = 'site'
 
-    @classmethod
-    def retrieve(cls, host):
-        resource = super(Site, cls).retrieve(host)
-        return Site(resource)
-
     def __init__(self, data):
         self.site_id = data['siteId']
         self.title = data['title']
@@ -196,6 +191,11 @@ class Site(APIResource):
         if data.has_key('headerBackgroundUrl'):
             self.header_background_url = data['headerBackgroundUrl']
 
+    @classmethod
+    def retrieve(cls, host):
+        resource = super(Site, cls).retrieve(host)
+        return Site(resource)
+
 
 class User(APIResource):
     """
@@ -206,14 +206,13 @@ class User(APIResource):
 
     resource_fragment = 'users'
 
+    def __init__(self, data):
+        self.email = data['email']
+
     @classmethod
     def retrieve(cls, host, id, access_token):
         resource = super(User, cls).retrieve(host, id=id, access_token=access_token)
         return User(resource)
-
-    # Only email address is used on User objects
-    def __init__(self, data):
-        self.email = data['email']
 
 
 class WhoAmI(APIResource):
@@ -236,11 +235,6 @@ class Profile(APIResource):
 
     resource_fragment = 'profiles'
 
-    @classmethod
-    def retrieve(cls, host, id, access_token=None):
-        resource = super(Profile, cls).retrieve(host, id, access_token=access_token)
-        return Profile(resource)
-
     def __init__(self, data, summary=True):
         self.id = data['id']
         self.site_id = data['siteId']
@@ -259,6 +253,11 @@ class Profile(APIResource):
             self.banned = data['banned']
             self.admin = data['admin']
 
+    @classmethod
+    def retrieve(cls, host, id, access_token=None):
+        resource = super(Profile, cls).retrieve(host, id, access_token=access_token)
+        return Profile(resource)
+
 
 class Microcosm(APIResource):
     """
@@ -266,11 +265,6 @@ class Microcosm(APIResource):
     """
 
     resource_fragment = 'microcosms'
-
-    @classmethod
-    def retrieve(cls, host, id, offset=None, access_token=None):
-        resource = super(Microcosm, cls).retrieve(host, id, offset, access_token)
-        return Microcosm(resource, summary=False)
 
     def __init__(self, data, summary=True):
         self.id = data['id']
@@ -282,13 +276,18 @@ class Microcosm(APIResource):
         self.meta = Meta(data['meta'])
 
         if summary:
-            if data.has_key('mostRecentUpdate') \
+            if data.has_key('mostRecentUpdate')\
             and data['mostRecentUpdate'] is not None:
                 self.most_recent_update = Item(data['mostRecentUpdate'])
             self.total_items = data['totalItems']
             self.total_comments = data['totalComments']
         else:
             self.items = PaginatedList(data['items'], Item)
+
+    @classmethod
+    def retrieve(cls, host, id, offset=None, access_token=None):
+        resource = super(Microcosm, cls).retrieve(host, id, offset, access_token)
+        return Microcosm(resource, summary=False)
 
 
 class MicrocosmList(APIResource):
@@ -298,14 +297,14 @@ class MicrocosmList(APIResource):
 
     resource_fragment = 'microcosms'
 
+    def __init__(self, data):
+        self.microcosms = PaginatedList(data['microcosms'], Microcosm)
+        self.meta = Meta(data['meta'])
+
     @classmethod
     def retrieve(cls, host, offset=None, access_token=None):
         resource = super(MicrocosmList, cls).retrieve(host, offset=offset, access_token=access_token)
         return MicrocosmList(resource)
-
-    def __init__(self, data):
-        self.microcosms = PaginatedList(data['microcosms'], Microcosm)
-        self.meta = Meta(data['meta'])
 
 
 class Item():
@@ -344,6 +343,10 @@ class PaginatedList():
         self.page = list['page']
         self.type = list['type']
         self.items = [list_item_cls(item) for item in list['items']]
+        self.linkmap = {}
+        for item in list['links']:
+            self.linkmap[item['rel']] = item['href']
+
 
 
 class Meta():
@@ -385,17 +388,17 @@ class Conversation(APIResource):
 
     resource_fragment = 'conversations'
 
-    @classmethod
-    def retrieve(cls, host, id=None, offset=None, access_token=None):
-        resource = super(Conversation, cls).retrieve(host, id, offset, access_token)
-        return APIResource.process_timestamp(resource)
-
     def __init__(self, data):
         self.id = data['id']
         self.microcosm_id = data['microcosmId']
         self.title = data['title']
         self.meta = Meta(data['meta'])
         self.comments = PaginatedList(data['comments'], None)
+
+    @classmethod
+    def retrieve(cls, host, id=None, offset=None, access_token=None):
+        resource = super(Conversation, cls).retrieve(host, id, offset, access_token)
+        return APIResource.process_timestamp(resource)
 
 
 class Event(APIResource):
