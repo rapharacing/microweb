@@ -169,9 +169,6 @@ class ItemView(object):
             'pagination': {},
         }
 
-        if content.has_key('comments') or content.has_key('items'):
-            cls.build_pagination_nav(request.path, content, view_data, offset)
-
         # Provide a comment form for items that allow comments
         if cls.commentable:
             comment_form = CommentForm(
@@ -212,8 +209,6 @@ class ItemView(object):
             'pagination': {},
         }
 
-        cls.build_pagination_nav(request.path, list, view_data, offset)
-
         return render(request, cls.many_template, view_data)
 
     @classmethod
@@ -240,36 +235,6 @@ class ItemView(object):
             return HttpResponseRedirect(redirect)
         else:
             return HttpResponseNotAllowed()
-
-    @classmethod
-    def build_pagination_nav(cls, path, resource, view_data, offset):
-
-        paginated_list = None
-
-        # Single item, which has comments or microcosms
-        # TODO: move this logic out
-        if resource.has_key('id'):
-            if resource.get('comments', None):
-                paginated_list = resource['comments']
-            elif resource.get('items', None):
-                paginated_list = resource['items']
-        # Collection of items
-        elif resource.has_key(cls.item_plural):
-            if resource.get(cls.item_plural, None):
-                paginated_list = resource.get(cls.item_plural)
-        else:
-            return
-
-        # TODO: remove implicit dependency on linkmap transformer
-        if paginated_list['linkmap'].has_key('first'):
-            view_data['pagination']['first'] = path
-        if paginated_list['linkmap'].has_key('prev'):
-            view_data['pagination']['prev'] = path + '?offset=%d' % (offset - settings.PAGE_SIZE)
-        if paginated_list['linkmap'].has_key('next'):
-            view_data['pagination']['next'] = path + '?offset=%d' % (offset + settings.PAGE_SIZE)
-        if paginated_list['linkmap'].has_key('last'):
-            view_data['pagination']['last'] = path + '?offset=%d' % paginated_list['maxOffset']
-
 
 class ConversationView(ItemView):
 
