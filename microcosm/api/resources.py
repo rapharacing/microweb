@@ -332,17 +332,17 @@ class PaginatedList():
     Generic list of items and pagination metadata (total, number of pages, etc.).
     """
 
-    def __init__(self, list, list_item_cls):
-        self.total = list['total']
-        self.limit = list['limit']
-        self.offset = list['offset']
-        self.max_offset = list['maxOffset']
-        self.total_pages = list['totalPages']
-        self.page = list['page']
-        self.type = list['type']
-        self.items = [list_item_cls(item) for item in list['items']]
+    def __init__(self, item_list, list_item_cls):
+        self.total = item_list['total']
+        self.limit = item_list['limit']
+        self.offset = item_list['offset']
+        self.max_offset = item_list['maxOffset']
+        self.total_pages = item_list['totalPages']
+        self.page = item_list['page']
+        self.type = item_list['type']
+        self.items = [list_item_cls(item) for item in item_list['items']]
         self.links = {}
-        for item in list['links']:
+        for item in item_list['links']:
             self.links[item['rel']] = item['href']
 
 
@@ -361,7 +361,7 @@ class Meta():
         if data.has_key('permissions'): self.permissions = PermissionSet(data['permissions'])
         if data.has_key('links'):
             self.links = {}
-            for item in list['links']:
+            for item in data['links']:
                 self.links[item['rel']] = item['href']
 
 
