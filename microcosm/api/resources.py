@@ -431,13 +431,13 @@ class Event(APIResource):
     @classmethod
     def retrieve(cls, host, id=None, offset=None, access_token=None):
         resource = super(Event, cls).retrieve(host, id, offset, access_token)
-        return APIResource.process_timestamp(resource)
+        return Event(resource)
 
     @classmethod
     def retrieve_attendees(cls, host, id, access_token=None):
         """
         Retrieve a list of attendees for an event.
-        TODO: pagination support
+        TODO: pagination support, use nested class to represent Attendee
         """
 
         resource_url = build_url(host, [cls.resource_fragment, id, 'attendees'])
