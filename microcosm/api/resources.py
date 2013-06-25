@@ -308,7 +308,6 @@ class MicrocosmList(APIResource):
 
 
 class Item():
-
     """
     Represents an item contained within a microcosm. Only used when
     fetching a single microcosm to represent the list of items
@@ -329,7 +328,6 @@ class Item():
 
 
 class PaginatedList():
-
     """
     Generic list of items and pagination metadata (total, number of pages, etc.).
     """
@@ -349,7 +347,6 @@ class PaginatedList():
 
 
 class Meta():
-
     """
     Represents a resource 'meta' type, including creation time/user,
     flags, links, and permissions.
@@ -369,7 +366,6 @@ class Meta():
 
 
 class PermissionSet():
-
     """
     Represents user permissions on a resource.
     """
@@ -555,7 +551,6 @@ class GeoCode():
 
 
 class Authentication(APIResource):
-
     """
     Stub for making calls to /auth for creating and destroying access tokens.
     TODO: shift the access_token/id logic in APIResource.delete to here.
