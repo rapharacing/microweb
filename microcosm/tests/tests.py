@@ -8,6 +8,11 @@ from django.test.client import RequestFactory
 from microcosm.views import MicrocosmView, ConversationView
 from microweb.helpers import build_url
 
+from microweb.settings import API_SCHEME
+from microweb.settings import API_DOMAIN_NAME
+from microweb.settings import API_PATH
+from microweb.settings import API_VERSION
+
 class BuildURLTests(unittest.TestCase):
     """
     Verify that helpers.build_url() builds valid URLs.
@@ -15,27 +20,27 @@ class BuildURLTests(unittest.TestCase):
 
     def testWithTrailingSeparator(self):
         url = build_url('a.microco.sm', ['resource/', '1/', 'extra/'])
-        assert url == 'https://a.microco.sm/api/v1/resource/1/extra'
+        assert url == API_SCHEME + 'a.' + API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
 
     def testWithPrependedSeparator(self):
         url = build_url('a.microco.sm', ['/resource', '/1', '/extra'])
-        assert url == 'https://a.microco.sm/api/v1/resource/1/extra'
+        assert url == API_SCHEME + 'a.' + API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
 
     def testWithDuplicateSeparator(self):
         url = build_url('a.microco.sm', ['resource/', '/1/', '/extra/'])
-        assert url == 'https://a.microco.sm/api/v1/resource/1/extra'
+        assert url == API_SCHEME + 'a.' + API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
 
     def testWithNoSeparator(self):
         url = build_url('a.microco.sm', ['resource', '1', 'extra'])
-        assert url == 'https://a.microco.sm/api/v1/resource/1/extra'
+        assert url == API_SCHEME + 'a.' + API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
 
     def testEmptyFragments(self):
         url = build_url('a.microco.sm', [])
-        assert url == 'https://a.microco.sm/api/v1'
+        assert url == API_SCHEME + 'a.' + API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION
 
     def testIntFragment(self):
         url = build_url('a.microco.sm', [1, 2, 3])
-        assert url == 'https://a.microco.sm/api/v1/1/2/3'
+        assert url == API_SCHEME + 'a.' + API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/1/2/3'
 
     def testInvalidFragment(self):
         with self.assertRaises(AssertionError):
