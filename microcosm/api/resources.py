@@ -236,13 +236,18 @@ class Profile(APIResource):
     resource_fragment = 'profiles'
 
     def __init__(self, data, summary=True):
-        self.id = data['id']
-        self.site_id = data['siteId']
-        self.user_id = data['userId']
-        self.profile_name = data['profileName']
-        self.visible = data['visible']
-        self.gravatar = data['gravatar']
-        self.meta = Meta(data['meta'])
+        """
+        We're permissive about the data passed in, since it may
+        be a PUT or PATCH operation and not have all the expected keys.
+        """
+
+        if data.get('id'): self.id = data['id']
+        if data.get('siteId'): self.site_id = data['siteId']
+        if data.get('userId'): self.user_id = data['userId']
+        if data.get('profileName'): self.profile_name = data['profileName']
+        if data.get('visible'): self.visible = data['visible']
+        if data.get('gravatar'): self.gravatar = data['gravatar']
+        if data.get('meta'): self.meta = Meta(data['meta'])
 
         if not summary:
             self.style_id = data['styleId']
@@ -254,9 +259,25 @@ class Profile(APIResource):
             self.admin = data['admin']
 
     @classmethod
-    def retrieve(cls, host, id, offset=None, access_token=None):
+    def retrieve(cls, host, id, access_token=None):
         resource = super(Profile, cls).retrieve(host, id, access_token=access_token)
         return Profile(resource)
+
+    @property
+    def as_dict(self):
+        """
+        Return instance as a dictionary, with correct keys for POST or PUT to API.
+        """
+
+        repr = {}
+        if hasattr(self, 'id'): repr['id'] = self.id
+        if hasattr(self, 'site_id'): repr['siteId'] = self.site_id
+        if hasattr(self, 'user_id'): repr['userId'] = self.user_id
+        if hasattr(self, 'profile_name'): repr['profileName'] = self.profile_name
+        if hasattr(self, 'visible'): repr['visible'] =  self.visible
+        if hasattr(self, 'gravatar'): repr['gravatar'] = self.gravatar
+        return repr
+
 
 class Microcosm(APIResource):
     """
