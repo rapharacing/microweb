@@ -13,7 +13,7 @@
 		{% for item in content.microcosms.items %}
 			<section id="microcosm{{item.id}}" class="row">
 				<div class="col col-lg-16">
-					<a href="/microcosms/{{ item.id }}/">
+					<a href="{% url single-microcosm item.id %}">
 						<h1>{{ item.title }}</h1>
 					</a>
 				</div>
