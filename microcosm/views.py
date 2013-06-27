@@ -403,17 +403,15 @@ class MicrocosmView(ItemView):
     @exception_handler
     def create(request):
 
-        view_data = {
-            'user': request.whoami,
-            'site': request.site,
-        }
+        view_data = dict(user=request.whoami, site=request.site)
 
         if request.method == 'POST':
             form = MicrocosmView.create_form(request.POST)
             if form.is_valid():
+                form_data = Microcosm(form.cleaned_data)
                 microcosm = Microcosm.create(
                     request.META['HTTP_HOST'],
-                    form.cleaned_data,
+                    form_data.as_dict,
                     request.access_token
                 )
                 return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm['id'],)))
@@ -428,14 +426,57 @@ class MicrocosmView(ItemView):
         else:
             return HttpResponseNotAllowed(['GET', 'POST'])
 
-    @classmethod
+    @staticmethod
     @exception_handler
-    def create_item_choice(cls, request, microcosm_id):
+    def edit(request, microcosm_id):
+
+        view_data = dict(user=request.whoami, site=request.site)
+
+        if request.method == 'POST':
+            form = MicrocosmView.edit_form(request.POST)
+            if form.is_valid():
+                form_data = Microcosm(form.cleaned_data)
+                import pprint; pprint.pprint(form_data.as_dict)
+                print hasattr(form_data, 'edit_reason')
+                microcosm = Microcosm.update(
+                    request.META['HTTP_HOST'],
+                    form_data.as_dict,
+                    microcosm_id,
+                    request.access_token
+                )
+                return HttpResponseRedirect(reverse('single-microcosm', microcosm['id']))
+            else:
+                view_data['form'] = form
+                return render(request, MicrocosmView.form_template, view_data)
+
+        elif request.method == 'GET':
+            microcosm = Microcosm.retrieve(
+                request.META['HTTP_HOST'],
+                id=microcosm_id,
+                access_token=request.access_token
+            )
+            view_data['form'] = MicrocosmView.edit_form(microcosm.as_dict)
+            return render(request, MicrocosmView.form_template, view_data)
+
+        else:
+            return HttpResponseNotAllowed(['GET', 'POST'])
+
+    @staticmethod
+    @exception_handler
+    def delete(request, microcosm_id):
+        if request.method == 'POST':
+            Microcosm.delete(request.META['HTTP_HOST'], microcosm_id, request.access_token)
+            return HttpResponseRedirect(reverse(MicrocosmView.list))
+        return HttpResponseNotAllowed(['POST'])
+
+    @staticmethod
+    @exception_handler
+    def create_item_choice(request, microcosm_id):
         """
         Interstitial page for creating an item (e.g. Event) belonging to a microcosm.
         """
 
-        microcosm = cls.resource_cls.retrieve(
+        microcosm = Microcosm.retrieve(
             request.META['HTTP_HOST'],
             microcosm_id,
             access_token=request.access_token
