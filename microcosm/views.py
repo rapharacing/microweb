@@ -64,6 +64,32 @@ def exception_handler(view_func):
     return decorator
 
 
+def build_pagination_links(request, paged_list):
+    """
+    Builds page navigation links based on the request path
+    and links supplied in a paginated list.
+    """
+
+    page_nav = {}
+
+    if paged_list.links.get('first'):
+        page_nav['first'] = request.path
+
+    if paged_list.links.get('prev'):
+        offset = paged_list.offset
+        page_nav['prev'] = urlunparse(('', '', request.path, '', 'offset=%d' % (offset - PAGE_SIZE), '',))
+
+    if paged_list.links.get('next'):
+        offset = paged_list.offset
+        page_nav['next'] = urlunparse(('', '', request.path, '', 'offset=%d' % (offset + PAGE_SIZE), '',))
+
+    if paged_list.links.get('last'):
+        offset = paged_list.max_offset
+        page_nav['last'] = urlunparse(('', '', request.path, '', 'offset=%d' % offset, '',))
+
+    return page_nav
+
+
 class ItemView(object):
     """
     A base view class that provides generic create/read/update methods and single item or list views.
@@ -320,33 +346,6 @@ class ProfileView(ItemView):
 
         else:
             return HttpResponseNotAllowed(['GET', 'POST'])
-
-
-def build_pagination_links(request, paged_list):
-
-    """
-    Builds page navigation links based on the request path
-    and links supplied in the paginated list.
-    """
-
-    page_nav = {}
-
-    if paged_list.links.get('first'):
-        page_nav['first'] = request.path
-
-    if paged_list.links.get('prev'):
-        offset = paged_list.offset
-        page_nav['prev'] = urlunparse(('', '', request.path, '', 'offset=%d' % (offset - PAGE_SIZE), '',))
-
-    if paged_list.links.get('next'):
-        offset = paged_list.offset
-        page_nav['next'] = urlunparse(('', '', request.path, '', 'offset=%d' % (offset + PAGE_SIZE), '',))
-
-    if paged_list.links.get('last'):
-        offset = paged_list.max_offset
-        page_nav['last'] = urlunparse(('', '', request.path, '', 'offset=%d' % offset, '',))
-
-    return page_nav
 
 
 class MicrocosmView(ItemView):
