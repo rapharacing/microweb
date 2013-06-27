@@ -2,14 +2,13 @@
 
 {% block content %}
 
-    
-    <h1 id="profile_name"><img src="{{content.gravatar}}" class="gravatar" alt="Avatar for {{ content.profileName }}" /> {{content.profileName}}</h1>
+    <h1 id="profile_name"><img src="{{content.gravatar}}" class="gravatar" alt="Avatar for {{ content.profile_name }}" /> {{content.profile_name}}</h1>
 
     <h3>Statistics</h3>
     <ul>
-    	<li>Created: {{content.created}}</li>
-    	<li>Last active: {{content.lastActive}} </li>
-    	<li>Comment count: {{content.commentCount}}</li>
+        <li>Created: {{content.created}}</li>
+        <li>Last active: {{content.last_active}} </li>
+        <li>Comment count: {{content.comment_count}}</li>
     </ul>
 
 {% endblock %}
