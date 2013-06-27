@@ -24,9 +24,9 @@ urlpatterns = patterns('',
     url(r'^$', MicrocosmView.list),
     url(r'^microcosms/$', MicrocosmView.list, name='list-microcosms'),
     url(r'^microcosms/create/$', MicrocosmView.create, name='create-microcosm'),
-    url(r'^microcosms/(?P<item_id>\d+)/$', MicrocosmView.single, name='single-microcosm'),
-    url(r'^microcosms/(?P<item_id>\d+)/edit/$', MicrocosmView.edit, name='edit-microcosm'),
-    url(r'^microcosms/(?P<item_id>\d+)/delete/$', MicrocosmView.delete, name='delete-microcosm'),
+    url(r'^microcosms/(?P<microcosm_id>\d+)/$', MicrocosmView.single, name='single-microcosm'),
+    url(r'^microcosms/(?P<microcosm_id>\d+)/edit/$', MicrocosmView.edit, name='edit-microcosm'),
+    url(r'^microcosms/(?P<microcosm_id>\d+)/delete/$', MicrocosmView.delete, name='delete-microcosm'),
 
     # Interstitial page for creating an item (Event, ...) within a microcosm.
     url(r'^microcosms/(?P<microcosm_id>\d+)/create/$', MicrocosmView.create_item_choice, name='item-choice'),
