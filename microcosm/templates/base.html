@@ -45,8 +45,8 @@
 							{% if user %}
 								<div class="col col-lg-3 col-sm-7 pull-right">
 									<div class="row margin-top-half">
-										<a href="{% url edit-profile user.id %}" id="edit_profile"><img src="{{ user.gravatar }}" alt="Avatar for {{ user.profileName }}" title="Edit your profile" class="gravatar" align="left" /></a>
-										<a href="{% url edit-profile user.id %}" id="profile_name">{{ user.profileName|truncatechars:25 }}</a><br /><br />
+										<a href="{% url edit-profile user.id %}" id="edit_profile"><img src="{{ user.gravatar }}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" class="gravatar" align="left" /></a>
+										<a href="{% url edit-profile user.id %}" id="profile_name">{{ user.profile_name|truncatechars:25 }}</a><br /><br />
 										<a href="{% url logout %}" id="logout">Log out</a>
 									</div>
 								</div>
