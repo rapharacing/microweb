@@ -301,25 +301,122 @@ class ProfileView(ItemView):
                 id=item_id,
                 access_token=request.access_token
             )
-            if user_private_details.has_key('email'):
-                user_profile['gravatar'] = user_private_details['email']
-            view_data['form'] = cls.edit_form(user_profile)
+            user_profile.gravatar = user_private_details.email
+            view_data['form'] = cls.edit_form(user_profile.__dict__)
             return render(request, cls.form_template, view_data)
 
         else:
             return HttpResponseNotAllowed(['GET', 'POST'])
 
 
+def build_pagination_links(request, paged_list):
+
+    """
+    Builds page navigation links based on the request path
+    and links supplied in the paginated list.
+    """
+
+    page_nav = {}
+
+    if paged_list.links.get('first'):
+        page_nav['first'] = request.path
+
+    if paged_list.links.get('prev'):
+        offset = paged_list.offset
+        page_nav['prev'] = urlunparse(('', '', request.path, '', 'offset=%d' % (offset - PAGE_SIZE), '',))
+
+    if paged_list.links.get('next'):
+        offset = paged_list.offset
+        page_nav['next'] = urlunparse(('', '', request.path, '', 'offset=%d' % (offset + PAGE_SIZE), '',))
+
+    if paged_list.links.get('last'):
+        offset = paged_list.max_offset
+        page_nav['last'] = urlunparse(('', '', request.path, '', 'offset=%d' % offset, '',))
+
+    return page_nav
+
+
 class MicrocosmView(ItemView):
 
-    item_type = 'microcosm'
-    item_plural = 'microcosms'
-    resource_cls = Microcosm
     create_form = MicrocosmCreate
     edit_form = MicrocosmEdit
     form_template = 'forms/microcosm.html'
-    one_template = 'microcosm.html'
-    many_template = 'microcosms.html'
+    single_template = 'microcosm.html'
+    list_template = 'microcosms.html'
+
+    @staticmethod
+    @exception_handler
+    def single(request, microcosm_id):
+
+        # record offset for paging of items within the microcosm
+        offset = int(request.GET.get('offset', 0))
+
+        microcosm = Microcosm.retrieve(
+            request.META['HTTP_HOST'],
+            id=microcosm_id,
+            offset=offset,
+            access_token=request.access_token
+        )
+
+        view_data = {
+            'user': request.whoami,
+            'site': request.site,
+            'content': microcosm,
+            'pagination': build_pagination_links(request, microcosm.items)
+        }
+
+        return render(request, MicrocosmView.single_template, view_data)
+
+    @staticmethod
+    @exception_handler
+    def list(request):
+
+        # record offset for paging of microcosms
+        offset = int(request.GET.get('offset', 0))
+
+        microcosm_list = MicrocosmList.retrieve(
+            request.META['HTTP_HOST'],
+            offset=offset,
+            access_token=request.access_token
+        )
+
+        view_data = {
+            'user': request.whoami,
+            'site': request.site,
+            'content': microcosm_list,
+            'pagination': build_pagination_links(request, microcosm_list.microcosms)
+        }
+
+        return render(request, MicrocosmView.list_template, view_data)
+
+    @staticmethod
+    @exception_handler
+    def create(request):
+
+        view_data = {
+            'user': request.whoami,
+            'site': request.site,
+        }
+
+        if request.method == 'POST':
+            form = MicrocosmView.create_form(request.POST)
+            if form.is_valid():
+                microcosm = Microcosm.create(
+                    request.META['HTTP_HOST'],
+                    form.cleaned_data,
+                    request.access_token
+                )
+                return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm['id'],)))
+            else:
+                view_data['form'] = form
+                return render(request, MicrocosmView.form_template, view_data)
+
+        elif request.method == 'GET':
+            view_data['form'] = MicrocosmView.create_form()
+            return render(request, MicrocosmView.form_template, view_data)
+
+        else:
+            return HttpResponseNotAllowed(['GET', 'POST'])
 
     @classmethod
     @exception_handler
@@ -341,22 +438,6 @@ class MicrocosmView(ItemView):
         }
 
         return render(request, 'create_item_choice.html', view_data)
-
-    @staticmethod
-    def list(request):
-
-        # Pagination offset
-        offset = int(request.GET.get('offset', 0))
-
-        microcosms = MicrocosmList.retrieve(request.META['HTTP_HOST'], offset=offset, access_token=request.access_token)
-
-        view_data = {
-            'user': request.whoami,
-            'site': request.site,
-            'content': microcosms,
-        }
-
-        return render(request, MicrocosmView.many_template, view_data)
 
 
 class EventView(ItemView):
