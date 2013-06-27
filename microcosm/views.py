@@ -2,10 +2,13 @@ import requests
 
 from functools import wraps
 from microweb import settings
+from microweb.settings import PAGE_SIZE
 from microweb.helpers import build_url
+from urlparse import urlunparse
 
 from django.core.urlresolvers import reverse
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import PermissionDenied
+from django.core.exceptions import SuspiciousOperation
 from django.http import Http404
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
@@ -16,7 +19,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from microcosm.api.exceptions import APIException
-from microcosm.api.resources import Microcosm, MicrocosmList
+from microcosm.api.resources import Microcosm
+from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import User
 from microcosm.api.resources import GeoCode
 from microcosm.api.resources import Event
@@ -65,8 +69,6 @@ class ItemView(object):
     A base view class that provides generic create/read/update methods and single item or list views.
     This class shouldn't be used directly, it should be subclassed.
     """
-
-    commentable = False
 
     @classmethod
     @exception_handler
@@ -291,7 +293,7 @@ class ProfileView(ItemView):
         elif request.method == 'GET':
             user_private_details = User.retrieve(
                 request.META['HTTP_HOST'],
-                request.whoami['userId'],
+                request.whoami.user_id,
                 access_token=request.access_token
             )
             user_profile = cls.resource_cls.retrieve(
