@@ -186,9 +186,9 @@ class Site(APIResource):
         self.owned_by = Profile(data['ownedBy'])
 
         # Site themes are optional
-        if data.has_key('logoUrl'): self.logo_url = data['logoUrl']
-        if data.has_key('themeId'): self.theme_id = data['themeId']
-        if data.has_key('headerBackgroundUrl'):
+        if data.get('logoUrl'): self.logo_url = data['logoUrl']
+        if data.get('themeId'): self.theme_id = data['themeId']
+        if data.get('headerBackgroundUrl'):
             self.header_background_url = data['headerBackgroundUrl']
 
     @classmethod
@@ -254,10 +254,9 @@ class Profile(APIResource):
             self.admin = data['admin']
 
     @classmethod
-    def retrieve(cls, host, id, access_token=None):
+    def retrieve(cls, host, id, offset=None, access_token=None):
         resource = super(Profile, cls).retrieve(host, id, access_token=access_token)
         return Profile(resource)
-
 
 class Microcosm(APIResource):
     """
@@ -276,8 +275,7 @@ class Microcosm(APIResource):
         self.meta = Meta(data['meta'])
 
         if summary:
-            if data.has_key('mostRecentUpdate')\
-            and data['mostRecentUpdate'] is not None:
+            if data.get('mostRecentUpdate'):
                 self.most_recent_update = Item(data['mostRecentUpdate'])
             self.total_items = data['totalItems']
             self.total_comments = data['totalComments']
@@ -353,13 +351,13 @@ class Meta():
     """
 
     def __init__(self, data):
-        if data.has_key('created'): self.created = (data['created'])
-        if data.has_key('createdBy'): self.created_by = Profile(data['createdBy'])
-        if data.has_key('edited'): self.created = (data['edited'])
-        if data.has_key('editedBy'): self.created_by = Profile(data['editedBy'])
-        if data.has_key('flags'): self.flags = data['flags']
-        if data.has_key('permissions'): self.permissions = PermissionSet(data['permissions'])
-        if data.has_key('links'):
+        if data.get('created'): self.created = (data['created'])
+        if data.get('createdBy'): self.created_by = Profile(data['createdBy'])
+        if data.get('edited'): self.created = (data['edited'])
+        if data.get('editedBy'): self.created_by = Profile(data['editedBy'])
+        if data.get('flags'): self.flags = data['flags']
+        if data.get('permissions'): self.permissions = PermissionSet(data['permissions'])
+        if data.get('links'):
             self.links = {}
             for item in data['links']:
                 self.links[item['rel']] = item['href']
@@ -416,17 +414,16 @@ class Event(APIResource):
         self.status = data['status']
         self.comments = PaginatedList(data['comments'], Comment)
 
-        if data.has_key('rsvpAttend'): self.rsvp_attend = data['rsvpAttend']
-        if data.has_key('rsvpLimit'): self.rsvp_attend = data['rsvpLimit']
-        if data.has_key('rsvpSpaces'): self.rsvp_attend = data['rsvpSpaces']
+        if data.get('rsvpAttend'): self.rsvp_attend = data['rsvpAttend']
+        if data.get('rsvpLimit'): self.rsvp_attend = data['rsvpLimit']
+        if data.get('rsvpSpaces'): self.rsvp_attend = data['rsvpSpaces']
 
         self.lat = data['lat']
         self.lat = data['lon']
-        if data.has_key('north'): self.north = data['north']
-        if data.has_key('east'): self.east = data['east']
-        if data.has_key('south'): self.south = data['south']
-        if data.has_key('west'): self.west = data['west']
-
+        if data.get('north'): self.north = data['north']
+        if data.get('east'): self.east = data['east']
+        if data.get('south'): self.south = data['south']
+        if data.get('west'): self.west = data['west']
 
     @classmethod
     def retrieve(cls, host, id=None, offset=None, access_token=None):
