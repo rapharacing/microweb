@@ -265,10 +265,6 @@ class Profile(APIResource):
 
     @property
     def as_dict(self):
-        """
-        Return instance as a dictionary, with correct keys for POST or PUT to API.
-        """
-
         repr = {}
         if hasattr(self, 'id'): repr['id'] = self.id
         if hasattr(self, 'site_id'): repr['siteId'] = self.site_id
@@ -276,6 +272,13 @@ class Profile(APIResource):
         if hasattr(self, 'profile_name'): repr['profileName'] = self.profile_name
         if hasattr(self, 'visible'): repr['visible'] =  self.visible
         if hasattr(self, 'gravatar'): repr['gravatar'] = self.gravatar
+        if hasattr(self, 'style_id'): repr['styleId'] = self.style_id
+        if hasattr(self, 'item_count'): repr['itemCount'] = self.item_count
+        if hasattr(self, 'comment_count'): repr['commentCount'] = self.comment_count
+        if hasattr(self, 'created'): repr['created'] = self.created
+        if hasattr(self, 'last_active'): repr['lastActive'] = self.last_active
+        if hasattr(self, 'banned'): repr['banned']
+        if hasattr(self, 'admin'): repr['admin']
         return repr
 
 
@@ -286,27 +289,45 @@ class Microcosm(APIResource):
 
     resource_fragment = 'microcosms'
 
-    def __init__(self, data, summary=True):
-        self.id = data['id']
-        self.site_id = data['siteId']
-        self.visibility = data['visibility']
-        self.title = data['title']
-        self.description = data['description']
-        self.moderators = data['moderators']
-        self.meta = Meta(data['meta'])
+    def __init__(self, data, summary=False):
+        if data.get('id'): self.id = data['id']
+        if data.get('siteId'): self.site_id = data['siteId']
+        if data.get('visibility'): self.visibility = data['visibility']
+        if data.get('title'): self.title = data['title']
+        if data.get('description'): self.description = data['description']
+        if data.get('moderators'): self.moderators = data['moderators']
+        if data.get('editReason'): self.edit_reason = data['editReason']
+        if data.get('meta'): self.meta = Meta(data['meta'])
 
         if summary:
             if data.get('mostRecentUpdate'):
                 self.most_recent_update = Item(data['mostRecentUpdate'])
-            self.total_items = data['totalItems']
-            self.total_comments = data['totalComments']
+            if data.get('totalItems'): self.total_items = data['totalItems']
+            if data.get('totalComments'): self.total_comments = data['totalComments']
         else:
-            self.items = PaginatedList(data['items'], Item)
+            if data.get('items'): self.items = PaginatedList(data['items'], Item)
 
     @classmethod
     def retrieve(cls, host, id, offset=None, access_token=None):
         resource = super(Microcosm, cls).retrieve(host, id, offset, access_token)
         return Microcosm(resource, summary=False)
+
+    @property
+    def as_dict(self):
+        repr = {}
+        if hasattr(self, 'id'): repr['id'] = self.id
+        if hasattr(self, 'site_id'): repr['siteId'] = self.site_id
+        if hasattr(self, 'visibility'): repr['visibility'] = self.visibility
+        if hasattr(self, 'title'): repr['title'] = self.title
+        if hasattr(self, 'description'): repr['description'] = self.description
+        if hasattr(self, 'moderators'): repr['moderators'] = self.moderators
+        if hasattr(self, 'meta'): repr['meta'] = self.meta
+        if hasattr(self, 'most_recent_update'): repr['mostRecentUpdate'] = self.most_recent_update
+        if hasattr(self, 'total_items'): repr['totalItems'] = self.total_items
+        if hasattr(self, 'total_comments'): repr['totalComments'] = self.total_comments
+        if hasattr(self, 'items'): repr['items'] = self.items
+        if hasattr(self, 'edit_reason'): repr['meta'] = dict(editReason=self.edit_reason)
+        return repr
 
 
 class MicrocosmList(APIResource):
@@ -359,7 +380,7 @@ class PaginatedList():
         self.total_pages = item_list['totalPages']
         self.page = item_list['page']
         self.type = item_list['type']
-        self.items = [list_item_cls(item) for item in item_list['items']]
+        self.items = [list_item_cls(item, summary=True) for item in item_list['items']]
         self.links = {}
         for item in item_list['links']:
             self.links[item['rel']] = item['href']
