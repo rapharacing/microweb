@@ -278,8 +278,6 @@ class ConversationView(ItemView):
 
 class ProfileView(ItemView):
 
-    item_type = 'profile'
-    item_plural = 'profiles'
     edit_form = ProfileEdit
     form_template = 'forms/profile.html'
     single_template = 'profile.html'
