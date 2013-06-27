@@ -254,56 +254,69 @@ class ProfileView(ItemView):
 
     item_type = 'profile'
     item_plural = 'profiles'
-    resource_cls = Profile
     edit_form = ProfileEdit
     form_template = 'forms/profile.html'
-    one_template = 'profile.html'
+    single_template = 'profile.html'
 
-    @classmethod
+    @staticmethod
     @exception_handler
-    def edit(cls, request, item_id):
+    def single(request, profile_id):
         """
-        We need to fetch a 'user' object to edit their profile, since the
-        user's email is submitted as 'gravatar'. This won't be needed when
+        Generic method for displaying a single item.
+        """
+
+        view_data = dict(user=request.whoami, site=request.site)
+
+        profile = Profile.retrieve(
+            request.META['HTTP_HOST'],
+            profile_id,
+            request.access_token
+        )
+
+        view_data['content'] = profile
+
+        return render(request, ProfileView.single_template, view_data)
+
+    @staticmethod
+    @exception_handler
+    def edit(request, profile_id):
+        """
+        To edit a Profile, we must fetch the associated User object since the
+        user's email is submitted as Profile.gravatar. This won't be needed when
         PATCH support is added.
         """
 
-        view_data = {
-            'user': request.whoami,
-            'site': request.site,
-        }
+        view_data = dict(user=request.whoami, site=request.site)
 
-        # Populate form from POST data, return populated form if not valid
         if request.method == 'POST':
-            form = cls.edit_form(request.POST)
+            form = ProfileView.edit_form(request.POST)
             if form.is_valid():
-                form_data = form.cleaned_data
-                item = cls.resource_cls.update(
+                form_data = Profile(form.cleaned_data)
+                profile = Profile.update(
                     request.META['HTTP_HOST'],
-                    form_data,
-                    item_id,
+                    form_data.as_dict,
+                    profile_id,
                     request.access_token
                 )
-                return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
+                return HttpResponseRedirect(reverse('single-profile', args=(profile['id'],)))
             else:
                 view_data['form'] = form
-                return render(request, cls.form_template, view_data)
+                return render(request, ProfileView.form_template, view_data)
 
-        # Populate form with item data
         elif request.method == 'GET':
             user_private_details = User.retrieve(
                 request.META['HTTP_HOST'],
                 request.whoami.user_id,
                 access_token=request.access_token
             )
-            user_profile = cls.resource_cls.retrieve(
+            user_profile = Profile.retrieve(
                 request.META['HTTP_HOST'],
-                id=item_id,
-                access_token=request.access_token
+                profile_id,
+                request.access_token
             )
             user_profile.gravatar = user_private_details.email
-            view_data['form'] = cls.edit_form(user_profile.__dict__)
-            return render(request, cls.form_template, view_data)
+            view_data['form'] = ProfileView.edit_form(user_profile.as_dict)
+            return render(request, ProfileView.form_template, view_data)
 
         else:
             return HttpResponseNotAllowed(['GET', 'POST'])

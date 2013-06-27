@@ -52,8 +52,8 @@ urlpatterns = patterns('',
     url(r'comments/(?P<item_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
 
     # User profiles
-    url(r'^profiles/(?P<item_id>\d+)/$', ProfileView.single, name='single-profile'),
-    url(r'^profiles/(?P<item_id>\d+)/edit/$', ProfileView.edit, name='edit-profile'),
+    url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),
+    url(r'^profiles/(?P<profile_id>\d+)/edit/$', ProfileView.edit, name='edit-profile'),
 
     # Proxy geocoding requests to the backend
     url(r'^geocode/$', GeoView.geocode, name='geocode'),
