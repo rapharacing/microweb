@@ -432,8 +432,9 @@ class Conversation(APIResource):
         self.id = data['id']
         self.microcosm_id = data['microcosmId']
         self.title = data['title']
-        self.meta = Meta(data['meta'])
-        self.comments = PaginatedList(data['comments'], Comment)
+
+        if data.get('comments'): self.comments = PaginatedList(data['comments'], Comment)
+        if data.get('meta'): self.meta = Meta(data['meta'])
         if data.get('editReason'): self.edit_reason = data['editReason']
 
     @classmethod
@@ -447,7 +448,7 @@ class Conversation(APIResource):
         repr['id'] = self.id
         repr['microcosmId'] = self.microcosm_id
         repr['title'] = self.title
-        if hasattr(self, 'edit_reason'): repr['editReason']
+        if hasattr(self, 'edit_reason'): repr['meta'] = dict(editReason=self.edit_reason)
         return repr
 
 class Event(APIResource):
