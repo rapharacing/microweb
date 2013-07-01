@@ -48,7 +48,7 @@
 				<p class="text-muted">Attendees</p>
 			</div>
 			<div class="col col-lg-8">
-				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvpAttend }}</p>
+				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvp_attend }}</p>
 			</div>
 		</div>
 
@@ -57,7 +57,7 @@
 				<p class="text-muted">Attendee Limit</p>
 			</div>
 			<div class="col col-lg-8">
-				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvpLimit }}</p>
+				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvp_limit }}</p>
 			</div>
 		</div>
 
@@ -66,7 +66,7 @@
 				<p class="text-muted">Spaces Left</p>
 			</div>
 			<div class="col col-lg-8">
-				<p id="spaces_left" style="padding-left:6px;">{{ content.rsvpSpaces }}</p>
+				<p id="spaces_left" style="padding-left:6px;">{{ content.rsvp_spaces }}</p>
 			</div>
 		</div>
 	</div>
@@ -121,23 +121,23 @@
 	<h4>Who's going?</h4>
 	{# Iterating the attendees four times is only temporary, they'll be split into different collections in future. #}
 	<p><strong>Confirmed</strong></p>
-	{% for item in attendees.attendees.items %}
+	{% for item in attendees.items.items %}
 		<ul>
 			{% if item.rsvp == "yes" %}
-				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
+				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}
 	<p><strong>Maybe</strong></p>
-	{% for item in attendees.attendees.items %}
+	{% for item in attendees.items.items %}
 		<ul>
 			{% if item.rsvp == "maybe" %}
-				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
+				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}
 	<!--<p><strong>Yet to reply</strong></p>
-	{% for item in attendees.attendees.items %}
+	{% for item in attendees.items.items %}
 		<ul>
 			{% if item.rsvp == "invited" %}
 				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
@@ -145,10 +145,10 @@
 		</ul>
 	{% endfor %}-->
 	<p><strong>Nope</strong></p>
-	{% for item in attendees.attendees.items %}
+	{% for item in attendees.items.items %}
 		<ul>
 			{% if item.rsvp == "no" %}
-				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
+				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}
