@@ -47,9 +47,9 @@ urlpatterns = patterns('',
 
     # Comments
     url(r'comments/create/$', CommentView.create, name='create-comment'),
-    url(r'comments/(?P<item_id>\d+)/$', CommentView.single, name='single-comment'),
-    url(r'comments/(?P<item_id>\d+)/edit/$', CommentView.edit, name='edit-comment'),
-    url(r'comments/(?P<item_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
+    url(r'comments/(?P<comment_id>\d+)/$', CommentView.single, name='single-comment'),
+    url(r'comments/(?P<comment_id>\d+)/edit/$', CommentView.edit, name='edit-comment'),
+    url(r'comments/(?P<comment_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
 
     # User profiles
     url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),
