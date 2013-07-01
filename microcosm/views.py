@@ -503,22 +503,14 @@ class EventView(ItemView):
 
         # Offset for paging of event comments
         offset = int(request.GET.get('offset', 0))
-
         event = Event.retrieve(
             request.META['HTTP_HOST'],
             id=event_id,
             offset=offset,
             access_token=request.access_token
         )
-
         attendees = event.get_attendees(request.META['HTTP_HOST'], request.access_token)
-
-        comment_form = CommentForm(
-            initial={
-                'itemId': event_id,
-                'itemType': 'event',
-            }
-        )
+        comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
 
         view_data = {
             'user': request.whoami,
@@ -530,6 +522,63 @@ class EventView(ItemView):
         }
 
         return render(request, EventView.single_template, view_data)
+
+    @staticmethod
+    @exception_handler
+    def create(request, microcosm_id):
+        """
+        Create an event within a microcosm.
+        """
+
+        view_data = dict(user=request.whoami, site=request.site)
+
+        if request.method == 'POST':
+            form = EventView.create_form(request.POST)
+            if form.is_valid():
+                event = Event.create(
+                    request.META['HTTP_HOST'],
+                    form.cleaned_data,
+                    request.access_token
+                )
+                return HttpResponseRedirect(reverse('single-event', args=(event['id'],)))
+            else:
+                view_data['form'] = form
+                return render(request, EventView.form_template, view_data)
+
+        elif request.method == 'GET':
+            view_data['form'] = EventView.create_form(initial=dict(microcosmId=microcosm_id))
+            return render(request, EventView.form_template, view_data)
+
+        else:
+            return HttpResponseNotAllowed(['GET', 'POST'])
+
+    @staticmethod
+    @exception_handler
+    def edit(request, event_id):
+        """
+        Edit an event.
+        """
+
+        view_data = dict(user=request.whoami, site=request.site)
+
+        if request.method == 'POST':
+            form = EventView.edit_form(request.POST)
+
+            if form.is_valid():
+                form_data = Event(form.cleaned_data)
+                event = Event.update(request.META['HTTP_HOST'], form_data, event_id, request.access_token)
+                return HttpResponseRedirect(reverse('single-event', args=(event['id'],)))
+            else:
+                view_data['form'] = form
+                return render(request, EventView.form_template, view_data)
+
+        elif request.method == 'GET':
+            event = Event.retrieve(request.META['HTTP_HOST'], id=event_id, access_token=request.access_token)
+            view_data['form'] = EventView.edit_form(event.as_dict)
+            return render(request, EventView.form_template, view_data)
+
+        else:
+            return HttpResponseNotAllowed(['GET', 'POST'])
 
     @staticmethod
     def rsvp(request, event_id):
