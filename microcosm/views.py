@@ -109,10 +109,7 @@ class ItemView(object):
         within a microcosm (e.g. a conversation or event).
         """
 
-        view_data = {
-            'user': request.whoami,
-            'site': request.site,
-        }
+        view_data = dict(user=request.whoami, site=request.site)
 
         # Populate form from POST data, return populated form if not valid
         if request.method == 'POST':
@@ -147,10 +144,7 @@ class ItemView(object):
         Generic edit view. The item with item_id is used to populate form fields.
         """
 
-        view_data = {
-            'user': request.whoami,
-            'site': request.site,
-        }
+        view_data = dict(user=request.whoami, site=request.site)
 
         # Populate form from POST data, return populated form if not valid
         if request.method == 'POST':
@@ -657,10 +651,7 @@ class CommentView(ItemView):
         method to be extended.
         """
 
-        view_data = {
-            'user': request.whoami,
-            'site': request.site,
-        }
+        view_data = dict(user=request.whoami, site=request.site)
 
         if request.method == 'POST':
             form = CommentForm(request.POST)
@@ -696,20 +687,12 @@ class ErrorView():
 
     @staticmethod
     def not_found(request):
-
-        view_data = {
-            'site' : request.site,
-            'user' : request.whoami,
-        }
+        view_data = dict(site=request.site, user=request.whoami)
         return render(request, '404.html', view_data)
 
     @staticmethod
     def forbidden(request):
-
-        view_data = {
-            'site' : request.site,
-            'user' : request.whoami,
-        }
+        view_data = dict(site=request.site,user=request.whoami)
         return render(request, '403.html', view_data)
 
     @staticmethod
@@ -733,12 +716,8 @@ class AuthenticationView():
 
         target_url = request.POST.get('target_url')
         assertion = request.POST.get('Assertion')
-        client_secret = settings.CLIENT_SECRET
 
-        data = {
-            "Assertion": assertion,
-            "ClientSecret": client_secret
-        }
+        data = dict(Assertion=assertion, ClientSecret=settings.CLIENT_SECRET)
         headers= {'Host': request.META.get('HTTP_HOST')}
 
         access_token = requests.post(build_url(request.META['HTTP_HOST'], ['auth']), data=data, headers=headers).json()['data']
@@ -756,10 +735,7 @@ class AuthenticationView():
         clear the user's access_token cookie.
         """
 
-        view_data = {
-            'site': request.site,
-        }
-
+        view_data = dict(site=request.site)
         response = render(request, 'logout.html', view_data)
 
         if request.COOKIES.has_key('access_token'):
