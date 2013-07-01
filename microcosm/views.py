@@ -3,6 +3,7 @@ import requests
 from functools import wraps
 from microweb import settings
 from microweb.settings import PAGE_SIZE
+from microweb.helpers import join_path_fragments
 from microweb.helpers import build_url
 from urlparse import urlunparse
 
@@ -576,67 +577,81 @@ class CommentView(ItemView):
     @staticmethod
     def fill_from_get(request, initial):
         """
-        Populating comment form fields from GET parameters
+        Populate comment form fields from GET parameters.
         """
 
         if request.GET.has_key('itemId'):
             initial['itemId'] = int(request.GET.get('itemId', None))
+
         if request.GET.has_key('itemType'):
             if request.GET['itemType'] not in COMMENTABLE_ITEM_TYPES:
                 raise ValueError
             initial['itemType'] = request.GET.get('itemType', None)
+
         if request.GET.has_key('inReplyTo'):
             initial['inReplyTo'] = int(request.GET.get('inReplyTo', None))
 
         return initial
 
-    @classmethod
+    @staticmethod
+    def build_comment_location(comment):
+
+        # TODO: item_type -> plural mappings
+        path = join_path_fragments(['%ss' % comment.item_type, comment.item_id])
+
+        if 'offset' in comment.meta.links.get('via'):
+            offset = comment.meta.links.get('via').split('offset=')[1]
+            location = urlunparse((
+                '', '', path, '',
+                'offset=%s' % offset,
+                'comment%d' % comment.id,)
+            )
+        else:
+            location = urlunparse((
+                '', '', path, '', '',
+                'comment%d' % comment.id,)
+            )
+
+        return location
+
+    @staticmethod
     @exception_handler
-    def create(cls, request):
+    def create(request):
         """
         Comment forms populate attributes from GET parameters, so require the create
         method to be extended.
         """
 
-        view_data = {
-            'user': request.whoami,
-            'site': request.site,
-        }
+        view_data = dict(user=request.whoami, site=request.site)
 
         if request.method == 'POST':
-            form = cls.create_form(request.POST)
+            form = CommentForm(request.POST)
             if form.is_valid():
-                item = cls.resource_cls.create(
+                comment = Comment.create(
                     request.META['HTTP_HOST'],
                     data=form.cleaned_data,
                     access_token=request.access_token
                 )
 
-                # If a 'via' link is returned, go to that page and comment fragment
-                if item['meta'].has_key('linkmap') and item['meta']['linkmap'].has_key('via'):
-                    if 'offset' in item['meta']['linkmap']['via']:
-                        offset = item['meta']['linkmap']['via'].split('offset=')[1]
-                        return HttpResponseRedirect('/%ss/%d?offset=%s#comment%d' %
-                            (item['itemType'], item['itemId'], offset, item['id']))
-                    else:
-                        return HttpResponseRedirect('/%ss/%d#comment%d' % (item['itemType'], item['itemId'], item['id']))
+                if comment.meta.links.get('via'):
+                    return HttpResponseRedirect(CommentView.build_comment_location(comment))
                 else:
-                    return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
+                    return HttpResponseRedirect(reverse('single-comment', args=(comment.id,)))
             else:
                 view_data['form'] = form
-                return render(request, cls.form_template, view_data)
+                return render(request, CommentView.form_template, view_data)
 
         elif request.method == 'GET':
             initial = CommentView.fill_from_get(request, {})
-            view_data['form'] = cls.create_form(initial=initial)
-            return render(request, cls.form_template, view_data)
+            view_data['form'] = CommentForm(initial=initial)
+            return render(request, CommentView.form_template, view_data)
 
         else:
             return HttpResponseNotAllowed(['GET', 'POST'])
 
-    @classmethod
+    @staticmethod
     @exception_handler
-    def edit(cls, request, item_id):
+    def edit(request, comment_id):
         """
         Comment forms populate attributes from GET parameters, so require the create
         method to be extended.
@@ -648,37 +663,30 @@ class CommentView(ItemView):
         }
 
         if request.method == 'POST':
-            form = cls.create_form(request.POST)
+            form = CommentForm(request.POST)
             if form.is_valid():
-                item = cls.resource_cls.update(
+                comment = Comment.update(
                     request.META['HTTP_HOST'],
                     form.cleaned_data,
-                    item_id,
+                    comment_id,
                     request.access_token
                 )
-
-                # If a 'via' link is returned, go to that page and comment fragment
-                if item['meta'].has_key('linkmap') and item['meta']['linkmap'].has_key('via'):
-                    if 'offset' in item['meta']['linkmap']['via']:
-                        offset = item['meta']['linkmap']['via'].split('offset=')[1]
-                        return HttpResponseRedirect('/%ss/%d?offset=%s#comment%d' %
-                            (item['itemType'], item['itemId'], offset, item['id']))
-                    else:
-                        return HttpResponseRedirect('/%ss/%d#comment%d' % (item['itemType'], item['itemId'], item['id']))
+                if comment.meta.links.get('via'):
+                    return HttpResponseRedirect(CommentView.build_comment_location(comment))
                 else:
-                    return HttpResponseRedirect(''.join(['/', cls.item_plural, '/', str(item['id'])]))
+                    return HttpResponseRedirect(reverse('single-comment', args=(comment.id,)))
             else:
                 view_data['form'] = form
-                return render(request, cls.form_template, view_data)
+                return render(request, CommentView.form_template, view_data)
 
         elif request.method == 'GET':
-            comment = cls.resource_cls.retrieve(
+            comment = Comment.retrieve(
                 request.META['HTTP_HOST'],
-                item_id,
+                comment_id,
                 access_token=request.access_token
             )
-            view_data['form'] = cls.edit_form(comment)
-            return render(request, cls.form_template, view_data)
+            view_data['form'] = CommentForm(comment.as_dict)
+            return render(request, CommentView.form_template, view_data)
 
         else:
             return HttpResponseNotAllowed(['GET', 'POST'])
