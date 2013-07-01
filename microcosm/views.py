@@ -96,6 +96,8 @@ class ItemView(object):
     This class shouldn't be used directly, it should be subclassed.
     """
 
+    commentable = False
+
     @classmethod
     @exception_handler
     def create(cls, request, microcosm_id=None):
@@ -436,15 +438,13 @@ class MicrocosmView(ItemView):
             form = MicrocosmView.edit_form(request.POST)
             if form.is_valid():
                 form_data = Microcosm(form.cleaned_data)
-                import pprint; pprint.pprint(form_data.as_dict)
-                print hasattr(form_data, 'edit_reason')
                 microcosm = Microcosm.update(
                     request.META['HTTP_HOST'],
                     form_data.as_dict,
                     microcosm_id,
                     request.access_token
                 )
-                return HttpResponseRedirect(reverse('single-microcosm', microcosm['id']))
+                return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm['id'],)))
             else:
                 view_data['form'] = form
                 return render(request, MicrocosmView.form_template, view_data)
@@ -493,26 +493,51 @@ class MicrocosmView(ItemView):
 
 class EventView(ItemView):
 
-    item_type = 'event'
-    item_plural = 'events'
-    resource_cls = Event
     create_form = EventCreate
     edit_form = EventEdit
     form_template = 'forms/event.html'
-    one_template = 'event.html'
-    commentable = True
+    single_template = 'event.html'
+    comment_form = CommentForm
 
-    @classmethod
-    def extra_item_data(cls, request, event_id, view_data, access_token=None):
-        view_data['attendees'] = cls.resource_cls.retrieve_attendees(
+    @staticmethod
+    @exception_handler
+    def single(request, event_id):
+        """
+        Display a single event with comments and attendees.
+        """
+
+        # Offset for paging of event comments
+        offset = int(request.GET.get('offset', 0))
+
+        event = Event.retrieve(
             request.META['HTTP_HOST'],
-            event_id,
-            access_token
+            id=event_id,
+            offset=offset,
+            access_token=request.access_token
         )
-        return view_data
 
-    @classmethod
-    def rsvp(cls, request, event_id):
+        attendees = event.get_attendees(request.META['HTTP_HOST'], request.access_token)
+
+        comment_form = CommentForm(
+            initial={
+                'itemId': event_id,
+                'itemType': 'event',
+            }
+        )
+
+        view_data = {
+            'user': request.whoami,
+            'site': request.site,
+            'content': event,
+            'comment_form': comment_form,
+            'attendees': attendees,
+            'pagination': build_pagination_links(request, event.comments)
+        }
+
+        return render(request, EventView.single_template, view_data)
+
+    @staticmethod
+    def rsvp(request, event_id):
         """
         Create an attendee (RSVP) for an event. An attendee can be in one of four states:
         invited, confirmed, maybe, no.
@@ -522,16 +547,16 @@ class EventView(ItemView):
             if request.whoami:
                 attendee = {
                     'RSVP' : request.POST['rsvp'],
-                    'AttendeeId' : request.whoami['id']
+                    'AttendeeId' : request.whoami.id
                 }
-                cls.resource_cls.rsvp(
+                Event.rsvp(
                     request.META['HTTP_HOST'],
                     event_id,
-                    request.whoami['id'],
+                    request.whoami.id,
                     attendee,
                     access_token=request.access_token
                 )
-                return HttpResponseRedirect('/events/%s' % event_id)
+                return HttpResponseRedirect(reverse('single-event', args=(event_id,)))
             else:
                 raise PermissionDenied
         else:
