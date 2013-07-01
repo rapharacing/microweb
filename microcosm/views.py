@@ -263,14 +263,100 @@ class ItemView(object):
 
 class ConversationView(ItemView):
 
-    item_type = 'conversation'
-    item_plural = 'conversations'
-    resource_cls = Conversation
     create_form = ConversationCreate
     edit_form = ConversationEdit
     form_template = 'forms/conversation.html'
-    one_template = 'conversation.html'
-    commentable = True
+    single_template = 'conversation.html'
+
+    @staticmethod
+    @exception_handler
+    def single(request, conversation_id):
+
+        # Offset for paging of event comments
+        offset = int(request.GET.get('offset', 0))
+        event = Conversation.retrieve(
+            request.META['HTTP_HOST'],
+            id=conversation_id,
+            offset=offset,
+            access_token=request.access_token
+        )
+        comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='event'))
+
+        view_data = {
+            'user': request.whoami,
+            'site': request.site,
+            'content': event,
+            'comment_form': comment_form,
+            'pagination': build_pagination_links(request, event.comments)
+        }
+
+        return render(request, ConversationView.single_template, view_data)
+
+    @staticmethod
+    @exception_handler
+    def create(request, microcosm_id):
+        """
+        Create a conversation.
+        """
+
+        view_data = dict(user=request.whoami, site=request.site)
+
+        if request.method == 'POST':
+            form = Conversation.create_form(request.POST)
+            if form.is_valid():
+                conversation = Conversation.create(
+                    request.META['HTTP_HOST'],
+                    form.cleaned_data,
+                    request.access_token
+                )
+                return HttpResponseRedirect(reverse('single-conversation', args=(conversation['id'],)))
+            else:
+                view_data['form'] = form
+                return render(request, ConversationView.form_template, view_data)
+
+        elif request.method == 'GET':
+            view_data['form'] = ConversationView.create_form(initial=dict(microcosmId=microcosm_id))
+            return render(request, ConversationView.form_template, view_data)
+
+        else:
+            return HttpResponseNotAllowed(['GET', 'POST'])
+
+    @staticmethod
+    @exception_handler
+    def edit(request, conversation_id):
+        """
+        Edit a conversation.
+        """
+
+        view_data = dict(user=request.whoami, site=request.site)
+
+        if request.method == 'POST':
+            form = ConversationView.edit_form(request.POST)
+
+            if form.is_valid():
+                form_data = Conversation(form.cleaned_data)
+                conversation = Conversation.update(
+                    request.META['HTTP_HOST'],
+                    form_data.as_dict,
+                    conversation_id,
+                    request.access_token
+                )
+                return HttpResponseRedirect(reverse('single-conversation', args=(conversation['id'],)))
+            else:
+                view_data['form'] = form
+                return render(request, ConversationView.form_template, view_data)
+
+        elif request.method == 'GET':
+            conversation = Conversation.retrieve(
+                request.META['HTTP_HOST'],
+                id=conversation_id,
+                access_token=request.access_token
+            )
+            view_data['form'] = ConversationView.edit_form(conversation.as_dict)
+            return render(request, ConversationView.form_template, view_data)
+
+        else:
+            return HttpResponseNotAllowed(['GET', 'POST'])
 
 
 class ProfileView(ItemView):
@@ -283,7 +369,7 @@ class ProfileView(ItemView):
     @exception_handler
     def single(request, profile_id):
         """
-        Generic method for displaying a single item.
+        Display a single profile by ID.
         """
 
         view_data = dict(user=request.whoami, site=request.site)
