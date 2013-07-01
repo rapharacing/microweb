@@ -470,7 +470,7 @@ class Event(APIResource):
         if data.get('rsvpSpaces'): self.rsvp_spaces = data['rsvpSpaces']
 
         self.lat = data['lat']
-        self.lat = data['lon']
+        self.lon = data['lon']
         if data.get('north'): self.north = data['north']
         if data.get('east'): self.east = data['east']
         if data.get('south'): self.south = data['south']
@@ -504,16 +504,15 @@ class Event(APIResource):
         resource = super(Event, cls).retrieve(host, id, offset, access_token)
         return Event(resource)
 
-    @classmethod
-    def retrieve_attendees(cls, host, id, access_token=None):
+    def get_attendees(self, host, access_token=None):
         """
         Retrieve a list of attendees for an event.
         TODO: pagination support, use nested class to represent Attendee
         """
 
-        resource_url = build_url(host, [cls.resource_fragment, id, 'attendees'])
+        resource_url = build_url(host, [Event.resource_fragment, self.id, 'attendees'])
         resource = APIResource.retrieve(host, id=id, access_token=access_token, url_override=resource_url)
-        return APIResource.process_timestamp(resource)
+        return AttendeeList(resource)
 
     @classmethod
     def rsvp(cls, host, event_id, profile_id, attendance_data, access_token):
@@ -568,6 +567,35 @@ class Event(APIResource):
 
         else:
             raise APIException(response.content)
+
+
+class AttendeeList(APIResource):
+    """
+    Represents a paginated list of event attendees.
+    """
+
+    def __init__(self, data):
+        self.items = PaginatedList(data['attendees'], Attendee)
+        self.meta = Meta(data['meta'])
+
+
+class Attendee(object):
+
+    def __init__(self, data, summary=None):
+        self.attendee_id = data['attendeeId']
+        self.attendee = Attendee.AttendeeRecord(data['attendee'])
+        self.rsvp = data['rsvp']
+        self.rsvpd_on = data['rsvpdOn']
+        self.meta = Meta(data['meta'])
+
+    class AttendeeRecord(object):
+        def __init__(self, data):
+            self.site_id = data['siteId']
+            self.user_id = data['userId']
+            self.profile_name = data['profileName']
+            self.visible = data['visible']
+            self.gravatar = data['gravatar']
+            self.meta = Meta(data['meta'])
 
 
 class Comment(APIResource):
