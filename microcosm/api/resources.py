@@ -432,12 +432,21 @@ class Conversation(APIResource):
         self.title = data['title']
         self.meta = Meta(data['meta'])
         self.comments = PaginatedList(data['comments'], Comment)
+        if data.get('editReason'): self.edit_reason = data['editReason']
 
     @classmethod
     def retrieve(cls, host, id=None, offset=None, access_token=None):
         resource = super(Conversation, cls).retrieve(host, id, offset, access_token)
         return Conversation(resource)
 
+    @property
+    def as_dict(self):
+        repr = {}
+        repr['id'] = self.id
+        repr['microcosmId'] = self.microcosm_id
+        repr['title'] = self.title
+        if hasattr(self, 'edit_reason'): repr['editReason']
+        return repr
 
 class Event(APIResource):
     """
@@ -457,8 +466,8 @@ class Event(APIResource):
         self.comments = PaginatedList(data['comments'], Comment)
 
         if data.get('rsvpAttend'): self.rsvp_attend = data['rsvpAttend']
-        if data.get('rsvpLimit'): self.rsvp_attend = data['rsvpLimit']
-        if data.get('rsvpSpaces'): self.rsvp_attend = data['rsvpSpaces']
+        if data.get('rsvpLimit'): self.rsvp_limit = data['rsvpLimit']
+        if data.get('rsvpSpaces'): self.rsvp_spaces = data['rsvpSpaces']
 
         self.lat = data['lat']
         self.lat = data['lon']
@@ -466,6 +475,29 @@ class Event(APIResource):
         if data.get('east'): self.east = data['east']
         if data.get('south'): self.south = data['south']
         if data.get('west'): self.west = data['west']
+
+    @property
+    def as_dict(self):
+        repr = {}
+        repr['id'] = self.id
+        repr['microcosmId'] = self.microcosm_id
+        repr['title'] = self.title
+        repr['when'] = self.when
+        repr['duration'] = self.duration
+        repr['where'] = self.where
+        repr['status'] = self.status
+        if hasattr(self, 'rsvp_attend'): repr['rsvpAttend'] = self.rsvp_attend
+        if hasattr(self, 'rsvp_limit'): repr['rsvpLimit'] = self.rsvp_attend
+        if hasattr(self, 'rsvp_spaces'): repr['rsvpSpaces'] = self.rsvp_attend
+
+        repr['lat'] = self.lat
+        repr['lon'] = self.lon
+        if hasattr('north'): repr['north'] = self.north
+        if hasattr('east'): repr['east'] = self.east
+        if hasattr('south'): repr['south'] = self.south
+        if hasattr('west'): repr['west'] = self.west
+
+        return repr
 
     @classmethod
     def retrieve(cls, host, id=None, offset=None, access_token=None):
