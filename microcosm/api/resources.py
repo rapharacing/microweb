@@ -407,7 +407,7 @@ class Meta():
                 self.links[item['rel']] = item['href']
 
 
-class PermissionSet():
+class PermissionSet(object):
     """
     Represents user permissions on a resource.
     """
