@@ -354,7 +354,7 @@ class Item():
     contained within.
     """
 
-    def __init__(self, data):
+    def __init__(self, data, summary=None):
         self.id = data['id']
         self.item_type = data['itemType']
         self.microcosm_id = data['microcosmId']
@@ -605,7 +605,7 @@ class Comment(APIResource):
 
     resource_fragment = 'comments'
 
-    def __init__(self, data):
+    def __init__(self, data, summary=None):
         self.id = data['id']
         self.item_type = data['itemType']
         self.item_id = data['itemId']
@@ -625,12 +625,27 @@ class Comment(APIResource):
     @classmethod
     def create(cls, host, data, access_token):
         resource = super(Comment, cls).create(host, data, access_token)
-        return resource
+        return Comment(resource)
 
     @classmethod
     def update(cls, host, data, id, access_token):
         resource = super(Comment, cls).update(host, data, id, access_token)
-        return resource
+        return Comment(resource)
+
+    @property
+    def as_dict(self):
+        repr = {}
+        repr['id'] = self.id
+        repr['itemType'] = self.item_type
+        repr['itemId'] = self.item_id
+        repr['revisions'] = self.revisions
+        repr['inReplyTo'] = self.in_reply_to
+        repr['attachments'] = self.attachments
+        repr['firstLine'] = self.first_line
+        repr['markdown'] = self.markdown
+        repr['html'] = self.html
+        repr['meta'] = self.meta
+        return repr
 
 
 class GeoCode():
