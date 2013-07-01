@@ -466,6 +466,7 @@ class Event(APIResource):
         self.where = data['where']
         self.status = data['status']
         self.comments = PaginatedList(data['comments'], Comment)
+        self.meta = Meta(data['meta'])
 
         if data.get('rsvpAttend'): self.rsvp_attend = data['rsvpAttend']
         if data.get('rsvpLimit'): self.rsvp_limit = data['rsvpLimit']
@@ -477,6 +478,8 @@ class Event(APIResource):
         if data.get('east'): self.east = data['east']
         if data.get('south'): self.south = data['south']
         if data.get('west'): self.west = data['west']
+
+        if data.get('editReason'): self.edit_reason = data['editReason']
 
     @property
     def as_dict(self):
@@ -494,10 +497,12 @@ class Event(APIResource):
 
         repr['lat'] = self.lat
         repr['lon'] = self.lon
-        if hasattr('north'): repr['north'] = self.north
-        if hasattr('east'): repr['east'] = self.east
-        if hasattr('south'): repr['south'] = self.south
-        if hasattr('west'): repr['west'] = self.west
+        if hasattr(self, 'north'): repr['north'] = self.north
+        if hasattr(self, 'east'): repr['east'] = self.east
+        if hasattr(self, 'south'): repr['south'] = self.south
+        if hasattr(self, 'west'): repr['west'] = self.west
+
+        if hasattr(self, 'edit_reason'): repr['editReason'] = self.edit_reason
 
         return repr
 
