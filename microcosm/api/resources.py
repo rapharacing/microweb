@@ -361,9 +361,11 @@ class Item():
         self.title = data['title']
         self.total_comments = data['totalComments']
         self.total_views = data['totalViews']
-        self.last_comment_id = data['lastCommentId']
-        self.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
-        self.last_comment_created = parse_timestamp(data['lastCommentCreated'])
+        if data.get('lastCommentId'): self.last_comment_id = data['lastCommentId']
+        if data.get('lastCommentCreatedBy'):
+            self.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
+        if data.get('lastCommentCreated'):
+            self.last_comment_created = parse_timestamp(data['lastCommentCreated'])
         self.meta = Meta(data['meta'])
 
 
