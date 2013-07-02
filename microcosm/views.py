@@ -561,13 +561,10 @@ class EventView(object):
 
 class CommentView(object):
 
-    item_type = 'comment'
-    item_plural = 'comments'
-    resource_cls = Comment
     create_form = CommentForm
     edit_form = CommentForm
     form_template = 'forms/create_comment.html'
-    one_template = 'comment.html'
+    single_template = 'comment.html'
 
     @staticmethod
     def fill_from_get(request, initial):
@@ -608,6 +605,27 @@ class CommentView(object):
             )
 
         return location
+
+    @staticmethod
+    @exception_handler
+    def single(request, comment_id):
+        """
+        Display a single comment.
+        """
+
+        comment = Comment.retrieve(
+            request.META['HTTP_HOST'],
+            id=comment_id,
+            access_token=request.access_token
+        )
+
+        view_data = {
+            'user': request.whoami,
+            'site': request.site,
+            'content': comment,
+        }
+
+        return render(request, CommentView.single_template, view_data)
 
     @staticmethod
     @exception_handler
