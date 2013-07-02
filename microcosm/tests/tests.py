@@ -1,17 +1,23 @@
 import random
 import string
+import json
+import os
 from mock import patch
 
 from django.utils import unittest
 from django.test.client import RequestFactory
 
-from microcosm.views import MicrocosmView, ConversationView
+from microcosm.views import MicrocosmView
+from microcosm.views import build_pagination_links
 from microweb.helpers import build_url
 
 from microweb.settings import API_SCHEME
 from microweb.settings import API_DOMAIN_NAME
 from microweb.settings import API_PATH
 from microweb.settings import API_VERSION
+
+TEST_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 
 class BuildURLTests(unittest.TestCase):
     """
@@ -75,6 +81,7 @@ class RoutingAPITests(unittest.TestCase):
         for x in xrange(10):
             subdomain += random.choice(string.lowercase)
         host = '%s.microco.sm' % subdomain
+        path = build_url(host, ['microcosms'])
 
         # Create a request for a list of microcosms
         request = self.factory.get('/microcosms', HTTP_HOST=host)
@@ -84,9 +91,8 @@ class RoutingAPITests(unittest.TestCase):
 
         # Patch requests.get and check the call args
         with patch('requests.get') as mock:
-            mock.return_value.json.return_value = {'error': None, 'data': {'hi': 5}}
+            mock.return_value.json.return_value = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosms.json')).read())
             MicrocosmView.list(request)
-            path = build_url(host, ['microcosms'])
             mock.assert_called_once_with(path, headers={'Host': host}, params={})
 
 
@@ -98,7 +104,6 @@ class PaginationTests(unittest.TestCase):
 
     def testConversationPagination(self):
 
-        # TODO: read resources from a file, remove hardcoded values
         resource = {
             'id': 1,
             'comments': {
@@ -116,7 +121,7 @@ class PaginationTests(unittest.TestCase):
             'pagination': {}
         }
         # current offset of 50, so viewing page 3
-        ConversationView.build_pagination_nav('path', resource, view_data, 50)
+        build_pagination_links('path', resource, view_data, 50)
 
         assert view_data['pagination']['first'] == 'path'
         assert view_data['pagination']['last'] == 'path?offset=75'
