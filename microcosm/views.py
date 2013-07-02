@@ -855,6 +855,26 @@ class CommentView(ItemView):
             return HttpResponseNotAllowed(['GET', 'POST'])
 
 
+    @staticmethod
+    @exception_handler
+    def delete(request, comment_id):
+        """
+        Delete a comment and be redirected to the item.
+        """
+
+        if request.method == 'POST':
+            comment = Comment.retrieve(request.META['HTTP_HOST'], comment_id, access_token=request.access_token)
+            Comment.delete(request.META['HTTP_HOST'], comment_id, request.access_token)
+            if comment.item_type == 'event':
+                return HttpResponseRedirect(reverse('single-event', args=(comment.item_id,)))
+            elif comment.item_type == 'conversation':
+                return HttpResponseRedirect(reverse('single-conversation', args=(comment.item_id,)))
+            else:
+                return HttpResponseRedirect(reverse('microcosm-list'))
+        else:
+            return HttpResponseNotAllowed()
+
+
 class ErrorView():
 
     @staticmethod
