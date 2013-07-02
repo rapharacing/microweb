@@ -686,6 +686,24 @@ class EventView(ItemView):
             return HttpResponseNotAllowed(['GET', 'POST'])
 
     @staticmethod
+    @exception_handler
+    def delete(request, event_id):
+        """
+        Delete an event and be redirected to the parent microcosm.
+        """
+
+        if request.method == 'POST':
+            event = Event.retrieve(
+                request.META['HTTP_HOST'],
+                event_id,
+                access_token=request.access_token
+            )
+            Event.delete(request.META['HTTP_HOST'], event_id, request.access_token)
+            return HttpResponseRedirect(reverse('single-microcosm', args=(event.microcosm_id,)))
+        else:
+            return HttpResponseNotAllowed()
+
+    @staticmethod
     def rsvp(request, event_id):
         """
         Create an attendee (RSVP) for an event. An attendee can be in one of four states:
