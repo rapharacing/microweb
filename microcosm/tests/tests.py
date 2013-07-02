@@ -11,6 +11,12 @@ from microcosm.views import MicrocosmView
 from microcosm.views import build_pagination_links
 
 from microcosm.api.resources import Conversation
+from microcosm.api.resources import Microcosm
+from microcosm.api.resources import MicrocosmList
+from microcosm.api.resources import Profile
+from microcosm.api.resources import Site
+from microcosm.api.resources import Conversation
+from microcosm.api.resources import Event
 
 from microweb.helpers import build_url
 
@@ -135,3 +141,58 @@ class PaginationTests(unittest.TestCase):
 
         assert pagination_nav['next'] == path + '?offset=25'
 
+    def testPrevLink(self):
+        self.fail()
+
+    def testFirstLink(self):
+        self.fail()
+
+    def testLastLink(self):
+        self.fail()
+
+
+class ResourceTests(unittest.TestCase):
+
+    """
+    Basic initialisation and serilisation tests for API resources.
+    """
+
+    def testMicrocosmInit(self):
+        Microcosm(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data'])
+
+    def testMicrocosmAsDict(self):
+        microcosm = Microcosm(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data'])
+        microcosm.as_dict
+
+    def testMicrocosmSummaryInit(self):
+        Microcosm(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data'], summary=True)
+
+    def testMicrocosmListInit(self):
+        MicrocosmList(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosms.json')).read())['data'])
+
+    def testConversationInit(self):
+        Conversation(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+
+    def testConversationAsDict(self):
+        conversation = Conversation(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        conversation.as_dict
+
+    def testEventInit(self):
+        Event(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
+
+    def testEventAsDict(self):
+        event = Event(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
+        event.as_dict
+
+    def testProfileInit(self):
+        Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'])
+
+    def testProfileAsDict(self):
+        profile = Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'])
+        profile.as_dict
+
+    def testProfileSummaryInit(self):
+        Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'], summary=True)
+
+    def testSiteInit(self):
+        Site(json.loads(open(os.path.join(TEST_ROOT, 'data', 'site.json')).read())['data'])
