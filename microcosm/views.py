@@ -103,7 +103,7 @@ class ConversationView(object):
 
         # Offset for paging of event comments
         offset = int(request.GET.get('offset', 0))
-        event = Conversation.retrieve(
+        conversation = Conversation.retrieve(
             request.META['HTTP_HOST'],
             id=conversation_id,
             offset=offset,
@@ -114,9 +114,9 @@ class ConversationView(object):
         view_data = {
             'user': request.whoami,
             'site': request.site,
-            'content': event,
+            'content': conversation,
             'comment_form': comment_form,
-            'pagination': build_pagination_links(request, event.comments)
+            'pagination': build_pagination_links(request, conversation.comments)
         }
 
         return render(request, ConversationView.single_template, view_data)
