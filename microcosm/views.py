@@ -9,7 +9,6 @@ from urlparse import urlunparse
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
-from django.core.exceptions import SuspiciousOperation
 from django.http import Http404
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
@@ -91,177 +90,7 @@ def build_pagination_links(request, paged_list):
     return page_nav
 
 
-class ItemView(object):
-    """
-    A base view class that provides generic create/read/update methods and single item or list views.
-    This class shouldn't be used directly, it should be subclassed.
-    """
-
-    commentable = False
-
-    @classmethod
-    @exception_handler
-    def create(cls, request, microcosm_id=None):
-        """
-        Generic method for creating microcosms and items within microcosms.
-
-        microcosm_id only needs to be provided if an item is being created
-        within a microcosm (e.g. a conversation or event).
-        """
-
-        view_data = dict(user=request.whoami, site=request.site)
-
-        # Populate form from POST data, return populated form if not valid
-        if request.method == 'POST':
-            form = cls.create_form(request.POST)
-            if form.is_valid():
-                item = cls.resource_cls.create(
-                    request.META['HTTP_HOST'],
-                    form.cleaned_data,
-                    request.access_token
-                )
-                return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
-            else:
-                view_data['form'] = form
-                return render(request, cls.form_template, view_data)
-
-        # Render form for creating a new item
-        elif request.method == 'GET':
-            initial = {}
-            # If a microcosm_id is provided, this must be pre-populated in the item form
-            if microcosm_id:
-                initial['microcosmId'] = microcosm_id
-            view_data['form'] = cls.create_form(initial=initial)
-            return render(request, cls.form_template, view_data)
-
-        else:
-            return HttpResponseNotAllowed(['GET', 'POST'])
-
-    @classmethod
-    @exception_handler
-    def edit(cls, request, item_id):
-        """
-        Generic edit view. The item with item_id is used to populate form fields.
-        """
-
-        view_data = dict(user=request.whoami, site=request.site)
-
-        # Populate form from POST data, return populated form if not valid
-        if request.method == 'POST':
-            form = cls.edit_form(request.POST)
-            if form.is_valid():
-                form_data = form.cleaned_data
-                # API expects editReason wrapped in a 'meta' object
-                if form_data.has_key('editReason'):
-                    form_data['meta'] =  {'editReason': form_data['editReason']}
-                item = cls.resource_cls.update(request.META['HTTP_HOST'], form_data, item_id, request.access_token)
-                return HttpResponseRedirect('/%s/%d' % (cls.item_plural, item['id']))
-            else:
-                view_data['form'] = form
-                return render(request, cls.form_template, view_data)
-
-        # Populate form with item data
-        elif request.method == 'GET':
-            item = cls.resource_cls.retrieve(request.META['HTTP_HOST'], id=item_id, access_token=request.access_token)
-            view_data['form'] = cls.edit_form(item)
-            return render(request, cls.form_template, view_data)
-
-        else:
-            return HttpResponseNotAllowed(['GET', 'POST'])
-
-    @classmethod
-    @exception_handler
-    def single(cls, request, item_id):
-        """
-        Generic method for displaying a single item.
-        """
-
-        # Offset for paging of item comments
-        offset = int(request.GET.get('offset', 0))
-
-        content = cls.resource_cls.retrieve(
-            request.META['HTTP_HOST'],
-            id=item_id,
-            offset=offset,
-            access_token=request.access_token
-        )
-
-        view_data = {
-            'user': request.whoami,
-            'site': request.site,
-            'item_type': cls.item_type,
-            'content': content,
-            'pagination': {},
-        }
-
-        # Provide a comment form for items that allow comments
-        if cls.commentable:
-            comment_form = CommentForm(
-                initial = {
-                    'itemId': item_id,
-                    'itemType': cls.item_type,
-                }
-            )
-            view_data['comment_form'] = comment_form
-
-        # Composition of any other elements, e.g. attendees or poll choices
-        if hasattr(cls, 'extra_item_data') and callable(cls.extra_item_data):
-            view_data = cls.extra_item_data(
-                request,
-                item_id,
-                view_data,
-                request.access_token
-            )
-
-        return render(request, cls.one_template, view_data)
-
-    @classmethod
-    @exception_handler
-    def list(cls, request):
-        """
-        Generic method for displaying a list of items.
-        """
-
-        # Pagination offset
-        offset = int(request.GET.get('offset', 0))
-
-        list = cls.resource_cls.retrieve(request.META['HTTP_HOST'], offset=offset, access_token=request.access_token)
-
-        view_data = {
-            'user': request.whoami,
-            'site': request.site,
-            'content': list,
-            'pagination': {},
-        }
-
-        return render(request, cls.many_template, view_data)
-
-    @classmethod
-    @exception_handler
-    def delete(cls, request, item_id):
-        """
-        Generic method for deleting a single item (deletion of a list is not yet implemented).
-        """
-
-        if request.method == 'POST':
-            cls.resource_cls.delete(request.META['HTTP_HOST'], item_id, request.access_token)
-            # item deletion
-            if request.POST.has_key('microcosm_id') and request.POST['microcosm_id'] != "":
-                microcosm_id = int(request.POST['microcosm_id'])
-                redirect = reverse(MicrocosmView.single, args=(microcosm_id,))
-            # comment deletion
-            # TODO: to be replaced with item mappings
-            elif request.POST.has_key('item_type'):
-                if request.POST['item_type'] not in ['event', 'conversation']:
-                    raise SuspiciousOperation
-                redirect = '/%ss/%d' % (request.POST['item_type'], int(request.POST['item_id']))
-            else:
-                redirect = reverse(MicrocosmView.list)
-            return HttpResponseRedirect(redirect)
-        else:
-            return HttpResponseNotAllowed()
-
-class ConversationView(ItemView):
+class ConversationView(object):
 
     create_form = ConversationCreate
     edit_form = ConversationEdit
@@ -378,7 +207,7 @@ class ConversationView(ItemView):
 
 
 
-class ProfileView(ItemView):
+class ProfileView(object):
 
     edit_form = ProfileEdit
     form_template = 'forms/profile.html'
@@ -448,7 +277,7 @@ class ProfileView(ItemView):
             return HttpResponseNotAllowed(['GET', 'POST'])
 
 
-class MicrocosmView(ItemView):
+class MicrocosmView(object):
 
     create_form = MicrocosmCreate
     edit_form = MicrocosmEdit
@@ -591,7 +420,7 @@ class MicrocosmView(ItemView):
         return render(request, 'create_item_choice.html', view_data)
 
 
-class EventView(ItemView):
+class EventView(object):
 
     create_form = EventCreate
     edit_form = EventEdit
@@ -730,7 +559,7 @@ class EventView(ItemView):
             raise HttpResponseNotAllowed(['POST'])
 
 
-class CommentView(ItemView):
+class CommentView(object):
 
     item_type = 'comment'
     item_plural = 'comments'
@@ -875,7 +704,7 @@ class CommentView(ItemView):
             return HttpResponseNotAllowed()
 
 
-class ErrorView():
+class ErrorView(object):
 
     @staticmethod
     def not_found(request):
@@ -894,7 +723,7 @@ class ErrorView():
         )
 
 
-class AuthenticationView():
+class AuthenticationView(object):
 
     @staticmethod
     @exception_handler
@@ -938,7 +767,7 @@ class AuthenticationView():
         return response
 
 
-class GeoView():
+class GeoView(object):
 
     @staticmethod
     @exception_handler
