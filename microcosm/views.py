@@ -358,6 +358,25 @@ class ConversationView(ItemView):
         else:
             return HttpResponseNotAllowed(['GET', 'POST'])
 
+    @staticmethod
+    @exception_handler
+    def delete(request, conversation_id):
+        """
+        Delete a conversation and be redirected to the parent microcosm.
+        """
+
+        if request.method == 'POST':
+            conversation = Conversation.retrieve(
+                request.META['HTTP_HOST'],
+                conversation_id,
+                access_token=request.access_token
+            )
+            Conversation.delete(request.META['HTTP_HOST'], conversation_id, request.access_token)
+            return HttpResponseRedirect(reverse('single-microcosm', args=(conversation.microcosm_id,)))
+        else:
+            return HttpResponseNotAllowed()
+
+
 
 class ProfileView(ItemView):
 
