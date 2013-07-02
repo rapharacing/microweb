@@ -109,7 +109,7 @@ class ConversationView(object):
             offset=offset,
             access_token=request.access_token
         )
-        comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='event'))
+        comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
 
         view_data = {
             'user': request.whoami,
