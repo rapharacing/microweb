@@ -15,7 +15,6 @@ from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import Profile
 from microcosm.api.resources import Site
-from microcosm.api.resources import Conversation
 from microcosm.api.resources import Event
 
 from microweb.helpers import build_url
@@ -121,7 +120,7 @@ class PaginationTests(unittest.TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-    def testNextLink(self):
+    def testLinks(self):
         """
         Assert that a response containing a 'next page' link is correctly represnted in navigation.
         """
@@ -139,16 +138,10 @@ class PaginationTests(unittest.TestCase):
             mock.return_value.json.return_value = conversation
             pagination_nav = build_pagination_links(request, conversation.comments)
 
-        assert pagination_nav['next'] == path + '?offset=25'
-
-    def testPrevLink(self):
-        self.fail()
-
-    def testFirstLink(self):
-        self.fail()
-
-    def testLastLink(self):
-        self.fail()
+        assert pagination_nav['first'] == path
+        assert pagination_nav['prev'] == path + '?offset=25'
+        assert pagination_nav['next'] == path + '?offset=75'
+        assert pagination_nav['last'] == path + '?offset=100'
 
 
 class ResourceTests(unittest.TestCase):
