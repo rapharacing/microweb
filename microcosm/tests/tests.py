@@ -9,6 +9,9 @@ from django.test.client import RequestFactory
 
 from microcosm.views import MicrocosmView
 from microcosm.views import build_pagination_links
+
+from microcosm.api.resources import Conversation
+
 from microweb.helpers import build_url
 
 from microweb.settings import API_SCHEME
@@ -17,6 +20,14 @@ from microweb.settings import API_PATH
 from microweb.settings import API_VERSION
 
 TEST_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+
+def generate_location():
+    # Construct a random subdomain string
+    subdomain = ''
+    for x in xrange(10):
+        subdomain += random.choice(string.lowercase)
+    return '%s.microco.sm' % subdomain
 
 
 class BuildURLTests(unittest.TestCase):
@@ -74,14 +85,11 @@ class RoutingAPITests(unittest.TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
+
     def testMicrocosmsView(self):
 
-        # Construct a random subdomain string
-        subdomain = ''
-        for x in xrange(10):
-            subdomain += random.choice(string.lowercase)
-        host = '%s.microco.sm' % subdomain
-        path = build_url(host, ['microcosms'])
+        host = generate_location()
+        full_path = build_url(host, ['microcosms'])
 
         # Create a request for a list of microcosms
         request = self.factory.get('/microcosms', HTTP_HOST=host)
@@ -89,11 +97,13 @@ class RoutingAPITests(unittest.TestCase):
         request.whoami = None
         request.site = None
 
+        microcosms = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosms.json')).read())
+
         # Patch requests.get and check the call args
         with patch('requests.get') as mock:
-            mock.return_value.json.return_value = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosms.json')).read())
+            mock.return_value.json.return_value = microcosms
             MicrocosmView.list(request)
-            mock.assert_called_once_with(path, headers={'Host': host}, params={})
+            mock.assert_called_once_with(full_path, headers={'Host': host}, params={})
 
 
 class PaginationTests(unittest.TestCase):
@@ -102,29 +112,26 @@ class PaginationTests(unittest.TestCase):
     where pagination can occur.
     """
 
-    def testConversationPagination(self):
+    def setUp(self):
+        self.factory = RequestFactory()
 
-        resource = {
-            'id': 1,
-            'comments': {
-                'maxOffset': 75, # indicating 4 pages of comments
-                'linkmap': {
-                    'first': 'first',
-                    'prev': 'prev',
-                    'next': 'next',
-                    'last': 'last',
-                }
-            }
-        }
+    def testNextLink(self):
+        """
+        Assert that a response containing a 'next page' link is correctly represnted in navigation.
+        """
 
-        view_data = {
-            'pagination': {}
-        }
-        # current offset of 50, so viewing page 3
-        build_pagination_links('path', resource, view_data, 50)
+        host = generate_location()
+        path = '/conversations/1'
+        # Create a request for a list of microcosms
+        request = self.factory.get(path, HTTP_HOST=host)
+        request.access_token = None
+        request.whoami = None
+        request.site = None
 
-        assert view_data['pagination']['first'] == 'path'
-        assert view_data['pagination']['last'] == 'path?offset=75'
-        assert view_data['pagination']['next'] == 'path?offset=75'
-        assert view_data['pagination']['prev'] == 'path?offset=25'
+        conversation = Conversation(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        with patch('requests.get') as mock:
+            mock.return_value.json.return_value = conversation
+            pagination_nav = build_pagination_links(request, conversation.comments)
+
+        assert pagination_nav['next'] == path + '?offset=25'
 
