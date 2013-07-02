@@ -131,7 +131,7 @@ class ConversationView(object):
         view_data = dict(user=request.whoami, site=request.site)
 
         if request.method == 'POST':
-            form = Conversation.create_form(request.POST)
+            form = ConversationView.create_form(request.POST)
             if form.is_valid():
                 conversation = Conversation.create(
                     request.META['HTTP_HOST'],
