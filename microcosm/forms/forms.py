@@ -102,6 +102,35 @@ class EventEdit(EventCreate):
     id = django.forms.IntegerField(widget=django.forms.HiddenInput)
     editReason = django.forms.CharField(label='Reason for editing')
 
+    @classmethod
+    def from_event_instance(cls, event):
+        """
+        Populate form from an event instance.
+        """
+
+        repr = {}
+        repr['id'] = event.id
+        repr['microcosmId'] = event.microcosm_id
+        repr['title'] = event.title
+        repr['when'] = event.when
+        repr['duration'] = event.duration
+
+        # Event location
+        repr['where'] = event.where
+        repr['lat'] = event.lat
+        repr['lon'] = event.lon
+        repr['north'] = event.north
+        repr['east'] = event.east
+        repr['south'] = event.south
+        repr['west'] = event.west
+
+        # RSVP limit is optional
+        if hasattr(event, 'rsvp_attend'): repr['rsvpAttend'] = event.rsvp_attend
+        if hasattr(event, 'rsvp_limit'): repr['rsvpLimit'] = event.rsvp_attend
+        if hasattr(event, 'rsvp_spaces'): repr['rsvpSpaces'] = event.rsvp_attend
+
+        return cls(repr)
+
 
 class ConversationCreate(ItemForm):
     """
