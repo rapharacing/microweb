@@ -443,6 +443,7 @@ class EventView(object):
             offset=offset,
             access_token=request.access_token
         )
+
         attendees = event.get_attendees(request.META['HTTP_HOST'], request.access_token)
         comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
 
@@ -469,12 +470,9 @@ class EventView(object):
         if request.method == 'POST':
             form = EventView.create_form(request.POST)
             if form.is_valid():
-                event = Event.create(
-                    request.META['HTTP_HOST'],
-                    form.cleaned_data,
-                    request.access_token
-                )
-                return HttpResponseRedirect(reverse('single-event', args=(event['id'],)))
+                event_request = Event.from_create_form(form.cleaned_data)
+                event_response = event_request.create(request.META['HTTP_HOST'], request.access_token)
+                return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
             else:
                 view_data['form'] = form
                 return render(request, EventView.form_template, view_data)
@@ -497,18 +495,17 @@ class EventView(object):
 
         if request.method == 'POST':
             form = EventView.edit_form(request.POST)
-
             if form.is_valid():
-                form_data = Event(form.cleaned_data)
-                event = Event.update(request.META['HTTP_HOST'], form_data, event_id, request.access_token)
-                return HttpResponseRedirect(reverse('single-event', args=(event['id'],)))
+                event_request = Event.from_edit_form(form.cleaned_data)
+                event_response = event_request.update(request.META['HTTP_HOST'], event_request.id, request.access_token)
+                return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
             else:
                 view_data['form'] = form
                 return render(request, EventView.form_template, view_data)
 
         elif request.method == 'GET':
             event = Event.retrieve(request.META['HTTP_HOST'], id=event_id, access_token=request.access_token)
-            view_data['form'] = EventView.edit_form(event.as_dict)
+            view_data['form'] = EventView.edit_form.from_event_instance(event)
             return render(request, EventView.form_template, view_data)
 
         else:
