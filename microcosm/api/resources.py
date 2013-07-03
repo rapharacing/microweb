@@ -451,6 +451,7 @@ class Conversation(APIResource):
         if hasattr(self, 'edit_reason'): repr['meta'] = dict(editReason=self.edit_reason)
         return repr
 
+
 class Event(APIResource):
     """
     Represents an event (event details and list of comments).
@@ -458,64 +459,119 @@ class Event(APIResource):
 
     resource_fragment = 'events'
 
-    def __init__(self, data):
-        self.id = data['id']
-        self.microcosm_id = data['microcosmId']
-        self.title = data['title']
-        self.when = parse_timestamp(data['when'])
-        self.duration = data['duration']
-        self.where = data['where']
-        self.status = data['status']
-        self.comments = PaginatedList(data['comments'], Comment)
-        self.meta = Meta(data['meta'])
+    @classmethod
+    def from_api_response(cls, data):
+        event = cls()
 
-        if data.get('rsvpAttend'): self.rsvp_attend = data['rsvpAttend']
-        if data.get('rsvpLimit'): self.rsvp_limit = data['rsvpLimit']
-        if data.get('rsvpSpaces'): self.rsvp_spaces = data['rsvpSpaces']
+        event.id = data['id']
+        event.microcosm_id = data['microcosmId']
+        event.title = data['title']
+        event.when = parse_timestamp(data['when'])
+        event.duration = data['duration']
+        event.status = data['status']
 
-        self.lat = data['lat']
-        self.lon = data['lon']
-        if data.get('north'): self.north = data['north']
-        if data.get('east'): self.east = data['east']
-        if data.get('south'): self.south = data['south']
-        if data.get('west'): self.west = data['west']
+        # Event location
+        event.where = data['where']
+        event.lat = data['lat']
+        event.lon = data['lon']
+        event.north = data['north']
+        event.east = data['east']
+        event.south = data['south']
+        event.west = data['west']
 
-        if data.get('editReason'): self.edit_reason = data['editReason']
+        event.comments = PaginatedList(data['comments'], Comment)
+        event.meta = Meta(data['meta'])
 
-    @property
-    def as_dict(self):
+        # RSVP numbers are optional
+        if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
+        if data.get('rsvpLimit'): event.rsvp_limit = data['rsvpLimit']
+        if data.get('rsvpSpaces'): event.rsvp_spaces = data['rsvpSpaces']
+
+        return event
+
+    @classmethod
+    def from_create_form(cls, data):
+        event = cls()
+
+        event.microcosm_id = data['microcosmId']
+        event.title = data['title']
+        # This is already type(datetime.datetime) so need not be parsed
+        event.when = data['when']
+        event.duration = data['duration']
+
+        # Event location
+        event.where = data['where']
+        event.lat = data['lat']
+        event.lon = data['lon']
+        event.north = data['north']
+        event.east = data['east']
+        event.south = data['south']
+        event.west = data['west']
+
+        return event
+
+    @classmethod
+    def from_edit_form(cls, data):
+        """
+        Similar to from_create_form, but 'editReason' is expected in
+        the meta object for Event updates, and the ID is known.
+        """
+
+        event = Event.from_create_form(data)
+        event.id = data['id']
+        event.meta = {'editReason': data['editReason']}
+        return event
+
+    def as_dict(self, update=False):
+        """
+        Renders Event as a dictionary for POST/PUT to API. 'update' indicates
+        whether this is an update action instead of a create action.s
+        """
+
         repr = {}
-        repr['id'] = self.id
+
+        if update:
+            repr['id'] = self.id
+            repr['meta'] = self.meta
+
         repr['microcosmId'] = self.microcosm_id
         repr['title'] = self.title
         repr['when'] = self.when
         repr['duration'] = self.duration
+
+        # Event location
         repr['where'] = self.where
-        repr['status'] = self.status
+        repr['lat'] = self.lat
+        repr['lon'] = self.lon
+        repr['north'] = self.north
+        repr['east'] = self.east
+        repr['south'] = self.south
+        repr['west'] = self.west
+
+        # RSVP limit is optional
         if hasattr(self, 'rsvp_attend'): repr['rsvpAttend'] = self.rsvp_attend
         if hasattr(self, 'rsvp_limit'): repr['rsvpLimit'] = self.rsvp_attend
         if hasattr(self, 'rsvp_spaces'): repr['rsvpSpaces'] = self.rsvp_attend
 
-        repr['lat'] = self.lat
-        repr['lon'] = self.lon
-        if hasattr(self, 'north'): repr['north'] = self.north
-        if hasattr(self, 'east'): repr['east'] = self.east
-        if hasattr(self, 'south'): repr['south'] = self.south
-        if hasattr(self, 'west'): repr['west'] = self.west
-
-        if hasattr(self, 'edit_reason'): repr['editReason'] = self.edit_reason
-
         return repr
 
     @classmethod
-    def retrieve(cls, host, id=None, offset=None, access_token=None):
+    def retrieve(cls, host, id, offset=None, access_token=None):
         resource = super(Event, cls).retrieve(host, id, offset, access_token)
-        return Event(resource)
+        return Event.from_api_response(resource)
+
+    def create(self, host, access_token):
+        resource = super(Event, self.__class__).create(host, self.as_dict(), access_token)
+        return Event.from_api_response(resource)
+
+    def update(self, host, id, access_token):
+        resource = super(Event, self.__class__).update(host, self.as_dict(update=True), id, access_token)
+        return Event.from_api_response(resource)
 
     def get_attendees(self, host, access_token=None):
         """
         Retrieve a list of attendees for an event.
-        TODO: pagination support, use nested class to represent Attendee
+        TODO: pagination support
         """
 
         resource_url = build_url(host, [Event.resource_fragment, self.id, 'attendees'])
@@ -526,7 +582,7 @@ class Event(APIResource):
     def rsvp(cls, host, event_id, profile_id, attendance_data, access_token):
         """
         Create or update attendance to an event.
-        TODO: This is obviously pretty nasty but it'll be changed soon.
+        TODO: This is obviously pretty nasty but it'll be changed when PATCH support is added.
         """
 
         collection_url = build_url(host, [cls.resource_fragment, event_id, 'attendees'])
@@ -541,7 +597,6 @@ class Event(APIResource):
         # If it is not found, POST an attendance
         if response.status_code == 404:
             try:
-                print 'Not found, posting to ' + collection_url
                 post_response = requests.post(collection_url, attendance_data, params={'access_token': access_token})
             except RequestException:
                 raise
@@ -557,7 +612,6 @@ class Event(APIResource):
         elif response.status_code >= 200 and response.status_code < 400:
 
             try:
-                print 'Found, putting to ' + item_url
                 put_response = requests.post(
                     item_url,
                     data=attendance_data,
