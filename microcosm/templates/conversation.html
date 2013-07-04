@@ -15,7 +15,7 @@
 
 {% block sidebar %}
 	<p class="muted">
-		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:25 }}</a><br />
+		Created by <a href="/profiles/{{content.meta.created_by.id}}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
 		<time datetime="{{ content.meta.created|date:"c" }}"></time>
 	</p>
 
@@ -26,8 +26,7 @@
 	{% if content.meta.permissions.delete %}
 		<form method="POST" action="{% url delete-conversation content.id %}">
 			{% csrf_token %}
-			<input type="hidden" name="microcosm_id" value="{{content.microcosmId}}" />
-			<input type="submit" value="Delete Conversation" class="btn-as-p btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
+			<input type="submit" value="Delete Conversation" id="delete-conversation" class="btn-as-p btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
 		</form>
 	{% endif %}
 
