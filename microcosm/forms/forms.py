@@ -155,6 +155,19 @@ class ConversationEdit(ConversationCreate):
     id = django.forms.IntegerField(widget=django.forms.HiddenInput)
     editReason = django.forms.CharField(label='Reason for editing')
 
+    @classmethod
+    def from_conversation_instance(cls, conversation):
+        """
+        Populate a conversation edit form from a conversation instance.
+        """
+
+        repr = {}
+        repr['id'] = conversation.id
+        repr['microcosmId'] = conversation.microcosm_id
+        repr['title'] = conversation.title
+
+        return cls(repr)
+
 
 class MicrocosmCreate(django.forms.Form):
     """
