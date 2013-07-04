@@ -134,12 +134,9 @@ class ConversationView(object):
         if request.method == 'POST':
             form = ConversationView.create_form(request.POST)
             if form.is_valid():
-                conversation = Conversation.create(
-                    request.META['HTTP_HOST'],
-                    form.cleaned_data,
-                    request.access_token
-                )
-                return HttpResponseRedirect(reverse('single-conversation', args=(conversation['id'],)))
+                conv_request = Conversation.from_create_form(form.cleaned_data)
+                conv_response = conv_request.create(request.META['HTTP_HOST'], request.access_token)
+                return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
             else:
                 view_data['form'] = form
                 return render(request, ConversationView.form_template, view_data)
@@ -164,14 +161,9 @@ class ConversationView(object):
             form = ConversationView.edit_form(request.POST)
 
             if form.is_valid():
-                form_data = Conversation(form.cleaned_data)
-                conversation = Conversation.update(
-                    request.META['HTTP_HOST'],
-                    form_data.as_dict,
-                    conversation_id,
-                    request.access_token
-                )
-                return HttpResponseRedirect(reverse('single-conversation', args=(conversation['id'],)))
+                conv_request = Conversation.from_edit_form(form.cleaned_data)
+                conv_response = conv_request.update(request.META['HTTP_HOST'], conv_request.id, request.access_token)
+                return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
             else:
                 view_data['form'] = form
                 return render(request, ConversationView.form_template, view_data)
@@ -182,7 +174,7 @@ class ConversationView(object):
                 id=conversation_id,
                 access_token=request.access_token
             )
-            view_data['form'] = ConversationView.edit_form(conversation.as_dict)
+            view_data['form'] = ConversationView.edit_form.from_conversation_instance(conversation)
             return render(request, ConversationView.form_template, view_data)
 
         else:
