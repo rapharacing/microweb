@@ -9,6 +9,16 @@ from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
 from microweb.helpers import build_url
 
+RESOURCE_PLURAL = {
+    'event': 'events',
+    'conversation': 'conversations',
+    'poll': 'polls',
+    'comment': 'comments',
+    'profile': 'profiles',
+    'user': 'users',
+    'site': 'sites',
+}
+
 # Item types that can have comments
 COMMENTABLE_ITEM_TYPES = [
     'event',

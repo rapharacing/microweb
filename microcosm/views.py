@@ -27,6 +27,7 @@ from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Profile
+from microcosm.api.resources import RESOURCE_PLURAL
 from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
 
 from microcosm.forms.forms import EventCreate
@@ -585,8 +586,7 @@ class CommentView(object):
     @staticmethod
     def build_comment_location(comment):
 
-        # TODO: item_type -> plural mappings
-        path = join_path_fragments(['%ss' % comment.item_type, comment.item_id])
+        path = join_path_fragments([RESOURCE_PLURAL[comment.item_type], comment.item_id])
 
         if 'offset' in comment.meta.links.get('via'):
             offset = comment.meta.links.get('via').split('offset=')[1]
