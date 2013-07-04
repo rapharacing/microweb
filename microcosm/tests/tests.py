@@ -133,7 +133,7 @@ class PaginationTests(unittest.TestCase):
         request.whoami = None
         request.site = None
 
-        conversation = Conversation(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        conversation = Conversation.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
         with patch('requests.get') as mock:
             mock.return_value.json.return_value = conversation
             pagination_nav = build_pagination_links(request, conversation.comments)
@@ -164,18 +164,18 @@ class ResourceTests(unittest.TestCase):
         MicrocosmList(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosms.json')).read())['data'])
 
     def testConversationInit(self):
-        Conversation(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        Conversation.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
 
     def testConversationAsDict(self):
-        conversation = Conversation(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
-        conversation.as_dict
+        conversation = Conversation.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        conversation.as_dict()
 
     def testEventInit(self):
-        Event(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
+        Event.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
 
     def testEventAsDict(self):
-        event = Event(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
-        event.as_dict
+        event = Event.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
+        event.as_dict()
 
     def testProfileInit(self):
         Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'])
