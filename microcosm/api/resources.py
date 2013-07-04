@@ -438,27 +438,52 @@ class Conversation(APIResource):
 
     resource_fragment = 'conversations'
 
-    def __init__(self, data):
-        self.id = data['id']
-        self.microcosm_id = data['microcosmId']
-        self.title = data['title']
+    @classmethod
+    def from_api_response(cls, data):
+        conversation = cls()
+        conversation.id = data['id']
+        conversation.microcosm_id = data['microcosmId']
+        conversation.title = data['title']
+        conversation.comments = PaginatedList(data['comments'], Comment)
+        conversation.meta = Meta(data['meta'])
+        return conversation
 
-        if data.get('comments'): self.comments = PaginatedList(data['comments'], Comment)
-        if data.get('meta'): self.meta = Meta(data['meta'])
-        if data.get('editReason'): self.edit_reason = data['editReason']
+    @classmethod
+    def from_create_form(cls, data):
+        conversation = cls()
+        conversation.microcosm_id = data['microcosmId']
+        conversation.title = data['title']
+        return conversation
+
+    @classmethod
+    def from_edit_form(cls, data):
+        conversation = Conversation.from_create_form(data)
+        conversation.id = data['id']
+        conversation.meta = {'editReason': data['editReason']}
+        return conversation
 
     @classmethod
     def retrieve(cls, host, id=None, offset=None, access_token=None):
         resource = super(Conversation, cls).retrieve(host, id, offset, access_token)
-        return Conversation(resource)
+        return Conversation.from_api_response(resource)
 
-    @property
-    def as_dict(self):
+    def create(self, host, access_token):
+        resource = super(Conversation, self.__class__).create(host, self.as_dict(), access_token)
+        return Conversation.from_api_response(resource)
+
+    def update(self, host, id, access_token):
+        resource = super(Conversation, self.__class__).update(host, self.as_dict(update=True), id, access_token)
+        return Conversation.from_api_response(resource)
+
+    def as_dict(self, update=False):
         repr = {}
-        repr['id'] = self.id
+
+        if update:
+            repr['id'] = self.id
+            repr['meta'] = self.meta
+
         repr['microcosmId'] = self.microcosm_id
         repr['title'] = self.title
-        if hasattr(self, 'edit_reason'): repr['meta'] = dict(editReason=self.edit_reason)
         return repr
 
 
@@ -535,7 +560,7 @@ class Event(APIResource):
     def as_dict(self, update=False):
         """
         Renders Event as a dictionary for POST/PUT to API. 'update' indicates
-        whether this is an update action instead of a create action.s
+        whether this is an update action instead of a create action.
         """
 
         repr = {}
