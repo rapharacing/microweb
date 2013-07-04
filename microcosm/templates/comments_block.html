@@ -8,8 +8,8 @@
 			<article id="comment{{ comment.id }}" class="row">
 				
 				<div class="col col-lg-4">
-					<a href="{% if user.id == comment.meta.createdBy.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.createdBy.id }}/{% endif %}"><img src="{{ comment.meta.createdBy.gravatar }}" alt="Avatar for {{ comment.meta.createdBy.profileName }}" align="left" class="gravatar" /></a>
-					<div class="h4"><a href="{% if user.id == comment.meta.createdBy.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.createdBy.id }}/{% endif %}">{{ comment.meta.createdBy.profileName|truncatechars:25 }}</a></div>
+					<a href="{% if user.id == comment.meta.created_by.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.created_by.id }}/{% endif %}"><img src="{{ comment.meta.created_by.gravatar }}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
+					<div class="h4"><a href="{% if user.id == comment.meta.created_by.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.created_by.id }}/{% endif %}">{{ comment.meta.created_by.profile_name|truncatechars:25 }}</a></div>
 				</div>
 
 				<div class="col col-lg-12">
@@ -24,11 +24,11 @@
 						</div>
 
 						<section class="pull-right" id="comment{{ comment.id }}controls">
-							{% if comment.meta.createdBy.id == user.id or user.admin or user.moderator %}
+							{% if comment.meta.created_by.id == user.id or user.admin or user.moderator %}
 								<form method="POST" action="{% url delete-comment comment.id %}" style="display:inline;">
 									{% csrf_token %}
-									<input type="hidden" name="item_id" value="{{comment.itemId}}"/>
-									<input type="hidden" name="item_type" value="{{comment.itemType}}"/>
+									<input type="hidden" name="item_id" value="{{comment.item_id}}"/>
+									<input type="hidden" name="item_type" value="{{comment.item_type}}"/>
 									<input type="submit" value="Delete Comment" class="btn btn-small btn-danger" id="comment{{ comment.id }}delete"/>
 								</form>
 								<a class="btn btn-default btn-small" href="/comments/{{comment.id}}/edit" id="comment{{ comment.id }}edit">Edit</a>
@@ -52,8 +52,8 @@
 		<div id="comment{{ comment.id }}" class="row">
 			
 			<div class="col col-lg-4">
-				<img src="{{ user.gravatar }}" alt="Avatar for {{ user.profileName|truncatechars:25 }}" align="left" class="gravatar" />
-				<div class="h4">{{ user.profileName|truncatechars:25 }}</div>
+				<img src="{{ user.gravatar }}" alt="Avatar for {{ user.profile_name|truncatechars:25 }}" align="left" class="gravatar" />
+				<div class="h4">{{ user.profile_name|truncatechars:25 }}</div>
 			</div>
 
 			<form action="/comments/create/" method="POST" id="commentForm">{% csrf_token %}

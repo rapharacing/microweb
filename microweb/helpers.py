@@ -1,14 +1,10 @@
 import datetime
 import json
-import re
 
 from settings import API_VERSION
 from settings import API_PATH
 from settings import API_SCHEME
 from settings import API_DOMAIN_NAME
-
-# A hack used when converting timestamp strings to datetime.datetime instances
-VALID_DATETIME = re.compile(r'^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}.?\d{0,6}Z$')
 
 def build_url(host, path_fragments):
     """
@@ -31,6 +27,12 @@ def build_url(host, path_fragments):
 
     url = API_SCHEME + host
     path_fragments = [API_PATH, API_VERSION] + path_fragments
+    url += join_path_fragments(path_fragments)
+    return url
+
+
+def join_path_fragments(path_fragments):
+    path = ''
 
     for fragment in path_fragments:
         if not isinstance(fragment, str):
@@ -39,10 +41,8 @@ def build_url(host, path_fragments):
             fragment = fragment.strip('/')
             if '/' in fragment:
                 raise AssertionError('Do not use path fragments containing slashes')
-        url += ('/' + fragment)
-
-    return url
-
+        path += ('/' + fragment)
+    return path
 
 class DateTimeEncoder(json.JSONEncoder):
     """Custom JSON encoder for datetime.datetime objects, producing an

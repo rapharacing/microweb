@@ -2,7 +2,7 @@
 
 
 {% block content %}
-	<a id="microcosm_title" href="/microcosms/{{content.id}}/"><h1>{{ content.title }}</h1></a>
+	<a id="microcosm_title" href="{% url single-microcosm content.id %}"><h1>{{ content.title }}</h1></a>
 	<p id="microcosm_description" class="text-muted">{{ content.description }}</p>
 
 	{% include "pagination_nav.html" %}
@@ -10,25 +10,25 @@
 	{% for item in content.items.items %}
 		<section id="{{ item.itemType }}{{ item.id }}" class="row">
 			<div class="col col-lg-1 col-sm-2">
-				{% ifequal item.itemType "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;"></span>{% endifequal %}
-				{% ifequal item.itemType "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;"></span>{% endifequal %}
+				{% ifequal item.item_type "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;"></span>{% endifequal %}
+				{% ifequal item.item_type "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;"></span>{% endifequal %}
 			</div>
 
 			<div class="col col-lg-9 col-sm-14">
-				<strong><a href="/{{ item.itemType }}s/{{ item.id }}/">{{ item.title }}</a></strong><br />
-				<small class="text-muted">started by <a href="/profiles/{{ item.meta.createdBy.id }}/">{{ item.meta.createdBy.profileName|truncatechars:25 }}</a> <time datetime="{{ item.meta.created|date:"c" }}"></time></small>
+				<strong><a href="/{{ item.item_type }}s/{{ item.id }}/">{{ item.title }}</a></strong><br />
+				<small class="text-muted">started by <a href="{% url single-profile item.meta.created_by.id %}">{{ item.meta.created_by.profile_name|truncatechars:25 }}</a> <time datetime="{{ item.meta.created|date:"c" }}"></time></small>
 			</div>
 
 			<div class="col col-lg-2 col-sm-2 small text-muted">
-				<small class="nowrap"><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.totalComments }}</small><br />
-				<small class="nowrap"><i class="glyphicon glyphicon-eye-open buffer-right"></i> {{ item.totalViews }}</small>
+				<small class="nowrap"><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.total_comments }}</small><br />
+				<small class="nowrap"><i class="glyphicon glyphicon-eye-open buffer-right"></i> {{ item.total_views }}</small>
 			</div>
 
 			<div class="col col-lg-4 col-sm-14">
-				{% if item.lastCommentCreated %}
-				<a href="/profiles/{{item.lastCommentCreatedBy.id}}/"><img src="{{ item.lastCommentCreatedBy.gravatar }}" alt="Avatar for {{item.lastCommentCreatedBy.profileName }}" align="left" class="gravatar-small" /></a>
-				<small><a href="/profiles/{{item.lastCommentCreatedBy.id}}/">{{ item.lastCommentCreatedBy.profileName|truncatechars:25 }}</a></small><br />
-				<small class="text-muted"><time datetime="{{ item.lastCommentCreated|date:"c" }}"></time></small>
+				{% if item.last_comment_created %}
+				<a href="{% url single-profile item.last_comment_created_by.id %}"><img src="{{ item.last_comment_created_by.gravatar }}" alt="Avatar for {{item.last_comment_created_by.profile_name }}" align="left" class="gravatar-small" /></a>
+				<small><a href="{{ item.last_comment_created_by.id }}">{{ item.last_comment_created_by.profile_name|truncatechars:25 }}</a></small><br />
+				<small class="text-muted"><time datetime="{{ item.last_comment_created|date:"c" }}"></time></small>
 				{% endif %}
 			</div>
 		</section>
@@ -42,7 +42,7 @@
 
 {% block sidebar%}
 	<p class="muted">
-		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:25 }}</a><br />
+		Created by <a href="{% url single-profile content.meta.created_by.id %}">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
 		<time datetime="{{ content.meta.created|date:"c" }}"></time>
 	</p>
 
@@ -53,7 +53,7 @@
 	{% if content.meta.permissions.delete %}
 		<form method="POST" action="{% url delete-microcosm content.id %}">
 			{% csrf_token %}
-			<input type="submit" value="Delete Microcosm" class="btn-as-p btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
+			<input type="submit" id="delete-microcosm" value="Delete Microcosm" class="btn-as-p btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
 		</form>
 	{% endif %}
 

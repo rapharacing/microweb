@@ -13,7 +13,7 @@
 		{% for item in content.microcosms.items %}
 			<section id="microcosm{{item.id}}" class="row">
 				<div class="col col-lg-16">
-					<a href="/microcosms/{{ item.id }}/">
+					<a href="{% url single-microcosm item.id %}">
 						<h1>{{ item.title }}</h1>
 					</a>
 				</div>
@@ -22,16 +22,17 @@
 						{{ item.description }}
 					</div>
 					<div class="col col-lg-2 col-sm-4 small text-muted">
-						<small><i class="glyphicon glyphicon-list buffer-right"></i> {{ item.totalItems }}</small></br>
-						<small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.totalComments }}</small>
+						<small><i class="glyphicon glyphicon-list buffer-right"></i> {{ item.total_items }}</small></br>
+						<small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.total_comments }}</small>
 					</div>
 					<div class="col col-lg-4 col-sm-12 recent">
-						{% if item.mostRecentUpdate %}
-							<a href="/{{item.mostRecentUpdate.itemType}}s/{{item.mostRecentUpdate.id}}/">{{item.mostRecentUpdate.title}}</a><br />
-							{% if item.mostRecentUpdate.totalComments %}
-								<small class="text-muted"><time datetime="{{item.mostRecentUpdate.lastCommentCreated|date:"c"}}"></time> by <a href="/profiles/{{ item.mostRecentUpdate.lastCommentCreatedBy.id }}/">{{ item.mostRecentUpdate.lastCommentCreatedBy.profileName }}</a></small>
+						{% if item.most_recent_update %}
+							<!-- TODO: use a template tag (or provide from the view) a mapping of item_type to path -->
+							<a href="/{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/">{{item.most_recent_update.title}}</a><br />
+							{% if item.most_recent_update.total_comments %}
+								<small class="text-muted"><time datetime="{{item.most_recent_update.last_comment_created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a></small>
 							{% else%}
-								<small class="text-muted"><time datetime="{{item.mostRecentUpdate.meta.created|date:"c"}}"></time> by <a href="/profiles/{{ item.mostRecentUpdate.meta.createdBy.id }}/">{{ item.mostRecentUpdate.meta.createdBy.profileName }}</a></small>
+								<small class="text-muted"><time datetime="{{item.most_recent_update.meta.created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.meta.created_by.id %}/">{{ item.most_recent_update.meta.created_by.profile_name }}</a></small>
 							{% endif %}
 						{% endif %}
 					</div>

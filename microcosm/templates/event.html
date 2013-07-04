@@ -9,7 +9,6 @@
 {% endblock %}
 
 {% block notifications %}
-	<h2><a href='{{ content.meta.links.1.href|slice:"7:" }}/'>{{ content.meta.links.1.title}}</a></h2>
 {% endblock %}
 
 {% block content %}
@@ -48,7 +47,7 @@
 				<p class="text-muted">Attendees</p>
 			</div>
 			<div class="col col-lg-8">
-				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvpAttend }}</p>
+				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvp_attend }}</p>
 			</div>
 		</div>
 
@@ -57,7 +56,7 @@
 				<p class="text-muted">Attendee Limit</p>
 			</div>
 			<div class="col col-lg-8">
-				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvpLimit }}</p>
+				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvp_limit }}</p>
 			</div>
 		</div>
 
@@ -66,7 +65,7 @@
 				<p class="text-muted">Spaces Left</p>
 			</div>
 			<div class="col col-lg-8">
-				<p id="spaces_left" style="padding-left:6px;">{{ content.rsvpSpaces }}</p>
+				<p id="spaces_left" style="padding-left:6px;">{{ content.rsvp_spaces }}</p>
 			</div>
 		</div>
 	</div>
@@ -78,7 +77,7 @@
 
 {% block sidebar %}
 	<p class="muted">
-		Created by <a href="/profiles/{{content.meta.createdBy.id}}/">{{ content.meta.createdBy.profileName|truncatechars:25 }}</a><br />
+		Created by <a href="/profiles/{{content.meta.created_by.id}}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
 		<time datetime="{{ content.meta.created|date:"c" }}"></time>
 	</p>
 
@@ -90,7 +89,6 @@
 	{% if content.meta.permissions.delete %}
 		<form method="POST" action="{% url delete-event content.id %}">
 			{% csrf_token %}
-			<input type="hidden" name="microcosm_id" value="{{content.microcosmId}}" />
 			<input type="submit" value="Delete Event" id="delete-event" class="btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
 		</form>
 	{% endif %}
@@ -121,34 +119,34 @@
 	<h4>Who's going?</h4>
 	{# Iterating the attendees four times is only temporary, they'll be split into different collections in future. #}
 	<p><strong>Confirmed</strong></p>
-	{% for item in attendees.attendees.items %}
+	{% for item in attendees.items.items %}
 		<ul>
 			{% if item.rsvp == "yes" %}
-				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
+				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}
 	<p><strong>Maybe</strong></p>
-	{% for item in attendees.attendees.items %}
+	{% for item in attendees.items.items %}
 		<ul>
 			{% if item.rsvp == "maybe" %}
-				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
+				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}
 	<!--<p><strong>Yet to reply</strong></p>
-	{% for item in attendees.attendees.items %}
+	{% for item in attendees.items.items %}
 		<ul>
 			{% if item.rsvp == "invited" %}
-				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
+				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}-->
 	<p><strong>Nope</strong></p>
-	{% for item in attendees.attendees.items %}
+	{% for item in attendees.items.items %}
 		<ul>
 			{% if item.rsvp == "no" %}
-				<li>{{ item.attendee.profileName|truncatechars:25 }}</li>
+				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
 			{% endif %}
 		</ul>
 	{% endfor %}

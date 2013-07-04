@@ -1,7 +1,6 @@
-from microcosm.api.resources import Site, WhoAmI
+from microcosm.api.resources import Site
+from microcosm.api.resources import WhoAmI
 from microcosm.api.exceptions import APIException
-
-from microweb import settings
 
 import requests
 from requests import RequestException
@@ -51,7 +50,8 @@ class ContextMiddleware():
 
 
     def process_response(self, request, response):
-        """Deletes the user's access token cookie if it has previously
+        """
+        Deletes the user's access token cookie if it has previously
         been marked as invalid (by process_request)
         """
 
