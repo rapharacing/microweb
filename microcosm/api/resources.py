@@ -33,149 +33,64 @@ class APIResource(object):
     to deal with custom validation and JSON processing.
     """
 
-    @classmethod
-    def retrieve(cls, host, id=None, offset=None, access_token=None, url_override=None):
-        """
-        GET an API resource. If resource ID is omitted, returns a list. Appends access_token
-        and offset (for paging) if provided.
-        """
-
-        headers = {'Host': host}
-
-        if url_override:
-            resource_url = url_override
-        else:
-            path_fragments = [cls.resource_fragment]
-            if id: path_fragments.append(id)
-            resource_url = build_url(host, path_fragments)
-
-        params = {}
-        if access_token: params['access_token'] = access_token
-        if offset: params['offset'] = offset
-
-        response = requests.get(resource_url, params=params, headers=headers)
-
+    @staticmethod
+    def process_response(url, response):
         try:
             resource = response.json()
         except ValueError:
-            raise APIException('Response not valid json: %s' % response.content, 500)
-
+            raise APIException('Response is not valid json:\n %s' % response.content, 500)
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
-
         if not resource['data']:
-            raise APIException('No data returned at: %s' % resource_url)
-
+            raise APIException('No data returned at: %s' % url)
         return resource['data']
 
-    @classmethod
-    def create(cls, host, data, access_token, headers=None):
+    @staticmethod
+    def retrieve(url, params, headers):
         """
-        Create an API resource with POST.
-        """
-
-        resource_url = build_url(host, [cls.resource_fragment])
-        params = {'access_token': access_token}
-
-        if headers:
-            headers['Content-Type'] = 'application/json'
-            headers['Host'] = host
-        else:
-            headers = {
-                'Content-Type': 'application/json',
-                'Host': host
-            }
-
-        response = requests.post(
-            resource_url,
-            data=json.dumps(data, cls=DateTimeEncoder),
-            headers=headers,
-            params=params
-        )
-
-        try:
-            resource = response.json()
-        except ValueError:
-            raise APIException('Response not valid json: %s' % response.content, 500)
-
-        if resource['error']:
-            raise APIException(resource['error'], response.status_code)
-
-        if not resource['data']:
-            raise APIException('No data returned at: %s' % resource_url)
-
-        return resource['data']
-
-    @classmethod
-    def update(cls, host, data, id, access_token):
-        """
-        Update an API resource with PUT.
+        Fetch an API resource and handle any errors.
         """
 
-        resource_url = build_url(host, [cls.resource_fragment, id])
+        headers['Accept-Encoding'] = 'application/json'
+        response = requests.get(url, params=params, headers=headers)
+        return APIResource.process_response(url, response)
 
-        headers = {
-            'Content-Type': 'application/json',
-            'Host': host,
-        }
-        params = {
-            'method': 'PUT',
-            'access_token': access_token,
-        }
+    @staticmethod
+    def create(url, data, params, headers):
+        """
+        Create an API resource and handle any errors.
+        """
 
-        response = requests.post(
-            resource_url,
-            data=json.dumps(data, cls=DateTimeEncoder),
-            headers=headers,
-            params=params
-        )
+        headers['Content-Type'] = 'application/json'
+        headers['Accept-Encoding'] = 'application/json'
+        response = requests.post(url, data=data, params=params, headers=headers)
+        return APIResource.process_response(url, response)
 
+    @staticmethod
+    def update(url, data, params, headers):
+        """
+        Update an API resource with PUT and handle any errors.
+        """
+
+        # Override HTTP method on API
+        params['method'] = 'PUT'
+        headers['Content-Type'] = 'application/json'
+        headers['Accept-Encoding'] = 'application/json'
+        response = requests.post(url, data=data, params=params, headers=headers)
+        return APIResource.process_response(url, response)
+
+    @staticmethod
+    def delete(url, params, headers):
+        """
+        DELETE an API resource. A 'data' object is never returned by a delete, so only
+        raises an exception if 'error' is non-empty or the response cannot be parsed.
+        """
+
+        response = requests.post(url, params=params, headers=headers)
         try:
             resource = response.json()
         except ValueError:
             raise APIException('The API has returned invalid json: %s' % response.content, 500)
-
-        if resource['error']:
-            raise APIException(resource['error'], response.status_code)
-
-        if not resource['data']:
-            raise APIException('No data returned at: %s' % resource_url)
-
-        return resource['data']
-
-    @classmethod
-    def delete(cls, host, id, access_token):
-        """
-        DELETE an API resource. ID must be supplied.
-
-        A 'data' object is never returned by a DELETE, so this
-        method will raise an exception on failure. In normal
-        operation the method simply returns.
-        """
-
-        path_fragments = [cls.resource_fragment]
-
-        if id:
-            path_fragments.append(id)
-        elif access_token:
-            path_fragments.append(access_token)
-        else:
-            raise AssertionError, 'You must supply either an id or '\
-                                  'an access_token to delete'
-
-        resource_url = build_url(host, path_fragments)
-        params = {
-            'method': 'DELETE',
-            'access_token': access_token,
-        }
-        headers = {'Host': host}
-        response = requests.post(resource_url, params=params, headers=headers)
-
-        try:
-            resource = response.json()
-        except ValueError:
-            raise APIException('The API has returned invalid json: %s' % response.content, 500)
-
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
 
