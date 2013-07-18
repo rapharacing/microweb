@@ -193,7 +193,7 @@ class ConversationView(object):
                 conversation_id,
                 access_token=request.access_token
             )
-            Conversation.delete(request.META['HTTP_HOST'], conversation_id, request.access_token)
+            conversation.delete(request.META['HTTP_HOST'], request.access_token)
             return HttpResponseRedirect(reverse('single-microcosm', args=(conversation.microcosm_id,)))
         else:
             return HttpResponseNotAllowed()
@@ -332,13 +332,9 @@ class MicrocosmView(object):
         if request.method == 'POST':
             form = MicrocosmView.create_form(request.POST)
             if form.is_valid():
-                form_data = Microcosm(form.cleaned_data)
-                microcosm = Microcosm.create(
-                    request.META['HTTP_HOST'],
-                    form_data.as_dict,
-                    request.access_token
-                )
-                return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm['id'],)))
+                microcosm_request = Microcosm.from_create_form(form.cleaned_data)
+                microcosm_response = microcosm_request.create(request.META['HTTP_HOST'], request.access_token)
+                return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_response.id,)))
             else:
                 view_data['form'] = form
                 return render(request, MicrocosmView.form_template, view_data)
@@ -359,14 +355,9 @@ class MicrocosmView(object):
         if request.method == 'POST':
             form = MicrocosmView.edit_form(request.POST)
             if form.is_valid():
-                form_data = Microcosm(form.cleaned_data)
-                microcosm = Microcosm.update(
-                    request.META['HTTP_HOST'],
-                    form_data.as_dict,
-                    microcosm_id,
-                    request.access_token
-                )
-                return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm['id'],)))
+                microcosm_request = Microcosm.from_edit_form(form.cleaned_data)
+                microcosm_response = microcosm_request.update(request.META['HTTP_HOST'], request.access_token)
+                return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_response.id,)))
             else:
                 view_data['form'] = form
                 return render(request, MicrocosmView.form_template, view_data)
@@ -387,7 +378,8 @@ class MicrocosmView(object):
     @exception_handler
     def delete(request, microcosm_id):
         if request.method == 'POST':
-            Microcosm.delete(request.META['HTTP_HOST'], microcosm_id, request.access_token)
+            microcosm = Microcosm.retrieve(request.META['HTTP_HOST'], microcosm_id, request.access_token)
+            microcosm.delete(request.META['HTTP_HOST'], request.access_token)
             return HttpResponseRedirect(reverse(MicrocosmView.list))
         return HttpResponseNotAllowed(['POST'])
 
@@ -517,7 +509,7 @@ class EventView(object):
                 event_id,
                 access_token=request.access_token
             )
-            Event.delete(request.META['HTTP_HOST'], event_id, request.access_token)
+            event.delete(request.META['HTTP_HOST'], request.access_token)
             return HttpResponseRedirect(reverse('single-microcosm', args=(event.microcosm_id,)))
         else:
             return HttpResponseNotAllowed()
@@ -628,17 +620,14 @@ class CommentView(object):
 
         if request.method == 'POST':
             form = CommentForm(request.POST)
+            print form.errors
             if form.is_valid():
-                comment = Comment.create(
-                    request.META['HTTP_HOST'],
-                    data=form.cleaned_data,
-                    access_token=request.access_token
-                )
-
-                if comment.meta.links.get('via'):
-                    return HttpResponseRedirect(CommentView.build_comment_location(comment))
+                comment_request = Comment.from_create_form(form.cleaned_data)
+                comment_response = comment_request.create(request.META['HTTP_HOST'], access_token=request.access_token)
+                if comment_response.meta.links.get('via'):
+                    return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
                 else:
-                    return HttpResponseRedirect(reverse('single-comment', args=(comment.id,)))
+                    return HttpResponseRedirect(reverse('single-comment', args=(comment_response.id,)))
             else:
                 view_data['form'] = form
                 return render(request, CommentView.form_template, view_data)
@@ -664,16 +653,12 @@ class CommentView(object):
         if request.method == 'POST':
             form = CommentForm(request.POST)
             if form.is_valid():
-                comment = Comment.update(
-                    request.META['HTTP_HOST'],
-                    form.cleaned_data,
-                    comment_id,
-                    request.access_token
-                )
-                if comment.meta.links.get('via'):
-                    return HttpResponseRedirect(CommentView.build_comment_location(comment))
+                comment_request = Comment.from_edit_form(form.cleaned_data)
+                comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
+                if comment_response.meta.links.get('via'):
+                    return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
                 else:
-                    return HttpResponseRedirect(reverse('single-comment', args=(comment.id,)))
+                    return HttpResponseRedirect(reverse('single-comment', args=(comment_response.id,)))
             else:
                 view_data['form'] = form
                 return render(request, CommentView.form_template, view_data)
@@ -700,7 +685,7 @@ class CommentView(object):
 
         if request.method == 'POST':
             comment = Comment.retrieve(request.META['HTTP_HOST'], comment_id, access_token=request.access_token)
-            Comment.delete(request.META['HTTP_HOST'], comment_id, request.access_token)
+            comment.delete(request.META['HTTP_HOST'], request.access_token)
             if comment.item_type == 'event':
                 return HttpResponseRedirect(reverse('single-event', args=(comment.item_id,)))
             elif comment.item_type == 'conversation':
