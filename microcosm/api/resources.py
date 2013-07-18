@@ -8,6 +8,8 @@ from dateutil.parser import parse as parse_timestamp
 from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
 from microweb.helpers import build_url
+from microweb.helpers import join_path_fragments
+
 
 RESOURCE_PLURAL = {
     'event': 'events',
@@ -46,12 +48,17 @@ class APIResource(object):
         return resource['data']
 
     @staticmethod
+    def make_request_headers(access_token=None):
+        headers = {'Accept-Encoding': 'application/json'}
+        if access_token:
+            headers['Authorization'] = 'Bearer %s' % access_token
+        return headers
+
+    @staticmethod
     def retrieve(url, params, headers):
         """
         Fetch an API resource and handle any errors.
         """
-
-        headers['Accept-Encoding'] = 'application/json'
         response = requests.get(url, params=params, headers=headers)
         return APIResource.process_response(url, response)
 
@@ -62,7 +69,6 @@ class APIResource(object):
         """
 
         headers['Content-Type'] = 'application/json'
-        headers['Accept-Encoding'] = 'application/json'
         response = requests.post(url, data=data, params=params, headers=headers)
         return APIResource.process_response(url, response)
 
@@ -75,17 +81,17 @@ class APIResource(object):
         # Override HTTP method on API
         params['method'] = 'PUT'
         headers['Content-Type'] = 'application/json'
-        headers['Accept-Encoding'] = 'application/json'
         response = requests.post(url, data=data, params=params, headers=headers)
         return APIResource.process_response(url, response)
 
     @staticmethod
     def delete(url, params, headers):
         """
-        DELETE an API resource. A 'data' object is never returned by a delete, so only
+        Delete an API resource. A 'data' object is never returned by a delete, so only
         raises an exception if 'error' is non-empty or the response cannot be parsed.
         """
 
+        params['method'] = 'DELETE'
         response = requests.post(url, params=params, headers=headers)
         try:
             resource = response.json()
@@ -95,12 +101,12 @@ class APIResource(object):
             raise APIException(resource['error'], response.status_code)
 
 
-class Site(APIResource):
+class Site(object):
     """
     Represents the current site (title, logo, etc.).
     """
 
-    resource_fragment = 'site'
+    api_path_fragment = 'site'
 
     def __init__(self, data):
         self.site_id = data['siteId']
@@ -116,44 +122,47 @@ class Site(APIResource):
         if data.get('headerBackgroundUrl'):
             self.header_background_url = data['headerBackgroundUrl']
 
-    @classmethod
-    def retrieve(cls, host):
-        resource = super(Site, cls).retrieve(host)
+    @staticmethod
+    def retrieve(host):
+        url = build_url(host, [Site.api_path_fragment])
+        resource = APIResource.retrieve(url, {}, {})
         return Site(resource)
 
 
-class User(APIResource):
+class User(object):
     """
     User API resource. A user is only defined once across the platform
     (and is thus multi-site). A Profile is site specific, and associates
     a given user and site.
     """
 
-    resource_fragment = 'users'
+    api_path_fragment = 'users'
 
     def __init__(self, data):
         self.email = data['email']
 
-    @classmethod
-    def retrieve(cls, host, id, access_token):
-        resource = super(User, cls).retrieve(host, id=id, access_token=access_token)
+    @staticmethod
+    def retrieve(host, id, access_token):
+        url = build_url(host, [User.api_path_fragment, id])
+        resource = APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token))
         return User(resource)
 
 
-class WhoAmI(APIResource):
+class WhoAmI(object):
     """
     WhoAmI returns the profile of the currently logged-in user.
     """
 
-    resource_fragment = 'whoami'
+    api_path_fragment = 'whoami'
 
-    @classmethod
-    def retrieve(cls, host, access_token):
-        resource = super(WhoAmI, cls).retrieve(host, access_token=access_token)
+    @staticmethod
+    def retrieve(host, access_token):
+        url = build_url(host, [WhoAmI.api_path_fragment])
+        resource = APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token))
         return Profile(resource)
 
 
-class Profile(APIResource):
+class Profile(object):
     """
     Represents a user profile belonging to a specific site.
     """
@@ -183,9 +192,16 @@ class Profile(APIResource):
             self.banned = data['banned']
             self.admin = data['admin']
 
-    @classmethod
-    def retrieve(cls, host, id, access_token=None):
-        resource = super(Profile, cls).retrieve(host, id, access_token=access_token)
+    @staticmethod
+    def retrieve(host, id, access_token=None):
+        url = build_url(host, [Profile.api_path_fragment, id])
+        resource = APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token))
+        return Profile(resource)
+
+    def update(self, host, access_token):
+        url = build_url(host, [Profile.api_path_fragment, self.id])
+        payload = json.dumps(self.as_dict, cls=DateTimeEncoder)
+        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers())
         return Profile(resource)
 
     @property
@@ -212,30 +228,61 @@ class Microcosm(APIResource):
     Represents a single microcosm, containing items (conversations, events, ...)
     """
 
-    resource_fragment = 'microcosms'
-
-    def __init__(self, data, summary=False):
-        if data.get('id'): self.id = data['id']
-        if data.get('siteId'): self.site_id = data['siteId']
-        if data.get('visibility'): self.visibility = data['visibility']
-        if data.get('title'): self.title = data['title']
-        if data.get('description'): self.description = data['description']
-        if data.get('moderators'): self.moderators = data['moderators']
-        if data.get('editReason'): self.edit_reason = data['editReason']
-        if data.get('meta'): self.meta = Meta(data['meta'])
-
-        if summary:
-            if data.get('mostRecentUpdate'):
-                self.most_recent_update = Item(data['mostRecentUpdate'])
-            if data.get('totalItems'): self.total_items = data['totalItems']
-            if data.get('totalComments'): self.total_comments = data['totalComments']
-        else:
-            if data.get('items'): self.items = PaginatedList(data['items'], Item)
+    api_path_fragment = 'microcosms'
 
     @classmethod
-    def retrieve(cls, host, id, offset=None, access_token=None):
-        resource = super(Microcosm, cls).retrieve(host, id, offset, access_token)
-        return Microcosm(resource, summary=False)
+    def from_api_response(cls, data):
+        microcosm = Microcosm()
+        if data.get('id'): microcosm.id = data['id']
+        if data.get('siteId'): microcosm.site_id = data['siteId']
+        if data.get('visibility'): microcosm.visibility = data['visibility']
+        if data.get('title'): microcosm.title = data['title']
+        if data.get('description'): microcosm.description = data['description']
+        if data.get('moderators'): microcosm.moderators = data['moderators']
+        if data.get('editReason'): microcosm.edit_reason = data['editReason']
+        if data.get('meta'): microcosm.meta = Meta(data['meta'])
+        if data.get('items'): microcosm.items = PaginatedList(data['items'], Item)
+        return microcosm
+
+    @classmethod
+    def from_create_form(cls, data):
+        return Microcosm.from_api_response(data)
+
+    @classmethod
+    def from_edit_form(cls, data):
+        return Microcosm.from_api_response(data)
+
+    @classmethod
+    def from_summary(cls, data):
+        microcosm = Microcosm.from_api_response(data)
+        if data.get('mostRecentUpdate'):
+            microcosm = Item.from_summary(data['mostRecentUpdate'])
+        if data.get('totalItems'): microcosm.total_items = data['totalItems']
+        if data.get('totalComments'): microcosm.total_comments = data['totalComments']
+        return microcosm
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url = build_url(host, [Microcosm.api_path_fragment, id])
+        params = {'offset': offset} if offset else {}
+        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        return Microcosm.from_api_response(resource)
+
+    def create(self, host, access_token):
+        url = build_url(host, [Microcosm.api_path_fragment])
+        payload = json.dumps(self.as_dict, cls=DateTimeEncoder)
+        resource = APIResource.create(url, payload, {}, APIResource.make_request_headers(access_token))
+        return Microcosm.from_api_response(resource)
+
+    def update(self, host, access_token):
+        url = build_url(host, [Microcosm.api_path_fragment, self.id])
+        payload = json.dumps(self.as_dict, cls=DateTimeEncoder)
+        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers())
+        return Microcosm.from_api_response(resource)
+
+    def delete(self, host, access_token):
+        url = build_url(host, [Microcosm.api_path_fragment, self.id])
+        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
     @property
     def as_dict(self):
@@ -255,46 +302,51 @@ class Microcosm(APIResource):
         return repr
 
 
-class MicrocosmList(APIResource):
+class MicrocosmList(object):
     """
     Represents a list of microcosms for a given site.
     """
 
-    resource_fragment = 'microcosms'
+    api_path_fragment = 'microcosms'
 
     def __init__(self, data):
         self.microcosms = PaginatedList(data['microcosms'], Microcosm)
         self.meta = Meta(data['meta'])
 
-    @classmethod
-    def retrieve(cls, host, offset=None, access_token=None):
-        resource = super(MicrocosmList, cls).retrieve(host, offset=offset, access_token=access_token)
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url = build_url(host, [MicrocosmList.api_path_fragment])
+        params = {'offset': offset} if offset else {}
+        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
         return MicrocosmList(resource)
 
 
-class Item():
+class Item(object):
     """
     Represents an item contained within a microcosm. Only used when
     fetching a single microcosm to represent the list of items
     contained within.
     """
 
-    def __init__(self, data, summary=None):
-        self.id = data['id']
-        self.item_type = data['itemType']
-        self.microcosm_id = data['microcosmId']
-        self.title = data['title']
-        self.total_comments = data['totalComments']
-        self.total_views = data['totalViews']
-        if data.get('lastCommentId'): self.last_comment_id = data['lastCommentId']
+    @classmethod
+    def from_summary(cls, data):
+        item = cls()
+        item.id = data['id']
+        item.item_type = data['itemType']
+        item.microcosm_id = data['microcosmId']
+        item.title = data['title']
+        item.total_comments = data['totalComments']
+        item.total_views = data['totalViews']
+        if data.get('lastCommentId'): item.last_comment_id = data['lastCommentId']
         if data.get('lastCommentCreatedBy'):
-            self.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
+            item.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
         if data.get('lastCommentCreated'):
-            self.last_comment_created = parse_timestamp(data['lastCommentCreated'])
-        self.meta = Meta(data['meta'])
+            item.last_comment_created = parse_timestamp(data['lastCommentCreated'])
+        item.meta = Meta(data['meta'])
+        return item
 
 
-class PaginatedList():
+class PaginatedList(object):
     """
     Generic list of items and pagination metadata (total, number of pages, etc.).
     """
@@ -307,13 +359,13 @@ class PaginatedList():
         self.total_pages = item_list['totalPages']
         self.page = item_list['page']
         self.type = item_list['type']
-        self.items = [list_item_cls(item, summary=True) for item in item_list['items']]
+        self.items = [list_item_cls.from_summary(item) for item in item_list['items']]
         self.links = {}
         for item in item_list['links']:
             self.links[item['rel']] = item['href']
 
 
-class Meta():
+class Meta(object):
     """
     Represents a resource 'meta' type, including creation time/user,
     flags, links, and permissions.
@@ -351,7 +403,7 @@ class Conversation(APIResource):
     Represents a conversation (title and list of comments).
     """
 
-    resource_fragment = 'conversations'
+    api_path_fragment = 'conversations'
 
     @classmethod
     def from_api_response(cls, data):
@@ -377,26 +429,34 @@ class Conversation(APIResource):
         conversation.meta = {'editReason': data['editReason']}
         return conversation
 
-    @classmethod
-    def retrieve(cls, host, id=None, offset=None, access_token=None):
-        resource = super(Conversation, cls).retrieve(host, id, offset, access_token)
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url = build_url(host, [Conversation.api_path_fragment, id])
+        params = {'offset': offset} if offset else {}
+        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
         return Conversation.from_api_response(resource)
 
     def create(self, host, access_token):
-        resource = super(Conversation, self.__class__).create(host, self.as_dict(), access_token)
+        url = build_url(host, [Conversation.api_path_fragment])
+        payload = json.dumps(self.as_dict(), cls=DateTimeEncoder)
+        resource = APIResource.create(url, payload, {}, APIResource.make_request_headers(access_token))
         return Conversation.from_api_response(resource)
 
-    def update(self, host, id, access_token):
-        resource = super(Conversation, self.__class__).update(host, self.as_dict(update=True), id, access_token)
+    def update(self, host, access_token):
+        url = build_url(host, [Conversation.api_path_fragment, self.id])
+        payload = json.dumps(self.as_dict(update=True), cls=DateTimeEncoder)
+        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers())
         return Conversation.from_api_response(resource)
+
+    def delete(self, host, access_token):
+        url = build_url(host, [Conversation.api_path_fragment, self.id])
+        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
     def as_dict(self, update=False):
         repr = {}
-
         if update:
             repr['id'] = self.id
             repr['meta'] = self.meta
-
         repr['microcosmId'] = self.microcosm_id
         repr['title'] = self.title
         return repr
@@ -407,7 +467,7 @@ class Event(APIResource):
     Represents an event (event details and list of comments).
     """
 
-    resource_fragment = 'events'
+    api_path_fragment = 'events'
 
     @classmethod
     def from_api_response(cls, data):
@@ -479,11 +539,9 @@ class Event(APIResource):
         """
 
         repr = {}
-
         if update:
             repr['id'] = self.id
             repr['meta'] = self.meta
-
         repr['microcosmId'] = self.microcosm_id
         repr['title'] = self.title
         repr['when'] = self.when
@@ -505,18 +563,29 @@ class Event(APIResource):
 
         return repr
 
-    @classmethod
-    def retrieve(cls, host, id, offset=None, access_token=None):
-        resource = super(Event, cls).retrieve(host, id, offset, access_token)
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url = build_url(host, [Event.api_path_fragment, id])
+        params = {'offset': offset} if offset else {}
+        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
         return Event.from_api_response(resource)
 
     def create(self, host, access_token):
-        resource = super(Event, self.__class__).create(host, self.as_dict(), access_token)
+        url = build_url(host, [Event.api_path_fragment])
+        payload = json.dumps(self.as_dict(), cls=DateTimeEncoder)
+        resource = APIResource.create(url, payload, {}, APIResource.make_request_headers(access_token))
         return Event.from_api_response(resource)
 
-    def update(self, host, id, access_token):
-        resource = super(Event, self.__class__).update(host, self.as_dict(update=True), id, access_token)
+    def update(self, host, access_token):
+        url = build_url(host, [Event.api_path_fragment, self.id])
+        payload = json.dumps(self.as_dict(update=True), cls=DateTimeEncoder)
+        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
         return Event.from_api_response(resource)
+
+    def delete(self, host, access_token):
+        url = build_url(host, [Event.api_path_fragment, self.id])
+        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
+
 
     def get_attendees(self, host, access_token=None):
         """
@@ -524,8 +593,8 @@ class Event(APIResource):
         TODO: pagination support
         """
 
-        resource_url = build_url(host, [Event.resource_fragment, self.id, 'attendees'])
-        resource = APIResource.retrieve(host, id=id, access_token=access_token, url_override=resource_url)
+        url = build_url(host, [Event.resource_fragment, self.id, 'attendees'])
+        resource = APIResource.retrieve(url, {}, APIResource.make_request_headers())
         return AttendeeList(resource)
 
     @classmethod
@@ -536,7 +605,7 @@ class Event(APIResource):
         """
 
         collection_url = build_url(host, [cls.resource_fragment, event_id, 'attendees'])
-        item_url = collection_url + '/' + str(profile_id)
+        item_url = join_path_fragments([collection_url, profile_id])
 
         # See if there is an attendance entry for this profile
         try:
@@ -550,17 +619,13 @@ class Event(APIResource):
                 post_response = requests.post(collection_url, attendance_data, params={'access_token': access_token})
             except RequestException:
                 raise
-
             try:
                 post_response.json()
             except ValueError:
                 raise APIException('Invalid JSON returned')
-
             return
-
         # Attendance record exists, so update it with PUT
         elif response.status_code >= 200 and response.status_code < 400:
-
             try:
                 put_response = requests.post(
                     item_url,
@@ -569,19 +634,16 @@ class Event(APIResource):
                 )
             except RequestException:
                 raise
-
             try:
                 put_response.json()
             except ValueError:
                 raise APIException('Invalid JSON returned')
-
             return
-
         else:
             raise APIException(response.content)
 
 
-class AttendeeList(APIResource):
+class AttendeeList(object):
     """
     Represents a paginated list of event attendees.
     """
@@ -593,12 +655,15 @@ class AttendeeList(APIResource):
 
 class Attendee(object):
 
-    def __init__(self, data, summary=None):
-        self.attendee_id = data['attendeeId']
-        self.attendee = Attendee.AttendeeRecord(data['attendee'])
-        self.rsvp = data['rsvp']
-        self.rsvpd_on = data['rsvpdOn']
-        self.meta = Meta(data['meta'])
+    @classmethod
+    def from_summary(cls, data):
+        attendee = cls()
+        attendee.attendee_id = data['attendeeId']
+        attendee.attendee = Attendee.AttendeeRecord(data['attendee'])
+        attendee.rsvp = data['rsvp']
+        attendee.rsvpd_on = data['rsvpdOn']
+        attendee.meta = Meta(data['meta'])
+        return attendee
 
     class AttendeeRecord(object):
         def __init__(self, data):
@@ -615,52 +680,82 @@ class Comment(APIResource):
     Represents a single comment.
     """
 
-    resource_fragment = 'comments'
-
-    def __init__(self, data, summary=None):
-        self.id = data['id']
-        self.item_type = data['itemType']
-        self.item_id = data['itemId']
-        self.revisions = data['revisions']
-        self.in_reply_to = data['inReplyTo']
-        self.attachments = data['attachments']
-        self.first_line = data['firstLine']
-        self.markdown = data['markdown']
-        self.html = data['html']
-        self.meta = Meta(data['meta'])
+    api_path_fragment = 'comments'
 
     @classmethod
-    def retrieve(cls, host, id, offset=None, access_token=None):
-        resource = super(Comment, cls).retrieve(host, id, offset, access_token)
-        return Comment(resource)
+    def from_api_response(cls, data):
+        comment = cls()
+        comment.id = data['id']
+        comment.item_type = data['itemType']
+        comment.item_id = data['itemId']
+        comment.revisions = data['revisions']
+        comment.in_reply_to = data['inReplyTo']
+        comment.attachments = data['attachments']
+        comment.first_line = data['firstLine']
+        comment.markdown = data['markdown']
+        comment.html = data['html']
+        comment.meta = Meta(data['meta'])
+        return comment
 
     @classmethod
-    def create(cls, host, data, access_token):
-        resource = super(Comment, cls).create(host, data, access_token)
-        return Comment(resource)
+    def from_summary(cls, data):
+        return Comment.from_api_response(data)
 
     @classmethod
-    def update(cls, host, data, id, access_token):
-        resource = super(Comment, cls).update(host, data, id, access_token)
-        return Comment(resource)
+    def from_create_form(cls, data):
+        comment = cls()
+        comment.item_type = data['itemType']
+        comment.item_id = data['itemId']
+        comment.in_reply_to = data['inReplyTo']
+        comment.markdown = data['markdown']
+        return comment
+
+    @classmethod
+    def from_edit_form(cls, data):
+        comment = Comment.from_create_form(data)
+        comment.id = data['id']
+        return comment
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url = build_url(host, [Comment.api_path_fragment, id])
+        params = {'offset': offset} if offset else {}
+        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        return Comment.from_api_response(resource)
+
+    def create(self, host, access_token):
+        url = build_url(host, [Comment.api_path_fragment])
+        payload = json.dumps(self.as_dict, cls=DateTimeEncoder)
+        resource = APIResource.create(url, payload, {}, APIResource.make_request_headers(access_token))
+        return Comment.from_api_response(resource)
+
+    def update(self, host, access_token):
+        url = build_url(host, [Comment.api_path_fragment, self.id])
+        payload = json.dumps(self.as_dict, cls=DateTimeEncoder)
+        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
+        return Comment.from_api_response(resource)
+
+    def delete(self, host, access_token):
+        url = build_url(host, [Comment.api_path_fragment, self.id])
+        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
     @property
     def as_dict(self):
         repr = {}
-        repr['id'] = self.id
-        repr['itemType'] = self.item_type
-        repr['itemId'] = self.item_id
-        repr['revisions'] = self.revisions
-        repr['inReplyTo'] = self.in_reply_to
-        repr['attachments'] = self.attachments
-        repr['firstLine'] = self.first_line
-        repr['markdown'] = self.markdown
-        repr['html'] = self.html
-        repr['meta'] = self.meta
+        if hasattr(self, 'id'): repr['id'] = self.id
+        if hasattr(self, 'item_type'): repr['itemType'] = self.item_type
+        if hasattr(self, 'item_id'): repr['itemId'] = self.item_id
+        if hasattr(self, 'revisions'): repr['revisions'] = self.revisions
+        if hasattr(self, 'in_reply_to'): repr['inReplyTo'] = self.in_reply_to
+        if hasattr(self, 'attachments'): repr['attachments'] = self.attachments
+        if hasattr(self, 'first_line'): repr['firstLine'] = self.first_line
+        if hasattr(self, 'markdown'): repr['markdown'] = self.markdown
+        if hasattr(self, 'html'): repr['html'] = self.html
+        if hasattr(self, 'meta'): repr['meta'] = self.meta
         return repr
 
 
-class GeoCode():
+class GeoCode(object):
     """
     Used for proxying geocode requests to the backend.
     """
