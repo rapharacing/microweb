@@ -766,15 +766,57 @@ class GeoCode(object):
         Forward a geocode request (q) to the API.
         """
         params = {'q': q}
-        headers = {'Authorization': 'Bearer %s' % access_token}
+        headers = APIResource.make_request_headers(access_token)
         response = requests.get(build_url(host, ['geocode']), params=params, headers=headers)
         return response.content
 
 
-class Authentication(APIResource):
+class FileMetadata(object):
     """
-    Stub for making calls to /auth for creating and destroying access tokens.
-    TODO: shift the access_token/id logic in APIResource.delete to here.
+    For managing user-uploaded files.
+    TODO: manage multiple uploads
     """
 
-    resource_fragment = 'auth'
+    api_path_fragment = 'files'
+
+    @classmethod
+    def from_create_form(cls, file_upload):
+        file_metadata = cls()
+        file_metadata.file = {'files': file_upload.read()}
+        return file_metadata
+
+    @classmethod
+    def from_api_response(cls, data):
+        file_metadata = cls()
+        file_metadata.created = parse_timestamp(data[0]['created'])
+        file_metadata.file_size = data[0]['fileSize']
+        file_metadata.file_hash = data[0]['fileHash']
+        file_metadata.mime_type = data[0]['mimeType']
+        return file_metadata
+
+    def create(self, host, access_token):
+        url = build_url(host, [FileMetadata.api_path_fragment])
+        headers = APIResource.make_request_headers(access_token)
+        response = APIResource.process_response(url, requests.post(url, files=self.file, headers=headers))
+        return FileMetadata.from_api_response(response)
+
+
+class Attachment(object):
+    """
+    Represents the relation between a file and a profile or comment.
+    TODO: parse attachment list in response (currently create only signals
+    errors).
+    """
+
+    @staticmethod
+    def create(host, file_hash, profile_id=None, comment_id=None, access_token=None):
+        if profile_id:
+            url = build_url(host, ['profiles', profile_id, 'attachments'])
+        elif comment_id:
+            url = build_url(host, ['comments', comment_id, 'attachments'])
+        else:
+            raise AssertionError, 'You must supply a profile_id or comment_id to attach to'
+
+        attachment = {'FileHash': file_hash}
+        headers = APIResource.make_request_headers(access_token)
+        return APIResource.process_response(url, requests.post(url, data=attachment, headers=headers))
