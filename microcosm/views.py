@@ -19,6 +19,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from microcosm.api.exceptions import APIException
+from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import User
@@ -27,6 +28,7 @@ from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Profile
+from microcosm.api.resources import Attachment
 from microcosm.api.resources import RESOURCE_PLURAL
 from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
 
@@ -239,14 +241,17 @@ class ProfileView(object):
         if request.method == 'POST':
             form = ProfileView.edit_form(request.POST)
             if form.is_valid():
-                form_data = Profile(form.cleaned_data)
-                profile = Profile.update(
+                file_request = FileMetadata.from_create_form(request.FILES['avatar'])
+                file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+                Attachment.create(
                     request.META['HTTP_HOST'],
-                    form_data.as_dict,
-                    profile_id,
-                    request.access_token
+                    file_metadata.file_hash,
+                    profile_id=request.whoami.id,
+                    access_token=request.access_token
                 )
-                return HttpResponseRedirect(reverse('single-profile', args=(profile['id'],)))
+                profile_request = Profile(form.cleaned_data)
+                profile_response = profile_request.update(request.META['HTTP_HOST'], request.access_token)
+                return HttpResponseRedirect(reverse('single-profile', args=(profile_response.id,)))
             else:
                 view_data['form'] = form
                 return render(request, ProfileView.form_template, view_data)
@@ -620,7 +625,6 @@ class CommentView(object):
 
         if request.method == 'POST':
             form = CommentForm(request.POST)
-            print form.errors
             if form.is_valid():
                 comment_request = Comment.from_create_form(form.cleaned_data)
                 comment_response = comment_request.create(request.META['HTTP_HOST'], access_token=request.access_token)
