@@ -167,7 +167,7 @@ class Profile(object):
     Represents a user profile belonging to a specific site.
     """
 
-    resource_fragment = 'profiles'
+    api_path_fragment = 'profiles'
 
     def __init__(self, data, summary=True):
         """
@@ -201,7 +201,7 @@ class Profile(object):
     def update(self, host, access_token):
         url = build_url(host, [Profile.api_path_fragment, self.id])
         payload = json.dumps(self.as_dict, cls=DateTimeEncoder)
-        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers())
+        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
         return Profile(resource)
 
     @property
@@ -277,7 +277,7 @@ class Microcosm(APIResource):
     def update(self, host, access_token):
         url = build_url(host, [Microcosm.api_path_fragment, self.id])
         payload = json.dumps(self.as_dict, cls=DateTimeEncoder)
-        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers())
+        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
         return Microcosm.from_api_response(resource)
 
     def delete(self, host, access_token):
@@ -445,7 +445,7 @@ class Conversation(APIResource):
     def update(self, host, access_token):
         url = build_url(host, [Conversation.api_path_fragment, self.id])
         payload = json.dumps(self.as_dict(update=True), cls=DateTimeEncoder)
-        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers())
+        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
         return Conversation.from_api_response(resource)
 
     def delete(self, host, access_token):
