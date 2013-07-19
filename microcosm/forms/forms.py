@@ -217,6 +217,7 @@ class ProfileEdit(django.forms.Form):
     id = django.forms.IntegerField(widget=django.forms.HiddenInput)
     # This is the email address a user supplies associated with their gravatar.
     gravatar = django.forms.EmailField(widget=django.forms.HiddenInput, required=False)
+    avatar = django.forms.FileField(required=False)
     profileName = django.forms.CharField(
         max_length='25',
         label='Profile Name',

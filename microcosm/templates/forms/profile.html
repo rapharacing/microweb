@@ -3,9 +3,12 @@
 {% block content %}
 	<h1>Edit your profile</h1>
 
-	<form action="" method="post" id="profileForm">
+	<form action="" method="post" id="profileForm" enctype="multipart/form-data">
 		{% csrf_token %}
-		{{ form }}
+		{{ form.id }}
+        {{ form.gravatar }}
+        {{ form.avatar }}
+        {{ form.profileName }}
 
 		<p>
 			<br /><strong>Avatar:</strong><br />
