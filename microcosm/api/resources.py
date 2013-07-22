@@ -257,7 +257,7 @@ class Microcosm(APIResource):
     def from_summary(cls, data):
         microcosm = Microcosm.from_api_response(data)
         if data.get('mostRecentUpdate'):
-            microcosm = Item.from_summary(data['mostRecentUpdate'])
+            microcosm.most_recent_update = Item.from_summary(data['mostRecentUpdate'])
         if data.get('totalItems'): microcosm.total_items = data['totalItems']
         if data.get('totalComments'): microcosm.total_comments = data['totalComments']
         return microcosm
