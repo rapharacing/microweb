@@ -6,7 +6,7 @@
 			<div id="comment{{ comment.id }}" class="row">
 				
 				<div class="col col-lg-4">
-					<img src="{{ user.gravatar }}" alt="Avatar for {{ user.profile_name }}" align="left" class="gravatar" />
+					<img src="https://{{ request.META.HTTP_HOST }}{{ user.avatar }}" alt="Avatar for {{ user.profile_name }}" align="left" class="gravatar" />
 					<div class="h4">{{ user.profile_name }}</div>
 				</div>
 
@@ -37,7 +37,6 @@
 		{% else %}
 			<a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Signup or login to post a comment</a>
 		{% endif %}
-
 	</section>
 
 

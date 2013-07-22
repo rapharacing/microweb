@@ -8,7 +8,7 @@
 			<article id="comment{{ comment.id }}" class="row">
 				
 				<div class="col col-lg-4">
-					<a href="{% if user.id == comment.meta.created_by.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.created_by.id }}/{% endif %}"><img src="{{ comment.meta.created_by.gravatar }}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
+					<a href="{% if user.id == comment.meta.created_by.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.created_by.id }}/{% endif %}"><img src="https://{{ request.META.HTTP_HOST }}{{ user.avatar }}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
 					<div class="h4"><a href="{% if user.id == comment.meta.created_by.id %}{% url edit-profile user.id %}{% else %}/profiles/{{ comment.meta.created_by.id }}/{% endif %}">{{ comment.meta.created_by.profile_name|truncatechars:25 }}</a></div>
 				</div>
 
@@ -52,7 +52,7 @@
 		<div id="comment{{ comment.id }}" class="row">
 			
 			<div class="col col-lg-4">
-				<img src="{{ user.gravatar }}" alt="Avatar for {{ user.profile_name|truncatechars:25 }}" align="left" class="gravatar" />
+				<img src="https://{{ request.META.HTTP_HOST }}{{ user.avatar }}" alt="Avatar for {{ user.profile_name|truncatechars:25 }}" align="left" class="gravatar" />
 				<div class="h4">{{ user.profile_name|truncatechars:25 }}</div>
 			</div>
 

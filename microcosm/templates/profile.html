@@ -1,8 +1,7 @@
 {% extends 'base.html' %}profile
 
 {% block content %}
-
-    <h1 id="profile_name"><img src="{{content.gravatar}}" class="gravatar" alt="Avatar for {{ content.profile_name }}" /> {{content.profile_name}}</h1>
+    <h1 id="profile_name"><img src="https://{{ request.META.HTTP_HOST }}{{ user.avatar }}" class="gravatar" alt="Avatar for {{ content.profile_name }}" /> {{content.profile_name}}</h1>
 
     <h3>Statistics</h3>
     <ul>
