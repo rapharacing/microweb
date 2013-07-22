@@ -59,6 +59,7 @@ class APIResource(object):
         """
         Fetch an API resource and handle any errors.
         """
+
         response = requests.get(url, params=params, headers=headers)
         return APIResource.process_response(url, response)
 
@@ -180,7 +181,7 @@ class Profile(object):
         if data.get('userId'): self.user_id = data['userId']
         if data.get('profileName'): self.profile_name = data['profileName']
         if data.get('visible'): self.visible = data['visible']
-        if data.get('gravatar'): self.gravatar = data['gravatar']
+        if data.get('avatar'): self.avatar = data['avatar']
         if data.get('meta'): self.meta = Meta(data['meta'])
 
         if not summary:
@@ -212,7 +213,7 @@ class Profile(object):
         if hasattr(self, 'user_id'): repr['userId'] = self.user_id
         if hasattr(self, 'profile_name'): repr['profileName'] = self.profile_name
         if hasattr(self, 'visible'): repr['visible'] =  self.visible
-        if hasattr(self, 'gravatar'): repr['gravatar'] = self.gravatar
+        if hasattr(self, 'avatar'): repr['avatar'] = self.gravatar
         if hasattr(self, 'style_id'): repr['styleId'] = self.style_id
         if hasattr(self, 'item_count'): repr['itemCount'] = self.item_count
         if hasattr(self, 'comment_count'): repr['commentCount'] = self.comment_count
