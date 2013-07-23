@@ -509,6 +509,7 @@ class Event(APIResource):
         # This is already type(datetime.datetime) so need not be parsed
         event.when = data['when']
         event.duration = data['duration']
+        event.rsvp_limit = data['rsvpLimit']
 
         # Event location
         event.where = data['where']
@@ -559,8 +560,8 @@ class Event(APIResource):
 
         # RSVP limit is optional
         if hasattr(self, 'rsvp_attend'): repr['rsvpAttend'] = self.rsvp_attend
-        if hasattr(self, 'rsvp_limit'): repr['rsvpLimit'] = self.rsvp_attend
-        if hasattr(self, 'rsvp_spaces'): repr['rsvpSpaces'] = self.rsvp_attend
+        if hasattr(self, 'rsvp_limit'): repr['rsvpLimit'] = self.rsvp_limit
+        if hasattr(self, 'rsvp_spaces'): repr['rsvpSpaces'] = self.rsvp_spaces
 
         return repr
 
@@ -594,7 +595,7 @@ class Event(APIResource):
         TODO: pagination support
         """
 
-        url = build_url(host, [Event.resource_fragment, self.id, 'attendees'])
+        url = build_url(host, [Event.api_path_fragment, self.id, 'attendees'])
         resource = APIResource.retrieve(url, {}, APIResource.make_request_headers())
         return AttendeeList(resource)
 
@@ -605,8 +606,8 @@ class Event(APIResource):
         TODO: This is obviously pretty nasty but it'll be changed when PATCH support is added.
         """
 
-        collection_url = build_url(host, [cls.resource_fragment, event_id, 'attendees'])
-        item_url = join_path_fragments([collection_url, profile_id])
+        collection_url = build_url(host, [cls.api_path_fragment, event_id, 'attendees'])
+        item_url = '%s/%d' % (collection_url, profile_id)
 
         # See if there is an attendance entry for this profile
         try:
@@ -672,7 +673,8 @@ class Attendee(object):
             self.user_id = data['userId']
             self.profile_name = data['profileName']
             self.visible = data['visible']
-            self.gravatar = data['gravatar']
+            if data.get('avatar'):
+                self.avatar = data['avatar']
             self.meta = Meta(data['meta'])
 
 

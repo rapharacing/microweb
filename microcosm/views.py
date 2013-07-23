@@ -487,7 +487,7 @@ class EventView(object):
             form = EventView.edit_form(request.POST)
             if form.is_valid():
                 event_request = Event.from_edit_form(form.cleaned_data)
-                event_response = event_request.update(request.META['HTTP_HOST'], event_request.id, request.access_token)
+                event_response = event_request.update(request.META['HTTP_HOST'], request.access_token)
                 return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
             else:
                 view_data['form'] = form

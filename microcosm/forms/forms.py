@@ -126,8 +126,8 @@ class EventEdit(EventCreate):
 
         # RSVP limit is optional
         if hasattr(event, 'rsvp_attend'): repr['rsvpAttend'] = event.rsvp_attend
-        if hasattr(event, 'rsvp_limit'): repr['rsvpLimit'] = event.rsvp_attend
-        if hasattr(event, 'rsvp_spaces'): repr['rsvpSpaces'] = event.rsvp_attend
+        if hasattr(event, 'rsvp_limit'): repr['rsvpLimit'] = event.rsvp_limit
+        if hasattr(event, 'rsvp_spaces'): repr['rsvpSpaces'] = event.rsvp_spaces
 
         return cls(repr)
 
