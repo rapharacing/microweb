@@ -215,7 +215,7 @@ class ProfileEdit(django.forms.Form):
     """
 
     id = django.forms.IntegerField(widget=django.forms.HiddenInput)
-    avatar = django.forms.FileField(required=False)
+    avatar = django.forms.ImageField(required=False)
     profileName = django.forms.CharField(
         max_length='25',
         label='Profile Name',

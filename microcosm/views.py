@@ -241,6 +241,10 @@ class ProfileView(object):
             if form.is_valid():
                 if request.FILES.has_key('avatar'):
                     file_request = FileMetadata.from_create_form(request.FILES['avatar'])
+                    # TODO: better error handling/message for oversize image
+                    if len(file_request.file['files']) > 524288:
+                        view_data['form'] = form
+                        return render(request, ProfileView.form_template, view_data)
                     file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
                     Attachment.create(
                         request.META['HTTP_HOST'],

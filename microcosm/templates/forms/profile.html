@@ -7,7 +7,7 @@
 		{% csrf_token %}
 		{{ form.id }}
         {{ form.profileName }}
-        <p>Change your avatar:</p>
+        <p>Change your avatar (must be an image (jpg/gif/png) under half a MB in size):</p>
         {{ form.avatar }}
 		<input class="btn btn-primary pull-right" id="submit" type="submit" value="Save profile">
 	</form>
