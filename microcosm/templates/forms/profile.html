@@ -3,15 +3,12 @@
 {% block content %}
 	<h1>Edit your profile</h1>
 
-	<form action="" method="post" id="profileForm">
+	<form action="" method="post" id="profileForm" enctype="multipart/form-data">
 		{% csrf_token %}
-		{{ form }}
-
-		<p>
-			<br /><strong>Avatar:</strong><br />
-			To update your avatar please use <a href="https://gravatar.com/‎">Gravatar</a>.
-		</p>
-
+		{{ form.id }}
+        {{ form.profileName }}
+        <p>Change your avatar:</p>
+        {{ form.avatar }}
 		<input class="btn btn-primary pull-right" id="submit" type="submit" value="Save profile">
 	</form>
 

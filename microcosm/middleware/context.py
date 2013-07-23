@@ -12,12 +12,14 @@ from microweb.helpers import build_url
 logger = logging.getLogger('microcosm.middleware')
 
 class ContextMiddleware():
-    """Middleware for providing request context such as the current site and
+    """
+    Middleware for providing request context such as the current site and
     who the user is (through the whoami API call).
     """
 
     def process_request(self, request):
-        """Checks for access_token cookie and appends it to the request object
+        """
+        Checks for access_token cookie and appends it to the request object
         if it exists. If the access token is invalid, flags it for deletion.
 
         Populates request.whoami with the result of the whoami API call.

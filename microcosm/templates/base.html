@@ -45,20 +45,18 @@
 							{% if user %}
 								<div class="col col-lg-3 col-sm-7 pull-right">
 									<div class="row margin-top-half">
-										<a href="{% url edit-profile user.id %}" id="edit_profile"><img src="{{ user.gravatar }}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" class="gravatar" align="left" /></a>
+										<a href="{% url edit-profile user.id %}" id="edit_profile"><img src="https://{{ request.META.HTTP_HOST }}{{ user.avatar }}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" class="gravatar" align="left" /></a>
 										<a href="{% url edit-profile user.id %}" id="profile_name">{{ user.profile_name|truncatechars:25 }}</a><br /><br />
 										<a href="{% url logout %}" id="logout">Log out</a>
 									</div>
 								</div>
-
-							{%  else %}
+							{% else %}
 								<div class="col col-lg-3 col-sm-8 pull-right">
 									Browsing as a guest.
 									<a class="btn btn-primary buffer-right" id="login_link" href="javascript:login()">Log in with Persona</a><br />
 									<a href="https://login.persona.org/about">What is Persona?</a>
 								</div>
 							{% endif %}
-
 						{% endblock %}
 					</div>
 				</div>

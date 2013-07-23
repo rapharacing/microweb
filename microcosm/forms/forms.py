@@ -126,8 +126,8 @@ class EventEdit(EventCreate):
 
         # RSVP limit is optional
         if hasattr(event, 'rsvp_attend'): repr['rsvpAttend'] = event.rsvp_attend
-        if hasattr(event, 'rsvp_limit'): repr['rsvpLimit'] = event.rsvp_attend
-        if hasattr(event, 'rsvp_spaces'): repr['rsvpSpaces'] = event.rsvp_attend
+        if hasattr(event, 'rsvp_limit'): repr['rsvpLimit'] = event.rsvp_limit
+        if hasattr(event, 'rsvp_spaces'): repr['rsvpSpaces'] = event.rsvp_spaces
 
         return cls(repr)
 
@@ -215,8 +215,7 @@ class ProfileEdit(django.forms.Form):
     """
 
     id = django.forms.IntegerField(widget=django.forms.HiddenInput)
-    # This is the email address a user supplies associated with their gravatar.
-    gravatar = django.forms.EmailField(widget=django.forms.HiddenInput, required=False)
+    avatar = django.forms.FileField(required=False)
     profileName = django.forms.CharField(
         max_length='25',
         label='Profile Name',
