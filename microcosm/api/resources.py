@@ -197,13 +197,13 @@ class Profile(object):
     def retrieve(host, id, access_token=None):
         url = build_url(host, [Profile.api_path_fragment, id])
         resource = APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token))
-        return Profile(resource)
+        return Profile(resource, summary=False)
 
     def update(self, host, access_token):
         url = build_url(host, [Profile.api_path_fragment, self.id])
         payload = json.dumps(self.as_dict, cls=DateTimeEncoder)
         resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
-        return Profile(resource)
+        return Profile(resource, summary=False)
 
     @property
     def as_dict(self):
@@ -213,14 +213,14 @@ class Profile(object):
         if hasattr(self, 'user_id'): repr['userId'] = self.user_id
         if hasattr(self, 'profile_name'): repr['profileName'] = self.profile_name
         if hasattr(self, 'visible'): repr['visible'] =  self.visible
-        if hasattr(self, 'avatar'): repr['avatar'] = self.gravatar
+        if hasattr(self, 'avatar'): repr['avatar'] = self.avatar
         if hasattr(self, 'style_id'): repr['styleId'] = self.style_id
         if hasattr(self, 'item_count'): repr['itemCount'] = self.item_count
         if hasattr(self, 'comment_count'): repr['commentCount'] = self.comment_count
         if hasattr(self, 'created'): repr['created'] = self.created
         if hasattr(self, 'last_active'): repr['lastActive'] = self.last_active
-        if hasattr(self, 'banned'): repr['banned']
-        if hasattr(self, 'admin'): repr['admin']
+        if hasattr(self, 'banned'): repr['banned'] = self.banned
+        if hasattr(self, 'admin'): repr['admin'] = self.admin
         return repr
 
 

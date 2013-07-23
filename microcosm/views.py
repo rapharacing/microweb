@@ -231,9 +231,7 @@ class ProfileView(object):
     @exception_handler
     def edit(request, profile_id):
         """
-        To edit a Profile, we must fetch the associated User object since the
-        user's email is submitted as Profile.gravatar. This won't be needed when
-        PATCH support is added.
+        Edit a user profile (profile name or avatar).
         """
 
         view_data = dict(user=request.whoami, site=request.site)
@@ -241,14 +239,15 @@ class ProfileView(object):
         if request.method == 'POST':
             form = ProfileView.edit_form(request.POST)
             if form.is_valid():
-                file_request = FileMetadata.from_create_form(request.FILES['avatar'])
-                file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
-                Attachment.create(
-                    request.META['HTTP_HOST'],
-                    file_metadata.file_hash,
-                    profile_id=request.whoami.id,
-                    access_token=request.access_token
-                )
+                if request.FILES.has_key('avatar'):
+                    file_request = FileMetadata.from_create_form(request.FILES['avatar'])
+                    file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+                    Attachment.create(
+                        request.META['HTTP_HOST'],
+                        file_metadata.file_hash,
+                        profile_id=request.whoami.id,
+                        access_token=request.access_token
+                    )
                 profile_request = Profile(form.cleaned_data)
                 profile_response = profile_request.update(request.META['HTTP_HOST'], request.access_token)
                 return HttpResponseRedirect(reverse('single-profile', args=(profile_response.id,)))
@@ -257,17 +256,11 @@ class ProfileView(object):
                 return render(request, ProfileView.form_template, view_data)
 
         elif request.method == 'GET':
-            user_private_details = User.retrieve(
-                request.META['HTTP_HOST'],
-                request.whoami.user_id,
-                access_token=request.access_token
-            )
             user_profile = Profile.retrieve(
                 request.META['HTTP_HOST'],
                 profile_id,
                 request.access_token
             )
-            user_profile.gravatar = user_private_details.email
             view_data['form'] = ProfileView.edit_form(user_profile.as_dict)
             return render(request, ProfileView.form_template, view_data)
 
@@ -383,7 +376,7 @@ class MicrocosmView(object):
     @exception_handler
     def delete(request, microcosm_id):
         if request.method == 'POST':
-            microcosm = Microcosm.retrieve(request.META['HTTP_HOST'], microcosm_id, request.access_token)
+            microcosm = Microcosm.retrieve(request.META['HTTP_HOST'], microcosm_id, access_token=request.access_token)
             microcosm.delete(request.META['HTTP_HOST'], request.access_token)
             return HttpResponseRedirect(reverse(MicrocosmView.list))
         return HttpResponseNotAllowed(['POST'])
