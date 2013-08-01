@@ -117,12 +117,12 @@ class EventEdit(EventCreate):
 
         # Event location
         repr['where'] = event.where
-        repr['lat'] = event.lat
-        repr['lon'] = event.lon
-        repr['north'] = event.north
-        repr['east'] = event.east
-        repr['south'] = event.south
-        repr['west'] = event.west
+        if hasattr(event, 'lat'): repr['lat'] = event.lat
+        if hasattr(event, 'lon'): repr['lon'] = event.lon
+        if hasattr(event, 'north'): repr['north'] = event.north
+        if hasattr(event, 'east'): repr['east'] = event.east
+        if hasattr(event, 'south'): repr['south'] = event.south
+        if hasattr(event, 'west'): repr['west'] = event.west
 
         # RSVP limit is optional
         if hasattr(event, 'rsvp_attend'): repr['rsvpAttend'] = event.rsvp_attend
