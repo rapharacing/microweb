@@ -483,12 +483,12 @@ class Event(APIResource):
 
         # Event location
         event.where = data['where']
-        event.lat = data['lat']
-        event.lon = data['lon']
-        event.north = data['north']
-        event.east = data['east']
-        event.south = data['south']
-        event.west = data['west']
+        if data.get('lat'): event.lat = data['lat']
+        if data.get('lon'): event.lon = data['lon']
+        if data.get('north'): event.north = data['north']
+        if data.get('east'): event.east = data['east']
+        if data.get('south'): event.south = data['south']
+        if data.get('west'): event.west = data['west']
 
         event.comments = PaginatedList(data['comments'], Comment)
         event.meta = Meta(data['meta'])
