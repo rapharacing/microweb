@@ -79,6 +79,9 @@ MIDDLEWARE_CLASSES = (
     # push exceptions to riemann
     'microcosm.middleware.exception.ExceptionMiddleware',
 
+    # time all requests and report to riemann
+    'microcosm.middleware.timing.TimingMiddleware',
+
 )
 
 ROOT_URLCONF = 'microweb.urls'
@@ -161,12 +164,7 @@ CLIENT_SECRET = ''
 API_SCHEME = ''
 API_DOMAIN_NAME = ''
 RIEMANN_ENABLED = False
-
-# Persona test data
-PERSONA_USER = ''
-PERSONA_PASS = ''
-PERSONA_ADMIN = ''
-PERSONA_ADMIN_PASS = ''
+RIEMANN_HOST = ''
 
 PAGE_SIZE = 25
 
