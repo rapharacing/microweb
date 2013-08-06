@@ -76,11 +76,11 @@ MIDDLEWARE_CLASSES = (
     # convenience for request context like site, user account, etc.
     'microcosm.middleware.context.ContextMiddleware',
 
-    # push exceptions to riemann
-    'microcosm.middleware.exception.ExceptionMiddleware',
-
     # time all requests and report to riemann
     'microcosm.middleware.timing.TimingMiddleware',
+
+    # push exceptions to riemann
+    'microcosm.middleware.exception.ExceptionMiddleware',
 
 )
 
