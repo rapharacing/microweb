@@ -1,5 +1,6 @@
 class APIException(Exception):
-    """Encapsulates HTTP errors thrown by the microcosm API.
+    """
+    Encapsulates HTTP errors thrown by the microcosm API.
     """
 
     def __init__(self, error_message, status_code=None):
