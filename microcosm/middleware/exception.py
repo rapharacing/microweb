@@ -13,16 +13,15 @@ class ExceptionMiddleware():
             raise AssertionError, 'Please declare RIEMANN_ENABLED in settings.py'
 
         if microweb.settings.RIEMANN_ENABLED:
-            self.client = bernhard.Client()
+            self.client = bernhard.Client(host=microweb.settings.RIEMANN_HOST, transport=bernhard.UDPTransport)
 
     def process_exception(self, request, exception):
 
         logging.error(traceback.format_exc())
 
         if microweb.settings.RIEMANN_ENABLED:
-            # TODO: use a UDP method
             self.client.send({
-                'host': 'localhost',
+                'host': request.META['HTTP_HOST'],
                 'service' : 'microweb',
                 'description' : traceback.format_exc(),
                 'tags' : ['exception', 'ExceptionMiddleware'],
