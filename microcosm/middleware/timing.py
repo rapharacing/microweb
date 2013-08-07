@@ -18,11 +18,12 @@ class TimingMiddleware():
         return None
 
     def process_response(self, request, response):
-        delta = time.time() - request.start_time
-        self.client.send({
-            'host': 'django',
-            'service': 'microweb',
-            'metric': delta,
-            'tags' : ['timing'],
-        })
+        if hasattr(request, 'start_time'):
+            delta = time.time() - request.start_time
+            self.client.send({
+                'host': 'django',
+                'service': 'microweb',
+                'metric': delta,
+                'tags' : ['timing'],
+            })
         return response
