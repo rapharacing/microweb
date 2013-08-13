@@ -399,6 +399,41 @@ class PermissionSet(object):
         self.super_user = data['superUser']
 
 
+class NotificationList(object):
+    """
+    A list of user notifications.
+    """
+
+    api_path_fragment = 'notifications'
+
+    def __init__(self, data):
+        self.notifications = PaginatedList(data['notifications'], Notification)
+        self.meta = Meta(data['meta'])
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url = build_url(host, [NotificationList.api_path_fragment])
+        params = {'offset': offset} if offset else {}
+        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        return NotificationList(resource)
+
+
+class Notification(APIResource):
+    """
+    Represents a user notification.
+    """
+
+    @classmethod
+    def from_summary(cls, data):
+        notification = cls()
+        notification.id = data['id']
+        notification.alert_type_id = data['alertTypeId']
+        notification.item_id = data['itemId']
+        notification.item_type_id = data['itemTypeId']
+        notification.profile_id = data['profileId']
+        return notification
+
+
 class Conversation(APIResource):
     """
     Represents a conversation (title and list of comments).
