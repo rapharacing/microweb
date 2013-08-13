@@ -4,6 +4,7 @@ from django.conf.urls import patterns
 from microcosm.views import MicrocosmView
 from microcosm.views import EventView
 from microcosm.views import ConversationView
+from microcosm.views import NotificationView
 from microcosm.views import CommentView
 from microcosm.views import ProfileView
 from microcosm.views import AuthenticationView
@@ -50,6 +51,9 @@ urlpatterns = patterns('',
     url(r'comments/(?P<comment_id>\d+)/$', CommentView.single, name='single-comment'),
     url(r'comments/(?P<comment_id>\d+)/edit/$', CommentView.edit, name='edit-comment'),
     url(r'comments/(?P<comment_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
+
+    # Notifications
+    url(r'notifications/$', NotificationView.list, name='list-notifications'),
 
     # User profiles
     url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),
