@@ -22,7 +22,7 @@ from microcosm.api.exceptions import APIException
 from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
-from microcosm.api.resources import User
+from microcosm.api.resources import NotificationList
 from microcosm.api.resources import GeoCode
 from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
@@ -695,6 +695,33 @@ class CommentView(object):
                 return HttpResponseRedirect(reverse('microcosm-list'))
         else:
             return HttpResponseNotAllowed()
+
+
+class NotificationView(object):
+
+    list_template = 'notifications.html'
+
+    @staticmethod
+    @exception_handler
+    def list(request):
+
+        # pagination offset
+        offset = int(request.GET.get('offset', 0))
+
+        notifications_list = NotificationList.retrieve(
+            request.META['HTTP_HOST'],
+            offset=offset,
+            access_token=request.access_token
+        )
+
+        view_data = {
+            'user': request.whoami,
+            'site': request.site,
+            'content': notifications_list,
+            'pagination': build_pagination_links(request, notifications_list.notifications)
+        }
+
+        return render(request, NotificationView.list_template, view_data)
 
 
 class ErrorView(object):
