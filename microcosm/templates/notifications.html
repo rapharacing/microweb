@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if not content.notifications.items %}
+        <p>Nothing to see yet! When you get notifications, they'll appear here.</p>
+    {% else %}
+        {% include "pagination_nav.html" %}
+        {% for item in content.notifications.items %}
+            <section class="row">
+                <div class="col col-lg-16">
+                    <a href="">
+                        <h1>Item ID: {{ item.item_id }}</h1>
+                    </a>
+                </div>
+            </section>
+            <hr />
+        {% endfor %}
+
+        {% include "pagination_nav.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar%}
+{% endblock%}
