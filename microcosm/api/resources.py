@@ -360,7 +360,8 @@ class PaginatedList(object):
         self.total_pages = item_list['totalPages']
         self.page = item_list['page']
         self.type = item_list['type']
-        self.items = [list_item_cls.from_summary(item) for item in item_list['items']]
+        if item_list.get('items'):
+            self.items = [list_item_cls.from_summary(item) for item in item_list['items']]
         self.links = {}
         for item in item_list['links']:
             self.links[item['rel']] = item['href']
