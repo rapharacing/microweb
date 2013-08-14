@@ -400,39 +400,39 @@ class PermissionSet(object):
         self.super_user = data['superUser']
 
 
-class NotificationList(object):
+class AlertList(object):
     """
-    A list of user notifications.
+    A list of user alerts.
     """
 
-    api_path_fragment = 'notifications'
+    api_path_fragment = 'alerts'
 
     def __init__(self, data):
-        self.notifications = PaginatedList(data['notifications'], Notification)
+        self.alerts = PaginatedList(data['alerts'], Alert)
         self.meta = Meta(data['meta'])
 
     @staticmethod
     def retrieve(host, offset=None, access_token=None):
-        url = build_url(host, [NotificationList.api_path_fragment])
+        url = build_url(host, [AlertList.api_path_fragment])
         params = {'offset': offset} if offset else {}
         resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
-        return NotificationList(resource)
+        return AlertList(resource)
 
 
-class Notification(APIResource):
+class Alert(APIResource):
     """
-    Represents a user notification.
+    Represents a user alert, e.g. a mention by another user.
     """
 
     @classmethod
     def from_summary(cls, data):
-        notification = cls()
-        notification.id = data['id']
-        notification.alert_type_id = data['alertTypeId']
-        notification.item_id = data['itemId']
-        notification.item_type_id = data['itemTypeId']
-        notification.profile_id = data['profileId']
-        return notification
+        alert = cls()
+        alert.id = data['id']
+        alert.alert_type_id = data['alertTypeId']
+        alert.item_id = data['itemId']
+        alert.item_type_id = data['itemTypeId']
+        alert.profile_id = data['profileId']
+        return alert
 
 
 class Conversation(APIResource):

@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% if not content.notifications.items %}
+    {% if not content.alerts.items %}
         <p>Nothing to see yet! When you get notifications, they'll appear here.</p>
     {% else %}
         {% include "pagination_nav.html" %}
-        {% for item in content.notifications.items %}
+        {% for item in content.alerts.items %}
             <section class="row">
                 <div class="col col-lg-16">
                     <a href="">
