@@ -1,4 +1,5 @@
 import json
+import datetime
 
 import requests
 from requests import RequestException
@@ -424,15 +425,55 @@ class Alert(APIResource):
     Represents a user alert, e.g. a mention by another user.
     """
 
+    api_path_fragment = 'alerts'
+
     @classmethod
-    def from_summary(cls, data):
+    def from_api_response(cls, data):
         alert = cls()
         alert.id = data['id']
+        alert.alerted_profile_id = data['alertedProfileId']
         alert.alert_type_id = data['alertTypeId']
         alert.item_id = data['itemId']
-        alert.item_type_id = data['itemTypeId']
+        alert.item_type = data['itemType']
+        alert.item_link = '/%s/%s' % (RESOURCE_PLURAL[alert.item_type], alert.item_id)
         alert.profile_id = data['profileId']
+        alert.data = data['data']
+        alert.created = parse_timestamp(data['created'])
+        if data.get('viewed'):
+            alert.viewed = data['viewed']
         return alert
+
+    @classmethod
+    def from_summary(cls, data):
+        return Alert.from_api_response(data)
+
+    @staticmethod
+    def retrieve(host, alert_id, access_token):
+        url = build_url(host, [Alert.api_path_fragment, alert_id])
+        return Alert.from_api_response(APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token)))
+
+    def update(self, host, access_token):
+        """
+        Update an alert with a 'viewed' time to indicate it has been read by the user.
+        """
+
+        url = build_url(host, [Alert.api_path_fragment, self.id])
+        payload = json.dumps(self.as_dict(update=True), cls=DateTimeEncoder)
+        response = APIResource.update(url, payload, headers=APIResource.make_request_headers(access_token))
+        return Alert.from_api_response(response)
+
+    def as_dict(self):
+        repr = {}
+        repr['id'] = self.id
+        repr['alertedProfileId'] = self.alerted_profile_id
+        repr['alertTypeId'] = self.alert_type_id
+        repr['itemId'] = self.item_id
+        repr['itemType'] = self.item_type
+        repr['profileId'] = self.profile_id
+        repr['data'] = self.data
+        repr['created'] = self.created
+        repr['viewed'] = self.viewed
+        return repr
 
 
 class Conversation(APIResource):
