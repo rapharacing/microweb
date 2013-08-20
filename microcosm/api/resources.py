@@ -224,6 +224,11 @@ class Profile(object):
         if hasattr(self, 'admin'): repr['admin'] = self.admin
         return repr
 
+    @staticmethod
+    def get_unread_count(host, access_token):
+        url = build_url(host, ['alerts', 'unread'])
+        return APIResource.retrieve(url, {}, headers=APIResource.make_request_headers(access_token))
+
 
 class Microcosm(APIResource):
     """

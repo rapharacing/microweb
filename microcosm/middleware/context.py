@@ -1,5 +1,6 @@
 from microcosm.api.resources import Site
 from microcosm.api.resources import WhoAmI
+from microcosm.api.resources import Profile
 from microcosm.api.exceptions import APIException
 
 import requests
@@ -40,6 +41,14 @@ class ContextMiddleware():
             except APIException, e:
                 if e.status_code == 401:
                     request.delete_token = True
+            if request.whoami:
+                try:
+                    request.whoami.unread_count = Profile.get_unread_count(
+                        request.META['HTTP_HOST'],
+                        access_token=request.access_token
+                    )
+                except APIException, e:
+                    logger.error(e.message)
 
         try:
             request.site = Site.retrieve(request.META['HTTP_HOST'])
