@@ -731,7 +731,7 @@ class AlertView(object):
 
         if request.method == 'POST':
             Alert.mark_viewed(request.META['HTTP_HOST'], alert_id, request.access_token)
-            return HttpResponseRedirect(reverse('notifications-list'))
+            return HttpResponseRedirect(reverse('list-notifications'))
         else:
             return HttpResponseNotAllowed(['POST',])
 
