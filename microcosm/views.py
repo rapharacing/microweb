@@ -202,7 +202,6 @@ class ConversationView(object):
             return HttpResponseNotAllowed()
 
 
-
 class ProfileView(object):
 
     edit_form = ProfileEdit
@@ -676,7 +675,6 @@ class CommentView(object):
 
         else:
             return HttpResponseNotAllowed(['GET', 'POST'])
-
 
     @staticmethod
     @exception_handler
