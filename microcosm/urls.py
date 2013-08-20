@@ -53,7 +53,7 @@ urlpatterns = patterns('',
     url(r'comments/(?P<comment_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
 
     # Notifications
-    url(r'notifications/$', AlertView.list, name='notifications-list'),
+    url(r'notifications/$', AlertView.list, name='list-notifications'),
     url(r'notifications/(?P<alert_id>\d+)/viewed/$', AlertView.mark_viewed, name='mark-notification-viewed'),
 
     # User profiles
