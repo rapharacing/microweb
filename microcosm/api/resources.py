@@ -462,6 +462,19 @@ class Alert(APIResource):
         response = APIResource.update(url, payload, headers=APIResource.make_request_headers(access_token))
         return Alert.from_api_response(response)
 
+    @staticmethod
+    def mark_viewed(host, alert_id, access_token):
+        url = build_url(host, [Alert.api_path_fragment, alert_id])
+        payload = json.dumps([{
+            'op': 'replace',
+            'path': '/viewed',
+            # TODO: The rare hack, seen in the wild
+            'value': datetime.datetime.now().isoformat('T') + 'Z'
+        }])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        requests.patch(url, payload, headers=headers)
+
     def as_dict(self):
         repr = {}
         repr['id'] = self.id
