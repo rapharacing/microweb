@@ -4,6 +4,9 @@
 .margin-top-half {
 	margin-top: 12px;
 }
+.margin-bottom-half {
+    margin-bottom: 12px;
+}
 .margin-top {
 	margin-top: 24px;
 }
@@ -36,4 +39,8 @@ p, a, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 .nowrap {
 	white-space: nowrap;
+}
+
+.unread {
+    font-weight: bold;
 }

@@ -1,21 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <section class="row margin-bottom-half">
+    <h1>Notifications</h1>
+    </section>
     {% if not content.alerts.items %}
-        <p>Nothing to see yet! When you get notifications, they'll appear here.</p>
+        <p>Nothing to see here yet :-)</p>
+        <p>When you get notifications, they'll be listed here.</p>
     {% else %}
         {% include "pagination_nav.html" %}
-        {% for item in content.alerts.items %}
+        {% for alert in content.alerts.items %}
             <section class="row">
-                <div class="col col-lg-16">
-                    <a href="">
-                        <h1>Item ID: {{ item.item_id }}</h1>
-                    </a>
+                <div class="col col-sm-10">
+                    <span{% if not alert.viewed %} class="unread"{% endif %}><a href="{{ alert.item_link }}">{{ alert.data }}</a></span>
+                </div>
+                <div class="col col-sm-4">
+                    <span class="text-muted"><time datetime="{{ alert.created|date:"c" }}"></time></span>
+                </div>
+                <div class="col col-sm-2">
+                    {% if not alert.viewed %}
+                    <form method="POST" action="{% url mark-notification-viewed alert.id %}">
+                        {% csrf_token %}
+                        <input type="submit" value="✔" class="btn btn-small" />
+                    </form>
+                    {% endif %}
                 </div>
             </section>
             <hr />
         {% endfor %}
-
         {% include "pagination_nav.html" %}
     {% endif %}
 {% endblock %}
