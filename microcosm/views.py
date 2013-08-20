@@ -23,6 +23,7 @@ from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import AlertList
+from microcosm.api.resources import Alert
 from microcosm.api.resources import GeoCode
 from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
@@ -722,6 +723,21 @@ class AlertView(object):
         }
 
         return render(request, AlertView.list_template, view_data)
+
+    @staticmethod
+    @exception_handler
+    def mark_viewed(request, alert_id):
+        """
+        Mark a notification as viewed by setting a 'viewed' attribute.
+        """
+
+        if request.method == 'POST':
+            alert = Alert.retrieve(request.META['HTTP_HOST'], alert_id, request.access_token)
+
+            Alert.mark_viewed()
+            return HttpResponseRedirect(reverse('notifications-list'))
+        else:
+            return HttpResponseNotAllowed(['POST',])
 
 
 class ErrorView(object):
