@@ -221,7 +221,7 @@ class ProfileEdit(django.forms.Form):
     avatar = django.forms.ImageField(required=False)
     profileName = django.forms.CharField(
         max_length='25',
-        label='Profile Name',
+        label='Choose a username by which you wish to be known',
         error_messages = {
             'required' : 'Please add a profile name',
             'max_length' : 'Profile name may not be longer than 25 characters'
