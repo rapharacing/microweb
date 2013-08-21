@@ -6,9 +6,11 @@ from microcosm.api.exceptions import APIException
 import requests
 from requests import RequestException
 
-
+import memcache
 import logging
+
 from microweb.helpers import build_url
+from microweb import settings
 
 logger = logging.getLogger('microcosm.middleware')
 
@@ -17,6 +19,8 @@ class ContextMiddleware():
     Middleware for providing request context such as the current site and
     who the user is (through the whoami API call).
     """
+    def __init__(self):
+        self.mc = memcache.Client(['%s:%d' % (settings.MEMCACHE_HOST, settings.MEMCACHE_PORT)] , debug=0)
 
     def process_request(self, request):
         """
@@ -50,12 +54,17 @@ class ContextMiddleware():
                 except APIException, e:
                     logger.error(e.message)
 
-        try:
-            request.site = Site.retrieve(request.META['HTTP_HOST'])
-        except APIException, e:
-            logger.error(e.message)
-        except RequestException, e:
-            logger.error(e.message)
+        site = self.mc.get(request.META['HTTP_HOST'])
+        if not site:
+            logger.error('Site cache miss: %s' % request.META['HTTP_HOST'])
+            try:
+                site = Site.retrieve(request.META['HTTP_HOST'])
+                self.mc.set(request.META['HTTP_HOST'], site, time=3600)
+            except APIException, e:
+                logger.error(e.message)
+            except RequestException, e:
+                logger.error(e.message)
+        request.site = site
 
         return None
 

@@ -10,3 +10,6 @@ bernhard==0.0.3
 
 # Mock python objects for testing
 mock==1.0.1
+
+# Memcache client
+python-memcached==1.53

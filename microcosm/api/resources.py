@@ -44,7 +44,7 @@ class APIResource(object):
             raise APIException('Response is not valid json:\n %s' % response.content, 500)
         if resource['error']:
             raise APIException(resource['error'], response.status_code)
-        if not resource['data']:
+        if resource['data'] is None:
             raise APIException('No data returned at: %s' % url)
         return resource['data']
 
