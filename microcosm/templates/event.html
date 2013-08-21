@@ -16,55 +16,55 @@
 
 
 	<div class="row">
-		<div class="col col-lg-4">
+		<div class="col col-sm-4 col-xs-6">
 			<p class="text-muted">Where</p>
 		</div>
-		<div class="col col-lg-4">
+		<div class="col col-sm-4 col-xs-10">
 			<p id="where">{% if content.where %}{{ content.where }}{% else %}To be determined.{% endif %}</p>
 		</div>
-		<div id="map" class="col col-lg-8 pull-right" style="height:366px"></div>
+		<div id="map" class="col col-sm-8 col-xs-16 pull-right" style="height:366px"></div>
 
-		<div class="row col col-lg-8">
-			<div class="col col-lg-8">
+		<div class="row col col-sm-8 col-xs-16">
+			<div class="col col-sm-8 col-xs-6">
 				<p class="text-muted">Starts</p>
 			</div>
-			<div class="col col-lg-8">
+			<div class="col col-sm-8 col-xs-10">
 				<p style="padding-left:6px;"><time id="when" format="LLL" datetime="{{ content.when|date:"c\Z" }}" duration="{{content.duration}}">{{content.when}}</time></p>
 			</div>
 		</div>
 
-		<div class="row col col-lg-8">
-			<div class="col col-lg-8">
+		<div class="row col col-sm-8 col-xs-16">
+			<div class="col col-sm-8 col-xs-6">
 				<p class="text-muted">Ends</p>
 			</div>
-			<div class="col col-lg-8">
+			<div class="col col-sm-8 col-xs-10">
 				<p style="padding-left:6px;"><time id="ends" format="LLL"></time></p>
 			</div>
 		</div>
 
-		<div class="row col col-lg-8">
-			<div class="col col-lg-8">
+		<div class="row col col-sm-8 col-xs-16">
+			<div class="col col-sm-8 col-xs-6">
 				<p class="text-muted">Attendees</p>
 			</div>
-			<div class="col col-lg-8">
+			<div class="col col-sm-8 col-xs-10">
 				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvp_attend }}</p>
 			</div>
 		</div>
 
-		<div class="row col col-lg-8">
-			<div class="col col-lg-8">
+		<div class="row col col-sm-8 col-xs-16">
+			<div class="col col-sm-8 col-xs-6">
 				<p class="text-muted">Attendee Limit</p>
 			</div>
-			<div class="col col-lg-8">
+			<div class="col col-sm-8 col-xs-10">
 				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvp_limit }}</p>
 			</div>
 		</div>
 
-		<div class="row col col-lg-8">
-			<div class="col col-lg-8">
+		<div class="row col col-sm-8 col-xs-16">
+			<div class="col col-sm-8 col-xs-6">
 				<p class="text-muted">Spaces Left</p>
 			</div>
-			<div class="col col-lg-8">
+			<div class="col col-sm-8 col-xs-10">
 				<p id="spaces_left" style="padding-left:6px;">{{ content.rsvp_spaces }}</p>
 			</div>
 		</div>
@@ -76,21 +76,22 @@
 {% endblock %}
 
 {% block sidebar %}
-	<p class="muted">
+	<p class="muted hidden-xs">
 		Created by <a href="/profiles/{{content.meta.created_by.id}}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
 		<time datetime="{{ content.meta.created|date:"c" }}"></time>
 	</p>
 
 	{% if content.meta.permissions.update %}
-		<p>
-			<a href="{% url edit-event content.id %}" id="edit_event" class="btn btn-default col col-lg-16">Edit event</a>
-		</p>
-	{% endif %}
-	{% if content.meta.permissions.delete %}
-		<form method="POST" action="{% url delete-event content.id %}">
-			{% csrf_token %}
-			<input type="submit" value="Delete Event" id="delete-event" class="btn btn-danger col col-lg-16" style="width:100%; margin-top:12px;" />
-		</form>
+	<p class="hidden-xs">
+		<a id="edit_event" href="{% url edit-event content.id %}">Edit event</a>
+
+		{% if content.meta.permissions.delete %}
+			<form method="POST" action="{% url delete-event content.id %}" id="event_delete_form" class="hidden-xs">
+				{% csrf_token %}
+				<a href="#" onClick="if (confirm('Delete is a one-way action, are you sure?')) {$('#event_delete_form').submit()}" class="text-danger">Delete event</a>
+			</form>
+		{% endif %}
+	</p>
 	{% endif %}
 
 	<h4>Are you coming?</h4>
@@ -98,19 +99,19 @@
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="yes" />
-		<input id="rsvp_yes" type="submit" value="Count me in" class="btn btn-primary col col-lg-16" style="width:100%;">
+		<input id="rsvp_yes" type="submit" value="Count me in" class="btn btn-primary btn-block" style="width:100%;">
 	</form>
 
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="maybe" />
-		<input id="rsvp_maybe" type="submit" value="Maybe" class="btn btn-default col col-lg-16" style="width:100%; margin-top:12px;">
+		<input id="rsvp_maybe" type="submit" value="Maybe" class="btn btn-default btn-block" style="width:100%; margin-top:12px;">
 	</form>
 
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="no" />
-		<input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default col col-lg-16" style="width:100%; margin-top:12px;">
+		<input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default btn-block" style="width:100%; margin-top:12px;">
 	</form>
 	{% else %}
 	<a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Signup or login to attend</a>
@@ -177,6 +178,51 @@
 					[Number('{{ content.south }}'), Number('{{ content.east }}')]
 				]
 			);
+		});
+
+
+		function isEmpty(e) {
+			return (e.val().trim() == '');
+		}
+		function checkEmpty(e) {
+			if (isEmpty($(e))) {
+				addError($(e))
+			} else {
+				removeError($(e))
+			}
+		}
+		function addError(e) {
+			e.parent().addClass('has-error')
+		}
+		function removeError(e) {
+			e.parent().removeClass('has-error')
+		}
+
+		$('#id_markdown').on('change', function() {
+			checkEmpty(this);
+		}).on('blur', function() {
+			checkEmpty(this);
+		});
+
+		$('#commentForm').submit(function() {
+			if (isEmpty($('#id_markdown'))) {
+				addError($('#id_markdown'))
+				return false;
+			}
+
+			// Client-side dupe check
+			md5 = hex_md5($('#id_markdown').val())
+			if (this.md5 && this.md5 == md5) {
+				return false
+			}
+			this.md5 = md5;
+
+			return true;
+		});
+
+
+		$(document).ready(function() {
+			$('#id_markdown').addClass('form-control').parent().addClass('form-group');
 		});
 	</script>
 {% endblock %}

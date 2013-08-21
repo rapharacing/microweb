@@ -7,31 +7,31 @@
 		{% for comment in content.comments.items %}
 			<article id="comment{{ comment.id }}" class="row">
 				
-				<div class="col col-lg-4">
+				<div class="col col-sm-4">
 					<a href="/profiles/{{ comment.meta.created_by.id }}/"><img src="https://{{ request.META.HTTP_HOST }}{{ comment.meta.created_by.avatar }}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
 					<div class="h4"><a href="/profiles/{{ comment.meta.created_by.id }}/">{{ comment.meta.created_by.profile_name|truncatechars:25 }}</a></div>
 				</div>
 
-				<div class="col col-lg-12">
+				<div class="col col-sm-12">
 					<div class="row">
-						<section class="col col-lg-16" id="comment{{ comment.id }}body">
+						<section class="col col-sm-16" id="comment{{ comment.id }}body">
 							{{ comment.html|safe }}
 						</section>
 					</div>
 					<div class="row">
-						<div class="col col-lg-4 pull-left">
+						<div class="col col-sm-4 pull-left">
 							<small class="text-muted"><time datetime="{{ comment.meta.created|date:"c" }}"></time></small>
 						</div>
 
 						<section class="pull-right" id="comment{{ comment.id }}controls">
 							{% if comment.meta.created_by.id == user.id or user.admin or user.moderator %}
-								<form method="POST" action="{% url delete-comment comment.id %}" style="display:inline;">
+								<form method="POST" action="{% url delete-comment comment.id %}" style="display:inline;" onsubmit="return (confirm('Delete is a one-way action, are you sure?'))">
 									{% csrf_token %}
 									<input type="hidden" name="item_id" value="{{comment.item_id}}"/>
 									<input type="hidden" name="item_type" value="{{comment.item_type}}"/>
-									<input type="submit" value="Delete Comment" class="btn btn-small btn-danger" id="comment{{ comment.id }}delete"/>
+									<input type="submit" value="Delete" class="btn btn-small btn-link text-danger" id="comment{{ comment.id }}delete"/>
 								</form>
-								<a class="btn btn-default btn-small" href="/comments/{{comment.id}}/edit" id="comment{{ comment.id }}edit">Edit</a>
+								<a class="btn btn-small btn-link" href="/comments/{{comment.id}}/edit" id="comment{{ comment.id }}edit">Edit</a>
 							{% endif %}
 							<a class="btn btn-small btn-primary" href="/comments/create?itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}" id="comment{{ comment.id }}reply">Reply</a>
 						</section>
@@ -51,15 +51,15 @@
 	{% if user %}
 		<div id="comment{{ comment.id }}" class="row">
 			
-			<div class="col col-lg-4">
+			<div class="col col-sm-4">
 				<img src="https://{{ request.META.HTTP_HOST }}{{ user.avatar }}" alt="Avatar for {{ user.profile_name|truncatechars:25 }}" align="left" class="gravatar" />
 				<div class="h4">{{ user.profile_name|truncatechars:25 }}</div>
 			</div>
 
 			<form action="/comments/create/" method="POST" id="commentForm">{% csrf_token %}
-				<div class="col col-lg-12">
+				<div class="col col-sm-12">
 					<div class="row">
-						<section class="col col-lg-16" id="comment{{ comment.id }}body">
+						<section class="col col-sm-16" id="comment{{ comment.id }}body">
 							{{ comment_form.inReplyTo }}
 							{{ comment_form.itemId }}
 							{{ comment_form.itemType }}
@@ -93,62 +93,26 @@
 				<h4 class="modal-title">Markdown Cheat Sheet</h4>
 			</div>
 			<div class="modal-body">
-				<div class="row">
-					<div class="col col-lg-8">
-						<strong>Links</strong>
-<pre>http://www.google.com - automatic!
-[Google](http://www.google.com)
-</pre>
-						<strong>Images</strong>
-<pre>![Microcosm Logo](/static/themes/1/logo.png)
-Format: ![Alt Text](url)
-</pre>
-						<strong>Emphasis</strong>
-<pre>*This text will be italic*
-_This will also be italic_
-**This text will be bold**
-__This will also be bold__
-
-*You **can** combine them*
-</pre>
-						<strong>Headers</strong>
-<pre># Main Header
-## Header
-### Sub Header
-</pre>
-						<strong>Mentioning people</strong>
-<pre>@user +user</pre>
-					</div>
-					<div class="col col-lg-8">
-						<strong>Unordered Lists</strong>
-<pre>* fruits
-    + apples
-        - macintosh
-        - red delicious
-    + pears
-    + peaches
-* vegetables
-    + brocolli
-</pre>
-<p>Sub-lists are indented by 4 spaces.</p>
-						<strong>Ordered Lists</strong>
-<pre>1. fruits
-    a. apples
-        - macintosh
-        - red delicious
-    b. pears
-    c. peaches
-1. vegetables
-    a. brocolli
-</pre>
-						<strong>Quotes</strong>
-<pre>As Octocat said:
-
-> We're living the future so
-> the present is our past.
-</pre>
-					</div>
-				</div>
+				<p>
+					Don't worry about formatting, just type in the text and we'll take care of
+					making sense of it.
+				</p>
+				<p>
+					We'll auto-convert links, and if you put asterix around
+					words we'll make them bold.
+				</p>
+				<p>
+					The only things you might really need to know are:
+					<ul>
+						<li># Create headers by starting lines with a hash (#)</li>
+						<li>To make text <em>*italic*</em> put one asterix each side of the word</li>
+						<li>To make text <bold>**bold**</bold> put two asterix each side of the word</li>
+						<li>Embed images by entering:<br />&nbsp;![](https://www.google.co.uk/images/srpr/logo4w.png)<br />That's the only hard one, exclamation, square brackets and then the URL to the image in brackets.</li>
+						<li>Create lists by indenting text with 4 spaces</li>
+						<li>&gt; Quote text by starting each line with &gt;</li>
+						<li>Mention another user by +username or @username</li>
+					</ul>
+				</p>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>

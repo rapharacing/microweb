@@ -44,32 +44,29 @@
 
 		<div class="row">
 			<div class="col col-lg-16 {% if form.errors.title %} has-errors{% endif %}" style="padding-right:0px;">
-				<h4>Title</h4>
-				<p class="control-group">
+				<h4>What is the name of the event?</h4>
+				<p class="form-group">
 					<input
 						id="id_title"
 						type="text"
 						name="title"
-						class="input-with-feedback"
+						class="form-control"
 						maxlength="150"
 						value="{{ form.title.value }}"
 					/>
 				</p>
-				{% if form.errors.title %}
-					<p class="text-danger">What is the event called?</p>
-				{% endif %}
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="col col-lg-8">
-				<h4>Where</h4>
+				<h4>Where is the event being held?</h4>
 				<div id="control_where" class="input-group">
 					<input
 						id="id_where"
 						type="text"
 						name="where"
-						class="input-with-feedback"
+						class="form-control"
 						maxlength="150"
 						value="{{ form.where.value }}"
 					/>
@@ -77,20 +74,17 @@
 						<button class="btn btn-info" type="button" id="locate">Locate</button>
 					</span>
 				</div>
-				{% if form.errors.where %}
-					<p class="text-danger">Where is the event going to be held?</p>
-				{% endif %}
 			</div>
 			<div id="map" class="col col-lg-8 pull-right" style="height:366px"></div>
 
 			<div class="col col-lg-8">
-				<h4>From</h4>
-				<div id="control_from_date" class="control-group">
+				<h4>When does the event begin?</h4>
+				<div id="control_from_date" class="form-group">
 					<div class="controls col col-lg-8" style="padding-left:0px">
-						<input id="id_from_date" name="from_date" type="text" class="input-with-feedback" value="" />
+						<input id="id_from_date" name="from_date" type="text" class="form-control" value="" />
 					</div>
 					<div class="input-group col col-lg-8 bootstrap-timepicker">
-						<input id="id_from_time" type="text" value="" />
+						<input id="id_from_time" type="text" class="form-control" value="" />
 					</div>
 				</div>
 				{% if form.errors.when %}
@@ -100,31 +94,33 @@
 			</div>
 
 			<div class="col col-lg-8">
-				<h4>To</h4>
-				<div id="control_to_date" class="control-group">
+				<h4>When does the event end?</h4>
+				<div id="control_to_date" class="form-group">
 					<div class="controls col col-lg-8" style="padding-left:0px">
-						<input id="id_to_date" name="to_date" type="text" class="input-with-feedback" value="" />
+						<input id="id_to_date" name="to_date" type="text" class="form-control" value="" />
 					</div>
 					<div class="input-group col col-lg-8 bootstrap-timepicker">
-						<input id="id_to_time" type="text" value="" />
+						<input id="id_to_time" type="text" class="form-control" value="" />
 					</div>
 				</div>
 			</div>
 
 			<div class="col col-lg-8">
-				<h4>Attendee Limit (0 for unlimited)</h4>
+				<h4>What is the maximum number of attendees?</h4>
 				<div id="control_rsvp" class="input-group">
 					<input
 						id="id_rsvpLimit"
 						type="text"
 						name="rsvpLimit"
-						class="input-with-feedback"
+						class="form-control"
 						maxlength="150"
 						value="{{ form.rsvpLimit.value }}"
 					/>
 				</div>
 				{% if form.errors.rsvpLimit %}
 					<p class="text-danger">Attendee limit should be 0 for unlimited, or a whole number representing the maximum number of people that may attend the event.</p>
+				{% else %}
+					<p>Enter 0 for an unlimited number of attendees.</p>
 				{% endif %}
 			</div>
 		</div>
@@ -138,7 +134,7 @@
 							id="id_editReason"
 							type="text"
 							name="editReason"
-							class="input-with-feedback"
+							class="form-control"
 							maxlength="150"
 							value="{{ form.editReason.value }}"
 						/>

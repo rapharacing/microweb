@@ -165,7 +165,7 @@ class ConversationView(object):
 
             if form.is_valid():
                 conv_request = Conversation.from_edit_form(form.cleaned_data)
-                conv_response = conv_request.update(request.META['HTTP_HOST'], conv_request.id, request.access_token)
+                conv_response = conv_request.update(request.META['HTTP_HOST'], request.access_token)
                 return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
             else:
                 view_data['form'] = form

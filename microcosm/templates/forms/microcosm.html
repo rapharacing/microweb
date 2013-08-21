@@ -7,33 +7,39 @@
 		<h1>Create a microcosm</h1>
 	{% endif %}
 
-	<form action="" method="POST" id="microcosm-form">{% csrf_token %}
+	<form action="" method="POST" id="microcosm-form" role="form">{% csrf_token %}
 		{{ form.siteId.value }}
 		{{ form.id }}
 		
+		<div>
+			<label for="id_title">{{ form.title.label }}</label>
+			{{ form.title }}
+			{% if form.errors.title %}
+				<div class="text-error">{{ form.errors.title.as_text }}</div>
+			{% endif %}
+		</div>
 
-		<div>{{ form.title.label }}</div>
-		<div>{{ form.title }}</div>
-		{% if form.errors.title %}
-			<div class="text-error">{{ form.errors.title.as_text }}</div>
-		{% endif %}
-
-		<div>{{ form.description.label }}</div>
-		<div>{{ form.description }}</div>
-		{% if form.errors.description %}
-			<div class="text-error">{{ form.errors.description.as_text }}</div>
-		{% endif %}
+		<div>
+			<label for="id_description">{{ form.description.label }}</label>
+			{{ form.description }}
+			{% if form.errors.description %}
+				<div class="text-error">{{ form.errors.description.as_text }}</div>
+			{% endif %}
+		</div>
 		
-
-		<div>{{ form.visibility.label }}</div>
-		<div>{{ form.visibility }}</div>
+		<div>
+			<label for="id_visibility">{{ form.visibility.label }}</label>
+			{{ form.visibility }}
+		</div>
 
 		{% if form.id > 0 %}
-			<div>{{ form.editReason.label }}</div>
-			<div>{{ form.editReason }}</div>
-			{% if form.errors.editReason %}
-				<div class="text-error">{{ form.errors.editReason.as_text }}</div>
-			{% endif %}
+			<div>
+				<label for="id_editReason">{{ form.editReason.label }}</label>
+				{{ form.editReason }}
+				{% if form.errors.editReason %}
+					<div class="text-error">{{ form.errors.editReason.as_text }}</div>
+				{% endif %}
+			</div>
 		{% endif %}
 
 		<div>
@@ -90,7 +96,7 @@
 		});
 
 		$(document).ready(function() {
-			$('#id_title,#id_description').addClass('input-with-feedback').parent().addClass('control-group');
+			$('#id_title,#id_description,#id_visibility,#id_editReason').addClass('form-control').parent().addClass('form-group');
 		});
 	</script>
 {% endblock %}

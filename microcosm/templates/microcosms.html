@@ -4,7 +4,7 @@
 	{% if not content.microcosms.items %}
 		<p>This is such a new site that there are no Microcosms at the moment.</p>
 		{% if content.meta.permissions.create %}
-	    <p>Create your first Microcosm using the button on the right.</p>
+	    <p>Will you be the first to create one?</p>
 		{% endif %}
 	{% else %}
 
@@ -12,30 +12,37 @@
 
 		{% for item in content.microcosms.items %}
 			<section id="microcosm{{item.id}}" class="row">
-				<div class="col col-lg-16">
+				<div class="col col-sm-16">
 					<a href="{% url single-microcosm item.id %}">
 						<h1>{{ item.title }}</h1>
 					</a>
 				</div>
 				<div>
-					<div class="col col-lg-10 text-muted">
+					<div class="col col-md-10 text-muted">
 						{{ item.description }}
 					</div>
-					<div class="col col-lg-2 col-sm-4 small text-muted">
-						<small><i class="glyphicon glyphicon-list buffer-right"></i> {{ item.total_items }}</small></br>
-						<small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.total_comments }}</small>
-					</div>
-					<div class="col col-lg-4 col-sm-12 recent">
-						{% if item.most_recent_update %}
-							<!-- TODO: use a template tag (or provide from the view) a mapping of item_type to path -->
-							<a href="/{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/">{{item.most_recent_update.title}}</a><br />
-							{% if item.most_recent_update.total_comments %}
-								<small class="text-muted"><time datetime="{{item.most_recent_update.last_comment_created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a></small>
-							{% else%}
-								<small class="text-muted"><time datetime="{{item.most_recent_update.meta.created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.meta.created_by.id %}/">{{ item.most_recent_update.meta.created_by.profile_name }}</a></small>
-							{% endif %}
-						{% endif %}
-					</div>
+					<table class="col col-md-6 small text-muted">
+						<tbody>
+							<tr>
+								<td width="100"><small><i class="glyphicon glyphicon-list buffer-right"></i> {{ item.total_items }}</small></td>
+								{% if item.most_recent_update %}
+									<!-- TODO: use a template tag (or provide from the view) a mapping of item_type to path -->
+									<td><a href="/{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/">{{item.most_recent_update.title}}</a></td>
+								{% endif %}
+							</tr>
+							<tr>
+								<td><small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.total_comments }}</small></td>
+								{% if item.most_recent_update %}
+									{% if item.most_recent_update.total_comments %}
+										<td><small class="text-muted"><time datetime="{{item.most_recent_update.last_comment_created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a></small></td>
+									{% else%}
+										<td><small class="text-muted"><time datetime="{{item.most_recent_update.meta.created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.meta.created_by.id %}/">{{ item.most_recent_update.meta.created_by.profile_name }}</a></small></td>
+									{% endif %}
+								{% endif %}
+							</tr>
+						</tbody>
+					</table>
+
 				</div>
 			</section>
 			<hr />
@@ -49,7 +56,7 @@
 
 {% block sidebar%}
 	{% if content.meta.permissions.create %}
-		<p><a class="btn btn-primary col col-lg-16" id="create_microcosm" href="{% url create-microcosm %}">Create Microcosm</a></p>
+		<p><a class="btn btn-primary col col-sm-16" id="create_microcosm" href="{% url create-microcosm %}">Create Microcosm</a></p>
 	{% endif %}
 
 {% endblock%}

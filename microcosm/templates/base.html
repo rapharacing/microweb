@@ -7,10 +7,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 
+		<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600,400italic,600italic" rel="stylesheet" type="text/css" />
+
 		<!-- Default site theme ID is 1 -->
 		<link href="{{ STATIC_URL }}themes/{% if site.themeId %}{{ site.themeId }}{% else %}1{% endif %}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 		<link href="{{ STATIC_URL }}base.css" rel="stylesheet" type="text/css" />
-		<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600,400italic,600italic" rel="stylesheet" type="text/css" />
 
 		<style type="text/css">
 		.headBand {
@@ -35,15 +36,16 @@
 	<div class="headBand">
 		<div class="container">
 			<header class="row">
-				<div class="col col-lg-16">
+
+				<div class="col col-sm-16">
 					<div class="row">
-						<div id="logo" class="col col-lg-6 col-md-6 col-sm-8 margin-top-half">	
+						<div id="logo" class="col col-sm-8 margin-top-half">	
 							<a href="/"><img src="{% if site.logoUrl %}{{ site.logoUrl }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" /></a>
 						</div>
 
 						{% block whoami %}
 							{% if user %}
-								<div class="col col-lg-3 col-sm-7 pull-right">
+								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5">
 									<div class="row margin-top-half">
 										<a href="{% url edit-profile user.id %}" id="edit_profile"><img src="https://{{ request.META.HTTP_HOST }}{{ user.avatar }}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" class="gravatar" align="left" /></a>
 										<a href="{% url list-notifications %}" id="notifications">Notifications{% if user.unread_count %} (<span class="unread">{{ user.unread_count }}</span>){% endif %}</a><br />
@@ -52,10 +54,9 @@
 									</div>
 								</div>
 							{% else %}
-								<div class="col col-lg-3 col-sm-8 pull-right">
+								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5">
 									Browsing as a guest.
-									<a class="btn btn-primary buffer-right" id="login_link" href="javascript:login()">Log in with Persona</a><br />
-									<a href="https://login.persona.org/about">What is Persona?</a>
+									<a class="btn btn-primary btn-block" id="login_link" href="javascript:login()">Sign in</a><br />
 								</div>
 							{% endif %}
 						{% endblock %}
@@ -70,21 +71,20 @@
 		{% block notifications %}{% endblock %}
 
 		<div class="row">
-			<section id="content" class="col col-lg-12">
+			<section id="content" class="col col-sm-10 col-md-12">
 				{% block content %}{% endblock %}
 			</section>
 
-			<section id="sidebar" class="col-offset-1 col col-lg-3">
+			<section id="sidebar" class="col col-sm-offset-1 col-sm-5 col-md-offset-1 col-md-3">
 				{% block sidebar %}{% endblock %}
 			</section>
 		</div>
 
 		<footer class="row">
-			<div class="col-offset-13 col col-lg-3">
+			<div class="col col-sm-offset-11 col-sm-5 col-md-offset-13 col-md-3">
 				<small>Powered by <a href="http://microco.sm/" title="{{ site.title }} is powered by Microcosm">Microcosm</a></small>
 			</div>
 		</footer>
-
 	</div>
 
 	{% if not user %}

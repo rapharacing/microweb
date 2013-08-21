@@ -17,15 +17,22 @@
 		{{ form.visible }}
 		{{ form.deleted }}
 
-		<h4>{{ form.title.label }}</h4>
-		<p>{{ form.title }}</p>
+		<h4><label for="id_title">{{ form.title.label }}</label></h4>
+		<div>
+			{{ form.title }}
+			{% if form.errors.title %}
+				<div class="text-error">{{ form.errors.title.as_text }}</div>
+			{% endif %}
+		</div>
 
 		{% if form.id > 0 %}
-			<h4>{{ form.editReason.label }}</h4>
-			<div>{{ form.editReason }}</div>
-			{% if form.errors.editReason %}
-				<div class="text-error"><ul>{{ form.errors.editReason }}</ul></div>
-			{% endif %}
+			<div>
+				<label for="id_editReason">{{ form.editReason.label }}</label>
+				{{ form.editReason }}
+				{% if form.errors.editReason %}
+					<div class="text-error">{{ form.errors.editReason.as_text }}</div>
+				{% endif %}
+			</div>
 		{% endif %}
 
 		<input class="btn btn-primary" id="submit" type="submit" value="Save Conversation" />
@@ -77,7 +84,7 @@
 		});
 
 		$(document).ready(function() {
-			$('#id_title').addClass('input-with-feedback').parent().addClass('control-group');
+			$('#id_title,#id_editReason').addClass('form-control').parent().addClass('form-group');
 		});
 	</script>
 {% endblock %}

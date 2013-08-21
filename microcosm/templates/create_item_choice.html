@@ -4,14 +4,10 @@
 {% block content %}
 	<h1>{{ content.title }}</h1>
 
-	<h3>Create a...</h3>
+	<h3 class="row">Start...</h3>
 
-	<div class="col col-lg-8">
-		<a class="btn btn-large btn-primary col col-lg-8" id="create_conversation" href="conversation/"><span class="glyphicon glyphicon-comment"></span> conversation</a>
-	</div>
-
-	<div class="col col-lg-8">
-		<a class="btn btn-large btn-primary col col-lg-8" id="create_event" href="event/"><span class="glyphicon glyphicon-calendar"></span> event</a>
-	</div>
-
+	<a class="btn btn-lg btn-primary" id="create_conversation" href="conversation/"><span class="glyphicon glyphicon-comment"></span> a conversation</a>
+		
+	<a class="btn btn-lg btn-primary" id="create_event" href="event/"><span class="glyphicon glyphicon-calendar"></span> an event</a>
+	
 {% endblock %}

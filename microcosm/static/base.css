@@ -13,9 +13,9 @@
 .buffer-right {
 	margin-right: 10px;
 }
-.glyphicon {
+/*.glyphicon {
 	vertical-align: middle;
-}
+}*/
 .gravatar {
 	height: auto;
 	width: 72px;
@@ -43,4 +43,8 @@ p, a, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 .unread {
     font-weight: bold;
+}
+
+.text-danger, .text-danger:link, .text-danger:visited, .text-danger:hover, .text-danger:active, .text-danger:focus {
+  color: #b94a48 !important;
 }

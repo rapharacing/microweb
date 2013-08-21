@@ -51,7 +51,7 @@ class EventCreate(ItemForm):
 
     title = django.forms.CharField(
         max_length='150',
-        label='Event title',
+        label='What is the name of the event?',
         error_messages={
             'required' : 'Please add a title',
             'max_length' : 'Title may not be longer than 150 characters'
@@ -62,6 +62,7 @@ class EventCreate(ItemForm):
         formats.get_format('DATETIME_INPUT_FORMATS')
     when = django.forms.DateTimeField(
         input_formats=isoFormat,
+        label='When does the event begin?',
         error_messages={
             'required' : 'Please add a time and date for this event',
             'invalid' : 'Please check the date and time formatting'
@@ -70,6 +71,7 @@ class EventCreate(ItemForm):
 
     duration = django.forms.IntegerField(
         required=False,
+        label='How long (in minutes) does the event go on for?',
         error_messages={
             'required' : 'Please add a duration for this event',
             'invalid' : 'Please input an integer'
@@ -78,6 +80,7 @@ class EventCreate(ItemForm):
 
     where = django.forms.CharField(
         max_length='150',
+        label='Where is the event being held?',
         widget=longTextInput,
         error_messages={
             'required' : 'Please add a location',
@@ -139,10 +142,10 @@ class ConversationCreate(ItemForm):
 
     title = django.forms.CharField(
         max_length='150',
-        label='Topic',
+        label='What is the subject of the conversation?',
         error_messages={
-            'required' : 'Please add a title',
-            'max_length' : 'Title may not be longer than 150 characters'
+            'required' : 'Please add a subject',
+            'max_length' : 'The subject may not be longer than 150 characters'
         }
     )
 
@@ -176,18 +179,18 @@ class MicrocosmCreate(django.forms.Form):
 
     title = django.forms.CharField(
         max_length='150',
-        label='Title',
+        label='What is the name of the Microcosm?',
         error_messages={
-            'required' : 'Please add a title',
-            'max_length' : 'Title may not be longer than 150 characters'
+            'required' : 'The name is required',
+            'max_length' : 'Name may not be longer than 150 characters'
         }
     )
     description = django.forms.CharField(
         max_length='150',
-        label='Description',
+        label='What is the Microcosm about?',
         error_messages={
-            'required' : 'Please add a description',
-            'max_length' : 'Description may not be longer than 150 characters'
+            'required' : 'A description is required and helps keep a Microcosm on-topic',
+            'max_length' : 'The description may not be longer than 150 characters'
         }
     )
 
@@ -196,7 +199,7 @@ class MicrocosmCreate(django.forms.Form):
             ('public', 'public'),
             #('private', 'private')
             ),
-        label='All microcosms are currently public'
+        label='To whom is the Microcosm visible?'
     )
 
 
