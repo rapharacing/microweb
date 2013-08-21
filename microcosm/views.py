@@ -120,7 +120,8 @@ class ConversationView(object):
             'site': request.site,
             'content': conversation,
             'comment_form': comment_form,
-            'pagination': build_pagination_links(request, conversation.comments)
+            'pagination': build_pagination_links(request, conversation.comments),
+            'item_type': 'conversation'
         }
 
         return render(request, ConversationView.single_template, view_data)
@@ -440,7 +441,8 @@ class EventView(object):
             'content': event,
             'comment_form': comment_form,
             'attendees': attendees,
-            'pagination': build_pagination_links(request, event.comments)
+            'pagination': build_pagination_links(request, event.comments),
+            'item_type': 'event'
         }
 
         return render(request, EventView.single_template, view_data)
