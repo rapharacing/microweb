@@ -1,4 +1,5 @@
 import requests
+import grequests
 
 from functools import wraps
 from microweb import settings
@@ -19,7 +20,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from microcosm.api.exceptions import APIException
-from microcosm.api.resources import FileMetadata
+from microcosm.api.resources import FileMetadata, APIResource
 from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import AlertList
@@ -310,14 +311,21 @@ class MicrocosmView(object):
         # record offset for paging of microcosms
         offset = int(request.GET.get('offset', 0))
 
-        microcosm_list = MicrocosmList.retrieve(
-            request.META['HTTP_HOST'],
-            offset=offset,
-            access_token=request.access_token
-        )
+        url, params, headers = MicrocosmList.build_request(request.META['HTTP_HOST'], offset=offset, access_token=request.access_token)
+        microcosm_req = grequests.get(url, params=params, headers=headers)
+
+        view_reqs = [microcosm_req]
+        if hasattr(request, 'whoami_req'):
+            view_reqs.append(request.whoami_req)
+        responses = grequests.map(view_reqs)
+        for response in responses:
+            if response.url == microcosm_req.url:
+                microcosm_list = MicrocosmList(APIResource.process_response(response.url, response))
+            else:
+                whoami = Profile(APIResource.process_response(response.url, response))
 
         view_data = {
-            'user': request.whoami,
+            'user': whoami,
             'site': request.site,
             'content': microcosm_list,
             'pagination': build_pagination_links(request, microcosm_list.microcosms)

@@ -1,6 +1,7 @@
 import json
 import datetime
 
+import grequests
 import requests
 from requests import RequestException
 
@@ -9,7 +10,6 @@ from dateutil.parser import parse as parse_timestamp
 from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
 from microweb.helpers import build_url
-from microweb.helpers import join_path_fragments
 
 
 RESOURCE_PLURAL = {
@@ -158,9 +158,16 @@ class WhoAmI(object):
     api_path_fragment = 'whoami'
 
     @staticmethod
-    def retrieve(host, access_token):
+    def build_request(host, access_token):
         url = build_url(host, [WhoAmI.api_path_fragment])
-        resource = APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token))
+        params = {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, access_token):
+        url, params, headers = WhoAmI.build_request(host, access_token)
+        resource = APIResource.retrieve(url, params=params, headers=headers)
         return Profile(resource)
 
 
@@ -321,10 +328,16 @@ class MicrocosmList(object):
         self.meta = Meta(data['meta'])
 
     @staticmethod
-    def retrieve(host, offset=None, access_token=None):
+    def build_request(host, offset=None, access_token=None):
         url = build_url(host, [MicrocosmList.api_path_fragment])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = MicrocosmList.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return MicrocosmList(resource)
 
 
