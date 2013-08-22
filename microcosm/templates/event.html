@@ -88,7 +88,7 @@
 		{% if content.meta.permissions.delete %}
 			<form method="POST" action="{% url delete-event content.id %}" id="event_delete_form" class="hidden-xs">
 				{% csrf_token %}
-				<a href="#" onClick="if (confirm('Delete is a one-way action, are you sure?')) {$('#event_delete_form').submit()}" class="text-danger">Delete event</a>
+				<a id="delete-event" href="#" onClick="if (confirm('Delete is a one-way action, are you sure?')) {$('#event_delete_form').submit()}" class="text-danger">Delete event</a>
 			</form>
 		{% endif %}
 	</p>
