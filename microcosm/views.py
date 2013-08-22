@@ -123,7 +123,7 @@ class ConversationView(object):
         comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
 
         view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site,
             'content': conversation,
             'comment_form': comment_form,
@@ -226,7 +226,10 @@ class ProfileView(object):
         """
 
         responses = response_list_to_dict(grequests.map(request.view_requests))
-        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+        view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+            'site': request.site
+        }
 
         profile = Profile.retrieve(
             request.META['HTTP_HOST'],
@@ -311,7 +314,7 @@ class MicrocosmView(object):
         microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
         view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site,
             'content': microcosm,
             'pagination': build_pagination_links(request, microcosm.items)
@@ -338,7 +341,7 @@ class MicrocosmView(object):
         microcosms = MicrocosmList(responses[microcosms_url])
 
         view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site,
             'content': microcosms,
             'pagination': build_pagination_links(request, microcosms.microcosms)
@@ -424,7 +427,7 @@ class MicrocosmView(object):
         responses = response_list_to_dict(grequests.map(request.view_requests))
 
         view_data = {
-            'user' : Profile(responses[request.whoami_url], summary=False),
+            'user' : Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site' : request.site,
             'content' : Microcosm.from_api_response(responses[microcosm_url])
         }
@@ -470,7 +473,7 @@ class EventView(object):
         comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
 
         view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site,
             'content': event,
             'comment_form': comment_form,
@@ -645,7 +648,7 @@ class CommentView(object):
         responses = response_list_to_dict(grequests.map(request.view_requests))
 
         view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site,
             'content': Comment.from_api_response(responses[url]),
         }
@@ -748,6 +751,9 @@ class AlertView(object):
     @exception_handler
     def list(request):
 
+        if not request.access_token:
+            raise HttpResponseNotAllowed
+
         # pagination offset
         offset = int(request.GET.get('offset', 0))
 
@@ -789,13 +795,19 @@ class ErrorView(object):
     def not_found(request):
 
         responses = response_list_to_dict(grequests.map(request.view_requests))
-        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+        view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+            'site': request.site
+        }
         return render(request, '404.html', view_data)
 
     @staticmethod
     def forbidden(request):
         responses = response_list_to_dict(grequests.map(request.view_requests))
-        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+        view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+            'site': request.site
+        }
         return render(request, '403.html', view_data)
 
     @staticmethod
