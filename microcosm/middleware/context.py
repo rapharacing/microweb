@@ -5,7 +5,7 @@ from microcosm.api.exceptions import APIException
 from requests import RequestException
 
 import grequests
-import memcache
+import pylibmc as memcache
 import logging
 
 from microweb import settings
@@ -19,7 +19,7 @@ class ContextMiddleware():
     """
 
     def __init__(self):
-        self.mc = memcache.Client(['%s:%d' % (settings.MEMCACHE_HOST, settings.MEMCACHE_PORT)] , debug=0)
+        self.mc = memcache.Client(['%s:%d' % (settings.MEMCACHE_HOST, settings.MEMCACHE_PORT)])
 
     def process_request(self, request):
         """
@@ -31,6 +31,7 @@ class ContextMiddleware():
         """
 
         request.access_token = None
+        request.whoami_url = ''
         request.view_requests = []
         request.site = None
 
@@ -40,12 +41,12 @@ class ContextMiddleware():
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
             request.whoami_url = url
 
-        site = self.mc.get(request.META['HTTP_HOST'])
-        if not site:
-            logger.error('Site cache miss: %s' % request.META['HTTP_HOST'])
+        site = self.mc.get(request.META['HTTP_HOST'].split('.')[0])
+        if site is None:
+            logger.error('Site cache miss: %s' % request.META['HTTP_HOST'].split('.')[0])
             try:
                 site = Site.retrieve(request.META['HTTP_HOST'])
-                self.mc.set(request.META['HTTP_HOST'], site, time=3600)
+                self.mc.set(request.META['HTTP_HOST'].split('.')[0], site)
             except APIException, e:
                 logger.error(e.message)
             except RequestException, e:
