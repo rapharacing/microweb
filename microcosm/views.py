@@ -33,6 +33,7 @@ from microcosm.api.resources import Profile
 from microcosm.api.resources import Attachment
 from microcosm.api.resources import RESOURCE_PLURAL
 from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
+from microcosm.api.resources import response_list_to_dict
 
 from microcosm.forms.forms import EventCreate
 from microcosm.forms.forms import EventEdit
@@ -311,24 +312,23 @@ class MicrocosmView(object):
         # record offset for paging of microcosms
         offset = int(request.GET.get('offset', 0))
 
-        url, params, headers = MicrocosmList.build_request(request.META['HTTP_HOST'], offset=offset, access_token=request.access_token)
-        microcosm_req = grequests.get(url, params=params, headers=headers)
+        microcosms_url, params, headers = MicrocosmList.build_request(
+            request.META['HTTP_HOST'],
+            offset=offset,
+            access_token=request.access_token
+        )
 
-        view_reqs = [microcosm_req]
-        if hasattr(request, 'whoami_req'):
-            view_reqs.append(request.whoami_req)
-        responses = grequests.map(view_reqs)
-        for response in responses:
-            if response.url == microcosm_req.url:
-                microcosm_list = MicrocosmList(APIResource.process_response(response.url, response))
-            else:
-                whoami = Profile(APIResource.process_response(response.url, response))
+        request.view_requests.append(grequests.get(microcosms_url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+
+        microcosms = MicrocosmList(responses[microcosms_url])
+        profile = Profile(responses[request.whoami_url])
 
         view_data = {
-            'user': whoami,
+            'user': profile,
             'site': request.site,
-            'content': microcosm_list,
-            'pagination': build_pagination_links(request, microcosm_list.microcosms)
+            'content': microcosms,
+            'pagination': build_pagination_links(request, microcosms.microcosms)
         }
 
         return render(request, MicrocosmView.list_template, view_data)

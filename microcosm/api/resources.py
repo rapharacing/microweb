@@ -1,7 +1,6 @@
 import json
 import datetime
 
-import grequests
 import requests
 from requests import RequestException
 
@@ -28,6 +27,24 @@ COMMENTABLE_ITEM_TYPES = [
     'conversation',
     'poll'
 ]
+
+def response_list_to_dict(responses):
+    """
+    Takes a list of HTTP responses as returned by grequests.map and creates a dict
+    with the request url as the key and the response as the value. If the request
+    was redirected (as shown by a history tuple on the response), the
+    prior request url will be used as the key.
+    """
+
+    response_dict = {}
+    for response in responses:
+        # Only follow one redirect. This is specifically to handle the /whoami
+        # case where the client is redirected to /profiles/{id}
+        if response.history:
+            response_dict[response.history[0].url] = APIResource.process_response(response.history[0].url, response)
+        else:
+            response_dict[response.url] = APIResource.process_response(response.url, response)
+    return response_dict
 
 
 class APIResource(object):
