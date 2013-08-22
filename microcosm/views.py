@@ -20,13 +20,14 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from microcosm.api.exceptions import APIException
-from microcosm.api.resources import FileMetadata, APIResource
+from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import AlertList
 from microcosm.api.resources import Alert
 from microcosm.api.resources import GeoCode
 from microcosm.api.resources import Event
+from microcosm.api.resources import AttendeeList
 from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Profile
@@ -109,16 +110,20 @@ class ConversationView(object):
 
         # Offset for paging of event comments
         offset = int(request.GET.get('offset', 0))
-        conversation = Conversation.retrieve(
+
+        conversation_url, params, headers = Conversation.build_request(
             request.META['HTTP_HOST'],
             id=conversation_id,
             offset=offset,
             access_token=request.access_token
         )
+        request.view_requests.append(grequests.get(conversation_url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        conversation = Conversation.from_api_response(responses[conversation_url])
         comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
 
         view_data = {
-            'user': request.whoami,
+            'user': Profile(responses[request.whoami_url], summary=False),
             'site': request.site,
             'content': conversation,
             'comment_form': comment_form,
@@ -134,7 +139,8 @@ class ConversationView(object):
         Create a conversation.
         """
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
         if request.method == 'POST':
             form = ConversationView.create_form(request.POST)
@@ -160,7 +166,8 @@ class ConversationView(object):
         Edit a conversation.
         """
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
         if request.method == 'POST':
             form = ConversationView.edit_form(request.POST)
@@ -217,7 +224,8 @@ class ProfileView(object):
         Display a single profile by ID.
         """
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
         profile = Profile.retrieve(
             request.META['HTTP_HOST'],
@@ -236,8 +244,10 @@ class ProfileView(object):
         Edit a user profile (profile name or avatar).
         """
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        user = Profile(responses[request.whoami_url], summary=False)
 
+        view_data = dict(user=user, site=request.site)
         if request.method == 'POST':
             form = ProfileView.edit_form(request.POST)
             if form.is_valid():
@@ -251,7 +261,7 @@ class ProfileView(object):
                     Attachment.create(
                         request.META['HTTP_HOST'],
                         file_metadata.file_hash,
-                        profile_id=request.whoami.id,
+                        profile_id=user.id,
                         access_token=request.access_token
                     )
                 profile_request = Profile(form.cleaned_data)
@@ -289,15 +299,18 @@ class MicrocosmView(object):
         # record offset for paging of items within the microcosm
         offset = int(request.GET.get('offset', 0))
 
-        microcosm = Microcosm.retrieve(
+        microcosm_url, params, headers = Microcosm.build_request(
             request.META['HTTP_HOST'],
             id=microcosm_id,
             offset=offset,
             access_token=request.access_token
         )
+        request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
         view_data = {
-            'user': request.whoami,
+            'user': Profile(responses[request.whoami_url], summary=False),
             'site': request.site,
             'content': microcosm,
             'pagination': build_pagination_links(request, microcosm.items)
@@ -322,10 +335,9 @@ class MicrocosmView(object):
         responses = response_list_to_dict(grequests.map(request.view_requests))
 
         microcosms = MicrocosmList(responses[microcosms_url])
-        profile = Profile(responses[request.whoami_url])
 
         view_data = {
-            'user': profile,
+            'user': Profile(responses[request.whoami_url], summary=False),
             'site': request.site,
             'content': microcosms,
             'pagination': build_pagination_links(request, microcosms.microcosms)
@@ -337,7 +349,8 @@ class MicrocosmView(object):
     @exception_handler
     def create(request):
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
         if request.method == 'POST':
             form = MicrocosmView.create_form(request.POST)
@@ -360,7 +373,8 @@ class MicrocosmView(object):
     @exception_handler
     def edit(request, microcosm_id):
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
         if request.method == 'POST':
             form = MicrocosmView.edit_form(request.POST)
@@ -400,16 +414,18 @@ class MicrocosmView(object):
         Interstitial page for creating an item (e.g. Event) belonging to a microcosm.
         """
 
-        microcosm = Microcosm.retrieve(
+        microcosm_url, params, headers = Microcosm.build_request(
             request.META['HTTP_HOST'],
             microcosm_id,
             access_token=request.access_token
         )
+        request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(request.view_requests))
 
         view_data = {
-            'user' : request.whoami,
+            'user' : Profile(responses[request.whoami_url], summary=False),
             'site' : request.site,
-            'content' : microcosm
+            'content' : Microcosm.from_api_response(responses[microcosm_url])
         }
 
         return render(request, 'create_item_choice.html', view_data)
@@ -432,22 +448,33 @@ class EventView(object):
 
         # Offset for paging of event comments
         offset = int(request.GET.get('offset', 0))
-        event = Event.retrieve(
+
+        event_url, event_params, event_headers = Event.build_request(
             request.META['HTTP_HOST'],
             id=event_id,
             offset=offset,
             access_token=request.access_token
         )
+        request.view_requests.append(grequests.get(event_url, params=event_params, headers=event_headers))
 
-        attendees = event.get_attendees(request.META['HTTP_HOST'], request.access_token)
+        att_url, att_params, att_headers = Event.build_attendees_request(
+            request.META['HTTP_HOST'],
+            event_id,
+            request.access_token
+        )
+        request.view_requests.append(grequests.get(att_url, params=att_params, headers=att_headers))
+
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        event = Event.from_api_response(responses[event_url])
+
         comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
 
         view_data = {
-            'user': request.whoami,
+            'user': Profile(responses[request.whoami_url], summary=False),
             'site': request.site,
             'content': event,
             'comment_form': comment_form,
-            'attendees': attendees,
+            'attendees': AttendeeList(responses[att_url]),
             'pagination': build_pagination_links(request, event.comments)
         }
 
@@ -460,7 +487,8 @@ class EventView(object):
         Create an event within a microcosm.
         """
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
         if request.method == 'POST':
             form = EventView.create_form(request.POST)
@@ -486,7 +514,8 @@ class EventView(object):
         Edit an event.
         """
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
         if request.method == 'POST':
             form = EventView.edit_form(request.POST)
@@ -530,17 +559,19 @@ class EventView(object):
         Create an attendee (RSVP) for an event. An attendee can be in one of four states:
         invited, confirmed, maybe, no.
         """
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        user = Profile(responses[request.whoami_url], summary=False)
 
         if request.method == 'POST':
-            if request.whoami:
+            if user:
                 attendee = {
                     'RSVP' : request.POST['rsvp'],
-                    'AttendeeId' : request.whoami.id
+                    'AttendeeId' : user.id
                 }
                 Event.rsvp(
                     request.META['HTTP_HOST'],
                     event_id,
-                    request.whoami.id,
+                    user.id,
                     attendee,
                     access_token=request.access_token
                 )
@@ -604,16 +635,18 @@ class CommentView(object):
         Display a single comment.
         """
 
-        comment = Comment.retrieve(
+        url, params, headers = Comment.build_request(
             request.META['HTTP_HOST'],
             id=comment_id,
             access_token=request.access_token
         )
+        request.view_requests.append(grequests.get(url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(request.view_requests))
 
         view_data = {
-            'user': request.whoami,
+            'user': Profile(responses[request.whoami_url], summary=False),
             'site': request.site,
-            'content': comment,
+            'content': Comment.from_api_response(responses[url]),
         }
 
         return render(request, CommentView.single_template, view_data)
@@ -626,7 +659,8 @@ class CommentView(object):
         method to be extended.
         """
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
         if request.method == 'POST':
             form = CommentForm(request.POST)
@@ -657,7 +691,8 @@ class CommentView(object):
         method to be extended.
         """
 
-        view_data = dict(user=request.whoami, site=request.site)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
         if request.method == 'POST':
             form = CommentForm(request.POST)
@@ -715,14 +750,17 @@ class AlertView(object):
         # pagination offset
         offset = int(request.GET.get('offset', 0))
 
-        alerts_list = AlertList.retrieve(
+        url, params, headers = AlertList.build_request(
             request.META['HTTP_HOST'],
             offset=offset,
             access_token=request.access_token
         )
+        request.view_requests.append(grequests.get(url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        alerts_list = AlertList(responses[url])
 
         view_data = {
-            'user': request.whoami,
+            'user': Profile(responses[request.whoami_url], summary=False),
             'site': request.site,
             'content': alerts_list,
             'pagination': build_pagination_links(request, alerts_list.alerts)
@@ -748,12 +786,15 @@ class ErrorView(object):
 
     @staticmethod
     def not_found(request):
-        view_data = dict(site=request.site, user=request.whoami)
+
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
         return render(request, '404.html', view_data)
 
     @staticmethod
     def forbidden(request):
-        view_data = dict(site=request.site,user=request.whoami)
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
         return render(request, '403.html', view_data)
 
     @staticmethod

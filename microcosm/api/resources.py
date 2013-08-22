@@ -293,10 +293,16 @@ class Microcosm(APIResource):
         return microcosm
 
     @staticmethod
-    def retrieve(host, id, offset=None, access_token=None):
-        url = build_url(host, [Microcosm.api_path_fragment, id])
+    def build_request(host, id, offset=None, access_token=None):
+        url = build_url(host, [MicrocosmList.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Microcosm.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return Microcosm.from_api_response(resource)
 
     def create(self, host, access_token):
@@ -448,10 +454,16 @@ class AlertList(object):
         self.meta = Meta(data['meta'])
 
     @staticmethod
-    def retrieve(host, offset=None, access_token=None):
+    def build_request(host, offset=None, access_token=None):
         url = build_url(host, [AlertList.api_path_fragment])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = AlertList.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return AlertList(resource)
 
 
@@ -556,10 +568,16 @@ class Conversation(APIResource):
         return conversation
 
     @staticmethod
-    def retrieve(host, id, offset=None, access_token=None):
+    def build_request(host, id, offset=None, access_token=None):
         url = build_url(host, [Conversation.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Conversation.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return Conversation.from_api_response(resource)
 
     def create(self, host, access_token):
@@ -691,10 +709,16 @@ class Event(APIResource):
         return repr
 
     @staticmethod
-    def retrieve(host, id, offset=None, access_token=None):
+    def build_request(host, id, offset=None, access_token=None):
         url = build_url(host, [Event.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Event.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return Event.from_api_response(resource)
 
     def create(self, host, access_token):
@@ -713,6 +737,12 @@ class Event(APIResource):
         url = build_url(host, [Event.api_path_fragment, self.id])
         APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
+    @staticmethod
+    def build_attendees_request(host, id, access_token=None):
+        url = build_url(host, [Event.api_path_fragment, id, 'attendees'])
+        params = {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
 
     def get_attendees(self, host, access_token=None):
         """
@@ -720,8 +750,8 @@ class Event(APIResource):
         TODO: pagination support
         """
 
-        url = build_url(host, [Event.api_path_fragment, self.id, 'attendees'])
-        resource = APIResource.retrieve(url, {}, APIResource.make_request_headers())
+        url, params, headers = self.build_attendees_request(host, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return AttendeeList(resource)
 
     @classmethod
@@ -845,10 +875,16 @@ class Comment(APIResource):
         return comment
 
     @staticmethod
-    def retrieve(host, id, offset=None, access_token=None):
+    def build_request(host, id, offset=None, access_token=None):
         url = build_url(host, [Comment.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Comment.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return Comment.from_api_response(resource)
 
     def create(self, host, access_token):
