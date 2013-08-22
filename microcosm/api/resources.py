@@ -28,6 +28,9 @@ COMMENTABLE_ITEM_TYPES = [
     'poll'
 ]
 
+def discard_querystring(url):
+    return url.split('?')[0]
+
 def response_list_to_dict(responses):
     """
     Takes a list of HTTP responses as returned by grequests.map and creates a dict
@@ -41,9 +44,10 @@ def response_list_to_dict(responses):
         # Only follow one redirect. This is specifically to handle the /whoami
         # case where the client is redirected to /profiles/{id}
         if response.history:
-            response_dict[response.history[0].url] = APIResource.process_response(response.history[0].url, response)
+            response_dict[discard_querystring(response.history[0].url)] = \
+                APIResource.process_response(response.history[0].url, response)
         else:
-            response_dict[response.url] = APIResource.process_response(response.url, response)
+            response_dict[discard_querystring(response.url)] = APIResource.process_response(response.url, response)
     return response_dict
 
 
