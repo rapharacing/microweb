@@ -1,58 +1,44 @@
 from microcosm.api.resources import Site
 from microcosm.api.resources import WhoAmI
-from microcosm.api.resources import Profile
 from microcosm.api.exceptions import APIException
 
-import requests
 from requests import RequestException
 
+import grequests
 import memcache
 import logging
 
-from microweb.helpers import build_url
 from microweb import settings
 
 logger = logging.getLogger('microcosm.middleware')
 
 class ContextMiddleware():
     """
-    Middleware for providing request context such as the current site and
-    who the user is (through the whoami API call).
+    Middleware for providing request context such as the current site and authentication
+    status.
     """
+
     def __init__(self):
         self.mc = memcache.Client(['%s:%d' % (settings.MEMCACHE_HOST, settings.MEMCACHE_PORT)] , debug=0)
 
     def process_request(self, request):
         """
         Checks for access_token cookie and appends it to the request object
-        if it exists. If the access token is invalid, flags it for deletion.
+        if it exists.
 
-        Populates request.whoami with the result of the whoami API call.
+        All requests have a view_requests attribute. This is a list of requests that must be
+        executed by grequests (in parallel) to fetch data for the view.
         """
 
         request.access_token = None
-        request.delete_token = False
-        request.whoami = None
+        request.view_requests = []
         request.site = None
-        request.create_profile = False
 
         if request.COOKIES.has_key('access_token'):
             request.access_token = request.COOKIES['access_token']
-
-            # if a bad access token is provided, flag for deletion
-            try:
-                request.whoami = WhoAmI.retrieve(request.META['HTTP_HOST'], request.access_token)
-            except APIException, e:
-                if e.status_code == 401:
-                    request.delete_token = True
-            if request.whoami:
-                try:
-                    request.whoami.unread_count = Profile.get_unread_count(
-                        request.META['HTTP_HOST'],
-                        access_token=request.access_token
-                    )
-                except APIException, e:
-                    logger.error(e.message)
+            url, params, headers = WhoAmI.build_request(request.META['HTTP_HOST'], request.access_token)
+            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            request.whoami_url = url
 
         site = self.mc.get(request.META['HTTP_HOST'])
         if not site:
@@ -67,15 +53,3 @@ class ContextMiddleware():
         request.site = site
 
         return None
-
-
-    def process_response(self, request, response):
-        """
-        Deletes the user's access token cookie if it has previously
-        been marked as invalid (by process_request)
-        """
-
-        if hasattr(request, 'delete_token') and request.delete_token:
-            response.delete_cookie('access_token')
-            requests.delete(build_url(request.META['HTTP_HOST'], ['auth', request.COOKIES['access_token']]))
-        return response

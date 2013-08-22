@@ -9,7 +9,6 @@ from dateutil.parser import parse as parse_timestamp
 from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
 from microweb.helpers import build_url
-from microweb.helpers import join_path_fragments
 
 
 RESOURCE_PLURAL = {
@@ -28,6 +27,24 @@ COMMENTABLE_ITEM_TYPES = [
     'conversation',
     'poll'
 ]
+
+def response_list_to_dict(responses):
+    """
+    Takes a list of HTTP responses as returned by grequests.map and creates a dict
+    with the request url as the key and the response as the value. If the request
+    was redirected (as shown by a history tuple on the response), the
+    prior request url will be used as the key.
+    """
+
+    response_dict = {}
+    for response in responses:
+        # Only follow one redirect. This is specifically to handle the /whoami
+        # case where the client is redirected to /profiles/{id}
+        if response.history:
+            response_dict[response.history[0].url] = APIResource.process_response(response.history[0].url, response)
+        else:
+            response_dict[response.url] = APIResource.process_response(response.url, response)
+    return response_dict
 
 
 class APIResource(object):
@@ -158,9 +175,16 @@ class WhoAmI(object):
     api_path_fragment = 'whoami'
 
     @staticmethod
-    def retrieve(host, access_token):
+    def build_request(host, access_token):
         url = build_url(host, [WhoAmI.api_path_fragment])
-        resource = APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token))
+        params = {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, access_token):
+        url, params, headers = WhoAmI.build_request(host, access_token)
+        resource = APIResource.retrieve(url, params=params, headers=headers)
         return Profile(resource)
 
 
@@ -269,10 +293,16 @@ class Microcosm(APIResource):
         return microcosm
 
     @staticmethod
-    def retrieve(host, id, offset=None, access_token=None):
-        url = build_url(host, [Microcosm.api_path_fragment, id])
+    def build_request(host, id, offset=None, access_token=None):
+        url = build_url(host, [MicrocosmList.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Microcosm.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return Microcosm.from_api_response(resource)
 
     def create(self, host, access_token):
@@ -321,10 +351,16 @@ class MicrocosmList(object):
         self.meta = Meta(data['meta'])
 
     @staticmethod
-    def retrieve(host, offset=None, access_token=None):
+    def build_request(host, offset=None, access_token=None):
         url = build_url(host, [MicrocosmList.api_path_fragment])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = MicrocosmList.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return MicrocosmList(resource)
 
 
@@ -418,10 +454,16 @@ class AlertList(object):
         self.meta = Meta(data['meta'])
 
     @staticmethod
-    def retrieve(host, offset=None, access_token=None):
+    def build_request(host, offset=None, access_token=None):
         url = build_url(host, [AlertList.api_path_fragment])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = AlertList.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return AlertList(resource)
 
 
@@ -526,10 +568,16 @@ class Conversation(APIResource):
         return conversation
 
     @staticmethod
-    def retrieve(host, id, offset=None, access_token=None):
+    def build_request(host, id, offset=None, access_token=None):
         url = build_url(host, [Conversation.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Conversation.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return Conversation.from_api_response(resource)
 
     def create(self, host, access_token):
@@ -661,10 +709,16 @@ class Event(APIResource):
         return repr
 
     @staticmethod
-    def retrieve(host, id, offset=None, access_token=None):
+    def build_request(host, id, offset=None, access_token=None):
         url = build_url(host, [Event.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Event.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return Event.from_api_response(resource)
 
     def create(self, host, access_token):
@@ -683,6 +737,12 @@ class Event(APIResource):
         url = build_url(host, [Event.api_path_fragment, self.id])
         APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
+    @staticmethod
+    def build_attendees_request(host, id, access_token=None):
+        url = build_url(host, [Event.api_path_fragment, id, 'attendees'])
+        params = {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
 
     def get_attendees(self, host, access_token=None):
         """
@@ -690,8 +750,8 @@ class Event(APIResource):
         TODO: pagination support
         """
 
-        url = build_url(host, [Event.api_path_fragment, self.id, 'attendees'])
-        resource = APIResource.retrieve(url, {}, APIResource.make_request_headers())
+        url, params, headers = self.build_attendees_request(host, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return AttendeeList(resource)
 
     @classmethod
@@ -815,10 +875,16 @@ class Comment(APIResource):
         return comment
 
     @staticmethod
-    def retrieve(host, id, offset=None, access_token=None):
+    def build_request(host, id, offset=None, access_token=None):
         url = build_url(host, [Comment.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
-        resource = APIResource.retrieve(url, params, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Comment.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
         return Comment.from_api_response(resource)
 
     def create(self, host, access_token):

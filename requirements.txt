@@ -13,3 +13,6 @@ mock==1.0.1
 
 # Memcache client
 python-memcached==1.53
+
+# Gevent requests
+grequests==0.2.0
