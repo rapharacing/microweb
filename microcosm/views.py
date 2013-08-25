@@ -25,6 +25,7 @@ from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import AlertList
 from microcosm.api.resources import Alert
+from microcosm.api.resources import AlertPreference
 from microcosm.api.resources import GeoCode
 from microcosm.api.resources import Event
 from microcosm.api.resources import AttendeeList
@@ -787,6 +788,55 @@ class AlertView(object):
             return HttpResponseRedirect(reverse('list-notifications'))
         else:
             return HttpResponseNotAllowed(['POST',])
+
+
+class AlertPreferenceView(object):
+
+    list_template = 'alert_preferences.html'
+
+    @staticmethod
+    @exception_handler
+    def settings(request):
+
+        if not request.access_token:
+            raise HttpResponseNotAllowed
+
+        if request.method == 'GET':
+
+            url, params, headers = AlertPreference.build_request(
+                request.META['HTTP_HOST'],
+                request.access_token
+            )
+            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            preference_list = AlertPreference.from_list(responses[url])
+
+            view_data = {
+                'user': Profile(responses[request.whoami_url], summary=False),
+                'site': request.site,
+                'content': preference_list,
+            }
+
+            return render(request, AlertPreferenceView.list_template, view_data)
+
+        if request.method == 'POST':
+
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+
+            print request.POST.keys()
+            postdata = {
+                'alertTypeId': int(request.POST.get('alert_type_id')),
+                'receiveEmail': bool(request.POST.get('receive_email')),
+                'receiveAlert': bool(request.POST.get('receive_alert')),
+                'receiveSMS': False,
+            }
+            AlertPreference.update(
+                request.META['HTTP_HOST'],
+                request.POST.get('alert_type_id'),
+                postdata,
+                request.access_token
+            )
+            return HttpResponseRedirect(reverse('notification-settings'))
 
 
 class ErrorView(object):
