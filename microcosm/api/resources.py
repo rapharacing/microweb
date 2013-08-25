@@ -540,6 +540,55 @@ class Alert(APIResource):
         return repr
 
 
+class AlertPreference(APIResource):
+
+    api_path_fragment = ['alerts', 'preferences']
+
+    @classmethod
+    def from_api_response(cls, data):
+        alert_pref = cls()
+        alert_pref.profile_id = data['profileId']
+        alert_pref.alert_type_id = data['alertTypeId']
+        alert_pref.receive_email = data['receiveEmail']
+        alert_pref.receive_alert = data['receiveAlert']
+        alert_pref.receive_sms = data['receiveSMS']
+        return alert_pref
+
+    @staticmethod
+    def from_list(data):
+        list = []
+        for alert_preference in data:
+            list.append(AlertPreference.from_api_response(alert_preference))
+        return list
+
+    @staticmethod
+    def build_request(host, access_token):
+        url = build_url(host, AlertPreference.api_path_fragment)
+        params = {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, access_token):
+        url, params, headers = AlertPreference.build_request(host, access_token)
+        response = APIResource.process_response(url, params, headers)
+        return AlertPreference.from_list(response)
+
+    @staticmethod
+    def update(host, alert_type_id, data, access_token):
+        url = build_url(host, AlertPreference.api_path_fragment + [alert_type_id])
+        resource = APIResource.update(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
+        return AlertPreference.from_api_response(resource)
+
+    def as_dict(self):
+        repr = {}
+        repr['alertTypeId'] = self.alert_type_id
+        repr['receiveEmail'] = self.receive_email
+        repr['receiveAlert'] = self.receive_alert
+        repr['receiveSMS'] = self.receive_sms
+        return repr
+
+
 class Conversation(APIResource):
     """
     Represents a conversation (title and list of comments).
