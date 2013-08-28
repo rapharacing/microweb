@@ -821,11 +821,7 @@ class AlertPreferenceView(object):
 
         if request.method == 'POST':
 
-            responses = response_list_to_dict(grequests.map(request.view_requests))
-
-            print request.POST.keys()
             postdata = {
-                'alertTypeId': int(request.POST.get('alert_type_id')),
                 'receiveEmail': bool(request.POST.get('receive_email')),
                 'receiveAlert': bool(request.POST.get('receive_alert')),
                 'receiveSMS': False,
