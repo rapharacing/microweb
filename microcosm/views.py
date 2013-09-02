@@ -63,12 +63,10 @@ def exception_handler(view_func):
         try:
             return view_func(request, *args, **kwargs)
         except APIException as e:
-            if e.status_code == 401:
+            if e.status_code == 401 or e.status_code == 403:
                 raise PermissionDenied
             elif e.status_code == 404:
                 raise Http404
-            else:
-                raise
     return decorator
 
 
@@ -849,11 +847,15 @@ class ErrorView(object):
 
     @staticmethod
     def forbidden(request):
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-            'site': request.site
-        }
+        view_data = {}
+        # If fetching user login data results in HTTP 401, the access token is invalid
+        try:
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            view_data['user'] = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
+        except APIException as e:
+            if e.status_code == 401:
+                view_data['logout'] = True
+        view_data['site'] = request.site
         return render(request, '403.html', view_data)
 
     @staticmethod

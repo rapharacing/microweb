@@ -17,8 +17,6 @@ class ExceptionMiddleware():
 
     def process_exception(self, request, exception):
 
-        logging.error(traceback.format_exc())
-
         if microweb.settings.RIEMANN_ENABLED:
             self.client.send({
                 'host': request.META['HTTP_HOST'],
