@@ -490,8 +490,16 @@ class Alert(APIResource):
         alert.profile_id = data['profileId']
         alert.data = data['data']
         alert.created = parse_timestamp(data['created'])
+
         if data.get('viewed'):
             alert.viewed = data['viewed']
+
+        if data.get('item'):
+            if alert.item_type == "conversation":
+                alert.item = Conversation.from_summary(data['item'])
+            if alert.item_type == "event":
+                alert.item = Event.from_summary(data['item'])
+
         return alert
 
     @classmethod
@@ -598,11 +606,16 @@ class Conversation(APIResource):
 
     @classmethod
     def from_api_response(cls, data):
+        conversation = cls.from_summary(data)
+        conversation.comments = PaginatedList(data['comments'], Comment)
+        return conversation
+
+    @classmethod
+    def from_summary(cls, data):
         conversation = cls()
         conversation.id = data['id']
         conversation.microcosm_id = data['microcosmId']
         conversation.title = data['title']
-        conversation.comments = PaginatedList(data['comments'], Comment)
         conversation.meta = Meta(data['meta'])
         return conversation
 
@@ -668,11 +681,8 @@ class Event(APIResource):
 
     @classmethod
     def from_api_response(cls, data):
-        event = cls()
-
-        event.id = data['id']
-        event.microcosm_id = data['microcosmId']
-        event.title = data['title']
+        event = cls.from_summary(data)
+        event.comments = PaginatedList(data['comments'], Comment)
         event.when = parse_timestamp(data['when'])
         event.duration = data['duration']
         event.status = data['status']
@@ -686,14 +696,20 @@ class Event(APIResource):
         if data.get('south'): event.south = data['south']
         if data.get('west'): event.west = data['west']
 
-        event.comments = PaginatedList(data['comments'], Comment)
-        event.meta = Meta(data['meta'])
-
         # RSVP numbers are optional
         if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
         if data.get('rsvpLimit'): event.rsvp_limit = data['rsvpLimit']
         if data.get('rsvpSpaces'): event.rsvp_spaces = data['rsvpSpaces']
 
+        return event
+
+    @classmethod
+    def from_summary(cls, data):
+        event = cls()
+        event.id = data['id']
+        event.microcosm_id = data['microcosmId']
+        event.title = data['title']
+        event.meta = Meta(data['meta'])
         return event
 
     @classmethod

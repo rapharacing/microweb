@@ -11,7 +11,15 @@
         {% for alert in content.alerts.items %}
             <section class="row">
                 <div class="col col-sm-10">
-                    <span{% if not alert.viewed %} class="unread"{% endif %}><a href="{{ alert.item_link }}">{{ alert.data }}</a></span>
+                    <span{% if not alert.viewed %} class="unread"{% endif %}>
+                        <a href="{{ alert.item_link }}">
+                        {% if alert.item_type == "conversation" or alert.item_type == "event" %}
+                        	{{ alert.item.title }}
+                        {% elif alert.item_type == "comment" %}
+                            {{ alert.data }}
+                        {% endif %}
+                        </a>
+                    </span>
                 </div>
                 <div class="col col-sm-4">
                     <span class="text-muted"><time datetime="{{ alert.created|date:"c" }}"></time></span>
