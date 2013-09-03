@@ -5,8 +5,7 @@
     <h1>Notifications</h1>
     </section>
     {% if not content.alerts.items %}
-        <p>Nothing to see here yet :-)</p>
-        <p>When you get notifications, they'll be listed here.</p>
+        <p>No notifications yet. When your username is mentioned or a new comment is posted on an item you're watching, it'll show here.</p>
     {% else %}
         {% include "pagination_nav.html" %}
         {% for alert in content.alerts.items %}
