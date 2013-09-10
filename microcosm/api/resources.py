@@ -616,6 +616,11 @@ class Conversation(APIResource):
         conversation.id = data['id']
         conversation.microcosm_id = data['microcosmId']
         conversation.title = data['title']
+        if data.get('lastCommentId'): conversation.last_comment_id = data['lastCommentId']
+        if data.get('lastCommentCreatedBy'):
+            conversation.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
+        if data.get('lastCommentCreated'):
+            conversation.last_comment_created = parse_timestamp(data['lastCommentCreated'])
         conversation.meta = Meta(data['meta'])
         return conversation
 
@@ -709,6 +714,11 @@ class Event(APIResource):
         event.id = data['id']
         event.microcosm_id = data['microcosmId']
         event.title = data['title']
+        if data.get('lastCommentId'): event.last_comment_id = data['lastCommentId']
+        if data.get('lastCommentCreatedBy'):
+            event.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
+        if data.get('lastCommentCreated'):
+            event.last_comment_created = parse_timestamp(data['lastCommentCreated'])
         event.meta = Meta(data['meta'])
         return event
 
