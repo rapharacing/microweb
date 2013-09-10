@@ -5,6 +5,7 @@ from microcosm.views import MicrocosmView
 from microcosm.views import EventView
 from microcosm.views import ConversationView
 from microcosm.views import AlertView
+from microcosm.views import WatcherView
 from microcosm.views import AlertPreferenceView
 from microcosm.views import CommentView
 from microcosm.views import ProfileView
@@ -57,6 +58,10 @@ urlpatterns = patterns('',
     url(r'notifications/$', AlertView.list, name='list-notifications'),
     url(r'notifications/(?P<alert_id>\d+)/viewed/$', AlertView.mark_viewed, name='mark-notification-viewed'),
     url(r'notifications/settings/$', AlertPreferenceView.settings, name='notification-settings'),
+
+    # Watchers
+    url(r'watchers/$', WatcherView.list, name='list-watchers'),
+    url(r'watchers/(?P<watcher_id>\d+)/delete/$', WatcherView.delete, name='delete-watcher'),
 
     # User profiles
     url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),

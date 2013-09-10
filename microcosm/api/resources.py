@@ -446,6 +446,60 @@ class PermissionSet(object):
         self.super_user = data['moderator']
 
 
+class Watcher(APIResource):
+
+    api_path_fragment = 'watchers'
+
+    def __init__(self, data):
+        self.id = data['id']
+        self.alert_type_id = data['alertTypeId']
+        self.item_type_id = data['itemTypeId']
+        self.item_id = data['itemId']
+        self.receive_email = data['receiveEmail']
+        self.receive_sms = data['receiveSMS']
+        self.receive_alert = data['receiveAlert']
+
+        if data.get('item'):
+            if data.get('item').get('itemType') == "conversation":
+                self.item = Conversation.from_summary(data['item'])
+            if data.get('item').get('itemType') == "event":
+                self.item = Event.from_summary(data['item'])
+            self.item_link = '/%s/%s' % (RESOURCE_PLURAL[data.get('item').get('itemType')], self.item_id)
+
+    @classmethod
+    def from_summary(cls, data):
+        return cls(data)
+
+    @staticmethod
+    def delete(host, watcher_id, access_token):
+        url = build_url(host, [Watcher.api_path_fragment, watcher_id])
+        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
+
+
+class WatcherList(object):
+    """
+    List of a user's watchers.
+    """
+
+    api_path_fragment = 'watchers'
+
+    def __init__(self, data):
+        self.watchers = PaginatedList(data['watchers'], Watcher)
+
+    @staticmethod
+    def build_request(host, offset=None, access_token=None):
+        url = build_url(host, [WatcherList.api_path_fragment])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = AlertList.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return WatcherList(resource)
+
+
 class AlertList(object):
     """
     A list of user alerts.

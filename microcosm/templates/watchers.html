@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="row margin-bottom-half">
+        <h1>Items you're watching</h1>
+    </section>
+    {% if not content.watchers.items %}
+        <p>When you post a comment on a conversation or event, you'll start watching it. New comments posted on
+        that item will appear on your <a href="{% url list-notifications %}">notifications dashboard</a> or be emailed
+        to you (unless you've turned these things off).</p>
+    {% else %}
+        {% include "pagination_nav.html" %}
+        {% for watcher in content.watchers.items %}
+            <section class="row">
+                <div class="col col-sm-8">
+                    <a href="{{ watcher.item_link }}">{{ watcher.item.title }}</a>
+                </div>
+                <div class="col col-sm-6 text-muted">
+                    Last updated <time datetime="{{ watcher.item.last_comment_created|date:"c" }}"></time>
+                </div>
+                <div class="col col-sm-2">
+                    <form method="POST" action="{% url delete-watcher watcher.id %}">
+                        {% csrf_token %}
+                        <div class="col col-sm-2">
+                            <input type="submit" value="Stop watching" class="btn btn-primary btn-small" />
+                        </div>
+                    </form>
+                </div>
+            </section>
+            <hr />
+        {% endfor %}
+        {% include "pagination_nav.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar%}
+{% endblock%}
