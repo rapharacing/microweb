@@ -837,8 +837,8 @@ class ErrorView(object):
 
     @staticmethod
     def not_found(request):
-
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        # Only fetch the first element of view_requests (whoami)
+        responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site
@@ -850,7 +850,8 @@ class ErrorView(object):
         view_data = {}
         # If fetching user login data results in HTTP 401, the access token is invalid
         try:
-            responses = response_list_to_dict(grequests.map(request.view_requests))
+            # Only fetch the first element of view_requests (whoami)
+            responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
             view_data['user'] = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
         except APIException as e:
             if e.status_code == 401:
