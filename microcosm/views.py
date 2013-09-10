@@ -26,6 +26,8 @@ from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import AlertList
 from microcosm.api.resources import Alert
 from microcosm.api.resources import AlertPreference
+from microcosm.api.resources import WatcherList
+from microcosm.api.resources import Watcher
 from microcosm.api.resources import GeoCode
 from microcosm.api.resources import Event
 from microcosm.api.resources import AttendeeList
@@ -784,6 +786,52 @@ class AlertView(object):
         if request.method == 'POST':
             Alert.mark_viewed(request.META['HTTP_HOST'], alert_id, request.access_token)
             return HttpResponseRedirect(reverse('list-notifications'))
+        else:
+            return HttpResponseNotAllowed(['POST',])
+
+
+class WatcherView(object):
+
+    list_template = 'watchers.html'
+
+    @staticmethod
+    @exception_handler
+    def list(request):
+
+        if not request.access_token:
+            raise HttpResponseNotAllowed
+
+        # pagination offset
+        offset = int(request.GET.get('offset', 0))
+
+        url, params, headers = WatcherList.build_request(
+            request.META['HTTP_HOST'],
+            offset=offset,
+            access_token=request.access_token
+        )
+        request.view_requests.append(grequests.get(url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        watchers_list = WatcherList(responses[url])
+
+        view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False),
+            'site': request.site,
+            'content': watchers_list,
+            'pagination': build_pagination_links(request, watchers_list.watchers)
+        }
+
+        return render(request, WatcherView.list_template, view_data)
+
+    @staticmethod
+    @exception_handler
+    def delete(request, watcher_id):
+        """
+        Delete a watcher.
+        """
+
+        if request.method == 'POST':
+            Watcher.delete(request.META['HTTP_HOST'], watcher_id, request.access_token)
+            return HttpResponseRedirect(reverse('list-watchers'))
         else:
             return HttpResponseNotAllowed(['POST',])
 
