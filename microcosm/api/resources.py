@@ -443,7 +443,7 @@ class PermissionSet(object):
         self.update = data['update']
         self.delete = data['delete']
         self.guest = data['guest']
-        self.super_user = data['superUser']
+        self.super_user = data['moderator']
 
 
 class AlertList(object):
