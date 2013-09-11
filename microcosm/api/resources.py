@@ -422,8 +422,8 @@ class Meta(object):
     def __init__(self, data):
         if data.get('created'): self.created = (data['created'])
         if data.get('createdBy'): self.created_by = Profile(data['createdBy'])
-        if data.get('edited'): self.created = (data['edited'])
-        if data.get('editedBy'): self.created_by = Profile(data['editedBy'])
+        if data.get('edited'): self.edited = (data['edited'])
+        if data.get('editedBy'): self.edited_by = Profile(data['editedBy'])
         if data.get('flags'): self.flags = data['flags']
         if data.get('permissions'): self.permissions = PermissionSet(data['permissions'])
         if data.get('links'):
