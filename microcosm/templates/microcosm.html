@@ -8,7 +8,7 @@
 	{% include "pagination_nav.html" %}
 
 	{% for item in content.items.items %}
-		<section id="{{ item.itemType }}{{ item.id }}" class="row">
+		<section id="{{ item.itemType }}{{ item.id }}" class="row margin-bottom-half">
 			<table class="col col-md-10">
 				<tbody>
 					<tr>
@@ -36,7 +36,7 @@
 			</table>
 		</section>
 
-		<hr class="col-offset-1 col col-sm-15" />
+		<!-- <hr class="col-offset-1 col col-sm-15" /> -->
 	{% endfor %}
 
 	{% include "pagination_nav.html" %}
