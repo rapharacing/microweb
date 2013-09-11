@@ -17,7 +17,11 @@
 
 		<h4><label for="id_avatar">Choose a picture to be your avatar</label></h4>
         {{ form.avatar }}
-        <p>Your avatar should be a small image with a jpg, gif, or png file extension.</p>
+		{% if avatar_error %}
+			{{ avatar_error }}
+		{% else %}
+			<p>Your avatar should be an image under 30KB with jpg, png or gif file extension.</p>
+		{% endif %}
 
 		<input class="btn btn-primary pull-right" id="submit" type="submit" value="Save profile">
 	</form>
