@@ -251,24 +251,27 @@ class ProfileView(object):
 
         responses = response_list_to_dict(grequests.map(request.view_requests))
         user = Profile(responses[request.whoami_url], summary=False)
-
         view_data = dict(user=user, site=request.site)
+
         if request.method == 'POST':
             form = ProfileView.edit_form(request.POST)
             if form.is_valid():
                 if request.FILES.has_key('avatar'):
                     file_request = FileMetadata.from_create_form(request.FILES['avatar'])
-                    # TODO: better error handling/message for oversize image
-                    if len(file_request.file['files']) > 524288:
+                    # File must be under 30KB
+                    # TODO: use Django's built-in field validators and error messaging
+                    if len(file_request.file['files']) >= 30720:
                         view_data['form'] = form
+                        view_data['avatar_error'] = 'The file you\'ve uploaded is too large. It must be under 30KB.'
                         return render(request, ProfileView.form_template, view_data)
-                    file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
-                    Attachment.create(
-                        request.META['HTTP_HOST'],
-                        file_metadata.file_hash,
-                        profile_id=user.id,
-                        access_token=request.access_token
-                    )
+                    else:
+                        file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+                        Attachment.create(
+                            request.META['HTTP_HOST'],
+                            file_metadata.file_hash,
+                            profile_id=user.id,
+                            access_token=request.access_token
+                        )
                 profile_request = Profile(form.cleaned_data)
                 profile_response = profile_request.update(request.META['HTTP_HOST'], request.access_token)
                 return HttpResponseRedirect(reverse('single-profile', args=(profile_response.id,)))
