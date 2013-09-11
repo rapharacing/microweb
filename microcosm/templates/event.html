@@ -51,6 +51,7 @@
 			</div>
 		</div>
 
+		{% if content.rsvp_limit %}
 		<div class="row col col-sm-8 col-xs-16">
 			<div class="col col-sm-8 col-xs-6">
 				<p class="text-muted">Attendee Limit</p>
@@ -59,7 +60,9 @@
 				<p id="rsvp_limit" style="padding-left:6px;">{{ content.rsvp_limit }}</p>
 			</div>
 		</div>
+		{% endif %}
 
+		{% if content.rsvp_spaces %}
 		<div class="row col col-sm-8 col-xs-16">
 			<div class="col col-sm-8 col-xs-6">
 				<p class="text-muted">Spaces Left</p>
@@ -68,6 +71,7 @@
 				<p id="spaces_left" style="padding-left:6px;">{{ content.rsvp_spaces }}</p>
 			</div>
 		</div>
+		{% endif %}
 	</div>
 
 	<hr />
@@ -96,11 +100,13 @@
 
 	<h4>Are you coming?</h4>
 	{% if user %}
+	{% if content.rsvp_limit and content.rsvp_limit > content.rsvp_attend %}
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="yes" />
 		<input id="rsvp_yes" type="submit" value="Count me in" class="btn btn-primary btn-block" style="width:100%;">
 	</form>
+	{% endif %}
 
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
