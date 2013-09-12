@@ -8,7 +8,7 @@
 			<article id="comment{{ comment.id }}" class="row">
 				
 				<div class="col col-sm-4">
-					<a href="/profiles/{{ comment.meta.created_by.id }}/"><img src="https://{{ request.META.HTTP_HOST }}{{ comment.meta.created_by.avatar }}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
+					<a href="/profiles/{{ comment.meta.created_by.id }}/"><img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{request.META.HTTP_HOST}}{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
 					<div class="h4"><a href="/profiles/{{ comment.meta.created_by.id }}/">{{ comment.meta.created_by.profile_name|truncatechars:25 }}</a></div>
 				</div>
 
@@ -52,7 +52,7 @@
 		<div id="comment{{ comment.id }}" class="row">
 			
 			<div class="col col-sm-4">
-				<img src="https://{{ request.META.HTTP_HOST }}{{ user.avatar }}" alt="Avatar for {{ user.profile_name|truncatechars:25 }}" align="left" class="gravatar" />
+				<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{request.META.HTTP_HOST}}{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name|truncatechars:25 }}" align="left" class="gravatar" />
 				<div class="h4">{{ user.profile_name|truncatechars:25 }}</div>
 			</div>
 

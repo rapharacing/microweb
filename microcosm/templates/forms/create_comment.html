@@ -6,7 +6,7 @@
 			<div id="comment{{ comment.id }}" class="row">
 				
 				<div class="col col-lg-4">
-					<img src="https://{{ request.META.HTTP_HOST }}{{ user.avatar }}" alt="Avatar for {{ user.profile_name }}" align="left" class="gravatar" />
+					<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{request.META.HTTP_HOST}}{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" align="left" class="gravatar" />
 					<div class="h4">{{ user.profile_name }}</div>
 				</div>
 
