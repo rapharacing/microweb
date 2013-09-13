@@ -10,12 +10,12 @@
 		<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600,400italic,600italic" rel="stylesheet" type="text/css" />
 
 		<!-- Default site theme ID is 1 -->
-		<link href="{{ STATIC_URL }}themes/{% if site.themeId %}{{ site.themeId }}{% else %}1{% endif %}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		<link href="{{ STATIC_URL }}themes/{% if site.theme_id %}{{ site.theme_id }}{% else %}1{% endif %}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 		<link href="{{ STATIC_URL }}base.css" rel="stylesheet" type="text/css" />
 
 		<style type="text/css">
 		.headBand {
-			background-image: url('{% if site.headerBackgroundUrl %}{{ site.headerBackgroundUrl }}{% else %}{{ STATIC_URL }}themes/1/background.png{% endif %}');
+			background-image: url('{% if site.header_background_url %}{{ site.header_background_url }}{% else %}{{ STATIC_URL }}themes/1/background.png{% endif %}');
 			background-position: center center;
 			margin: 24px 0;
 			min-height: 96px;
@@ -40,7 +40,7 @@
 				<div class="col col-sm-16">
 					<div class="row">
 						<div id="logo" class="col col-sm-8 margin-top-half">	
-							<a href="/"><img src="{% if site.logoUrl %}{{ site.logoUrl }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" /></a>
+							<a href="/"><img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" /></a>
 						</div>
 
 						{% block whoami %}
