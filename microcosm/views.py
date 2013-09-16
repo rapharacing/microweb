@@ -69,6 +69,9 @@ def exception_handler(view_func):
                 raise PermissionDenied
             elif e.status_code == 404:
                 raise Http404
+            else:
+                raise
+
     return decorator
 
 
