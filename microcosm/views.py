@@ -868,19 +868,19 @@ class AlertPreferenceView(object):
                 'site': request.site,
                 'content': preference_list,
             }
-
             return render(request, AlertPreferenceView.list_template, view_data)
 
         if request.method == 'POST':
 
             postdata = {
+                'alertTypeId': int(request.POST['alert_type_id']),
                 'receiveEmail': bool(request.POST.get('receive_email')),
                 'receiveAlert': bool(request.POST.get('receive_alert')),
                 'receiveSMS': False,
             }
             AlertPreference.update(
                 request.META['HTTP_HOST'],
-                request.POST.get('alert_type_id'),
+                request.POST['alert_type_id'],
                 postdata,
                 request.access_token
             )
