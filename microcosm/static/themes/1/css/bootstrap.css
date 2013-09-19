@@ -464,7 +464,7 @@ h6,
 .h6 {
   font-family: "Source Sans Pro", sans-serif;
   font-weight: 200;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 h1 small,
@@ -881,7 +881,8 @@ pre code {
 .col-xs-12,
 .col-xs-13,
 .col-xs-14,
-.col-xs-15 {
+.col-xs-15,
+.col-xs-16 {
   float: left;
 }
 
@@ -967,7 +968,8 @@ pre code {
   .col-sm-12,
   .col-sm-13,
   .col-sm-14,
-  .col-sm-15 {
+  .col-sm-15,
+  .col-sm-16 {
     float: left;
   }
   .col-sm-1 {
@@ -1173,7 +1175,8 @@ pre code {
   .col-md-12,
   .col-md-13,
   .col-md-14,
-  .col-md-15 {
+  .col-md-15,
+  .col-md-16 {
     float: left;
   }
   .col-md-1 {
@@ -1357,16 +1360,16 @@ pre code {
     margin-left: 68.75%;
   }
   .col-md-offset-12 {
-    margin-left: 75%;
+    margin-left: 68.75%;
   }
   .col-md-offset-13 {
-    margin-left: 81.25%;
+    margin-left: 68.75%;
   }
   .col-md-offset-14 {
-    margin-left: 87.5%;
+    margin-left: 68.75%;
   }
   .col-md-offset-15 {
-    margin-left: 93.75%;
+    margin-left: 68.75%;
   }
 }
 
@@ -1388,7 +1391,8 @@ pre code {
   .col-lg-12,
   .col-lg-13,
   .col-lg-14,
-  .col-lg-15 {
+  .col-lg-15,
+  .col-lg-16 {
     float: left;
   }
   .col-lg-1 {
