@@ -1,5 +1,9 @@
 #logo {
-	max-height: 72px;
+	max-height: 84px;
+}
+.headBand {
+	background-position: center center;
+	max-height: 84px;
 }
 .margin-top-half {
 	margin-top: 12px;
