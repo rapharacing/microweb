@@ -11,14 +11,11 @@
 
 		<!-- Default site theme ID is 1 -->
 		<link href="{{ STATIC_URL }}themes/{% if site.theme_id %}{{ site.theme_id }}{% else %}1{% endif %}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-		<link href="{{ STATIC_URL }}base.css" rel="stylesheet" type="text/css" />
+		<link href="{{ STATIC_URL }}themes/{% if site.theme_id %}{{ site.theme_id }}{% else %}1{% endif %}/css/base.css" rel="stylesheet" type="text/css" />
 
 		<style type="text/css">
 		.headBand {
 			background-image: url('{% if site.header_background_url %}{{ site.header_background_url }}{% else %}{{ STATIC_URL }}themes/1/background.png{% endif %}');
-			background-position: center center;
-			margin: 24px 0;
-			min-height: 96px;
 		}
 		</style>
 
