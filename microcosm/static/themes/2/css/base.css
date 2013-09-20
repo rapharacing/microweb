@@ -1,9 +1,13 @@
 #logo {
-	max-height: 84px;
+	max-height: 80px;
 }
 .headBand {
 	background-position: center center;
-	max-height: 84px;
+    margin: 24px 0;
+    min-height: 96px;
+}
+.headBand a {
+    color: #cccccc;
 }
 .margin-top-half {
 	margin-top: 12px;
@@ -32,6 +36,12 @@
 }
 p, a, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	word-wrap: break-word;
+}
+a {
+    color: #4898ac;
+}
+pre {
+    font-size: 11px;
 }
 .recent {
 	overflow: hidden;
