@@ -34,7 +34,7 @@ def build_url(host, path_fragments):
         # In future this will use the sites management API and
         # synchronize a cache of CNAMEd sites.
         if CNAMED_HOST_MAPPINGS.has_key(host):
-            url = API_SCHEME + CNAMED_HOST_MAPPINGS['host']
+            url = API_SCHEME + CNAMED_HOST_MAPPINGS[host]
         else:
             raise AssertionError('Unknown CNAMEd host: %s' % host)
 
