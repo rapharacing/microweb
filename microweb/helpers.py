@@ -6,6 +6,11 @@ from settings import API_PATH
 from settings import API_SCHEME
 from settings import API_DOMAIN_NAME
 
+CNAMED_HOST_MAPPINGS = {
+    'forum.espruino.com': 'espruino.microco.sm',
+    'forum.pixelcharter.com': 'sandbox.microco.sm',
+}
+
 def build_url(host, path_fragments):
     """
     urljoin and os.path.join don't behave exactly as we want, so
@@ -22,10 +27,17 @@ def build_url(host, path_fragments):
     on CPython and we are not going to change interpreter.
     """
 
-    if not host.endswith(API_DOMAIN_NAME):
-        raise AssertionError('Custom domains are not yet supported on Microcosm')
+    if host.endswith(API_DOMAIN_NAME):
+        url = API_SCHEME + host
+    else:
+        # Host does not end with API_DOMAIN_NAME, so it's a CNAME.
+        # In future this will use the sites management API and
+        # synchronize a cache of CNAMEd sites.
+        if CNAMED_HOST_MAPPINGS.has_key(host):
+            url = API_SCHEME + CNAMED_HOST_MAPPINGS[host]
+        else:
+            raise AssertionError('Unknown CNAMEd host: %s' % host)
 
-    url = API_SCHEME + host
     path_fragments = [API_PATH, API_VERSION] + path_fragments
     url += join_path_fragments(path_fragments)
     return url

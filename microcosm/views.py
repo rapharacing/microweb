@@ -936,9 +936,10 @@ class AuthenticationView(object):
         assertion = request.POST.get('Assertion')
 
         data = dict(Assertion=assertion, ClientSecret=settings.CLIENT_SECRET)
-        headers= {'Host': request.META.get('HTTP_HOST')}
 
-        access_token = requests.post(build_url(request.META['HTTP_HOST'], ['auth']), data=data, headers=headers).json()['data']
+        url = build_url(request.META['HTTP_HOST'], ['auth'])
+        response = requests.post(url, data=data, headers={})
+        access_token = response.json()['data']
 
         response = HttpResponseRedirect(target_url if target_url != '' else '/')
         response.set_cookie('access_token', access_token, httponly=True)
