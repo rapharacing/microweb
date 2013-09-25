@@ -5,8 +5,9 @@
 	background-position: center center;
     margin: 24px 0;
     min-height: 96px;
+    color: #cccccc;
 }
-.headBand {
+.headBand a {
     color: #cccccc;
 }
 .margin-top-half {
