@@ -41,12 +41,20 @@ class ContextMiddleware():
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
             request.whoami_url = url
 
-        site = self.mc.get(request.META['HTTP_HOST'].split('.')[0])
+        try:
+            site = self.mc.get(request.META['HTTP_HOST'].split('.')[0])
+        except memcache.Error as e:
+            logger.error('Memcached error: %s' % str(e))
+            site = None
+
         if site is None:
             logger.error('Site cache miss: %s' % request.META['HTTP_HOST'].split('.')[0])
             try:
                 site = Site.retrieve(request.META['HTTP_HOST'])
-                self.mc.set(request.META['HTTP_HOST'].split('.')[0], site)
+                try:
+                    self.mc.set(request.META['HTTP_HOST'].split('.')[0], site)
+                except memcache.Error as e:
+                    logger.error('Memcached error: %s' % str(e))
             except APIException, e:
                 logger.error(e.message)
             except RequestException, e:
