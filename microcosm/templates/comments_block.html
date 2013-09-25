@@ -33,7 +33,11 @@
 								</form>
 								<a class="btn btn-small btn-link" href="/comments/{{comment.id}}/edit" id="comment{{ comment.id }}edit">Edit</a>
 							{% endif %}
+							{% if user %}
 							<a class="btn btn-small btn-primary" href="/comments/create?itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{comment.id}}" id="comment{{ comment.id }}reply">Reply</a>
+							{% else %}
+							<a class="btn btn-small btn-primary" href="javascript:login()" id="comment{{ comment.id }}reply">Reply</a>
+							{% endif %}
 						</section>
 					</div>
 				</div>
