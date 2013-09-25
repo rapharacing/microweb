@@ -42,7 +42,12 @@ a {
     color: #4898ac;
 }
 pre {
-    font-size: 11px;
+    font-size: 0.8em;
+    overflow-x: auto;
+}
+pre code {
+    word-wrap: normal;
+    white-space: pre;
 }
 .recent {
 	overflow: hidden;
