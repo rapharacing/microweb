@@ -1,7 +1,7 @@
 {% extends 'base.html' %}profile
 
 {% block content %}
-    <h1 id="profile-name"><img src="{% if 'gravatar' in content.avatar %}{{content.avatar}}{% elif 'files' in content.avatar %}https://{{request.META.HTTP_HOST}}{{content.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ content.profile_name }}" /> {{content.profile_name}}</h1>
+    <h1 id="profile-name"><img src="{% if 'gravatar' in content.avatar %}{{content.avatar}}{% elif 'files' in content.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ content.profile_name }}" /> {{content.profile_name}}</h1>
 
     <h3>Statistics</h3>
     <ul>

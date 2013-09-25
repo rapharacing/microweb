@@ -25,7 +25,7 @@
 				<tbody>
 					<tr>
 						<td width="100"><small class="nowrap"><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.total_comments }}</small></td>
-						<td rowspan="2" width="50">{% if item.last_comment_created %}<a href="{% url single-profile item.last_comment_created_by.id %}"><img src="{% if 'gravatar' in item.last_comment_created_by.avatar %}{{item.last_comment_created_by.avatar}}{% elif 'files' in item.last_comment_created_by.avatar %}https://{{request.META.HTTP_HOST}}{{item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.last_comment_created_by.profile_name }}" align="left" class="gravatar-small" /></a>{% endif %}</td>
+						<td rowspan="2" width="50">{% if item.last_comment_created %}<a href="{% url single-profile item.last_comment_created_by.id %}"><img src="{% if 'gravatar' in item.last_comment_created_by.avatar %}{{item.last_comment_created_by.avatar}}{% elif 'files' in item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.last_comment_created_by.profile_name }}" align="left" class="gravatar-small" /></a>{% endif %}</td>
 						<td>{% if item.last_comment_created %}<small><a href="{% url single-profile item.last_comment_created_by.id %}">{{ item.last_comment_created_by.profile_name|truncatechars:25 }}</a></small>{% endif %}</td>
 					</tr>					
 					<tr>
