@@ -11,13 +11,16 @@ from urlparse import urlunparse
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
+from django.http import HttpResponseNotFound
+from django.http import HttpResponseForbidden
+from django.http import HttpResponseServerError
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template import loader
 
 from microcosm.api.exceptions import APIException
 from microcosm.api.resources import FileMetadata
@@ -897,7 +900,8 @@ class ErrorView(object):
             'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site
         }
-        return render(request, '404.html', view_data)
+        context = RequestContext(request, view_data)
+        return HttpResponseNotFound(loader.get_template('404.html').render(context))
 
     @staticmethod
     def forbidden(request):
@@ -911,7 +915,8 @@ class ErrorView(object):
             if e.status_code == 401:
                 view_data['logout'] = True
         view_data['site'] = request.site
-        return render(request, '403.html', view_data)
+        context = RequestContext(request, view_data)
+        return HttpResponseForbidden(loader.get_template('403.html').render(context))
 
     @staticmethod
     def server_error(request):
@@ -921,7 +926,8 @@ class ErrorView(object):
             'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site,
         }
-        return render(request, '500.html', view_data)
+        context = RequestContext(request, view_data)
+        return HttpResponseServerError(loader.get_template('500.html').render(context))
 
 
 class AuthenticationView(object):
