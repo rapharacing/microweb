@@ -36,7 +36,7 @@
 									{% if item.most_recent_update.total_comments %}
 										<td><small class="text-muted"><time datetime="{{item.most_recent_update.last_comment_created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a></small></td>
 									{% else%}
-										<td><small class="text-muted"><time datetime="{{item.most_recent_update.meta.created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.meta.created_by.id %}/">{{ item.most_recent_update.meta.created_by.profile_name }}</a></small></td>
+										<td><small class="text-muted"><time datetime="{{item.most_recent_update.meta.created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.meta.created_by.id %}">{{ item.most_recent_update.meta.created_by.profile_name }}</a></small></td>
 									{% endif %}
 								{% endif %}
 							</tr>
