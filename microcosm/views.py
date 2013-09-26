@@ -912,11 +912,14 @@ class ErrorView(object):
             responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
             view_data['user'] = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
         except APIException as e:
-            if e.status_code == 401:
+            if e.status_code == 401 or e.status_code == 403:
                 view_data['logout'] = True
         view_data['site'] = request.site
         context = RequestContext(request, view_data)
-        return HttpResponseForbidden(loader.get_template('403.html').render(context))
+        response = HttpResponseForbidden(loader.get_template('403.html').render(context))
+        if view_data.get('logout'):
+            response.delete_cookie('access_token')
+        return response
 
     @staticmethod
     def server_error(request):
