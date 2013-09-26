@@ -10,6 +10,7 @@ from microcosm.views import AlertPreferenceView
 from microcosm.views import CommentView
 from microcosm.views import ProfileView
 from microcosm.views import AuthenticationView
+from microcosm.views import ErrorView
 from microcosm.views import GeoView
 
 
@@ -72,4 +73,9 @@ urlpatterns = patterns('',
 
     # Echoes request headers
     url(r'^headers/', 'microcosm.views.echo_headers'),
+
+    # Break things
+    url(r'error/', ErrorView.server_error),
+    url(r'notfound/', ErrorView.not_found),
+    url(r'forbidden/', ErrorView.forbidden),
 )

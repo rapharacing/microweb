@@ -915,9 +915,13 @@ class ErrorView(object):
 
     @staticmethod
     def server_error(request):
-        return render_to_response('500.html',
-            context_instance = RequestContext(request)
-        )
+        # Only fetch the first element of view_requests (whoami)
+        responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
+        view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+            'site': request.site,
+        }
+        return render(request, '500.html', view_data)
 
 
 class AuthenticationView(object):
