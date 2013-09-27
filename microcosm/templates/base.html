@@ -40,10 +40,10 @@
 						<div id="logo" class="col col-sm-8 margin-top-half">	
 							<a href="/"><img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" /></a>
 						</div>
-
+						<div id="whoami">
 						{% block whoami %}
 							{% if user %}
-								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5">
+								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5 whoami">
 									<div class="row margin-top-half">
 										<a href="{% url edit-profile user.id %}" id="edit_profile">
                                             <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" class="gravatar" align="left" />
@@ -54,12 +54,13 @@
 									</div>
 								</div>
 							{% else %}
-								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5">
+								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5 whoami">
 									Browsing as a guest.
 									<a class="btn btn-primary btn-block" id="login_link" href="javascript:login()">Sign in</a><br />
 								</div>
 							{% endif %}
 						{% endblock %}
+                        </div>
 					</div>
 				</div>
 			</header>
