@@ -673,6 +673,9 @@ class CommentView(object):
         method to be extended.
         """
 
+        if not request.access_token:
+            raise PermissionDenied
+
         responses = response_list_to_dict(grequests.map(request.view_requests))
         view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
@@ -704,6 +707,9 @@ class CommentView(object):
         Comment forms populate attributes from GET parameters, so require the create
         method to be extended.
         """
+
+        if not request.access_token:
+            raise PermissionDenied
 
         responses = response_list_to_dict(grequests.map(request.view_requests))
         view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
