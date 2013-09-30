@@ -19,5 +19,5 @@ source /srv/www/django/microwebenv/bin/activate
 cd /srv/www/django/microweb
 test -d $LOGDIR || mkdir -p $LOGDIR
 exec /srv/www/django/microwebenv/bin/gunicorn_django -b $HOST \
-  -w $NUM_WORKERS --user=$USER --group=$GROUP --log-level=debug \
+  -w $NUM_WORKERS --user=$USER --group=$GROUP --log-level=error \
   --log-file=$LOGFILE 2>>$LOGFILE
