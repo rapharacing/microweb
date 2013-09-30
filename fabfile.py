@@ -44,7 +44,7 @@ def create_virtualenv():
 def install_requirements():
 
     with activate_virtualenv():
-        sudo('pip install --use-mirrors -r %s' % env.requirements_path, user='django')
+        sudo('pip install -r %s' % env.requirements_path, user='django')
 
 def collectstatic():
 
@@ -70,12 +70,17 @@ def restart_service():
 
     sudo('service microweb restart', user='root')
 
+def restart_memcached():
+
+    sudo('service memcached restart', user='root')
+
 def first_deploy():
 
     create_virtualenv()
     rsync()
     install_requirements()
     collectstatic()
+    restart_memcached()
     start_service()
 
 def redeploy():
@@ -88,4 +93,5 @@ def redeploy():
     rsync()
     install_requirements()
     collectstatic()
+    restart_memcached()
     start_service()
