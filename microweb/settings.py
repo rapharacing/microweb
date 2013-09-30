@@ -127,37 +127,33 @@ LOGGING = {
             'formatter': 'simple',
         },
         'file':{
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'verbose',
             'filename' : os.path.join(PROJECT_ROOT, 'application.log'),
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
         }
     },
     'loggers': {
         'django': {
-            'handlers': ['console','file'],
+            'handlers': ['console'],
             'propagate': True,
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         'django.request': {
             'handlers': ['console'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': True,
         },
         'microcosm.views': {
-            'handlers': ['console','file'],
-            'level': 'ERROR',
+            'handlers': ['console'],
+            'level': 'DEBUG',
             'propagate' : True,
         },
         'microcosm.middleware': {
-            'handlers': ['console','file'],
-            'level': 'ERROR',
+            'handlers': ['console'],
+            'level': 'DEBUG',
             'propagate' : True,
-            }
+        }
     }
 }
 
