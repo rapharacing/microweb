@@ -64,6 +64,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 MIDDLEWARE_CLASSES = (
 
+    # Redirect to custom domain, if one exists for the site
+    'microcosm.middleware.redirect.DomainRedirectMiddleware',
+
     # Note: if using messages, enable the sessions middleware too
     'django.middleware.common.CommonMiddleware',
     #'django.contrib.sessions.middleware.SessionMiddleware',
