@@ -14,8 +14,7 @@ logger = logging.getLogger('microcosm.middleware')
 
 class ContextMiddleware():
     """
-    Middleware for providing request context such as the current site and authentication
-    status.
+    Provides request context such as the current site and authentication status.
     """
 
     def __init__(self):
@@ -23,11 +22,10 @@ class ContextMiddleware():
 
     def process_request(self, request):
         """
-        Checks for access_token cookie and appends it to the request object
-        if it exists.
+        Checks for access_token cookie and appends it to the request object if present.
 
-        All requests have a view_requests attribute. This is a list of requests that must be
-        executed by grequests (in parallel) to fetch data for the view.
+        All request objects have a view_requests attribute which is a list of requests
+        that will be executed by grequests to fetch data for the view.
         """
 
         request.access_token = None
@@ -37,22 +35,21 @@ class ContextMiddleware():
 
         if request.COOKIES.has_key('access_token'):
             request.access_token = request.COOKIES['access_token']
-            url, params, headers = WhoAmI.build_request(request.META['HTTP_HOST'], request.access_token)
+            url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
             request.whoami_url = url
 
         try:
-            site = self.mc.get(request.META['HTTP_HOST'].split('.')[0])
+            site = self.mc.get(request.get_host())
         except memcache.Error as e:
             logger.error('Memcached error: %s' % str(e))
             site = None
 
         if site is None:
-            logger.error('Site cache miss: %s' % request.META['HTTP_HOST'].split('.')[0])
             try:
-                site = Site.retrieve(request.META['HTTP_HOST'])
+                site = Site.retrieve(request.get_host())
                 try:
-                    self.mc.set(request.META['HTTP_HOST'].split('.')[0], site)
+                    self.mc.set(request.get_host(), site)
                 except memcache.Error as e:
                     logger.error('Memcached error: %s' % str(e))
             except APIException, e:
