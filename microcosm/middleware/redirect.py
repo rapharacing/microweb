@@ -1,7 +1,7 @@
 import pylibmc as memcache
 import logging
 
-from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponseRedirect
 
 from microweb import settings
 
@@ -63,6 +63,7 @@ class DomainRedirectMiddleware():
                     location += '?' + query_string
 
                 logger.debug('Redirecting subdomain to: %s' % location)
-                return HttpResponsePermanentRedirect(location)
+                # TODO: change to HttpResponsePermanentRedirect
+                return HttpResponseRedirect(location)
 
         return None
