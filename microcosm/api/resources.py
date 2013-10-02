@@ -877,6 +877,12 @@ class Event(APIResource):
         APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
     @staticmethod
+    def newest(host, id, access_token=None):
+        url = build_url(host, [Event.api_path_fragment, id, "newcomment"])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.json()['data']
+
+    @staticmethod
     def build_attendees_request(host, id, access_token=None):
         url = build_url(host, [Event.api_path_fragment, id, 'attendees'])
         params = {}

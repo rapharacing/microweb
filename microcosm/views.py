@@ -588,6 +588,26 @@ class EventView(object):
             return HttpResponseNotAllowed()
 
     @staticmethod
+    @exception_handler
+    def newest(request, event_id):
+        """
+        Get redirected to the first unread post in a conversation
+        """
+        if request.method == 'GET':
+            response = Event.newest(
+                request.META['HTTP_HOST'],
+                event_id,
+                access_token=request.access_token
+            )
+            #because redirects are always followed, we can't just get the 'location' value
+            response = response['comments']['links'][0]['href']
+            response = str.replace(str(response),'/api/v1','')
+            response = re.sub(r'(/.*/[0-9]*[?])comment_id=([0-9]*)&(.*)',r'\1\3#comment\2',response)
+            return HttpResponseRedirect(response)
+        else:
+            return HttpResponseNotAllowed()
+
+    @staticmethod
     def rsvp(request, event_id):
         """
         Create an attendee (RSVP) for an event. An attendee can be in one of four states:
