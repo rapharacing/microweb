@@ -1,5 +1,6 @@
 import requests
 import grequests
+import re
 
 from functools import wraps
 from microweb import settings
@@ -218,6 +219,25 @@ class ConversationView(object):
         else:
             return HttpResponseNotAllowed()
 
+    @staticmethod
+    @exception_handler
+    def newest(request, conversation_id):
+        """
+        Get redirected to the first unread post in a conversation
+        """
+        if request.method == 'GET':
+            response = Conversation.newest(
+                request.META['HTTP_HOST'],
+                conversation_id,
+                access_token=request.access_token
+            )
+            #because redirects are always followed, we can't just get the 'location' value
+            response = response['comments']['links'][0]['href']
+            response = str.replace(str(response),'/api/v1','')
+            response = re.sub(r'(/.*/[0-9]*[?])comment_id=([0-9]*)&(.*)',r'\1\3#comment\2',response)
+            return HttpResponseRedirect(response)
+        else:
+            return HttpResponseNotAllowed()
 
 class ProfileView(object):
 
@@ -564,6 +584,26 @@ class EventView(object):
             )
             event.delete(request.META['HTTP_HOST'], request.access_token)
             return HttpResponseRedirect(reverse('single-microcosm', args=(event.microcosm_id,)))
+        else:
+            return HttpResponseNotAllowed()
+
+    @staticmethod
+    @exception_handler
+    def newest(request, event_id):
+        """
+        Get redirected to the first unread post in a conversation
+        """
+        if request.method == 'GET':
+            response = Event.newest(
+                request.META['HTTP_HOST'],
+                event_id,
+                access_token=request.access_token
+            )
+            #because redirects are always followed, we can't just get the 'location' value
+            response = response['comments']['links'][0]['href']
+            response = str.replace(str(response),'/api/v1','')
+            response = re.sub(r'(/.*/[0-9]*[?])comment_id=([0-9]*)&(.*)',r'\1\3#comment\2',response)
+            return HttpResponseRedirect(response)
         else:
             return HttpResponseNotAllowed()
 

@@ -721,6 +721,12 @@ class Conversation(APIResource):
         url = build_url(host, [Conversation.api_path_fragment, self.id])
         APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
+    @staticmethod
+    def newest(host, id, access_token=None):
+        url = build_url(host, [Conversation.api_path_fragment, id, "newcomment"])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.json()['data']
+
     def as_dict(self, update=False):
         repr = {}
         if update:
@@ -755,9 +761,11 @@ class Event(APIResource):
         if data.get('south'): event.south = data['south']
         if data.get('west'): event.west = data['west']
 
-        # RSVP numbers are optional
+        # RSVP limit is always returned, even if zero
+        event.rsvp_limit = data['rsvpLimit']
+
+        # RSVP attend / spaces are only returned if non-zero
         if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
-        if data.get('rsvpLimit'): event.rsvp_limit = data['rsvpLimit']
         if data.get('rsvpSpaces'): event.rsvp_spaces = data['rsvpSpaces']
 
         return event
@@ -869,6 +877,12 @@ class Event(APIResource):
     def delete(self, host, access_token):
         url = build_url(host, [Event.api_path_fragment, self.id])
         APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
+
+    @staticmethod
+    def newest(host, id, access_token=None):
+        url = build_url(host, [Event.api_path_fragment, id, "newcomment"])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.json()['data']
 
     @staticmethod
     def build_attendees_request(host, id, access_token=None):

@@ -40,6 +40,7 @@ urlpatterns = patterns('',
     url(r'^events/(?P<event_id>\d+)/$', EventView.single, name='single-event'),
     url(r'^events/(?P<event_id>\d+)/edit/$', EventView.edit, name='edit-event'),
     url(r'^events/(?P<event_id>\d+)/delete/$', EventView.delete, name='delete-event'),
+    url(r'^events/(?P<event_id>\d+)/newest/$', EventView.newest, name='newest-event'),
     # RSVP to an event
     url(r'^events/(?P<event_id>\d+)/rsvp/$', EventView.rsvp, name='rsvp-event'),
 
@@ -48,6 +49,7 @@ urlpatterns = patterns('',
     url(r'^conversations/(?P<conversation_id>\d+)/$' , ConversationView.single, name='single-conversation'),
     url(r'^conversations/(?P<conversation_id>\d+)/edit/$', ConversationView.edit, name='edit-conversation'),
     url(r'^conversations/(?P<conversation_id>\d+)/delete/$', ConversationView.delete, name='delete-conversation'),
+    url(r'^conversations/(?P<conversation_id>\d+)/newest/$', ConversationView.newest, name='newest-conversation'),
 
     # Comments
     url(r'comments/create/$', CommentView.create, name='create-comment'),

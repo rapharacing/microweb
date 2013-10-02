@@ -13,7 +13,7 @@
 				<tbody>
 					<tr>
 						<td rowspan="2" width="42">{% ifequal item.item_type "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>{% endifequal %}{% ifequal item.item_type "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>{% endifequal %}</td>
-						<td><strong><a href="/{{ item.item_type }}s/{{ item.id }}/">{{ item.title }}</a></strong></td>
+						<td><strong><a href="/{{ item.item_type }}s/{{ item.id }}/{% if user %}newest/{% endif %}">{{ item.title }}</a></strong></td>
 					</tr>
 					<tr>
 						<td><small class="text-muted">started by <a href="{% url single-profile item.meta.created_by.id %}">{{ item.meta.created_by.profile_name|truncatechars:25 }}</a> <time datetime="{{ item.meta.created|date:"c" }}"></time></small></td>
