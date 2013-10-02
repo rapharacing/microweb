@@ -29,7 +29,7 @@
 		<![endif]-->
 	</head>
 
-<body onload="$('pre').addClass('prettyprint');prettyPrint();">
+<body>
 
 	<!-- Site banner and user module -->
 	<div class="headBand">
@@ -115,9 +115,29 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
 	<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 	<script src="{{ STATIC_URL }}js/base.js"></script>
+
+	<script>
+		$(document).ready(function () {
+			// Make code look pretty
+			$('pre > code').addClass('prettyprint')
+					.parent().addClass('prettyprint').addClass('linenums');
+
+			var acceptedLangs = ["bsh", "c", "cc", "cpp", "cs", "csh", "cyc", "cv", "htm", "html", "java", "js", "m", "mxml", "perl", "pl", "pm", "py", "rb", "sh", "xhtml", "xml", "xsl"];
+
+			$('pre.prettyprint').each(function(index) {
+				var lang = $(this).attr('lang');
+
+				if (typeof lang !== 'undefined' && lang != '' && $.inArray(lang, acceptedLangs) > -1) {
+					$(this).addClass('lang-' + lang);
+				}
+			});
+			
+			prettyPrint();
+		});
+	</script>
 
 	<!-- For custom page js (e.g. event.html) -->
 	{% block js %}{% endblock %}
