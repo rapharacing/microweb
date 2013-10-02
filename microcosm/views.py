@@ -232,9 +232,12 @@ class ConversationView(object):
                 access_token=request.access_token
             )
             #because redirects are always followed, we can't just get the 'location' value
-            response = response['comments']['links'][0]['href']
+            response = response['comments']['links']
+            for link in response:
+                if link['rel'] == 'self':
+                    response = link['href']
             response = str.replace(str(response),'/api/v1','')
-            response = re.sub(r'(/.*/[0-9]*[?])comment_id=([0-9]*)&(.*)',r'\1\3#comment\2',response)
+            response = re.sub(r'(.*)comment_id=([0-9]*)(.*)',r'\1\3#comment\2',response)
             return HttpResponseRedirect(response)
         else:
             return HttpResponseNotAllowed()
@@ -600,9 +603,12 @@ class EventView(object):
                 access_token=request.access_token
             )
             #because redirects are always followed, we can't just get the 'location' value
-            response = response['comments']['links'][0]['href']
+            response = response['comments']['links']
+            for link in response:
+                if link['rel'] == 'self':
+                    response = link['href']
             response = str.replace(str(response),'/api/v1','')
-            response = re.sub(r'(/.*/[0-9]*[?])comment_id=([0-9]*)&(.*)',r'\1\3#comment\2',response)
+            response = re.sub(r'(.*)comment_id=([0-9]*)(.*)',r'\1\3#comment\2',response)
             return HttpResponseRedirect(response)
         else:
             return HttpResponseNotAllowed()
