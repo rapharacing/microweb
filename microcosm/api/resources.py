@@ -721,6 +721,12 @@ class Conversation(APIResource):
         url = build_url(host, [Conversation.api_path_fragment, self.id])
         APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
+    @staticmethod
+    def newest(host, id, access_token=None):
+        url = build_url(host, [Conversation.api_path_fragment, id, "newcomment"])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.json()['data']
+
     def as_dict(self, update=False):
         repr = {}
         if update:
