@@ -147,7 +147,7 @@ L.Google = L.Class.extend({
 });
 
 // Create map
-var map = L.map('map')
+var map = L.map('map', {zoomAnimation:false})
 	.setMaxBounds([[-90,-180],[90,180]]); // Restrict map to valid lat:lng pairs
 
 var googleLayer = new L.Google('ROADMAP');

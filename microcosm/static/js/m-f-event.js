@@ -421,7 +421,7 @@ function loadForm() {
 	// let's just be sensible and do sensible things
 
 	// STart by creating the widgets and binding their events
-	map = L.map('map')
+	map = L.map('map', {zoomAnimation:false})
 		.setMaxBounds([[-90,-180],[90,180]]); // Restrict map to valid lat:lng pairs
 
 	var googleLayer = new L.Google('ROADMAP');
