@@ -100,7 +100,7 @@
 
 	<h4>Are you coming?</h4>
 	{% if user %}
-	{% if content.rsvp_limit and content.rsvp_limit > content.rsvp_attend %}
+	{% if content.rsvp_limit == 0 or content.rsvp_limit > content.rsvp_attend %}
 	<form method="POST" action="{% url rsvp-event content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="yes" />
@@ -141,14 +141,6 @@
 			{% endif %}
 		</ul>
 	{% endfor %}
-	<!--<p><strong>Yet to reply</strong></p>
-	{% for item in attendees.items.items %}
-		<ul>
-			{% if item.rsvp == "invited" %}
-				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
-			{% endif %}
-		</ul>
-	{% endfor %}-->
 	<p><strong>Nope</strong></p>
 	{% for item in attendees.items.items %}
 		<ul>

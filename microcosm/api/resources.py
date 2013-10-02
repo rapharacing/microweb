@@ -761,9 +761,11 @@ class Event(APIResource):
         if data.get('south'): event.south = data['south']
         if data.get('west'): event.west = data['west']
 
-        # RSVP numbers are optional
+        # RSVP limit is always returned, even if zero
+        event.rsvp_limit = data['rsvpLimit']
+
+        # RSVP attend / spaces are only returned if non-zero
         if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
-        if data.get('rsvpLimit'): event.rsvp_limit = data['rsvpLimit']
         if data.get('rsvpSpaces'): event.rsvp_spaces = data['rsvpSpaces']
 
         return event
