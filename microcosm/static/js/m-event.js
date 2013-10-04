@@ -153,7 +153,7 @@ var map = L.map('map', {zoomAnimation:false})
 var googleLayer = new L.Google('ROADMAP');
 map.addLayer(googleLayer);
 
-var cloudmadeLayer = new L.TileLayer("http://{s}.tile.cloudmade.com/d6f1a0c60e9746faa7cbfaec4b92dff3/96931/256/{z}/{x}/{y}.png");
+var cloudmadeLayer = new L.TileLayer("https://d1qte70nkdppk5.cloudfront.net/d6f1a0c60e9746faa7cbfaec4b92dff3/96931/256/{z}/{x}/{y}.png");
 map.addControl(new L.Control.Layers({'Open Street Map':cloudmadeLayer, 'Google Maps': googleLayer}))
 
 // If this is the edit screen and we need to set the map to known values then
