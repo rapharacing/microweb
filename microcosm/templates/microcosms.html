@@ -27,7 +27,7 @@
 								<td width="100"><small><i class="glyphicon glyphicon-list buffer-right"></i> {{ item.total_items }}</small></td>
 								{% if item.most_recent_update %}
 									<!-- TODO: use a template tag (or provide from the view) a mapping of item_type to path -->
-									<td><a href="/{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/">{{item.most_recent_update.title}}</a></td>
+									<td><a href="/{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">{{item.most_recent_update.title}}</a></td>
 								{% endif %}
 							</tr>
 							<tr>
