@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% block breadcrumb %}
+	<ol class="breadcrumb">
+		<li><a href="/">Home</a></li>
+		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.title }}</a></li>
+	</ol>
+{% endblock %}
 
 {% block content %}
 	<a id="microcosm_title" href="{% url single-microcosm content.id %}"><h1>{{ content.title }}</h1></a>

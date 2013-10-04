@@ -1,5 +1,13 @@
 {% extends 'base.html' %}profile
 
+{% block breadcrumb %}
+	<ol class="breadcrumb">
+		<li><a href="/">Home</a></li>
+		<li>Profiles</li>
+		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.profile_name }}</a></li>
+	</ol>
+{% endblock %}
+
 {% block content %}
     <h1 id="profile-name"><img src="{% if 'gravatar' in content.avatar %}{{content.avatar}}{% elif 'files' in content.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ content.profile_name }}" /> {{content.profile_name}}</h1>
 

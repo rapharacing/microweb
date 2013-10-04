@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href='/notifications'>Notifications</a></li>
+        <li class="active"><a href='/notifications/settings'>Settings</a></li>
+    </ol>
+{% endblock %}
+
 {% block content %}
     <section class="row margin-bottom-half">
         <h1>Notification Settings</h1>

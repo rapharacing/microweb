@@ -411,7 +411,10 @@ class PaginatedList(object):
             self.items = [list_item_cls.from_summary(item) for item in item_list['items']]
         self.links = {}
         for item in item_list['links']:
-            self.links[item['rel']] = item['href']
+            if 'title' in item:
+                self.links[item['rel']] = {'href': item['href'], 'title': item['title']}
+            else:
+                self.links[item['rel']] = {'href': item['href']}
 
 
 class Meta(object):
@@ -430,7 +433,10 @@ class Meta(object):
         if data.get('links'):
             self.links = {}
             for item in data['links']:
-                self.links[item['rel']] = item['href']
+                if 'title' in item:
+                    self.links[item['rel']] = {'href': item['href'], 'title': item['title']}
+                else:
+                    self.links[item['rel']] = {'href': item['href']}
 
 
 class PermissionSet(object):
