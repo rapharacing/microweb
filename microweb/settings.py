@@ -79,6 +79,9 @@ MIDDLEWARE_CLASSES = (
     # convenience for request context like site, user account, etc.
     'microcosm.middleware.context.ContextMiddleware',
 
+    # cache busting for static files
+    'microcosm.middleware.modtimeurls.ModTimeUrlsMiddleware',
+
     # time all requests and report to riemann
     'microcosm.middleware.timing.TimingMiddleware',
 
