@@ -19,6 +19,7 @@ RESOURCE_PLURAL = {
     'profile': 'profiles',
     'user': 'users',
     'site': 'sites',
+    'microcosm': 'microcosms',
 }
 
 # Item types that can have comments
@@ -460,11 +461,21 @@ class Watcher(APIResource):
         self.receive_alert = data['receiveAlert']
 
         if data.get('item'):
-            if data.get('item').get('itemType') == "conversation":
+            if data.get('itemType') == "conversation":
                 self.item = Conversation.from_summary(data['item'])
-            if data.get('item').get('itemType') == "event":
+                self.item_link = '/%s/%s/newest/' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
+            elif data.get('itemType') == "event":
                 self.item = Event.from_summary(data['item'])
-            self.item_link = '/%s/%s' % (RESOURCE_PLURAL[data.get('item').get('itemType')], self.item_id)
+                self.item_link = '/%s/%s/newest' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
+            elif data.get('itemType') == "microcosm":
+                self.item = Microcosm.from_summary(data['item'])
+                self.item_link = '/%s/%s' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
+                if data['item'].get('mostRecentUpdate'):
+                    self.item.last_comment_created = parse_timestamp(data['item']['mostRecentUpdate']['lastCommentCreated'])
+                else:
+                    self.item.last_comment_created = parse_timestamp(data['item']['meta']['created'])
+            else:
+                self.item_link = '/%s/%s' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
 
     @classmethod
     def from_summary(cls, data):
