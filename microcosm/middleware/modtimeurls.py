@@ -42,15 +42,9 @@
 # - changed July 27, 2012 to add support for STATIC_ROOT
 
 import re, os
-import logging
 import pylibmc as memcache
 
 from django.conf import settings
-
-from pprint import pprint
-
-
-logger = logging.getLogger('microcosm.middleware')
 
 url_attributes = ['src', 'href']
 
@@ -98,7 +92,6 @@ class ModTimeUrlsMiddleware:
 
         try:
             if not mc_ts is None:
-                logger.error('HIT: Found timestamp for %s' % filename)
                 return url + ('&' if contains_question_mark else '?') + "_=" + mc_ts
 
             stat = os.stat(filename)
@@ -109,7 +102,6 @@ class ModTimeUrlsMiddleware:
             except memcache.Error as e:
                 pass
 
-            logger.error('MISS: Did not find timestamp for %s' % filename)
             return url + ('&' if contains_question_mark else '?') + "_=" + timestamp
         except OSError:
             pass
