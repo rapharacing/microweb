@@ -298,7 +298,7 @@ function setStartDate(d) {
 	$('#id_from_date').val(getIsoStringFromDate(d));
 	$('#id_from_date').datepicker('update');
 	startDate = d;
-	validateDateTimes();
+	validateDateTimesAndUpdateForm();
 }
 
 // Likewise for end date
@@ -311,7 +311,7 @@ function setEndDate(d) {
 	$('#id_to_date').val(getIsoStringFromDate(d));
 	$('#id_to_date').datepicker('update');
 	endDate = d;
-	validateDateTimes();
+	validateDateTimesAndUpdateForm();
 }
 
 //////////
@@ -354,13 +354,13 @@ function dateToUtcString(d) {
 var duration = 0;
 
 // If everything checks out
-function validateDateTimes() {
+function validateDateTimesAndUpdateForm() {
 	var startTime = $('#id_from_time').val().trim();
 	var endTime = $('#id_to_time').val().trim();
 
 	// By which we mean, if we have all of the values
 	if (!startDate || !endDate || !startTime || !endTime) {
-		console.log('validation fails')
+		console.log('validation fails: startDate="' + startDate + '", startTime="' + startTime + '", endDate="' + endDate+ '", endTime="' + endTime + '"')
 		return false;
 	}
 
@@ -376,7 +376,9 @@ function validateDateTimes() {
 	duration = (endDateTime.valueOf() / 60000) - (startDateTime.valueOf() / 60000);
 
 	// And if we've got junk input, default to an hour
-	if (!duration) {duration = 60;}
+	if (!duration || duration < 0) {
+		duration = 60;
+	}
 
 	// Save all the things!
 	$('#id_duration').val(duration);
@@ -451,17 +453,7 @@ function loadForm() {
 		.datepicker({format: 'yyyy-mm-dd'})
 		// Detect not-null changes in the value
 		.on('changeDate', function(ev){
-			// If the end is before the start
-			if (endDate && ev.date.valueOf() > endDate.valueOf()){
-				// Then set the end to be the same as the start
-				setStartDate(new Date(ev.date));
-				$('#id_to_date').val($('#id_from_date').val());
-			} else {
-				// Else all is good and just set the start
-				$('#control_from_date').removeClass('has-error');
-				$('#control_to_date').removeClass('has-error');
-				setStartDate(new Date(ev.date));
-			}
+			setStartDate(new Date(ev.date));
 
 			// Prevent the user from trying to select an end date prior to
 			// the start date
@@ -485,21 +477,7 @@ function loadForm() {
 		.datepicker({format: 'yyyy-mm-dd'})
 		// Detect not-null changes in the value
 		.on('changeDate', function(ev){
-			if (startDate && ev.date.valueOf() < startDate.valueOf()){
-				// Ideally not possible due to restriction of interface and
-				// preventing the end date picker having a value earlier than
-				// the start date... but *if* the user has managed to select
-				// a date earlier than start, then show an error and wipe
-				// this erroneous value
-				$('#control_from_date').addClass('has-error');
-				$('#control_to_date').addClass('has-error');
-				setEndDate(false);
-			} else {
-				// All is good, set the end
-				$('#control_from_date').removeClass('has-error');
-				$('#control_to_date').removeClass('has-error');
-				setEndDate(new Date(ev.date));
-			}
+			setEndDate(new Date(ev.date));
 
 			// The user is done, hide the picker
 			$('#id_to_date').datepicker('hide');
@@ -615,9 +593,7 @@ function loadForm() {
 	// Need to determine whether we have a fromTime, and if we do we can
 	// set the form to that, otherwise we will use 'current', which literally
 	// means whatever the user's clock is
-	var fromTime = ($('#id_from_time').val().trim() != "") ?
-		$('#id_from_time').val() :
-		'current';
+	var fromTime = ($('#id_from_time').val().trim() != "") ? $('#id_from_time').val() : 'current';
 
 	$('#id_from_time')
 		// When a user goes into the field show the picker
@@ -626,14 +602,7 @@ function loadForm() {
 		})
 		// And if they change the value, update the form state
 		.on('change', function() {
-			validateDateTimes();
-
-			// validateDateTime sets the duration, and it could be negative!
-			// If it is negative then the end time should move forward so that
-			// it is not negative
-			if (duration < 0) {
-				$('#id_to_time').val($('#id_from_time').val());
-			}
+			validateDateTimesAndUpdateForm();
 		})
 		// Create the time picker and set the time
 		.timepicker({"disableFocus": true, "defaultTime": fromTime});
@@ -652,17 +621,12 @@ function loadForm() {
 		})
 		// If the value changes, update the form state
 		.on('change', function() {
-			validateDateTimes();
-
-			// And if the duration is negative, bump the time backwards
-			if (duration < 0) {
-				$('#id_from_time').val($('#id_to_time').val());
-			}
+			validateDateTimesAndUpdateForm();
 		});
 
 	// And as we've jigged all of the dates and times around, update the
 	// form state
-	validateDateTimes();
+	validateDateTimesAndUpdateForm();
 }
 
 function isEmpty(e) {
@@ -695,7 +659,7 @@ $('#eventForm').submit(function() {
 		return false;
 	}
 
-	if (!validateDateTimes()) {
+	if (!validateDateTimesAndUpdateForm()) {
 		return false;
 	}
 
