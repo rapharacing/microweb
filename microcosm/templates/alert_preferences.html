@@ -5,50 +5,51 @@
         <h1>Notification Settings</h1>
         <p class="text-muted">Configure which notifications you receive with the controls below.</p>
     </section>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <section class="row">
+            <div class="col col-sm-10">
+            </div>
+            <div class="col col-sm-2">
+                Notify me
+            </div>
+            <div class="col col-sm-2">
+                Email me
+            </div>
+        </section>
+        <hr />
+        <section class="row">
+            <div class="col col-sm-10">
+                <span>Profile override settings - if these are set to 'off' then you will not receive any of that type of alert</span>
+            </div>
+                <div class="col col-sm-2">
+                    <input name="profile_receive_alert" type="checkbox" {% if globaloptions.alertNotifications %}checked="true"{% endif %}>
+                </div>
+                <div class="col col-sm-2">
+                    <input name="profile_receive_email" type="checkbox" {% if globaloptions.emailNotifications %}checked="true"{% endif %}>
+                </div>
+        </section>
+        <hr />
+        <br />
         {% for preference in content %}
-            {% if preference.alert_type_id == 1 %}
+            {% if preference.alert_type_id == 1 or preference.alert_type_id == 3 %}
             <section class="row">
                 <div class="col col-sm-10">
-                    <span>A new comment is posted on an item you're watching</span>
+                    <span>{{ preference.description }}</span>
                 </div>
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    <input type="hidden" name="alert_type_id" value="1">
+                    <input type="hidden" name="alert_type_id_{{ preference.alert_type_id }}" value="{{ preference.alert_type_id }}">
                     <div class="col col-sm-2">
-                        Notify me<br> <input name="receive_alert" type="checkbox" {% if preference.receive_alert %}checked="true"{% endif %}>
+                        <input name="receive_alert_{{ preference.alert_type_id }}" type="checkbox" {% if preference.receive_alert %}checked="true"{% endif %}>
                     </div>
                     <div class="col col-sm-2">
-                        Email me<br> <input name="receive_email" type="checkbox" {% if preference.receive_email %}checked="true"{% endif %}>
+                        <input name="receive_email_{{ preference.alert_type_id }}" type="checkbox" {% if preference.receive_email %}checked="true"{% endif %}>
                     </div>
-                    <div class="col col-sm-2">
-                        <input type="submit" value="Save" class="btn btn-primary btn-small" />
-                    </div>
-                </form>
-            </section>
-            <hr />
-            {% endif %}
-            {% if preference.alert_type_id == 3 %}
-            <section class="row">
-                <div class="col col-sm-10">
-                    <span>Your username is mentioned in a comment</span>
-                </div>
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    <input type="hidden" name="alert_type_id" value="3">
-                    <span class="col col-sm-2">
-                        Notify me<br> <input name="receive_alert" type="checkbox" {% if preference.receive_alert %}checked="true"{% endif %}>
-                    </span>
-                    <div class="col col-sm-2">
-                        Email me<br> <input name="receive_email" type="checkbox" {% if preference.receive_email %}checked="true"{% endif %}>
-                    </div>
-                    <div class="col col-sm-2">
-                        <input type="submit" value="Save" class="btn btn-primary btn-small" />
-                    </div>
-                </form>
             </section>
             <hr />
             {% endif %}
         {% endfor %}
+        <input type="submit" value="Save" class="btn btn-primary btn-small" style="float: right;"/>
+        </form>
 {% endblock %}
 
 {% block sidebar%}
