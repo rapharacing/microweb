@@ -4,7 +4,7 @@
 	<ol class="breadcrumb">
 		<li><a href="/">Home</a></li>
 		<li>Profiles</li>
-		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.profile_name }}</a></li>
+		<li class="active"><a href='{{ content.meta.links.self.href|slice:"7:" }}'>{{ content.profile_name }}</a></li>
 	</ol>
 {% endblock %}
 
