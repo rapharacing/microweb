@@ -9,7 +9,6 @@
 
 {% block content %}
 	<a id="microcosm_title" href="{% url single-microcosm content.id %}"><h1>{{ content.title }}</h1></a>
-	<p id="microcosm_description" class="text-muted">{{ content.description }}</p>
 
 	{% include "pagination_nav.html" %}
 
@@ -50,7 +49,9 @@
 {% endblock %}
 
 {% block sidebar%}
-	<p class="muted hidden-xs">
+	<p id="microcosm_description">{{ content.description }}</p>
+
+	<p class="text-muted hidden-xs">
 		Created by <a href="{% url single-profile content.meta.created_by.id %}">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
 		<time datetime="{{ content.meta.created|date:"c" }}"></time>
 	</p>
@@ -67,8 +68,6 @@
 		{% endif %}
 	</p>
 	{% endif %}
-
-
 
 	{% if content.meta.permissions.create %}
 		<a class="btn btn-primary btn-block" id="create_item" href="{% url item-choice content.id %}">Create item</a>
