@@ -1,12 +1,14 @@
 import requests
 import grequests
-import re
 
 from functools import wraps
 from microweb import settings
 from microweb.settings import PAGE_SIZE
 from microweb.helpers import join_path_fragments
 from microweb.helpers import build_url
+from urllib import urlencode
+from urlparse import parse_qs
+from urlparse import urlparse
 from urlparse import urlunparse
 
 from django.core.urlresolvers import reverse
@@ -237,7 +239,18 @@ class ConversationView(object):
                 if link['rel'] == 'self':
                     response = link['href']
             response = str.replace(str(response),'/api/v1','')
-            response = re.sub(r'(.*)comment_id=([0-9]*)(.*)',r'\1\3#comment\2',response)
+            pr = urlparse(response)
+            queries = parse_qs(pr[4])
+            frag = ""
+            if queries.get('comment_id'):
+                frag = 'comment' + queries['comment_id'][0]
+                del queries['comment_id']
+            # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
+            # urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
+            for (key, value) in queries.items():
+                queries[key] = value[0]
+            queries = urlencode(queries)
+            response = urlunparse((pr[0],pr[1],pr[2],pr[3],queries,frag))
             return HttpResponseRedirect(response)
         else:
             return HttpResponseNotAllowed()
@@ -608,7 +621,18 @@ class EventView(object):
                 if link['rel'] == 'self':
                     response = link['href']
             response = str.replace(str(response),'/api/v1','')
-            response = re.sub(r'(.*)comment_id=([0-9]*)(.*)',r'\1\3#comment\2',response)
+            pr = urlparse(response)
+            queries = parse_qs(pr[4])
+            frag = ""
+            if queries.get('comment_id'):
+                frag = 'comment' + queries['comment_id'][0]
+                del queries['comment_id']
+            # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
+            # urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
+            for (key, value) in queries.items():
+                queries[key] = value[0]
+            queries = urlencode(queries)
+            response = urlunparse((pr[0],pr[1],pr[2],pr[3],queries,frag))
             return HttpResponseRedirect(response)
         else:
             return HttpResponseNotAllowed()
