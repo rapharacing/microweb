@@ -28,10 +28,10 @@ def activate_virtualenv():
         yield
 
 def dev_env():
-    env.hosts.append('wpy01.dev.microcosm.cc')
+    env.hosts.append('wpy01.dev.microcosm.cc:2020')
 
 def prod_env():
-    env.hosts.append('wpy01.microcosm.cc')
+    env.hosts.append('wpy01.microcosm.cc:2020')
 
 def destroy_virtualenv():
 
