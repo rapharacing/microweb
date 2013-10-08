@@ -138,7 +138,7 @@
 
 		var gaData = {
 			'dimension1': '{% if user %}contributor{% else %}lurker{% endif %}'
-			,'dimension4': '{{ site.subdomain_key }}',
+			,'dimension4': '{{ site.subdomain_key }}'
 			{% block ga %}{% endblock %}
 		};
 
