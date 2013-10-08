@@ -136,12 +136,17 @@
 		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-		ga('create', 'UA-36931318-3', 'microco.sm');
-		ga('send', 'pageview', {
+		var gaData = {
 			'dimension1': '{% if user %}contributor{% else %}lurker{% endif %}'
 			,'dimension4': '{{ site.subdomain_key }}',
 			{% block ga %}{% endblock %}
-		});
+		};
+
+		ga('create', 'UA-36931318-3', 'microco.sm');
+		ga('send', 'pageview', gaData);
+
+		{% if site.ga_web_property_id %}ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
+		ga('{{ site.subdomain_key }}.send', 'pageview', gaData);{% endif %}
 	</script>
 
 </body>
