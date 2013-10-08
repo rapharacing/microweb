@@ -121,23 +121,7 @@
 	<script src="{{ STATIC_URL }}js/base.js"></script>
 
 	<script>
-		$(document).ready(function () {
-			// Make code look pretty
-			$('pre > code').addClass('prettyprint')
-					.parent().addClass('prettyprint').addClass('linenums');
 
-			var acceptedLangs = ["bsh", "c", "cc", "cpp", "cs", "csh", "cyc", "cv", "htm", "html", "java", "js", "m", "mxml", "perl", "pl", "pm", "py", "rb", "sh", "xhtml", "xml", "xsl"];
-
-			$('pre.prettyprint').each(function(index) {
-				var lang = $(this).attr('lang');
-
-				if (typeof lang !== 'undefined' && lang != '' && $.inArray(lang, acceptedLangs) > -1) {
-					$(this).addClass('lang-' + lang);
-				}
-			});
-			
-			prettyPrint();
-		});
 	</script>
 
 	<!-- For custom page js (e.g. event.html) -->
@@ -151,9 +135,11 @@
 		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
 		ga('create', 'UA-36931318-3', 'microco.sm');
-		ga('set', 'dimension1', '{{ site.subdomainKey }}');
-		ga('set', 'dimension2', '{% if user %}user{% else %}guest{% endif %}');
-		ga('send', 'pageview');
+		ga('send', 'pageview', {
+			'dimension1': '{% if user %}contributor{% else %}lurker{% endif %}'
+			,'dimension4': '{{ site.subdomain_key }}',
+			{% block ga %}{% endblock %}
+		});
 	</script>
 
 </body>

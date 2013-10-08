@@ -26,4 +26,21 @@ if (jQuery && moment) {
 $('document').ready(function() {
 	updateTimes();
 	setInterval(updateTimes, 60000); // Update every minute
+
+
+	// Make code look pretty
+	$('pre > code').addClass('prettyprint')
+			.parent().addClass('prettyprint').addClass('linenums');
+
+	var acceptedLangs = ["bsh", "c", "cc", "cpp", "cs", "csh", "cyc", "cv", "htm", "html", "java", "js", "m", "mxml", "perl", "pl", "pm", "py", "rb", "sh", "xhtml", "xml", "xsl"];
+
+	$('pre.prettyprint').each(function(index) {
+		var lang = $(this).attr('lang');
+
+		if (typeof lang !== 'undefined' && lang != '' && $.inArray(lang, acceptedLangs) > -1) {
+			$(this).addClass('lang-' + lang);
+		}
+	});
+	
+	prettyPrint();
 });
