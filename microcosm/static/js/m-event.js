@@ -168,6 +168,19 @@ function restoreLocationState(lat, lng, bounds) {
 
 	var marker = L.marker(new L.LatLng(lat, lng));
 	map.addLayer(marker);
+
+	if (lat != 0 && lng != 0 && bounds.length == 2 && bounds[1].length == 2) {
+		var gmaplink = 'https://maps.google.com/maps?q=' + lat + ',' + lng + 
+			'&spn=' + (bounds[0][0]-bounds[1][0]) + ',' + (bounds[0][1]-bounds[1][1])
+
+		var osmlink = 'http://www.openstreetmap.org/?minlon=' + bounds[0][1] + '&minlat=' + bounds[1][0] +
+			'&maxlon=' + bounds[1][1] + '&maxlat=' + bounds[0][0] +
+			'&box=yes&mlat=' + lat + '&mlon=' + lng
+
+		$('#gmaplink').attr('href',gmaplink).text('Google Maps');
+		$('#osmlink').attr('href',osmlink).text('Open Street Maps');
+		$('#maplinks').show();
+	}
 }
 
 function formatDate(d) {

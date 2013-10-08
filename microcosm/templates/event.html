@@ -27,7 +27,10 @@
 		<div class="col col-sm-4 col-xs-10">
 			<p id="where">{% if content.where %}{{ content.where }}{% else %}To be determined.{% endif %}</p>
 		</div>
-		<div id="map" class="col col-sm-8 col-xs-16 pull-right" style="height:366px"></div>
+		<div class="col col-sm-8 col-xs-16 pull-right">
+			<div id="map" style="height:366px"></div>
+			<div id="maplinks" style="display:none;">View location in <a id="gmaplink"></a> or <a id="osmlink"></a>.</div>
+		</div>
 
 		<div class="row col col-sm-8 col-xs-16">
 			<div class="col col-sm-8 col-xs-6">
