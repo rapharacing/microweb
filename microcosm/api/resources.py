@@ -627,6 +627,7 @@ class AlertPreference(APIResource):
     def from_api_response(cls, data):
         alert_pref = cls()
         alert_pref.profile_id = data['profileId']
+        alert_pref.description = data['alertDescription']
         alert_pref.alert_type_id = data['alertTypeId']
         alert_pref.receive_email = data['receiveEmail']
         alert_pref.receive_alert = data['receiveAlert']
@@ -638,6 +639,7 @@ class AlertPreference(APIResource):
         list = []
         for alert_preference in data:
             list.append(AlertPreference.from_api_response(alert_preference))
+        list.sort(key=lambda x: x.alert_type_id)
         return list
 
     @staticmethod
@@ -662,9 +664,48 @@ class AlertPreference(APIResource):
     def as_dict(self):
         repr = {}
         repr['alertTypeId'] = self.alert_type_id
+        repr['alertDescription'] = self.description
         repr['receiveEmail'] = self.receive_email
         repr['receiveAlert'] = self.receive_alert
         repr['receiveSMS'] = self.receive_sms
+        return repr
+
+
+class GlobalOptions(APIResource):
+
+    api_path_fragment = ['profiles', 'options']
+
+    @classmethod
+    def from_api_response(cls, data):
+        glob_opt = cls()
+        glob_opt.profile_id = data['profileId']
+        glob_opt.emailNotifications = data['emailNotifications']
+        glob_opt.alertNotifications = data['alertNotifications']
+        glob_opt.smsNotifications = data['smsNotifications']
+        return glob_opt
+
+    @staticmethod
+    def build_request(host, access_token):
+        url = build_url(host, GlobalOptions.api_path_fragment)
+        params = {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def update(host, data, access_token):
+        print 'updating global options with: '
+        print data
+        url = build_url(host, GlobalOptions.api_path_fragment)
+        print url
+        print json.dumps(data)
+        resource = APIResource.update(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
+        return GlobalOptions.from_api_response(resource)
+
+    def as_dict(self):
+        repr = {}
+        repr['EmailNotifications'] = self.emailNotifications
+        repr['AlertNotifications'] = self.alertNotifications
+        repr['SMSNotifications'] = self.smsNotifications
         return repr
 
 

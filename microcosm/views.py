@@ -44,6 +44,7 @@ from microcosm.api.resources import Attachment
 from microcosm.api.resources import RESOURCE_PLURAL
 from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
 from microcosm.api.resources import response_list_to_dict
+from microcosm.api.resources import GlobalOptions
 
 from microcosm.forms.forms import EventCreate
 from microcosm.forms.forms import EventEdit
@@ -939,31 +940,52 @@ class AlertPreferenceView(object):
                 request.access_token
             )
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            url2, params2, headers2 = GlobalOptions.build_request(
+                request.META['HTTP_HOST'],
+                request.access_token
+            )
+            request.view_requests.append(grequests.get(url2, params=params2, headers=headers2))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             preference_list = AlertPreference.from_list(responses[url])
+            global_options = GlobalOptions.from_api_response(responses[url2])
 
             view_data = {
                 'user': Profile(responses[request.whoami_url], summary=False),
                 'site': request.site,
                 'content': preference_list,
+                'globaloptions': global_options,
             }
             return render(request, AlertPreferenceView.list_template, view_data)
 
         if request.method == 'POST':
+            for x in range(1,10):
+                if request.POST.get('alert_type_id_'+str(x)):
+                    postdata = {
+                        'alertTypeId': int(request.POST['alert_type_id_'+str(x)]),
+                        'receiveEmail': bool(request.POST.get('receive_email_'+str(x))),
+                        'receiveAlert': bool(request.POST.get('receive_alert_'+str(x))),
+                        'receiveSMS': False,
+                    }
+                    AlertPreference.update(
+                        request.META['HTTP_HOST'],
+                        request.POST['alert_type_id_'+str(x)],
+                        postdata,
+                        request.access_token
+                    )
 
             postdata = {
-                'alertTypeId': int(request.POST['alert_type_id']),
-                'receiveEmail': bool(request.POST.get('receive_email')),
-                'receiveAlert': bool(request.POST.get('receive_alert')),
-                'receiveSMS': False,
+                'emailNotifications': bool(request.POST.get('profile_receive_email')),
+                'alertNotifications': bool(request.POST.get('profile_receive_alert')),
+                'smsNotifications': False,
             }
-            AlertPreference.update(
+            GlobalOptions.update(
                 request.META['HTTP_HOST'],
-                request.POST['alert_type_id'],
                 postdata,
                 request.access_token
             )
             return HttpResponseRedirect(reverse('notification-settings'))
+        else:
+            return HttpResponseNotAllowed()
 
 
 class ErrorView(object):
