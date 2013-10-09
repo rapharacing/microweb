@@ -184,7 +184,7 @@ function restoreLocationState(lat, lng, bounds) {
 
 		var osmlink = 'http://www.openstreetmap.org/?minlon=' + bounds[0][1] + '&minlat=' + bounds[1][0] +
 			'&maxlon=' + bounds[1][1] + '&maxlat=' + bounds[0][0] +
-			'&box=yes&mlat=' + lat + '&mlon=' + lng;
+			'&box=no&mlat=' + lat + '&mlon=' + lng;
 
 		if (isAndroid) {
 			$('#maplinks').append(
