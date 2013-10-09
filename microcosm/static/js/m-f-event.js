@@ -548,13 +548,9 @@ function loadForm() {
 		}
 	}
 
-
-	// It is a good idea to not let the user plan an event in the past
 	var tomorrow = new Date();
 	tomorrow.setDate(tomorrow.getDate() + 1)
-	$('#id_from_date').datepicker('setStartDate', tomorrow);
 	setStartDate(tomorrow);
-	$('#id_to_date').datepicker('setStartDate', tomorrow);
 	setEndDate(tomorrow);
 
 	// And if we have primed our interface
