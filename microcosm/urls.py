@@ -64,7 +64,6 @@ urlpatterns = patterns('',
 
     # Watchers
     url(r'watchers/$', WatcherView.list, name='list-watchers'),
-    url(r'watchers/(?P<watcher_id>\d+)/delete/$', WatcherView.delete, name='delete-watcher'),
 
     # User profiles
     url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),

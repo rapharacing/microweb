@@ -10,25 +10,48 @@
         to you (unless you've turned these things off).</p>
     {% else %}
         {% include "pagination_nav.html" %}
+        <form method="POST" action="">
+        {% csrf_token %}
+        <section class="row">
+            <div class="col col-sm-8">
+            </div>
+            <div class="col col-sm-2">
+                Notify me
+            </div>
+            <div class="col col-sm-2">
+                Email me
+            </div>
+            <div class="col col-sm-2">
+                Delete watcher
+            </div>
+        </section>
+        <hr />
         {% for watcher in content.watchers.items %}
             <section class="row">
-                <div class="col col-sm-8">
+                <div class="col col-sm-8 text-muted" >
                     <a href="{{ watcher.item_link }}">{{ watcher.item.title }}</a>
+                    <br>Last updated <time datetime="{{ watcher.item.last_comment_created|date:"c" }}"></time>
                 </div>
-                <div class="col col-sm-6 text-muted">
-                    Last updated <time datetime="{{ watcher.item.last_comment_created|date:"c" }}"></time>
+                <input type="hidden" name="watcher_id" value="{{ watcher.id }}">
+                <div class="col col-sm-2">
+                    <input name="receive_alert_{{ watcher.id }}" type="checkbox" {% if watcher.receive_alert %}checked="true"{% endif %}>
                 </div>
                 <div class="col col-sm-2">
-                    <form method="POST" action="{% url delete-watcher watcher.id %}">
-                        {% csrf_token %}
-                        <div class="col col-sm-2">
-                            <input type="submit" value="Stop watching" class="btn btn-primary btn-small" />
-                        </div>
-                    </form>
+                    <input name="receive_email_{{ watcher.id }}" type="checkbox" {% if watcher.receive_email %}checked="true"{% endif %}>
+                </div>
+                <div class="col col-sm-2">
+                    <input name="delete_watcher_{{ watcher.id }}" type="checkbox">
                 </div>
             </section>
-            <hr />
         {% endfor %}
+        <section class="row">
+            <div class="col col-sm-2">
+                <div class="col col-sm-2">
+                    <input type="submit" value="Submit changes" class="btn btn-primary btn-small" />
+                </div>
+           </div>
+        </section>
+        </form>
         {% include "pagination_nav.html" %}
     {% endif %}
 {% endblock %}

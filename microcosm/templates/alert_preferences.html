@@ -40,7 +40,7 @@
         <hr />
         <br />
         {% for preference in content %}
-            {% if preference.alert_type_id == 1 or preference.alert_type_id == 3 %}
+            {% if preference.alert_type_id == 1 or preference.alert_type_id == 2 %}
             <section class="row">
                 <div class="col col-sm-10">
                     <span>{{ preference.description }}</span>
@@ -53,11 +53,11 @@
                         <input name="receive_email_{{ preference.alert_type_id }}" type="checkbox" {% if preference.receive_email %}checked="true"{% endif %}>
                     </div>
             </section>
-            <hr />
             {% endif %}
         {% endfor %}
+        <hr />
         <input type="submit" value="Save" class="btn btn-primary btn-small" style="float: right;"/>
-        </form>
+    </form>
 {% endblock %}
 
 {% block sidebar%}

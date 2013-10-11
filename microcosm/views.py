@@ -118,31 +118,43 @@ class ConversationView(object):
     @staticmethod
     @exception_handler
     def single(request, conversation_id):
+        if request.method == 'GET':
+            # Offset for paging of event comments
+            offset = int(request.GET.get('offset', 0))
 
-        # Offset for paging of event comments
-        offset = int(request.GET.get('offset', 0))
+            conversation_url, params, headers = Conversation.build_request(
+                request.META['HTTP_HOST'],
+                id=conversation_id,
+                offset=offset,
+                access_token=request.access_token
+            )
+            request.view_requests.append(grequests.get(conversation_url, params=params, headers=headers))
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            conversation = Conversation.from_api_response(responses[conversation_url])
+            comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
 
-        conversation_url, params, headers = Conversation.build_request(
-            request.META['HTTP_HOST'],
-            id=conversation_id,
-            offset=offset,
-            access_token=request.access_token
-        )
-        request.view_requests.append(grequests.get(conversation_url, params=params, headers=headers))
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-        conversation = Conversation.from_api_response(responses[conversation_url])
-        comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
+            view_data = {
+                'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+                'site': request.site,
+                'content': conversation,
+                'comment_form': comment_form,
+                'pagination': build_pagination_links(request, conversation.comments),
+                'item_type': 'conversation'
+            }
 
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-            'site': request.site,
-            'content': conversation,
-            'comment_form': comment_form,
-            'pagination': build_pagination_links(request, conversation.comments),
-            'item_type': 'conversation'
-        }
-
-        return render(request, ConversationView.single_template, view_data)
+            return render(request, ConversationView.single_template, view_data)
+        elif request.method == 'POST':
+            postdata = {
+                'alertTypeId': int(request.POST.get('alert_type_id')),
+                'itemTypeId': 6,
+                'itemId': int(conversation_id),
+            }
+            Watcher.create(
+                request.META['HTTP_HOST'],
+                postdata,
+                request.access_token
+            )
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     @staticmethod
     @exception_handler
@@ -496,40 +508,53 @@ class EventView(object):
         """
         Display a single event with comments and attendees.
         """
+        if request.method == 'GET':
+            # Offset for paging of event comments
+            offset = int(request.GET.get('offset', 0))
 
-        # Offset for paging of event comments
-        offset = int(request.GET.get('offset', 0))
+            event_url, event_params, event_headers = Event.build_request(
+                request.META['HTTP_HOST'],
+                id=event_id,
+                offset=offset,
+                access_token=request.access_token
+            )
+            request.view_requests.append(grequests.get(event_url, params=event_params, headers=event_headers))
 
-        event_url, event_params, event_headers = Event.build_request(
-            request.META['HTTP_HOST'],
-            id=event_id,
-            offset=offset,
-            access_token=request.access_token
-        )
-        request.view_requests.append(grequests.get(event_url, params=event_params, headers=event_headers))
+            att_url, att_params, att_headers = Event.build_attendees_request(
+                request.META['HTTP_HOST'],
+                event_id,
+                request.access_token
+            )
+            request.view_requests.append(grequests.get(att_url, params=att_params, headers=att_headers))
 
-        att_url, att_params, att_headers = Event.build_attendees_request(
-            request.META['HTTP_HOST'],
-            event_id,
-            request.access_token
-        )
-        request.view_requests.append(grequests.get(att_url, params=att_params, headers=att_headers))
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            event = Event.from_api_response(responses[event_url])
+            comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
 
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-        event = Event.from_api_response(responses[event_url])
-        comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
+            view_data = {
+                'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+                'site': request.site,
+                'content': event,
+                'comment_form': comment_form,
+                'pagination': build_pagination_links(request, event.comments),
+                'item_type': 'event',
+                'attendees': AttendeeList(responses[att_url])
+            }
 
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-            'site': request.site,
-            'content': event,
-            'comment_form': comment_form,
-            'pagination': build_pagination_links(request, event.comments),
-            'item_type': 'event',
-            'attendees': AttendeeList(responses[att_url])
-        }
+            return render(request, EventView.single_template, view_data)
 
-        return render(request, EventView.single_template, view_data)
+        elif request.method == 'POST':
+            postdata = {
+                'alertTypeId': int(request.POST.get('alert_type_id')),
+                'itemTypeId': 9,
+                'itemId': int(event_id),
+            }
+            Watcher.create(
+                request.META['HTTP_HOST'],
+                postdata,
+                request.access_token
+            )
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     @staticmethod
     @exception_handler
@@ -887,36 +912,47 @@ class WatcherView(object):
         if not request.access_token:
             raise HttpResponseNotAllowed
 
-        # pagination offset
-        offset = int(request.GET.get('offset', 0))
+        if request.method == 'GET':
+            # pagination offset
+            offset = int(request.GET.get('offset', 0))
 
-        url, params, headers = WatcherList.build_request(
-            request.META['HTTP_HOST'],
-            offset=offset,
-            access_token=request.access_token
-        )
-        request.view_requests.append(grequests.get(url, params=params, headers=headers))
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-        watchers_list = WatcherList(responses[url])
+            url, params, headers = WatcherList.build_request(
+                request.META['HTTP_HOST'],
+                offset=offset,
+                access_token=request.access_token
+            )
+            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            watchers_list = WatcherList(responses[url])
 
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': request.site,
-            'content': watchers_list,
-            'pagination': build_pagination_links(request, watchers_list.watchers)
-        }
+            view_data = {
+                'user': Profile(responses[request.whoami_url], summary=False),
+                'site': request.site,
+                'content': watchers_list,
+                'pagination': build_pagination_links(request, watchers_list.watchers)
+            }
 
-        return render(request, WatcherView.list_template, view_data)
-
-    @staticmethod
-    @exception_handler
-    def delete(request, watcher_id):
-        """
-        Delete a watcher.
-        """
+            return render(request, WatcherView.list_template, view_data)
 
         if request.method == 'POST':
-            Watcher.delete(request.META['HTTP_HOST'], watcher_id, request.access_token)
+            if 'watcher_id' in request.POST:
+                watchers = request.POST.getlist('watcher_id')
+                for w in watchers:
+                    if request.POST.get('delete_watcher_' + str(w)):
+                        Watcher.delete(request.META['HTTP_HOST'], w, request.access_token)
+                    else:
+                        postdata = {
+                            'id': int(w),
+                            'receiveEmail': bool(request.POST.get('receive_email_'+str(w))),
+                            'receiveAlert': bool(request.POST.get('receive_alert_'+str(w))),
+                            'receiveSMS': False,
+                        }
+                        Watcher.update(
+                            request.META['HTTP_HOST'],
+                            int(w),
+                            postdata,
+                            request.access_token
+                        )
             return HttpResponseRedirect(reverse('list-watchers'))
         else:
             return HttpResponseNotAllowed(['POST',])

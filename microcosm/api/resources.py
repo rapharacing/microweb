@@ -492,6 +492,16 @@ class Watcher(APIResource):
         url = build_url(host, [Watcher.api_path_fragment, watcher_id])
         APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
+    @staticmethod
+    def update(host, watcher_id, data, access_token):
+        url = build_url(host, [Watcher.api_path_fragment, watcher_id])
+        resource = APIResource.update(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
+
+    @staticmethod
+    def create(host, data, access_token):
+        url = build_url(host, [Watcher.api_path_fragment])
+        APIResource.create(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
+
 
 class WatcherList(object):
     """
@@ -512,7 +522,7 @@ class WatcherList(object):
 
     @staticmethod
     def retrieve(host, offset=None, access_token=None):
-        url, params, headers = AlertList.build_request(host, offset, access_token)
+        url, params, headers = WatcherList.build_request(host, offset, access_token)
         resource = APIResource.retrieve(url, params, headers)
         return WatcherList(resource)
 
@@ -693,11 +703,7 @@ class GlobalOptions(APIResource):
 
     @staticmethod
     def update(host, data, access_token):
-        print 'updating global options with: '
-        print data
         url = build_url(host, GlobalOptions.api_path_fragment)
-        print url
-        print json.dumps(data)
         resource = APIResource.update(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
         return GlobalOptions.from_api_response(resource)
 
