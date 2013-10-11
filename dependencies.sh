@@ -1,4 +1,4 @@
-virtualenv env
-source env/bin/activate
+virtualenv --no-site-packages ENV 
+source ENV/bin/activate
 pip install -r requirements.txt
-deactivate
+ENV/bin/deactivate
