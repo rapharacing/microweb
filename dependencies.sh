@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get -y install build-essential libevent1-dev libmemcached-dev python-pip
+sudo apt-get -y install build-essential libevent1-dev libmemcached-dev python-pip python2.7-dev
 sudo pip install virtualenv
 
 virtualenv ENV
