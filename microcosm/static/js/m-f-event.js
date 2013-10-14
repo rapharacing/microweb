@@ -455,10 +455,6 @@ function loadForm() {
 		.on('changeDate', function(ev){
 			setStartDate(new Date(ev.date));
 
-			// Prevent the user from trying to select an end date prior to
-			// the start date
-			$('#id_to_date').datepicker('setStartDate', $('#id_from_date').val());
-
 			// The user is done, hide the picker
 			$('#id_from_date').datepicker('hide');
 		})
@@ -559,9 +555,6 @@ function loadForm() {
 		// Then we can set our global var with the start date
 		setStartDate(getDateFromIsoString($('#id_from_date').val()));
 
-		// And prevent the user from selecting an end date prior to the start date
-		$('#id_to_date').datepicker('setStartDate', $('#id_from_date').val());
-
 		// And if we have an end date
 		if ($('#id_to_date').val().trim() != "" && $('#id_to_date').val().trim().match(dateReg)) {
 
@@ -578,7 +571,7 @@ function loadForm() {
 		var s = getIsoStringFromDate(tomorrow);
 
 		$('#id_from_date').val(s);
-		$('#id_to_date').val(s).datepicker('setStartDate', $('#id_from_date').val());
+		$('#id_to_date').val(s);
 		
 		// Remember to update the global vars whenever we manually touch the
 		// form values
