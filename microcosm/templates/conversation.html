@@ -8,6 +8,9 @@
 	</ol>
 {% endblock %}
 
+{% block ga %},'dimension2': '{{ content.meta.created_by.id }}'
+			,'dimension3': '{{ content.microcosm_id }}'{% endblock%}
+
 {% block content %}
 	<h1 id="conversation_title">{{ content.title }}</h1>
 	<br />

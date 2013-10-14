@@ -168,6 +168,34 @@ function restoreLocationState(lat, lng, bounds) {
 
 	var marker = L.marker(new L.LatLng(lat, lng));
 	map.addLayer(marker);
+
+	if (lat != 0 && lng != 0 && bounds.length == 2 && bounds[1].length == 2) {
+
+		var ua = navigator.userAgent.toLowerCase();
+		var isAndroid = ua.indexOf("android") > -1;
+
+		var gmaplink = '';
+		if (isAndroid) {
+			gmaplink = 'geo:' + lat + ',' + lng + '?q=' + lat + ',' + lng + '(' + $('#where').text() + ')';
+		} else {
+			gmaplink = 'https://maps.google.com/maps?q=' + lat + ',' + lng + 
+			'(' + $('#where').text() + ')&spn=' + (bounds[0][0]-bounds[1][0]) + ',' + (bounds[0][1]-bounds[1][1]);
+		}
+
+		var osmlink = 'http://www.openstreetmap.org/?minlon=' + bounds[0][1] + '&minlat=' + bounds[1][0] +
+			'&maxlon=' + bounds[1][1] + '&maxlat=' + bounds[0][0] +
+			'&box=no&mlat=' + lat + '&mlon=' + lng;
+
+		if (isAndroid) {
+			$('#maplinks').append(
+				'View location in <a href="' + gmaplink + '">Maps</a>.'
+			).show();
+		} else {
+			$('#maplinks').append(
+				'View location in <a href="' + gmaplink + '">Google Maps</a> or <a href="' + osmlink + '">Open Street Maps</a>.'
+			).show();
+		}
+	}
 }
 
 function formatDate(d) {

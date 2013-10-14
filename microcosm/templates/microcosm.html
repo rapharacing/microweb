@@ -7,6 +7,8 @@
 	</ol>
 {% endblock %}
 
+{% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
+
 {% block content %}
 	<a id="microcosm_title" href="{% url single-microcosm content.id %}"><h1>{{ content.title }}</h1></a>
 

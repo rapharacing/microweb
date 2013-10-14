@@ -54,8 +54,9 @@ class DomainRedirectMiddleware():
 
             # Site has a custom domain, so redirect
             if site and site.domain != '':
-                # Prepend URL scheme to custom domain
-                location = 'https://' if request.is_secure() else 'http://' + site.domain
+                # No custom domains can be SSL, so we must be redirecting to the
+                # http version regardless of how they came into the site
+                location = 'http://' + site.domain
 
                 # Append query string to new location, if it exists
                 query_string = request.META.get('QUERY_STRING', None)
