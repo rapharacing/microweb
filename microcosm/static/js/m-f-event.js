@@ -519,6 +519,11 @@ function loadForm() {
 		);
 	}
 
+	var tomorrow = new Date();
+	tomorrow.setDate(tomorrow.getDate() + 1)
+	setStartDate(tomorrow);
+	setEndDate(tomorrow);
+
 	// If we have the when info
 	if ($('#id_when').val().trim() != '') {
 		// Then we can prime our interface by setting the start date from
@@ -543,11 +548,6 @@ function loadForm() {
 			$('#id_to_time').val(getTimeStringFromDate(tEndDate));
 		}
 	}
-
-	var tomorrow = new Date();
-	tomorrow.setDate(tomorrow.getDate() + 1)
-	setStartDate(tomorrow);
-	setEndDate(tomorrow);
 
 	// And if we have primed our interface
 	if ($('#id_from_date').val().trim() != "" && $('#id_from_date').val().trim().match(dateReg)) {
