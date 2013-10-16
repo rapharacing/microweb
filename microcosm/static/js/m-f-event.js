@@ -297,6 +297,7 @@ function setStartDate(d) {
 	}
 	$('#id_from_date').val(getIsoStringFromDate(d));
 	$('#id_from_date').datepicker('update');
+	$('#id_from_date').text($('#id_from_date').val());
 	startDate = d;
 	validateDateTimesAndUpdateForm();
 }
@@ -310,6 +311,7 @@ function setEndDate(d) {
 	}
 	$('#id_to_date').val(getIsoStringFromDate(d));
 	$('#id_to_date').datepicker('update');
+	$('#id_to_date').text($('#id_to_date').val());
 	endDate = d;
 	validateDateTimesAndUpdateForm();
 }
@@ -363,6 +365,9 @@ function validateDateTimesAndUpdateForm() {
 		console.log('validation fails: startDate="' + startDate + '", startTime="' + startTime + '", endDate="' + endDate+ '", endTime="' + endTime + '"')
 		return false;
 	}
+
+	$('#id_from_time').text($('#id_from_time').val());	
+	$('#id_to_time').text($('#id_to_time').val());
 
 	// We can glue them together
 	var startDateTime = startDate;
@@ -456,7 +461,7 @@ function loadForm() {
 			setStartDate(new Date(ev.date));
 
 			// The user is done, hide the picker
-			$('#id_from_date').datepicker('hide');
+			$('#id_from_date').text($('#id_from_date').val()).datepicker('hide');
 		})
 		// Detect null changes
 		.on('change', function() {
@@ -476,7 +481,7 @@ function loadForm() {
 			setEndDate(new Date(ev.date));
 
 			// The user is done, hide the picker
-			$('#id_to_date').datepicker('hide');
+			$('#id_to_date').text($('#id_to_date').val()).datepicker('hide');
 		})
 		// Detect null changes
 		.on('change', function() {
@@ -519,6 +524,11 @@ function loadForm() {
 		);
 	}
 
+	var tomorrow = new Date();
+	tomorrow.setDate(tomorrow.getDate() + 1)
+	setStartDate(tomorrow);
+	setEndDate(tomorrow);
+
 	// If we have the when info
 	if ($('#id_when').val().trim() != '') {
 		// Then we can prime our interface by setting the start date from
@@ -543,11 +553,6 @@ function loadForm() {
 			$('#id_to_time').val(getTimeStringFromDate(tEndDate));
 		}
 	}
-
-	var tomorrow = new Date();
-	tomorrow.setDate(tomorrow.getDate() + 1)
-	setStartDate(tomorrow);
-	setEndDate(tomorrow);
 
 	// And if we have primed our interface
 	if ($('#id_from_date').val().trim() != "" && $('#id_from_date').val().trim().match(dateReg)) {
@@ -586,11 +591,13 @@ function loadForm() {
 
 	$('#id_from_time')
 		// When a user goes into the field show the picker
-		.on('focus', function() {
+		.on('click', function() {
 			$('#id_from_time').timepicker('showWidget');
+			return false;
 		})
 		// And if they change the value, update the form state
 		.on('change', function() {
+			$('#id_from_time').text($('#id_from_time').val());	
 			validateDateTimesAndUpdateForm();
 		})
 		// Create the time picker and set the time
@@ -605,12 +612,14 @@ function loadForm() {
 		// Create the time picker and set the time
 		.timepicker({"disableFocus": true, "defaultTime": toTime})
 		// Show the picker when the user enters the field
-		.on('focus', function() {
+		.on('click', function() {
 			$('#id_to_time').timepicker('showWidget');
+			return false;
 		})
 		// If the value changes, update the form state
 		.on('change', function() {
 			validateDateTimesAndUpdateForm();
+			$('#id_to_time').text($('#id_to_time').val());
 		});
 
 	// And as we've jigged all of the dates and times around, update the
