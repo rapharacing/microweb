@@ -3,6 +3,10 @@
 {% block content %}
     <h4>Showing single comment</h4>
 
-    {{ content.html|safe }}
+	<div class="row">
+		<section class="col col-sm-16 ugc" id="comment{{ comment.id }}body">
+			{{ comment.html|safe }}
+		</section>
+	</div>
 
 {% endblock content %}
