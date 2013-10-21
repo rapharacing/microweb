@@ -12,13 +12,15 @@ from microcosm.views import ProfileView
 from microcosm.views import AuthenticationView
 from microcosm.views import ErrorView
 from microcosm.views import GeoView
+from microcosm.views import FaviconView
+from microcosm.views import RobotsView
 
 
 urlpatterns = patterns('',
 
     # Static
-    url(r'^robots\.txt$', 'django.views.generic.simple.direct_to_template', {'template': 'robots.txt', 'mimetype': 'text/plain'}),
-    url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/img/favico.png'}),
+    url(r'^robots\.txt$', RobotsView.as_view()),
+    url(r'^favicon\.ico$', FaviconView.as_view()),
 
     # Auth
     url(r'^login/$', AuthenticationView.login, name='login'),

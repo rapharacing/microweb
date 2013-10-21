@@ -25,6 +25,9 @@ from django.shortcuts import render
 from django.template import RequestContext
 from django.template import loader
 
+from django.views.generic.base import RedirectView
+from django.views.generic.base import TemplateView
+
 from microcosm.api.exceptions import APIException
 from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import Microcosm
@@ -1078,3 +1081,17 @@ def echo_headers(request):
         view_data += '<tr><td>%s</td><td>%s</td></tr>' % (key, request.META[key])
     view_data += '</table></body></html>'
     return HttpResponse(view_data, content_type='text/html')
+
+
+class FaviconView(RedirectView):
+
+    def get_redirect_url(self, **kwargs):
+        return settings.STATIC_URL + '/img/favico.png'
+
+
+class RobotsView(TemplateView):
+
+    template = 'robots.txt'
+
+    def get_context_data(self, **kwargs):
+        return super(RobotsView, self).get_context_data(**kwargs)
