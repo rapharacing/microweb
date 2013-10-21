@@ -9,6 +9,12 @@ TEMPLATE_DEBUG = False
 ADMINS = ()
 MANAGERS = ADMINS
 
+# ALLOWED_HOSTS is required in >Django 1.5. Since we allow customers to CNAME their domain
+# to microcosm, we cannot make use of this feature. Host is verified in the API.
+ALLOWED_HOSTS = [
+    '*',
+]
+
 # Test runner gets unhappy if there's no database defined.
 DATABASES = {
     'default': {
