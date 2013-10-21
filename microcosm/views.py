@@ -358,28 +358,42 @@ class MicrocosmView(object):
     @staticmethod
     @exception_handler
     def single(request, microcosm_id):
+        if request.method == 'GET':
+            # record offset for paging of items within the microcosm
+            offset = int(request.GET.get('offset', 0))
 
-        # record offset for paging of items within the microcosm
-        offset = int(request.GET.get('offset', 0))
+            microcosm_url, params, headers = Microcosm.build_request(
+                request.META['HTTP_HOST'],
+                id=microcosm_id,
+                offset=offset,
+                access_token=request.access_token
+            )
+            request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
-        microcosm_url, params, headers = Microcosm.build_request(
-            request.META['HTTP_HOST'],
-            id=microcosm_id,
-            offset=offset,
-            access_token=request.access_token
-        )
-        request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-        microcosm = Microcosm.from_api_response(responses[microcosm_url])
+            view_data = {
+                'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+                'site': request.site,
+                'content': microcosm,
+                'pagination': build_pagination_links(request, microcosm.items)
+            }
 
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-            'site': request.site,
-            'content': microcosm,
-            'pagination': build_pagination_links(request, microcosm.items)
-        }
+            return render(request, MicrocosmView.single_template, view_data)
 
-        return render(request, MicrocosmView.single_template, view_data)
+        elif request.method == 'POST':
+            postdata = {
+                'alertTypeId': int(request.POST.get('alert_type_id')),
+                'itemTypeId': 2,
+                'itemId': int(microcosm_id),
+            }
+            Watcher.create(
+                request.META['HTTP_HOST'],
+                postdata,
+                request.access_token
+            )
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
     @staticmethod
     @exception_handler
