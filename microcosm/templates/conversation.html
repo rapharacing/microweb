@@ -28,10 +28,10 @@
 
 	{% if content.meta.permissions.update %}
 	<p class="hidden-xs">
-		<a id="edit_conversation" href="{% url edit-conversation content.id %}" >Edit conversation</a>
+		<a id="edit_conversation" href="{% url 'edit-conversation' content.id %}" >Edit conversation</a>
 
 		{% if content.meta.permissions.delete %}
-			<form method="POST" action="{% url delete-conversation content.id %}" id="conversation_delete_form" class="hidden-xs">
+			<form method="POST" action="{% url 'delete-conversation' content.id %}" id="conversation_delete_form" class="hidden-xs">
 				{% csrf_token %}
 				<a id="delete-conversation" href="#" onClick="if (confirm('Delete is a one-way action, are you sure?')) {$('#conversation_delete_form').submit()}" class="text-danger">Delete conversation</a>
 			</form>

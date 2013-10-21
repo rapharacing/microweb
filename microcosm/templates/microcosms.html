@@ -14,7 +14,7 @@
 			<section id="microcosm{{item.id}}" class="row">
 				<div class="row">
 					<div class="col col-sm-16">
-						<a href="{% url single-microcosm item.id %}"><h1>{{ item.title }}</h1></a>
+						<a href="{% url 'single-microcosm' item.id %}"><h1>{{ item.title }}</h1></a>
 					</div>
 				</div>
 				<div class="row">
@@ -34,9 +34,9 @@
 								<td><small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.total_comments }}</small></td>
 								{% if item.most_recent_update %}
 									{% if item.most_recent_update.total_comments %}
-										<td><small class="text-muted"><time datetime="{{item.most_recent_update.last_comment_created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a></small></td>
+										<td><small class="text-muted"><time datetime="{{item.most_recent_update.last_comment_created|date:"c"}}"></time> by <a href="{% url 'single-profile' item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a></small></td>
 									{% else%}
-										<td><small class="text-muted"><time datetime="{{item.most_recent_update.meta.created|date:"c"}}"></time> by <a href="{% url single-profile item.most_recent_update.meta.created_by.id %}">{{ item.most_recent_update.meta.created_by.profile_name }}</a></small></td>
+										<td><small class="text-muted"><time datetime="{{item.most_recent_update.meta.created|date:"c"}}"></time> by <a href="{% url 'single-profile' item.most_recent_update.meta.created_by.id %}">{{ item.most_recent_update.meta.created_by.profile_name }}</a></small></td>
 									{% endif %}
 								{% endif %}
 							</tr>
@@ -54,7 +54,7 @@
 
 {% block sidebar%}
 	{% if content.meta.permissions.create %}
-		<p><a class="btn btn-primary col col-sm-16" id="create_microcosm" href="{% url create-microcosm %}">Create Microcosm</a></p>
+		<p><a class="btn btn-primary col col-sm-16" id="create_microcosm" href="{% url 'create-microcosm' %}">Create Microcosm</a></p>
 	{% endif %}
 
 {% endblock%}

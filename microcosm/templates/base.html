@@ -45,12 +45,12 @@
 							{% if user %}
 								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5 whoami">
 									<div class="row margin-top-half">
-										<a href="{% url edit-profile user.id %}" id="edit_profile">
+										<a href="{% url 'edit-profile' user.id %}" id="edit_profile">
                                             <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" class="gravatar" align="left" />
                                         </a>
-										<a href="{% url list-notifications %}" id="notifications">Notifications{% if user.unread_count %} (<span class="unread">{{ user.unread_count }}</span>){% endif %}</a><br />
-                                        <a href="{% url edit-profile user.id %}" id="profile_name">Edit profile</a><br />
-										<a href="{% url logout %}" id="logout">Log out</a>
+										<a href="{% url 'list-notifications' %}" id="notifications">Notifications{% if user.unread_count %} (<span class="unread">{{ user.unread_count }}</span>){% endif %}</a><br />
+                                        <a href="{% url 'edit-profile' user.id %}" id="profile_name">Edit profile</a><br />
+										<a href="{% url 'logout' %}" id="logout">Log out</a>
 									</div>
 								</div>
 							{% else %}
@@ -91,7 +91,7 @@
 
 	{% if not user %}
 		<!-- Persona Login Form (submitted by persona login action, not directly by user) -->
-		<form id="login-form" method="POST" action="{% url login %}">
+		<form id="login-form" method="POST" action="{% url 'login' %}">
 			{% csrf_token %}
 			<input id="Assertion" type="hidden" name="Assertion" value="" />
 			<input id="target_url" type="hidden" name="target_url" value="{{ request.get_full_path }}" />

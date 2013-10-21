@@ -25,7 +25,7 @@
 
 						<section class="pull-right" id="comment{{ comment.id }}controls">
 							{% if comment.meta.created_by.id == user.id or user.admin or user.moderator %}
-								<form method="POST" action="{% url delete-comment comment.id %}" style="display:inline;" onsubmit="return (confirm('Delete is a one-way action, are you sure?'))">
+								<form method="POST" action="{% url 'delete-comment' comment.id %}" style="display:inline;" onsubmit="return (confirm('Delete is a one-way action, are you sure?'))">
 									{% csrf_token %}
 									<input type="hidden" name="item_id" value="{{comment.item_id}}"/>
 									<input type="hidden" name="item_type" value="{{comment.item_type}}"/>

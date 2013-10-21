@@ -33,7 +33,7 @@
                 </div>
                 <div class="col col-sm-2">
                     {% if not alert.viewed %}
-                    <form method="POST" action="{% url mark-notification-viewed alert.id %}">
+                    <form method="POST" action="{% url 'mark-notification-viewed' alert.id %}">
                         {% csrf_token %}
                         <input type="submit" value="✔" class="btn btn-small" />
                     </form>

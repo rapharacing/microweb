@@ -6,7 +6,7 @@
     </section>
     {% if not content.watchers.items %}
         <p>When you post a comment on a conversation or event, you'll start watching it. New comments posted on
-        that item will appear on your <a href="{% url list-notifications %}">notifications dashboard</a> or be emailed
+        that item will appear on your <a href="{% url 'list-notifications' %}">notifications dashboard</a> or be emailed
         to you (unless you've turned these things off).</p>
     {% else %}
         {% include "pagination_nav.html" %}
@@ -19,7 +19,7 @@
                     Last updated <time datetime="{{ watcher.item.last_comment_created|date:"c" }}"></time>
                 </div>
                 <div class="col col-sm-2">
-                    <form method="POST" action="{% url delete-watcher watcher.id %}">
+                    <form method="POST" action="{% url 'delete-watcher' watcher.id %}">
                         {% csrf_token %}
                         <div class="col col-sm-2">
                             <input type="submit" value="Stop watching" class="btn btn-primary btn-small" />
