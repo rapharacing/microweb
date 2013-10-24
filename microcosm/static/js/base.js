@@ -24,6 +24,7 @@ if (jQuery && moment) {
 }
 
 $('document').ready(function() {
+	// Updates <time> to use relative times
 	updateTimes();
 	setInterval(updateTimes, 60000); // Update every minute
 
@@ -43,4 +44,8 @@ $('document').ready(function() {
 	});
 	
 	prettyPrint();
+
+
+	// Make tables in user generated content look pretty
+	$('.ugc table').addClass('table').addClass('table-hover');
 });

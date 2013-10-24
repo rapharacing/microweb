@@ -10,7 +10,7 @@
 {% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
 
 {% block content %}
-	<a id="microcosm_title" href="{% url single-microcosm content.id %}"><h1>{{ content.title }}</h1></a>
+	<a id="microcosm_title" href="{% url 'single-microcosm' content.id %}"><h1>{{ content.title }}</h1></a>
 
 	{% include "pagination_nav.html" %}
 
@@ -23,7 +23,7 @@
 						<td><strong><a href="/{{ item.item_type }}s/{{ item.id }}/{% if user %}newest/{% endif %}">{{ item.title }}</a></strong></td>
 					</tr>
 					<tr>
-						<td><small class="text-muted">started by <a href="{% url single-profile item.meta.created_by.id %}">{{ item.meta.created_by.profile_name|truncatechars:25 }}</a> <time datetime="{{ item.meta.created|date:"c" }}"></time></small></td>
+						<td><small class="text-muted">started by <a href="{% url 'single-profile' item.meta.created_by.id %}">{{ item.meta.created_by.profile_name|truncatechars:25 }}</a> <time datetime="{{ item.meta.created|date:"c" }}"></time></small></td>
 					</tr>
 				</tbody>
 			</table>
@@ -32,8 +32,8 @@
 				<tbody>
 					<tr>
 						<td width="100"><small class="nowrap"><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.total_comments }}</small></td>
-						<td rowspan="2" width="50">{% if item.last_comment_created %}<a href="{% url single-profile item.last_comment_created_by.id %}"><img src="{% if 'gravatar' in item.last_comment_created_by.avatar %}{{item.last_comment_created_by.avatar}}{% elif 'files' in item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.last_comment_created_by.profile_name }}" align="left" class="gravatar-small" /></a>{% endif %}</td>
-						<td>{% if item.last_comment_created %}<small><a href="{% url single-profile item.last_comment_created_by.id %}">{{ item.last_comment_created_by.profile_name|truncatechars:25 }}</a></small>{% endif %}</td>
+						<td rowspan="2" width="50">{% if item.last_comment_created %}<a href="{% url 'single-profile' item.last_comment_created_by.id %}"><img src="{% if 'gravatar' in item.last_comment_created_by.avatar %}{{item.last_comment_created_by.avatar}}{% elif 'files' in item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.last_comment_created_by.profile_name }}" align="left" class="gravatar-small" /></a>{% endif %}</td>
+						<td>{% if item.last_comment_created %}<small><a href="{% url 'single-profile' item.last_comment_created_by.id %}">{{ item.last_comment_created_by.profile_name|truncatechars:25 }}</a></small>{% endif %}</td>
 					</tr>					
 					<tr>
 						<td><small class="nowrap"><i class="glyphicon glyphicon-eye-open buffer-right"></i> {{ item.total_views }}</small></td>
@@ -66,16 +66,16 @@
 	<p id="microcosm_description">{{ content.description }}</p>
 
 	<p class="text-muted hidden-xs">
-		Created by <a href="{% url single-profile content.meta.created_by.id %}">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
+		Created by <a href="{% url 'single-profile' content.meta.created_by.id %}">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
 		<time datetime="{{ content.meta.created|date:"c" }}"></time>
 	</p>
 
 	{% if content.meta.permissions.update %}
 	<p class="hidden-xs">
-		<a id="edit_microcosm" href="{% url edit-microcosm content.id %}">Edit Microcosm</a>
+		<a id="edit_microcosm" href="{% url 'edit-microcosm' content.id %}">Edit Microcosm</a>
 
 		{% if content.meta.permissions.delete %}
-		<form method="POST" action="{% url delete-microcosm content.id %}" id="microcosm_delete_form" class="hidden-xs">
+		<form method="POST" action="{% url 'delete-microcosm' content.id %}" id="microcosm_delete_form" class="hidden-xs">
 			{% csrf_token %}
 			<a id="delete-microcosm" href="#" onClick="if (confirm('Delete is a one-way action, are you sure?')) {$('#microcosm_delete_form').submit()}" class="text-danger">Delete Microcosm</a>
 		</form>
@@ -84,7 +84,7 @@
 	{% endif %}
 
 	{% if content.meta.permissions.create %}
-		<a class="btn btn-primary btn-block" id="create_item" href="{% url item-choice content.id %}">Create item</a>
+		<a class="btn btn-primary btn-block" id="create_item" href="{% url 'item-choice' content.id %}">Create item</a>
 	{% endif %}
 
 {% endblock%}

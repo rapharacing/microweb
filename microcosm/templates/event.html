@@ -107,10 +107,10 @@
 
 	{% if content.meta.permissions.update %}
 	<p class="hidden-xs">
-		<a id="edit_event" href="{% url edit-event content.id %}">Edit event</a>
+		<a id="edit_event" href="{% url 'edit-event' content.id %}">Edit event</a>
 
 		{% if content.meta.permissions.delete %}
-			<form method="POST" action="{% url delete-event content.id %}" id="event_delete_form" class="hidden-xs">
+			<form method="POST" action="{% url 'delete-event' content.id %}" id="event_delete_form" class="hidden-xs">
 				{% csrf_token %}
 				<a id="delete-event" href="#" onClick="if (confirm('Delete is a one-way action, are you sure?')) {$('#event_delete_form').submit()}" class="text-danger">Delete event</a>
 			</form>
@@ -121,20 +121,20 @@
 	<h4>Are you coming?</h4>
 	{% if user %}
 	{% if content.rsvp_limit == 0 or content.rsvp_limit > content.rsvp_attend %}
-	<form method="POST" action="{% url rsvp-event content.id %}">
+	<form method="POST" action="{% url 'rsvp-event' content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="yes" />
 		<input id="rsvp_yes" type="submit" value="Count me in" class="btn btn-primary btn-block" style="width:100%;">
 	</form>
 	{% endif %}
 
-	<form method="POST" action="{% url rsvp-event content.id %}">
+	<form method="POST" action="{% url 'rsvp-event' content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="maybe" />
 		<input id="rsvp_maybe" type="submit" value="Maybe" class="btn btn-default btn-block" style="width:100%; margin-top:12px;">
 	</form>
 
-	<form method="POST" action="{% url rsvp-event content.id %}">
+	<form method="POST" action="{% url 'rsvp-event' content.id %}">
 		{% csrf_token %}
 		<input type="hidden" name="rsvp" value="no" />
 		<input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default btn-block" style="width:100%; margin-top:12px;">
