@@ -60,12 +60,12 @@ urlpatterns = patterns('',
     url(r'comments/(?P<comment_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
 
     # Notifications
-    url(r'notifications/$', AlertView.list, name='list-notifications'),
-    url(r'notifications/(?P<alert_id>\d+)/viewed/$', AlertView.mark_viewed, name='mark-notification-viewed'),
-    url(r'notifications/settings/$', AlertPreferenceView.settings, name='notification-settings'),
+    url(r'^notifications/$', AlertView.list, name='list-notifications'),
+    url(r'^notifications/(?P<alert_id>\d+)/viewed/$', AlertView.mark_viewed, name='mark-notification-viewed'),
+    url(r'^notifications/settings/$', AlertPreferenceView.settings, name='notification-settings'),
 
     # Watchers
-    url(r'watchers/$', WatcherView.list, name='list-watchers'),
+    url(r'^watchers/$', WatcherView.list, name='list-watchers'),
 
     # User profiles
     url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),
