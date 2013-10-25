@@ -479,7 +479,7 @@ class Watcher(APIResource):
             elif data.get('itemType') == "microcosm":
                 self.item = Microcosm.from_summary(data['item'])
                 self.item_link = '/%s/%s' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
-                if data['item'].get('mostRecentUpdate'):
+                if data['item'].get('mostRecentUpdate') and data['item']['mostRecentUpdate'].get('lastCommentCreated'):
                     self.item.last_comment_created = parse_timestamp(data['item']['mostRecentUpdate']['lastCommentCreated'])
                 else:
                     self.item.last_comment_created = parse_timestamp(data['item']['meta']['created'])
