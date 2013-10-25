@@ -11,46 +11,42 @@
     {% else %}
         {% include "pagination_nav.html" %}
         <form method="POST" action="">
-        {% csrf_token %}
-        <section class="row">
-            <div class="col col-sm-8">
-            </div>
-            <div class="col col-sm-2">
-                Notify me
-            </div>
-            <div class="col col-sm-2">
-                Email me
-            </div>
-            <div class="col col-sm-2">
-                Delete watcher
-            </div>
-        </section>
-        <hr />
-        {% for watcher in content.watchers.items %}
+            {% csrf_token %}
             <section class="row">
-                <div class="col col-sm-8 text-muted" >
-                    <a href="{{ watcher.item_link }}">{{ watcher.item.title }}</a>
-                    <br>Last updated <time datetime="{{ watcher.item.last_comment_created|date:"c" }}"></time>
-                </div>
-                <input type="hidden" name="watcher_id" value="{{ watcher.id }}">
-                <div class="col col-sm-2">
-                    <input name="receive_alert_{{ watcher.id }}" type="checkbox" {% if watcher.receive_alert %}checked="true"{% endif %}>
+                <div class="col col-sm-8">
                 </div>
                 <div class="col col-sm-2">
-                    <input name="receive_email_{{ watcher.id }}" type="checkbox" {% if watcher.receive_email %}checked="true"{% endif %}>
+                    Show on Notifications
                 </div>
                 <div class="col col-sm-2">
-                    <input name="delete_watcher_{{ watcher.id }}" type="checkbox">
+                    Send me an email
+                </div>
+                <div class="col col-sm-2">
+                    Delete this watcher
                 </div>
             </section>
-        {% endfor %}
-        <section class="row">
-            <div class="col col-sm-2">
-                <div class="col col-sm-2">
-                    <input type="submit" value="Submit changes" class="btn btn-primary btn-small" />
-                </div>
-           </div>
-        </section>
+            <hr />
+            {% for watcher in content.watchers.items %}
+                <section class="row">
+                    <div class="col col-sm-8 text-muted" >
+                        <a href="{{ watcher.item_link }}">{{ watcher.item.title }}</a>
+                        <br>Last updated <time datetime="{{ watcher.item.last_comment_created|date:"c" }}"></time>
+                    </div>
+                    <input type="hidden" name="watcher_id" value="{{ watcher.id }}">
+                    <div class="col col-sm-2">
+                        <input name="receive_alert_{{ watcher.id }}" type="checkbox" {% if watcher.receive_alert %}checked="true"{% endif %}>
+                    </div>
+                    <div class="col col-sm-2">
+                        <input name="receive_email_{{ watcher.id }}" type="checkbox" {% if watcher.receive_email %}checked="true"{% endif %}>
+                    </div>
+                    <div class="col col-sm-2">
+                        <input name="delete_watcher_{{ watcher.id }}" type="checkbox">
+                    </div>
+                </section>
+            {% endfor %}
+
+            <br />
+            <input type="submit" value="Save changes" class="btn btn-primary btn-small" />
         </form>
         {% include "pagination_nav.html" %}
     {% endif %}

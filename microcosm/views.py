@@ -740,8 +740,10 @@ class CommentView(object):
 
         path = join_path_fragments([RESOURCE_PLURAL[comment.item_type], comment.item_id])
 
-        if 'offset' in comment.meta.links.get('via'):
-            offset = comment.meta.links.get('via').split('offset=')[1]
+        if 'commentPage' in comment.meta.links and \
+            'offset' in comment.meta.links['commentPage']['href']:
+
+            offset = comment.meta.links['commentPage']['href'].split('offset=')[1]
             location = urlunparse((
                 '', '', path, '',
                 'offset=%s' % offset,
@@ -797,7 +799,7 @@ class CommentView(object):
             if form.is_valid():
                 comment_request = Comment.from_create_form(form.cleaned_data)
                 comment_response = comment_request.create(request.META['HTTP_HOST'], access_token=request.access_token)
-                if comment_response.meta.links.get('via'):
+                if comment_response.meta.links.get('commentPage'):
                     return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
                 else:
                     return HttpResponseRedirect(reverse('single-comment', args=(comment_response.id,)))
@@ -832,7 +834,7 @@ class CommentView(object):
             if form.is_valid():
                 comment_request = Comment.from_edit_form(form.cleaned_data)
                 comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
-                if comment_response.meta.links.get('via'):
+                if comment_response.meta.links.get('commentPage'):
                     return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
                 else:
                     return HttpResponseRedirect(reverse('single-comment', args=(comment_response.id,)))
