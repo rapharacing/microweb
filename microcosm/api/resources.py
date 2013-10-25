@@ -473,16 +473,30 @@ class Watcher(APIResource):
             if data.get('itemType') == "conversation":
                 self.item = Conversation.from_summary(data['item'])
                 self.item_link = '/%s/%s/newest/' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
+
+                if data['item'].get('lastCommentCreated'):
+                    self.item.last_comment_created = parse_timestamp(data['item']['lastCommentCreated'])
+                else:
+                    self.item.last_comment_created = parse_timestamp(data['item']['meta']['created'])
+
             elif data.get('itemType') == "event":
                 self.item = Event.from_summary(data['item'])
                 self.item_link = '/%s/%s/newest' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
+
+                if data['item'].get('lastCommentCreated'):
+                    self.item.last_comment_created = parse_timestamp(data['item']['lastCommentCreated'])
+                else:
+                    self.item.last_comment_created = parse_timestamp(data['item']['meta']['created'])
+
             elif data.get('itemType') == "microcosm":
                 self.item = Microcosm.from_summary(data['item'])
                 self.item_link = '/%s/%s' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
-                if data['item'].get('mostRecentUpdate') and data['item']['mostRecentUpdate'].get('lastCommentCreated'):
-                    self.item.last_comment_created = parse_timestamp(data['item']['mostRecentUpdate']['lastCommentCreated'])
+
+                if data['item'].get('mostRecentUpdate'):
+                    self.item.last_comment_created = parse_timestamp(data['item']['mostRecentUpdate']['meta']['created'])
                 else:
                     self.item.last_comment_created = parse_timestamp(data['item']['meta']['created'])
+
             else:
                 self.item_link = '/%s/%s' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
 
