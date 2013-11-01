@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb %}
+	<ol class="breadcrumb">
+		<li><a href="/">Home</a></li>
+		<li class="active"><a href='{{ content.meta.links.self.href|slice:"7:" }}'>Profiles</a></li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+        <section id="alphabet">
+            <ol class="breadcrumb">
+            {% if q == "" %}
+                <li>All</li>
+            {% else %}
+                <li><a href="/profiles/{% if top %}?top=true{% endif %}">All</a></li>
+            {% endif %}
+            {% for letter in alphabet %}<li>{% if letter != q %}<a href="/profiles/?q={{ letter }}{% if top %}&top=true{% endif %}">{{ letter }}</a>{% else %}{{ letter }}{% endif %}</li>
+            {% endfor %}
+            </ol>
+        </section>
+        {% include "pagination_nav.html" %}
+        <section id="headers" class="row">
+            <div class="col col-sm-2" ></div>
+            <div class="col col-sm-14"><a href="/profiles/{% if q != "" or not top %}?{% endif %}{% if q != "" %}q={{ q }}{% endif %}{% if q != "" and not top %}&{% endif %}{% if not top %}top=true{% endif %}">Sort {% if top %}alphabetically{% else %}by post count{% endif %}</a>
+            </div>
+        {% for item in content.profiles.items %}
+            <section id="profile{{item.id}}">
+                <div class="col col-sm-2">
+                    <img src="{% if 'gravatar' in item.avatar %}{{item.avatar}}{% elif 'files' in item.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ item.profile_name }}" />
+                </div>
+                <div class="col col-sm-6">
+                    <a href="{% url 'single-profile' item.id %}"><h1>{{ item.profile_name }}</h1></a>
+                </div>
+            </section>
+
+        {% endfor %}
+{% endblock %}

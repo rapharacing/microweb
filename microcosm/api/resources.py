@@ -226,6 +226,11 @@ class Profile(object):
             self.banned = data['banned']
             self.admin = data['admin']
 
+    @classmethod
+    def from_summary(cls, data):
+        profile = Profile(data, summary=True)
+        return profile
+
     @staticmethod
     def retrieve(host, id, access_token=None):
         url = build_url(host, [Profile.api_path_fragment, id])
@@ -261,6 +266,33 @@ class Profile(object):
         url = build_url(host, ['alerts', 'unread'])
         return APIResource.retrieve(url, {}, headers=APIResource.make_request_headers(access_token))
 
+
+class ProfileList(object):
+    """
+    Represents a list of microcosms for a given site.
+    """
+
+    api_path_fragment = 'profiles'
+
+    def __init__(self, data):
+        self.profiles = PaginatedList(data['profiles'], Profile)
+        self.meta = Meta(data['meta'])
+
+    @staticmethod
+    def build_request(host, offset=None, top=False, q="", access_token=None):
+        url = build_url(host, [ProfileList.api_path_fragment])
+        params = {}
+        if offset: params['offset'] = offset
+        if top: params['top'] = top
+        if q: params['q'] = q
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = ProfileList.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return ProfileList(resource)
 
 class Microcosm(APIResource):
     """
