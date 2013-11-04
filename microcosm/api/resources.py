@@ -1075,9 +1075,12 @@ class Comment(APIResource):
         comment.item_type = data['itemType']
         comment.item_id = data['itemId']
         comment.revisions = data['revisions']
-        comment.in_reply_to = data['inReplyTo']
-        comment.attachments = data['attachments']
-        comment.first_line = data['firstLine']
+        if data.get('inReplyTo'):
+            comment.in_reply_to = data['inReplyTo']
+        if data.get('attachments'):
+            comment.attachments = data['attachments']
+        if data.get('firstLine'):
+            comment.first_line = data['firstLine']
         comment.markdown = data['markdown']
         comment.html = data['html']
         comment.meta = Meta(data['meta'])
