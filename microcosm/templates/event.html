@@ -93,7 +93,7 @@
 	{% if user %} {% if not content.meta.flags.iswatched %}
 	<form method="POST" action="" id="subscribe_form">
 		{% csrf_token %}
-		<input type="hidden" name="alert_type_id" value="1">
+		<input type="hidden" name="update_type_id" value="1">
 		<input class="btn btn-default btn-block" id="watch" type="submit" value="Watch this Event" />
 		<p/>
 	</form>

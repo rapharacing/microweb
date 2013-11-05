@@ -462,12 +462,11 @@ class Watcher(APIResource):
 
     def __init__(self, data):
         self.id = data['id']
-        self.alert_type_id = data['alertTypeId']
+        self.alert_type_id = data['updateTypeId']
         self.item_type_id = data['itemTypeId']
         self.item_id = data['itemId']
-        self.receive_email = data['receiveEmail']
-        self.receive_sms = data['receiveSMS']
-        self.receive_alert = data['receiveAlert']
+        self.receive_email = data['sendEmail']
+        self.receive_sms = data['sendSMS']
 
         if data.get('item'):
             if data.get('itemType') == "conversation":
