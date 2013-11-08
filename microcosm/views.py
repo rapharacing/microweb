@@ -89,8 +89,8 @@ def exception_handler(view_func):
 
 def build_pagination_links(request, paged_list):
     """
-    Builds page navigation links based on the request path
-    and links supplied in a paginated list.
+    This takes the data sent in the 'links' part of an api response
+    and generates a dictionary of navigation links based on that.
     """
 
     page_nav = {}

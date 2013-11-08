@@ -269,7 +269,7 @@ class Profile(object):
 
 class ProfileList(object):
     """
-    Represents a list of microcosms for a given site.
+    Represents a list of profiles for a given site.
     """
 
     api_path_fragment = 'profiles'
