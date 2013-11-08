@@ -1,5 +1,6 @@
 import requests
 import grequests
+import string
 
 from functools import wraps
 from microweb import settings
@@ -48,6 +49,7 @@ from microcosm.api.resources import RESOURCE_PLURAL
 from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
 from microcosm.api.resources import response_list_to_dict
 from microcosm.api.resources import GlobalOptions
+from microcosm.api.resources import ProfileList
 
 from microcosm.forms.forms import EventCreate
 from microcosm.forms.forms import EventEdit
@@ -87,29 +89,16 @@ def exception_handler(view_func):
 
 def build_pagination_links(request, paged_list):
     """
-    Builds page navigation links based on the request path
-    and links supplied in a paginated list.
+    This takes the data sent in the 'links' part of an api response
+    and generates a dictionary of navigation links based on that.
     """
 
     page_nav = {}
 
-    if paged_list.links.get('first'):
-        page_nav['first'] = request.path
-
-    if paged_list.links.get('prev'):
-        offset = paged_list.offset
-        page_nav['prev'] = urlunparse(('', '', request.path, '', 'offset=%d' % (offset - PAGE_SIZE), '',))
-
-    if paged_list.links.get('next'):
-        offset = paged_list.offset
-        page_nav['next'] = urlunparse(('', '', request.path, '', 'offset=%d' % (offset + PAGE_SIZE), '',))
-
-    if paged_list.links.get('last'):
-        offset = paged_list.max_offset
-        page_nav['last'] = urlunparse(('', '', request.path, '', 'offset=%d' % offset, '',))
+    for item in request:
+        page_nav[item['rel']] = str.replace(str(item['href']),'/api/v1','')
 
     return page_nav
-
 
 class ConversationView(object):
 
@@ -141,7 +130,7 @@ class ConversationView(object):
                 'site': request.site,
                 'content': conversation,
                 'comment_form': comment_form,
-                'pagination': build_pagination_links(request, conversation.comments),
+                'pagination': build_pagination_links(responses[conversation_url]['comments']['links'], conversation.comments),
                 'item_type': 'conversation'
             }
 
@@ -276,6 +265,7 @@ class ProfileView(object):
     edit_form = ProfileEdit
     form_template = 'forms/profile.html'
     single_template = 'profile.html'
+    list_template = 'profiles.html'
 
     @staticmethod
     @exception_handler
@@ -299,6 +289,40 @@ class ProfileView(object):
         view_data['content'] = profile
 
         return render(request, ProfileView.single_template, view_data)
+
+    @staticmethod
+    @exception_handler
+    def list(request):
+
+        # record offset for paging of profiles
+        offset = int(request.GET.get('offset', 0))
+        top = bool(request.GET.get('top', False))
+        q = request.GET.get('q', "")
+
+        profiles_url, params, headers = ProfileList.build_request(
+            request.META['HTTP_HOST'],
+            offset=offset,
+            top=top,
+            q=q,
+            access_token=request.access_token
+        )
+
+        request.view_requests.append(grequests.get(profiles_url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+
+        profiles = ProfileList(responses[profiles_url])
+        #print responses[profiles_url]['profiles']['links']
+        view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+            'site': request.site,
+            'content': profiles,
+            'pagination': build_pagination_links(responses[profiles_url]['profiles']['links'], profiles.profiles),
+            'q': q,
+            'top': top,
+            'alphabet': string.ascii_lowercase
+        }
+
+        return render(request, ProfileView.list_template, view_data)
 
     @staticmethod
     @exception_handler
@@ -379,7 +403,7 @@ class MicrocosmView(object):
                 'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
                 'site': request.site,
                 'content': microcosm,
-                'pagination': build_pagination_links(request, microcosm.items)
+                'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
             }
 
             return render(request, MicrocosmView.single_template, view_data)
@@ -420,7 +444,7 @@ class MicrocosmView(object):
             'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site,
             'content': microcosms,
-            'pagination': build_pagination_links(request, microcosms.microcosms)
+            'pagination': build_pagination_links(responses[microcosms_url]['microcosms']['links'], microcosms.microcosms)
         }
 
         return render(request, MicrocosmView.list_template, view_data)
@@ -553,7 +577,7 @@ class EventView(object):
                 'site': request.site,
                 'content': event,
                 'comment_form': comment_form,
-                'pagination': build_pagination_links(request, event.comments),
+                'pagination': build_pagination_links(responses[event_url]['comments']['links'], event.comments),
                 'item_type': 'event',
                 'attendees': AttendeeList(responses[att_url])
             }
@@ -901,7 +925,7 @@ class AlertView(object):
             'user': Profile(responses[request.whoami_url], summary=False),
             'site': request.site,
             'content': alerts_list,
-            'pagination': build_pagination_links(request, alerts_list.alerts)
+            'pagination': build_pagination_links(responses[url]['alerts']['links'], alerts_list.alerts)
         }
 
         return render(request, AlertView.list_template, view_data)
@@ -948,7 +972,7 @@ class WatcherView(object):
                 'user': Profile(responses[request.whoami_url], summary=False),
                 'site': request.site,
                 'content': watchers_list,
-                'pagination': build_pagination_links(request, watchers_list.watchers)
+                'pagination': build_pagination_links(responses[url]['watchers']['links'], watchers_list.watchers)
             }
 
             return render(request, WatcherView.list_template, view_data)
