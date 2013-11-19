@@ -465,6 +465,14 @@ class Meta(object):
         if data.get('editedBy'): self.edited_by = Profile(data['editedBy'])
         if data.get('flags'): self.flags = data['flags']
         if data.get('permissions'): self.permissions = PermissionSet(data['permissions'])
+        if data.get('parents'):
+            self.parents = []
+            for item in data['parents']:
+                self.parents.append(Comment.from_summary(item))
+        if data.get('children'):
+            self.children = []
+            for item in data['children']:
+                self.children.append(Comment.from_summary(item))
         if data.get('links'):
             self.links = {}
             for item in data['links']:
