@@ -85,11 +85,45 @@
 		{% endif %}
 	</div>
 
+	<div class="row">
+		<h4>Are you coming?</h4>
+		{% if user %}
+			{% if content.rsvp_limit == 0 or content.rsvp_limit > content.rsvp_attend %}
+			<form method="POST" action="{% url 'rsvp-event' content.id %}" style="display:inline-block;">
+				{% csrf_token %}
+				<input type="hidden" name="rsvp" value="yes" />
+				<input id="rsvp_yes" type="submit" value="Count me in" class="btn btn-primary">
+			</form>
+			{% endif %}
+
+			<form method="POST" action="{% url 'rsvp-event' content.id %}" style="display:inline-block;">
+				{% csrf_token %}
+				<input type="hidden" name="rsvp" value="no" />
+				<input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default">
+			</form>
+		{% endif %}
+	</div>
+
+	<h4>Who's going?</h4>
+	{# Iterating the attendees four times is only temporary, they'll be split into different collections in future. #}
+	<p><strong>Confirmed</strong></p>
+	<p>
+		{% for item in attendees.items.items %}
+			{% if item.rsvp == "yes" %}
+				<a href="/profiles/{{ item.attendee_id }}/">{{ item.attendee.profile_name|truncatechars:25 }}</a>
+			{% endif %}
+		{% endfor %}
+	</p>
+
 	<hr />
 	{% include "comments_block.html" %}
 {% endblock %}
 
 {% block sidebar %}
+	<p class="muted hidden-xs">
+		Created by <a href="/profiles/{{content.meta.created_by.id}}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
+		<time datetime="{{ content.meta.created|date:"c" }}"></time>
+	</p>
 	{% if user %} {% if not content.meta.flags.watched %}
 	<form method="POST" action="" id="subscribe_form">
 		{% csrf_token %}
@@ -100,10 +134,6 @@
 	{% else %}
 	<p class="text-muted">You are <a href="/watchers/">watching</a> this event and you will receive <a href="/updates/">updates</a>.</p>
 	{% endif %}{% endif %}
-	<p class="muted hidden-xs">
-		Created by <a href="/profiles/{{content.meta.created_by.id}}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
-		<time datetime="{{ content.meta.created|date:"c" }}"></time>
-	</p>
 
 	{% if content.meta.permissions.update %}
 	<p class="hidden-xs">
@@ -117,58 +147,6 @@
 		{% endif %}
 	</p>
 	{% endif %}
-
-	<h4>Are you coming?</h4>
-	{% if user %}
-	{% if content.rsvp_limit == 0 or content.rsvp_limit > content.rsvp_attend %}
-	<form method="POST" action="{% url 'rsvp-event' content.id %}">
-		{% csrf_token %}
-		<input type="hidden" name="rsvp" value="yes" />
-		<input id="rsvp_yes" type="submit" value="Count me in" class="btn btn-primary btn-block" style="width:100%;">
-	</form>
-	{% endif %}
-
-	<form method="POST" action="{% url 'rsvp-event' content.id %}">
-		{% csrf_token %}
-		<input type="hidden" name="rsvp" value="maybe" />
-		<input id="rsvp_maybe" type="submit" value="Maybe" class="btn btn-default btn-block" style="width:100%; margin-top:12px;">
-	</form>
-
-	<form method="POST" action="{% url 'rsvp-event' content.id %}">
-		{% csrf_token %}
-		<input type="hidden" name="rsvp" value="no" />
-		<input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default btn-block" style="width:100%; margin-top:12px;">
-	</form>
-	{% else %}
-	<a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Sign In or Register to attend</a>
-	{% endif %}
-
-	<h4>Who's going?</h4>
-	{# Iterating the attendees four times is only temporary, they'll be split into different collections in future. #}
-	<p><strong>Confirmed</strong></p>
-	{% for item in attendees.items.items %}
-		<ul>
-			{% if item.rsvp == "yes" %}
-				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
-			{% endif %}
-		</ul>
-	{% endfor %}
-	<p><strong>Maybe</strong></p>
-	{% for item in attendees.items.items %}
-		<ul>
-			{% if item.rsvp == "maybe" %}
-				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
-			{% endif %}
-		</ul>
-	{% endfor %}
-	<p><strong>Nope</strong></p>
-	{% for item in attendees.items.items %}
-		<ul>
-			{% if item.rsvp == "no" %}
-				<li>{{ item.attendee.profile_name|truncatechars:25 }}</li>
-			{% endif %}
-		</ul>
-	{% endfor %}
 
 {% endblock %}
 
