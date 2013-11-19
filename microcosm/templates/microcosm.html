@@ -52,15 +52,15 @@
 
 {% block sidebar%}
 
-	{% if user %} {% if not content.meta.flags.iswatched %}
+	{% if user %} {% if content.meta.flags.watched %}
+	<p class="text-muted">You are <a href="/watchers/">watching</a> this microcosm and updates will appear in your <a href="/notifications/">notifications</a>.</p>
+	{% else %}
 	<form method="POST" action="" id="subscribe_form">
 		{% csrf_token %}
-		<input type="hidden" name="alert_type_id" value="8">
+		<input type="hidden" name="update_type_id" value="8">
 		<input class="btn btn-default btn-block" id="watch" type="submit" value="Watch this microcosm" />
 		<p/>
 	</form>
-	{% else %}
-	<p class="text-muted">You are <a href="/watchers/">watching</a> this microcosm and updates will appear in your <a href="/notifications/">notifications</a>.</p>
 	{% endif %}{% endif %}
 
 	<p id="microcosm_description">{{ content.description }}</p>

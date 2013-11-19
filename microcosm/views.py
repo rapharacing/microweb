@@ -410,7 +410,7 @@ class MicrocosmView(object):
 
         elif request.method == 'POST':
             postdata = {
-                'alertTypeId': int(request.POST.get('alert_type_id')),
+                'updateTypeId': int(request.POST.get('update_type_id')),
                 'itemTypeId': 2,
                 'itemId': int(microcosm_id),
             }
