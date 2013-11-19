@@ -48,7 +48,7 @@
 										<a href="{% url 'edit-profile' user.id %}" id="edit_profile">
                                             <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" class="gravatar" align="left" />
                                         </a>
-										<a href="{% url 'list-notifications' %}" id="notifications">Notifications{% if user.unread_count %} (<span class="unread">{{ user.unread_count }}</span>){% endif %}</a><br />
+										<a href="{% url 'list-updates' %}" id="updates">Updates{% if user.unread_count %} (<span class="unread">{{ user.unread_count }}</span>){% endif %}</a><br />
                                         <a href="{% url 'edit-profile' user.id %}" id="profile_name">Edit profile</a><br />
 										<a href="{% url 'logout' %}" id="logout">Log out</a>
 									</div>

@@ -4,9 +4,9 @@ from django.conf.urls import patterns
 from microcosm.views import MicrocosmView
 from microcosm.views import EventView
 from microcosm.views import ConversationView
-from microcosm.views import AlertView
+from microcosm.views import UpdateView
 from microcosm.views import WatcherView
-from microcosm.views import AlertPreferenceView
+from microcosm.views import UpdatePreferenceView
 from microcosm.views import CommentView
 from microcosm.views import ProfileView
 from microcosm.views import AuthenticationView
@@ -59,10 +59,9 @@ urlpatterns = patterns('',
     url(r'comments/(?P<comment_id>\d+)/edit/$', CommentView.edit, name='edit-comment'),
     url(r'comments/(?P<comment_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
 
-    # Notifications
-    url(r'^notifications/$', AlertView.list, name='list-notifications'),
-    url(r'^notifications/(?P<alert_id>\d+)/viewed/$', AlertView.mark_viewed, name='mark-notification-viewed'),
-    url(r'^notifications/settings/$', AlertPreferenceView.settings, name='notification-settings'),
+    # Updates
+    url(r'^updates/$', UpdateView.list, name='list-updates'),
+    url(r'^updates/settings/$', UpdatePreferenceView.settings, name='updates-settings'),
 
     # Watchers
     url(r'^watchers/$', WatcherView.list, name='list-watchers'),

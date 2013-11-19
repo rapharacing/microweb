@@ -67,7 +67,7 @@
 	</p>
 
 	{% if user %} {% if content.meta.flags.watched %}
-	<p class="text-muted">You are <a href="/watchers/">watching</a> this microcosm and updates will appear in your <a href="/notifications/">notifications</a>.</p>
+	<p class="text-muted">You are <a href="/watchers/">watching</a> this microcosm and you will receive <a href="/updates/">updates</a>.</p>
 	{% else %}
 	<form method="POST" action="" id="subscribe_form">
 		{% csrf_token %}

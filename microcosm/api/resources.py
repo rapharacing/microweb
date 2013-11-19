@@ -263,7 +263,7 @@ class Profile(object):
 
     @staticmethod
     def get_unread_count(host, access_token):
-        url = build_url(host, ['alerts', 'unread'])
+        url = build_url(host, ['updates', 'unread'])
         return APIResource.retrieve(url, {}, headers=APIResource.make_request_headers(access_token))
 
 
@@ -583,84 +583,83 @@ class WatcherList(object):
         return WatcherList(resource)
 
 
-class AlertList(object):
+class UpdateList(object):
     """
-    A list of user alerts.
+    A list of user updates.
     """
 
-    api_path_fragment = 'alerts'
+    api_path_fragment = 'updates'
 
     def __init__(self, data):
-        self.alerts = PaginatedList(data['alerts'], Alert)
+        self.updates = PaginatedList(data['updates'], Update)
         self.meta = Meta(data['meta'])
 
     @staticmethod
     def build_request(host, offset=None, access_token=None):
-        url = build_url(host, [AlertList.api_path_fragment])
+        url = build_url(host, [UpdateList.api_path_fragment])
         params = {'offset': offset} if offset else {}
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
     @staticmethod
     def retrieve(host, offset=None, access_token=None):
-        url, params, headers = AlertList.build_request(host, offset, access_token)
+        url, params, headers = UpdateList.build_request(host, offset, access_token)
         resource = APIResource.retrieve(url, params, headers)
-        return AlertList(resource)
+        return UpdateList(resource)
 
 
-class Alert(APIResource):
+class Update(APIResource):
     """
-    Represents a user alert, e.g. a mention by another user.
+    Represents a user Update, e.g. a mention by another user.
     """
 
-    api_path_fragment = 'alerts'
+    api_path_fragment = 'updates'
 
     @classmethod
     def from_api_response(cls, data):
-        alert = cls()
-        alert.id = data['id']
-        alert.alerted_profile_id = data['alertedProfileId']
-        alert.alert_type_id = data['alertTypeId']
-        alert.item_id = data['itemId']
-        alert.item_type = data['itemType']
-        alert.item_link = '/%s/%s' % (RESOURCE_PLURAL[alert.item_type], alert.item_id)
-        alert.profile_id = data['profileId']
-        alert.data = data['data']
-        alert.created = parse_timestamp(data['created'])
+        update = cls()
+        update.id = data['id']
+        update.update_type = data['updateType']
+        update.item_type = data['itemType']
 
-        if data.get('viewed'):
-            alert.viewed = data['viewed']
+        if update.item_type == 'conversation':
+            update.item = Conversation(data['item'])
+        elif update.item_type == 'comment':
+            update.item = Comment.from_summary(data['item'])
+        elif update.item_type == 'event':
+            update.item = Event(data['item'])
+        elif update.item_type == 'profile':
+            update.item = Profile(data['item'])
+        elif update.item_type == 'microcosm':
+            update.item = Microcosm(data['item'])
+        else:
+            update.item = None
+        update.item_link = '/%s/%s' % (RESOURCE_PLURAL[update.item_type], update.item.id)
 
-        if data.get('item'):
-            if alert.item_type == "conversation":
-                alert.item = Conversation.from_summary(data['item'])
-            if alert.item_type == "event":
-                alert.item = Event.from_summary(data['item'])
-
-        return alert
+        return update
 
     @classmethod
     def from_summary(cls, data):
-        return Alert.from_api_response(data)
+        return Update.from_api_response(data)
 
     @staticmethod
-    def retrieve(host, alert_id, access_token):
-        url = build_url(host, [Alert.api_path_fragment, alert_id])
-        return Alert.from_api_response(APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token)))
+    def retrieve(host, update_id, access_token):
+        url = build_url(host, [Update.api_path_fragment, update_id])
+        return Update.from_api_response(APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token)))
 
     def update(self, host, access_token):
         """
-        Update an alert with a 'viewed' time to indicate it has been read by the user.
+        Update an Update with a 'viewed' time to indicate it has been read by the user.
         """
 
-        url = build_url(host, [Alert.api_path_fragment, self.id])
+        url = build_url(host, [Update.api_path_fragment, self.id])
         payload = json.dumps(self.as_dict(update=True), cls=DateTimeEncoder)
         response = APIResource.update(url, payload, headers=APIResource.make_request_headers(access_token))
-        return Alert.from_api_response(response)
+        return Update.from_api_response(response)
 
     @staticmethod
-    def mark_viewed(host, alert_id, access_token):
-        url = build_url(host, [Alert.api_path_fragment, alert_id])
+    def mark_viewed(host, update_id, access_token):
+        url = build_url(host, [Update.api_path_fragment, update_id])
         payload = json.dumps([{
             'op': 'replace',
             'path': '/viewed',
@@ -674,8 +673,7 @@ class Alert(APIResource):
     def as_dict(self):
         repr = {}
         repr['id'] = self.id
-        repr['alertedProfileId'] = self.alerted_profile_id
-        repr['alertTypeId'] = self.alert_type_id
+        repr['updateType'] = self.update_type_id
         repr['itemId'] = self.item_id
         repr['itemType'] = self.item_type
         repr['profileId'] = self.profile_id
@@ -685,55 +683,53 @@ class Alert(APIResource):
         return repr
 
 
-class AlertPreference(APIResource):
+class UpdatePreference(APIResource):
 
-    api_path_fragment = ['alerts', 'preferences']
+    api_path_fragment = ['updates', 'preferences']
 
     @classmethod
     def from_api_response(cls, data):
-        alert_pref = cls()
-        alert_pref.profile_id = data['profileId']
-        alert_pref.description = data['alertDescription']
-        alert_pref.alert_type_id = data['alertTypeId']
-        alert_pref.receive_email = data['receiveEmail']
-        alert_pref.receive_alert = data['receiveAlert']
-        alert_pref.receive_sms = data['receiveSMS']
-        return alert_pref
+        update_pref = cls()
+        update_pref.profile_id = data['profileId']
+        update_pref.description = data['description']
+        update_pref.id = data['id']
+        update_pref.send_email = data['sendEmail']
+        update_pref.send_sms = data['sendSMS']
+        return update_pref
 
     @staticmethod
     def from_list(data):
         list = []
-        for alert_preference in data:
-            list.append(AlertPreference.from_api_response(alert_preference))
-        list.sort(key=lambda x: x.alert_type_id)
+        for update_preference in data:
+            list.append(UpdatePreference.from_api_response(update_preference))
+        list.sort(key=lambda x: x.id)
         return list
 
     @staticmethod
     def build_request(host, access_token):
-        url = build_url(host, AlertPreference.api_path_fragment)
+        url = build_url(host, UpdatePreference.api_path_fragment)
         params = {}
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
     @staticmethod
     def retrieve(host, access_token):
-        url, params, headers = AlertPreference.build_request(host, access_token)
+        url, params, headers = UpdatePreference.build_request(host, access_token)
         response = APIResource.process_response(url, params, headers)
-        return AlertPreference.from_list(response)
+        return UpdatePreference.from_list(response)
 
     @staticmethod
-    def update(host, alert_type_id, data, access_token):
-        url = build_url(host, AlertPreference.api_path_fragment + [alert_type_id])
+    def update(host, update_type_id, data, access_token):
+        url = build_url(host, UpdatePreference.api_path_fragment + [update_type_id])
         resource = APIResource.update(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
-        return AlertPreference.from_api_response(resource)
+        return UpdatePreference.from_api_response(resource)
 
     def as_dict(self):
         repr = {}
-        repr['alertTypeId'] = self.alert_type_id
-        repr['alertDescription'] = self.description
-        repr['receiveEmail'] = self.receive_email
-        repr['receiveAlert'] = self.receive_alert
-        repr['receiveSMS'] = self.receive_sms
+        repr['id'] = self.id
+        repr['description'] = self.description
+        repr['sendEmail'] = self.send_email
+        repr['sendSMS'] = self.send_sms
         return repr
 
 
@@ -745,9 +741,8 @@ class GlobalOptions(APIResource):
     def from_api_response(cls, data):
         glob_opt = cls()
         glob_opt.profile_id = data['profileId']
-        glob_opt.emailNotifications = data['emailNotifications']
-        glob_opt.alertNotifications = data['alertNotifications']
-        glob_opt.smsNotifications = data['smsNotifications']
+        glob_opt.emailNotifications = data['sendEmail']
+        glob_opt.smsNotifications = data['sendSMS']
         return glob_opt
 
     @staticmethod
@@ -765,9 +760,8 @@ class GlobalOptions(APIResource):
 
     def as_dict(self):
         repr = {}
-        repr['EmailNotifications'] = self.emailNotifications
-        repr['AlertNotifications'] = self.alertNotifications
-        repr['SMSNotifications'] = self.smsNotifications
+        repr['sendEmail'] = self.emailNotifications
+        repr['sendSMS'] = self.smsNotifications
         return repr
 
 

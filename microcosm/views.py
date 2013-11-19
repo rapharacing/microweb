@@ -33,9 +33,9 @@ from microcosm.api.exceptions import APIException
 from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
-from microcosm.api.resources import AlertList
-from microcosm.api.resources import Alert
-from microcosm.api.resources import AlertPreference
+from microcosm.api.resources import UpdateList
+from microcosm.api.resources import Update
+from microcosm.api.resources import UpdatePreference
 from microcosm.api.resources import WatcherList
 from microcosm.api.resources import Watcher
 from microcosm.api.resources import GeoCode
@@ -137,7 +137,7 @@ class ConversationView(object):
             return render(request, ConversationView.single_template, view_data)
         elif request.method == 'POST':
             postdata = {
-                'alertTypeId': int(request.POST.get('alert_type_id')),
+                'updateTypeId': int(request.POST.get('update_type_id')),
                 'itemTypeId': 6,
                 'itemId': int(conversation_id),
             }
@@ -586,7 +586,7 @@ class EventView(object):
 
         elif request.method == 'POST':
             postdata = {
-                'alertTypeId': int(request.POST.get('alert_type_id')),
+                'updateTypeId': int(request.POST.get('update_type_id')),
                 'itemTypeId': 9,
                 'itemId': int(event_id),
             }
@@ -898,9 +898,9 @@ class CommentView(object):
             return HttpResponseNotAllowed()
 
 
-class AlertView(object):
+class UpdateView(object):
 
-    list_template = 'alerts.html'
+    list_template = 'updates.html'
 
     @staticmethod
     @exception_handler
@@ -912,34 +912,34 @@ class AlertView(object):
         # pagination offset
         offset = int(request.GET.get('offset', 0))
 
-        url, params, headers = AlertList.build_request(
+        url, params, headers = UpdateList.build_request(
             request.META['HTTP_HOST'],
             offset=offset,
             access_token=request.access_token
         )
         request.view_requests.append(grequests.get(url, params=params, headers=headers))
         responses = response_list_to_dict(grequests.map(request.view_requests))
-        alerts_list = AlertList(responses[url])
+        updates_list = UpdateList(responses[url])
 
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False),
             'site': request.site,
-            'content': alerts_list,
-            'pagination': build_pagination_links(responses[url]['alerts']['links'], alerts_list.alerts)
+            'content': updates_list,
+            'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates)
         }
 
-        return render(request, AlertView.list_template, view_data)
+        return render(request, UpdateView.list_template, view_data)
 
     @staticmethod
     @exception_handler
-    def mark_viewed(request, alert_id):
+    def mark_viewed(request, update_id):
         """
-        Mark a notification as viewed by setting a 'viewed' attribute.
+        Mark a update as viewed by setting a 'viewed' attribute.
         """
 
         if request.method == 'POST':
-            Alert.mark_viewed(request.META['HTTP_HOST'], alert_id, request.access_token)
-            return HttpResponseRedirect(reverse('list-notifications'))
+            Update.mark_viewed(request.META['HTTP_HOST'], update_id, request.access_token)
+            return HttpResponseRedirect(reverse('list-updates'))
         else:
             return HttpResponseNotAllowed(['POST',])
 
@@ -987,7 +987,7 @@ class WatcherView(object):
                         postdata = {
                             'id': int(w),
                             'receiveEmail': bool(request.POST.get('receive_email_'+str(w))),
-                            'receiveAlert': bool(request.POST.get('receive_alert_'+str(w))),
+                            'receiveUpdate': bool(request.POST.get('receive_update_'+str(w))),
                             'receiveSMS': False,
                         }
                         Watcher.update(
@@ -1001,9 +1001,9 @@ class WatcherView(object):
             return HttpResponseNotAllowed(['POST',])
 
 
-class AlertPreferenceView(object):
+class UpdatePreferenceView(object):
 
-    list_template = 'alert_preferences.html'
+    list_template = 'update_preferences.html'
 
     @staticmethod
     @exception_handler
@@ -1014,7 +1014,7 @@ class AlertPreferenceView(object):
 
         if request.method == 'GET':
 
-            url, params, headers = AlertPreference.build_request(
+            url, params, headers = UpdatePreference.build_request(
                 request.META['HTTP_HOST'],
                 request.access_token
             )
@@ -1025,7 +1025,7 @@ class AlertPreferenceView(object):
             )
             request.view_requests.append(grequests.get(url2, params=params2, headers=headers2))
             responses = response_list_to_dict(grequests.map(request.view_requests))
-            preference_list = AlertPreference.from_list(responses[url])
+            preference_list = UpdatePreference.from_list(responses[url])
             global_options = GlobalOptions.from_api_response(responses[url2])
 
             view_data = {
@@ -1034,35 +1034,33 @@ class AlertPreferenceView(object):
                 'content': preference_list,
                 'globaloptions': global_options,
             }
-            return render(request, AlertPreferenceView.list_template, view_data)
+            return render(request, UpdatePreferenceView.list_template, view_data)
 
         if request.method == 'POST':
             for x in range(1,10):
-                if request.POST.get('alert_type_id_'+str(x)):
+                if request.POST.get('id_'+str(x)):
                     postdata = {
-                        'alertTypeId': int(request.POST['alert_type_id_'+str(x)]),
-                        'receiveEmail': bool(request.POST.get('receive_email_'+str(x))),
-                        'receiveAlert': bool(request.POST.get('receive_alert_'+str(x))),
+                        'id': int(request.POST['id_'+str(x)]),
+                        'sendEmail': bool(request.POST.get('send_email_'+str(x))),
                         'receiveSMS': False,
                     }
-                    AlertPreference.update(
+                    UpdatePreference.update(
                         request.META['HTTP_HOST'],
-                        request.POST['alert_type_id_'+str(x)],
+                        request.POST['id_'+str(x)],
                         postdata,
                         request.access_token
                     )
 
             postdata = {
-                'emailNotifications': bool(request.POST.get('profile_receive_email')),
-                'alertNotifications': bool(request.POST.get('profile_receive_alert')),
-                'smsNotifications': False,
+                'emailUpdates': bool(request.POST.get('profile_receive_email')),
+                'smsUpdates': False,
             }
             GlobalOptions.update(
                 request.META['HTTP_HOST'],
                 postdata,
                 request.access_token
             )
-            return HttpResponseRedirect(reverse('notification-settings'))
+            return HttpResponseRedirect(reverse('update-settings'))
         else:
             return HttpResponseNotAllowed()
 

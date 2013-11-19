@@ -27,7 +27,7 @@
 		<p/>
 	</form>
 	{% else %}
-	<p class="text-muted">You are <a href="/watchers/">watching</a> this conversation and updates will appear in your <a href="/notifications/">notifications</a>.</p>
+	<p class="text-muted">You are <a href="/watchers/">watching</a> this conversation and you will receive <a href="/updates/">updates</a>.</p>
 	{% endif %}{% endif %}
 	<p class="muted hidden-xs">
 		Created by <a href="/profiles/{{content.meta.created_by.id}}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
