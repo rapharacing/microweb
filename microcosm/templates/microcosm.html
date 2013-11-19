@@ -52,6 +52,20 @@
 
 {% block sidebar%}
 
+	{% if content.meta.permissions.create %}
+		<p>
+			<a class="btn btn-primary btn-block" id="create_conversation" href="conversation/" style="text-align: left; padding-left: 12px;"><span class="glyphicon glyphicon-comment"></span> Start a conversation</a>
+			<a class="btn btn-primary btn-block" id="create_event" href="event/" style="text-align: left; padding-left: 12px;"><span class="glyphicon glyphicon-calendar"></span> Start an event</a>
+		</p>
+	{% endif %}
+
+	<p id="microcosm_description">{{ content.description }}</p>
+
+	<p class="text-muted hidden-xs">
+		Created by <a href="{% url 'single-profile' content.meta.created_by.id %}">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
+		<time datetime="{{ content.meta.created|date:"c" }}"></time>
+	</p>
+
 	{% if user %} {% if content.meta.flags.watched %}
 	<p class="text-muted">You are <a href="/watchers/">watching</a> this microcosm and updates will appear in your <a href="/notifications/">notifications</a>.</p>
 	{% else %}
@@ -62,13 +76,6 @@
 		<p/>
 	</form>
 	{% endif %}{% endif %}
-
-	<p id="microcosm_description">{{ content.description }}</p>
-
-	<p class="text-muted hidden-xs">
-		Created by <a href="{% url 'single-profile' content.meta.created_by.id %}">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
-		<time datetime="{{ content.meta.created|date:"c" }}"></time>
-	</p>
 
 	{% if content.meta.permissions.update %}
 	<p class="hidden-xs">
@@ -81,10 +88,6 @@
 		</form>
 		{% endif %}
 	</p>
-	{% endif %}
-
-	{% if content.meta.permissions.create %}
-		<a class="btn btn-primary btn-block" id="create_item" href="{% url 'item-choice' content.id %}">Create item</a>
 	{% endif %}
 
 {% endblock%}
