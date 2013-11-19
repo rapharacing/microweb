@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li class="active"><a href='/notifications/'>Notifications</a></li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <section class="row margin-bottom-half">
+    <h1>Updates</h1>
+    </section>
+    {% if not content.updates.items %}
+        <p>No notifications yet. When your username is mentioned or a new comment is posted on an item you're watching, it'll show here.</p>
+    {% else %}
+        {% include "pagination_nav.html" %}
+        {% for update in content.updates.items %}
+            <section class="row">
+                <div class="col col-sm-10">
+                    <span>
+                        {% if update.update_type == "new_comment" %}
+                        <a href="{{ update.item_link }}">
+                            {% if update.item_type == "conversation" or update.item_type == "event" %}
+                                {{ update.item.title }}
+                            {% elif update.item_type == "comment" %}
+                                {{ update.item.html|safe }}
+                            {% endif %}
+                        </a>
+                        {% elif update.update_type == "reply_to_comment" %}
+                        <a href="{{ update.item_link }}">
+                            {% if update.item_type == "conversation" or update.item_type == "event" %}
+                                {{ update.item.title }}
+                            {% elif update.item_type == "comment" %}
+                                {{ update.item.html|safe }}
+                            {% endif %}
+                        </a>
+                        {% elif update.update_type == "mentioned" %}
+                        <a href="{{ update.item_link }}">
+                            {% if update.item_type == "conversation" or update.item_type == "event" %}
+                                {{ update.item.title }}
+                            {% elif update.item_type == "comment" %}
+                                {{ update.item.html|safe }}
+                            {% endif %}
+                        </a>
+                        {% elif update.update_type == "new_comment_in_huddle" %}
+                        <a href="{{ update.item_link }}">
+                            {% if update.item_type == "conversation" or update.item_type == "event" %}
+                                {{ update.item.title }}
+                            {% elif update.item_type == "comment" %}
+                                {{ update.item.html|safe }}
+                            {% endif %}
+                        </a>
+                        {% elif update.update_type == "new_attendee" %}
+                        <a href="{{ update.item_link }}">
+                            {% if update.item_type == "conversation" or update.item_type == "event" %}
+                                {{ update.item.title }}
+                            {% elif update.item_type == "comment" %}
+                                {{ update.item.html|safe }}
+                            {% endif %}
+                        </a>
+                        {% elif update.update_type == "new_vote" %}
+                        <a href="{{ update.item_link }}">
+                            {% if update.item_type == "conversation" or update.item_type == "event" %}
+                                {{ update.item.title }}
+                            {% elif update.item_type == "comment" %}
+                                {{ update.item.html|safe }}
+                            {% endif %}
+                        </a>
+                        {% elif update.update_type == "event_reminder" %}
+                        <a href="{{ update.item_link }}">
+                            {% if update.item_type == "conversation" or update.item_type == "event" %}
+                                {{ update.item.title }}
+                            {% elif update.item_type == "comment" %}
+                                {{ update.item.html|safe }}
+                            {% endif %}
+                        </a>
+                        {% elif update.update_type == "new_item" %}
+                        <a href="{{ update.item_link }}">
+                            {% if update.item_type == "conversation" or update.item_type == "event" %}
+                                {{ update.item.title }}
+                            {% elif update.item_type == "comment" %}
+                                {{ update.item.html|safe }}
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="col col-sm-4">
+                    <span class="text-muted"><time datetime="{{ update.item.meta.created|date:"c" }}"></time></span>
+                </div>
+            </section>
+        {% endfor %}
+        <hr />
+        {% include "pagination_nav.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar%}
+    <a href="/updates/settings/">Update Settings</a>
+{% endblock%}

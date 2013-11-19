@@ -40,17 +40,17 @@
         <hr />
         <br />
         {% for preference in content %}
-            {% if preference.alert_type_id == 1 or preference.alert_type_id == 2 %}
+            {% if preference.id == 1 or preference.id == 2 %}
             <section class="row">
                 <div class="col col-sm-10">
                     <span>{{ preference.description }}</span>
                 </div>
-                    <input type="hidden" name="alert_type_id_{{ preference.alert_type_id }}" value="{{ preference.alert_type_id }}">
+                    <input type="hidden" name="update_type_id_{{ preference.id }}" value="{{ preference.id }}">
                     <div class="col col-sm-2">
-                        <input name="receive_alert_{{ preference.alert_type_id }}" type="checkbox" {% if preference.receive_alert %}checked="true"{% endif %}>
+                        <input name="send_alert_{{ preference.id }}" type="checkbox" {% if preference.send_alert %}checked="true"{% endif %}>
                     </div>
                     <div class="col col-sm-2">
-                        <input name="receive_email_{{ preference.alert_type_id }}" type="checkbox" {% if preference.receive_email %}checked="true"{% endif %}>
+                        <input name="send_email_{{ preference.id }}" type="checkbox" {% if preference.send_email %}checked="true"{% endif %}>
                     </div>
             </section>
             {% endif %}
