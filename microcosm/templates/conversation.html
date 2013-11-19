@@ -19,6 +19,11 @@
 {% endblock %}
 
 {% block sidebar %}
+	<p class="muted hidden-xs">
+		Created by <a href="/profiles/{{content.meta.created_by.id}}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
+		<time datetime="{{ content.meta.created|date:"c" }}"></time>
+	</p>
+	
 	{% if user %} {% if not content.meta.flags.watched %}
 	<form method="POST" action="" id="subscribe_form">
 		{% csrf_token %}
@@ -29,10 +34,6 @@
 	{% else %}
 	<p class="text-muted">You are <a href="/watchers/">watching</a> this conversation and you will receive <a href="/updates/">updates</a>.</p>
 	{% endif %}{% endif %}
-	<p class="muted hidden-xs">
-		Created by <a href="/profiles/{{content.meta.created_by.id}}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
-		<time datetime="{{ content.meta.created|date:"c" }}"></time>
-	</p>
 
 	{% if content.meta.permissions.update %}
 	<p class="hidden-xs">
