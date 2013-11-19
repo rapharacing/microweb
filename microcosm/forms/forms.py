@@ -193,12 +193,9 @@ class MicrocosmCreate(django.forms.Form):
         }
     )
 
-    visibility = django.forms.ChoiceField(
-        choices=(
-            ('public', 'public'),
-            #('private', 'private')
-            ),
-        label='To whom is the Microcosm visible?'
+    visibility = django.forms.CharField(
+        initial='public',
+        widget=django.forms.HiddenInput
     )
 
 
