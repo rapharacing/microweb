@@ -465,6 +465,14 @@ class Meta(object):
         if data.get('editedBy'): self.edited_by = Profile(data['editedBy'])
         if data.get('flags'): self.flags = data['flags']
         if data.get('permissions'): self.permissions = PermissionSet(data['permissions'])
+        if data.get('parents'):
+            self.parents = []
+            for item in data['parents']:
+                self.parents.append(Comment.from_summary(item))
+        if data.get('children'):
+            self.children = []
+            for item in data['children']:
+                self.children.append(Comment.from_summary(item))
         if data.get('links'):
             self.links = {}
             for item in data['links']:
@@ -494,12 +502,11 @@ class Watcher(APIResource):
 
     def __init__(self, data):
         self.id = data['id']
-        self.update_type_id = data['UpdateTypeId']
+        self.alert_type_id = data['updateTypeId']
         self.item_type_id = data['itemTypeId']
         self.item_id = data['itemId']
-        self.receive_email = data['receiveEmail']
-        self.receive_sms = data['receiveSMS']
-        self.receive_Update = data['receiveUpdate']
+        self.receive_email = data['sendEmail']
+        self.receive_sms = data['sendSMS']
 
         if data.get('item'):
             if data.get('itemType') == "conversation":
