@@ -477,9 +477,9 @@ class Meta(object):
             self.links = {}
             for item in data['links']:
                 if 'title' in item:
-                    self.links[item['rel']] = {'href': item['href'], 'title': item['title']}
+                    self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1',''), 'title': item['title']}
                 else:
-                    self.links[item['rel']] = {'href': item['href']}
+                    self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1','')}
 
 
 class PermissionSet(object):
@@ -623,18 +623,53 @@ class Update(APIResource):
         update.item_type = data['itemType']
 
         if update.item_type == 'conversation':
-            update.item = Conversation(data['item'])
+            update.item = Conversation.from_summary(data['item'])
         elif update.item_type == 'comment':
             update.item = Comment.from_summary(data['item'])
         elif update.item_type == 'event':
-            update.item = Event(data['item'])
+            update.item = Event.from_summary(data['item'])
         elif update.item_type == 'profile':
-            update.item = Profile(data['item'])
+            update.item = Profile.from_api_response(data['item'])
         elif update.item_type == 'microcosm':
             update.item = Microcosm(data['item'])
         else:
             update.item = None
+
+        if data.get('parentItem'):
+            update.parent_item_type = data['parentItemType']
+
+            if update.parent_item_type == 'conversation':
+                update.parent_item = Conversation.from_summary(data['parentItem'])
+            elif update.parent_item_type == 'event':
+                update.parent_item = Event.from_summary(data['parentItem'])
+            elif update.parent_item_type == 'profile':
+                update.parent_item = Profile.from_api_response(data['parentItem'])
+            elif update.parent_item_type == 'microcosm':
+                update.parent_item = Microcosm(data['parentItem'])
+            else:
+                update.parent_item = None
+
         update.item_link = '/%s/%s' % (RESOURCE_PLURAL[update.item_type], update.item.id)
+
+        if update.update_type == 'new_comment':
+            update.parent_link = update.parent_item.meta.links['self']['href']
+        elif update.update_type == 'reply_to_comment':
+            update.profile_link = update.item.meta.created_by.meta.links['self']['href']
+            update.parent_link = update.parent_item.meta.links['self']['href']
+        elif update.update_type == 'mentioned':
+            update.profile_link = update.item.meta.created_by.meta.links['self']['href']
+            update.parent_link = update.parent_item.meta.links['self']['href']
+        elif update.update_type == 'new_comment_in_huddle':
+            update = update
+        elif update.update_type == 'new_attendee':
+            update = update
+        elif update.update_type == 'new_vote':
+            update = update
+        elif update.update_type == 'event_reminder':
+            update = update
+        elif update.update_type == 'new_item':
+            update.parent_text = update.item.meta.links['microcosm']['title']
+            update.parent_link = update.item.meta.links['microcosm']['href']
 
         return update
 
@@ -878,10 +913,6 @@ class Event(APIResource):
         # RSVP limit is always returned, even if zero
         event.rsvp_limit = data['rsvpLimit']
 
-        # RSVP attend / spaces are only returned if non-zero
-        if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
-        if data.get('rsvpSpaces'): event.rsvp_spaces = data['rsvpSpaces']
-
         return event
 
     @classmethod
@@ -896,6 +927,10 @@ class Event(APIResource):
         if data.get('lastCommentCreated'):
             event.last_comment_created = parse_timestamp(data['lastCommentCreated'])
         event.meta = Meta(data['meta'])
+
+        # RSVP attend / spaces are only returned if non-zero
+        if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
+        if data.get('rsvpSpaces'): event.rsvp_spaces = data['rsvpSpaces']
         return event
 
     @classmethod
