@@ -6,7 +6,7 @@
     </section>
     {% if not content.watchers.items %}
         <p>When you post a comment on a conversation or event, you'll start watching it. New comments posted on
-        that item will appear on your <a href="{% url 'list-notifications' %}">notifications dashboard</a> or be emailed
+        that item will appear on your <a href="{% url 'list-updates' %}">updates dashboard</a> or be emailed
         to you (unless you've turned these things off).</p>
     {% else %}
         {% include "pagination_nav.html" %}

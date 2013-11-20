@@ -3,7 +3,7 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        <li class="active"><a href='/notifications/'>Notifications</a></li>
+        <li class="active"><a href='/updates/'>Updates</a></li>
     </ol>
 {% endblock %}
 
@@ -12,7 +12,7 @@
     <h1>Updates</h1>
     </section>
     {% if not content.updates.items %}
-        <p>No notifications yet. When your username is mentioned or a new comment is posted on an item you're watching, it'll show here.</p>
+        <p>No updates yet. When your username is mentioned or a new comment is posted on an item you're watching, it'll show here.</p>
     {% else %}
         {% include "pagination_nav.html" %}
         {% for update in content.updates.items %}
