@@ -986,8 +986,7 @@ class WatcherView(object):
                     else:
                         postdata = {
                             'id': int(w),
-                            'receiveEmail': bool(request.POST.get('receive_email_'+str(w))),
-                            'receiveUpdate': bool(request.POST.get('receive_update_'+str(w))),
+                            'sendEmail': bool(request.POST.get('send_email_'+str(w))),
                             'receiveSMS': False,
                         }
                         Watcher.update(
