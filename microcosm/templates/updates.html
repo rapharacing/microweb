@@ -17,8 +17,16 @@
         {% include "pagination_nav.html" %}
         {% for update in content.updates.items %}
             <section class="row">
-                <div class="col col-sm-16">
-                    <span>
+            <table class="col col-md-16">
+                <tbody>
+                    <tr>
+                        <td rowspan="2" width="42">
+            {% if update.parent_item_type == "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>
+            {% elif update.parent_item_type == "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>
+            {% elif update.item_type == "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>
+            {% elif update.item_type == "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>
+            {% endif %}</td>
+                        <td>                    <span>
                         {% if update.update_type == "new_comment" %}
                             <a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title }}</a>
                         {% elif update.update_type == "reply_to_comment" %}
@@ -61,19 +69,19 @@
                             <a href="{{ update.item_link }}/newest/">{{ update.item.title }}</a> was started in
                             <a href="{{ update.parent_link }}">{{ update.parent_text }}</a>
                         {% endif %}
-                    </span>
-                </div>
-            </section>
-            <section class="row">
-                <div class="col col-sm-16 text-muted">→ <a href="{{ update.parent_link }}">view 
+                    </span><br />
+                    <span class="text-muted">→ <a href="{{ update.parent_link }}">view 
                 {% if update.parent_item_type == "conversation" %}conversation
                 {% elif update.parent_item_type == "event" %}event
                 {% elif update.parent_item_type == "poll" %}poll
                 {% elif update.item_type == "conversation" %}conversation
                 {% elif update.item_type == "event" %}event
                 {% elif update.item_type == "poll" %}poll
-                {% endif %}</a> • <time datetime="{{ update.item.meta.created|date:"c" }}"></time>
-                </div>
+                {% endif %}</a></span> • <time datetime="{{ update.item.meta.created|date:"c" }}"></time>
+                </div></td>
+                    </tr>
+                </tbody>
+            </table>
             </section>
         <hr style="margin-top:12px;margin-bottom:12px" />
         {% endfor %}
