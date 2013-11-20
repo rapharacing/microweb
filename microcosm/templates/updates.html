@@ -28,17 +28,17 @@
             {% endif %}</td>
                         <td>                    <span>
                         {% if update.update_type == "new_comment" %}
-                            <a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title }}</a>
+                            <a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title }}</a></span><br />
                         {% elif update.update_type == "reply_to_comment" %}
                             <a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name }}</a>
                             replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
                             <br />
-                            {{ update.item.html|safe}}
+                            {{ update.item.html|safe}}</span>
                         {% elif update.update_type == "mentioned" %}
                             <a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name }}</a>
                             mentioned you in <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
                             <br />
-                            {{ update.item.html|safe}}
+                            {{ update.item.html|safe}}</span>
                         {% elif update.update_type == "new_comment_in_huddle" %}
                             <a href="{{ update.item_link }}">
                             {% if update.item_type == "conversation" or update.item_type == "event" %}
@@ -46,17 +46,11 @@
                             {% elif update.item_type == "comment" %}
                                 {{ update.item.html|safe }}
                             {% endif %}
-                            </a>
+                            </a></span>
                         {% elif update.update_type == "new_attendee" %}
-                            <a href="{{ update.item_link }}/newest/">{{ update.item.title }}</a>
+                            <a href="{{ update.item_link }}/newest/">{{ update.item.title }}</a></span><br />
                         {% elif update.update_type == "new_vote" %}
-                            <a href="{{ update.item_link }}/newest/">
-                            {% if update.item_type == "conversation" or update.item_type == "event" %}
-                                {{ update.item.title }}
-                            {% elif update.item_type == "comment" %}
-                                {{ update.item.html|safe }}
-                            {% endif %}
-                            </a>
+                            <a href="{{ update.item_link }}/newest/">{{ update.item.title }}</a></span><br />
                         {% elif update.update_type == "event_reminder" %}
                             <a href="{{ update.item_link }}">
                             {% if update.item_type == "conversation" or update.item_type == "event" %}
@@ -64,20 +58,19 @@
                             {% elif update.item_type == "comment" %}
                                 {{ update.item.html|safe }}
                             {% endif %}
-                         </a>
+                         </a></span>
                         {% elif update.update_type == "new_item" %}
                             <a href="{{ update.item_link }}/newest/">{{ update.item.title }}</a> was started in
-                            <a href="{{ update.parent_link }}">{{ update.parent_text }}</a>
+                            <a href="{{ update.parent_link }}">{{ update.parent_text }}</a></span><br />
                         {% endif %}
-                    </span><br />
-                    <span class="text-muted">→ <a href="{{ update.parent_link }}">view 
+                    <small class="text-muted">→ <a href="{{ update.parent_link }}">view 
                 {% if update.parent_item_type == "conversation" %}conversation
                 {% elif update.parent_item_type == "event" %}event
                 {% elif update.parent_item_type == "poll" %}poll
                 {% elif update.item_type == "conversation" %}conversation
                 {% elif update.item_type == "event" %}event
                 {% elif update.item_type == "poll" %}poll
-                {% endif %}</a></span> • <time datetime="{{ update.item.meta.created|date:"c" }}"></time>
+                {% endif %}</a> • <time datetime="{{ update.item.meta.created|date:"c" }}"></time></small>
                 </div></td>
                     </tr>
                 </tbody>
