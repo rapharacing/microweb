@@ -16,10 +16,7 @@
     <form method="POST" action="">
         {% csrf_token %}
         <section class="row">
-            <div class="col col-sm-10">
-            </div>
-            <div class="col col-sm-2">
-                Notify me
+            <div class="col col-sm-14">
             </div>
             <div class="col col-sm-2">
                 Email me
@@ -27,28 +24,22 @@
         </section>
         <hr />
         <section class="row">
-            <div class="col col-sm-10">
+            <div class="col col-sm-14">
                 <span>Profile override settings - if these are set to 'off' then you will not receive any of that type of alert</span>
             </div>
-                <div class="col col-sm-2">
-                    <input name="profile_receive_alert" type="checkbox" {% if globaloptions.alertNotifications %}checked="true"{% endif %}>
-                </div>
-                <div class="col col-sm-2">
+            <div class="col col-sm-2">
                     <input name="profile_receive_email" type="checkbox" {% if globaloptions.emailNotifications %}checked="true"{% endif %}>
-                </div>
+            </div>
         </section>
         <hr />
         <br />
         {% for preference in content %}
             {% if preference.id == 1 or preference.id == 2 %}
             <section class="row">
-                <div class="col col-sm-10">
+                <div class="col col-sm-14">
                     <span>{{ preference.description }}</span>
                 </div>
-                    <input type="hidden" name="update_type_id_{{ preference.id }}" value="{{ preference.id }}">
-                    <div class="col col-sm-2">
-                        <input name="send_alert_{{ preference.id }}" type="checkbox" {% if preference.send_alert %}checked="true"{% endif %}>
-                    </div>
+                    <input type="hidden" name="id_{{ preference.id }}" value="{{ preference.id }}">
                     <div class="col col-sm-2">
                         <input name="send_email_{{ preference.id }}" type="checkbox" {% if preference.send_email %}checked="true"{% endif %}>
                     </div>
@@ -56,7 +47,12 @@
             {% endif %}
         {% endfor %}
         <hr />
-        <input type="submit" value="Save" class="btn btn-primary btn-small" style="float: right;"/>
+        <section class="row">
+            <div class="col col-sm-14">
+            </div>
+            <div class="col col-sm-2">
+            <input type="submit" value="Save" class="btn btn-primary btn-small"/>
+            </div>
     </form>
 {% endblock %}
 

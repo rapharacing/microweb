@@ -20,12 +20,12 @@
             <table class="col col-md-16">
                 <tbody>
                     <tr>
-                        <td rowspan="2" width="42">
+                        <td rowspan="2" width="42">{% if update.update_type == "new_comment" or update.update_type == "new_comment_in_huddle" %}
             {% if update.parent_item_type == "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>
             {% elif update.parent_item_type == "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>
             {% elif update.item_type == "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>
             {% elif update.item_type == "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>
-            {% endif %}</td>
+            {% endif %}{% endif %}</td>
                         <td>                    <span>
                         {% if update.update_type == "new_comment" %}
                             <a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title }}</a></span><br />

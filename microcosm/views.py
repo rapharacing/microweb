@@ -1041,7 +1041,7 @@ class UpdatePreferenceView(object):
                     postdata = {
                         'id': int(request.POST['id_'+str(x)]),
                         'sendEmail': bool(request.POST.get('send_email_'+str(x))),
-                        'receiveSMS': False,
+                        'sendSMS': False,
                     }
                     UpdatePreference.update(
                         request.META['HTTP_HOST'],
@@ -1051,15 +1051,15 @@ class UpdatePreferenceView(object):
                     )
 
             postdata = {
-                'emailUpdates': bool(request.POST.get('profile_receive_email')),
-                'smsUpdates': False,
+                'sendEmail': bool(request.POST.get('profile_receive_email')),
+                'sendSMS': False,
             }
             GlobalOptions.update(
                 request.META['HTTP_HOST'],
                 postdata,
                 request.access_token
             )
-            return HttpResponseRedirect(reverse('update-settings'))
+            return HttpResponseRedirect(reverse('updates-settings'))
         else:
             return HttpResponseNotAllowed()
 
