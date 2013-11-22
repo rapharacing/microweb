@@ -43,7 +43,7 @@
 		<input type="hidden" name="duration" id="id_duration" value="{{ form.duration.value }}" />
 
 		<div class="row">
-			<div class="col col-lg-16 {% if form.errors.title %} has-errors{% endif %}" style="padding-right:0px;">
+			<div class="col col-md-16 {% if form.errors.title %} has-errors{% endif %}" style="padding-right:0px;">
 				<h4>What is the name of the event?</h4>
 				<p class="form-group">
 					<input
@@ -59,7 +59,7 @@
 		</div>
 
 		<div class="row">
-			<div class="col col-lg-8">
+			<div class="col col-md-8">
 				<h4>Where is the event being held?</h4>
 				<div id="control_where" class="input-group">
 					<input
@@ -75,15 +75,15 @@
 					</span>
 				</div>
 			</div>
-			<div id="map" class="col col-lg-8 pull-right" style="height:366px"></div>
+			<div id="map" class="col col-xs-16 col-md-8 pull-right" style="height:366px; margin-top:10px; margin-bottom:10px"></div>
 
-			<div class="col col-lg-8">
+			<div class="col col-md-8">
 				<h4>When does the event begin?</h4>
 				<div id="control_from_date" class="form-group">
-					<div class="controls col col-lg-8" style="padding-left:0px">
+					<div class="controls col col-sm-8" style="padding-left:0px">
 						<button id="id_from_date" name="from_date" type="text" class="btn btn-default" value="" style="width:100%"></button>
 					</div>
-					<div class="input-group col col-lg-8 bootstrap-timepicker">
+					<div class="input-group col col-sm-8 bootstrap-timepicker">
 						<button id="id_from_time" type="text" class="btn btn-default" value="" style="width:100%"></button>
 					</div>
 				</div>
@@ -93,19 +93,19 @@
 				{% endif %}
 			</div>
 
-			<div class="col col-lg-8">
+			<div class="col col-md-8">
 				<h4>When does the event end?</h4>
 				<div id="control_to_date" class="form-group">
-					<div class="controls col col-lg-8" style="padding-left:0px">
+					<div class="controls col col-sm-8" style="padding-left:0px">
 						<button id="id_to_date" name="to_date" type="text" class="btn btn-default" value="" style="width:100%"></button>
 					</div>
-					<div class="input-group col col-lg-8 bootstrap-timepicker">
+					<div class="input-group col col-sm-8 bootstrap-timepicker">
 						<button id="id_to_time" type="text" class="btn btn-default" value="" style="width:100%"></button>
 					</div>
 				</div>
 			</div>
 
-			<div class="col col-lg-8">
+			<div class="col col-md-8">
 				<h4>What is the maximum number of attendees?</h4>
 				<div id="control_rsvp" class="input-group">
 					<input
@@ -127,7 +127,7 @@
 
 		{% if form.id > 0 %}
 			<div class="row">
-				<div class="col col-lg-16 input-group">
+				<div class="col col-md-16 input-group">
 					<h4>Edit reason</h4>
 					<p>
 						<input
