@@ -3,8 +3,8 @@
 {% block breadcrumb %}
 	<ol class="breadcrumb">
 		<li><a href="/">Home</a></li>
-		<li><a href='{{ content.meta.links.microcosm.href|slice:"7:" }}/'>{{ content.meta.links.microcosm.title }}</a></li>
-		<li class="active"><a href='{{ content.meta.links.self.href|slice:"7:" }}'>{{ content.title }}</a></li>
+		<li><a href='{{ content.meta.links.microcosm.href }}/'>{{ content.meta.links.microcosm.title }}</a></li>
+		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.title }}</a></li>
 	</ol>
 {% endblock %}
 

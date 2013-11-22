@@ -3,7 +3,7 @@
 {% block breadcrumb %}
 	<ol class="breadcrumb">
 		<li><a href="/">Home</a></li>
-		<li class="active"><a href='{{ content.meta.links.self.href|slice:"7:" }}'>{{ content.title }}</a></li>
+		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.title }}</a></li>
 	</ol>
 {% endblock %}
 
