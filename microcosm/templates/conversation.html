@@ -20,7 +20,7 @@
 
 {% block sidebar %}
 	<p class="muted hidden-xs">
-		Created by <a href="/profiles/{{content.meta.created_by.id}}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
+		Created by <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
 		<time datetime="{{ content.meta.created|date:"c" }}"></time>
 	</p>
 	

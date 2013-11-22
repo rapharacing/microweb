@@ -8,8 +8,8 @@
 			<article id="comment{{ comment.id }}" class="row">
 				
 				<div class="col col-sm-4">
-					<a href="/profiles/{{ comment.meta.created_by.id }}/"><img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
-					<div class="h4"><a href="/profiles/{{ comment.meta.created_by.id }}/">{{ comment.meta.created_by.profile_name|truncatechars:25 }}</a></div>
+					<a href="{% url 'single-profile' comment.meta.created_by.id %}"><img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
+					<div class="h4"><a href="{% url 'single-profile' comment.meta.created_by.id %}">{{ comment.meta.created_by.profile_name|truncatechars:25 }}</a></div>
 				</div>
 
 				<div class="col col-sm-12">

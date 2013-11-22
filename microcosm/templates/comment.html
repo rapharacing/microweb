@@ -7,8 +7,8 @@
 		<article id="comment{{ item.id }}" class="row">
 			
 			<div class="col col-sm-4">
-				<a href="/profiles/{{ item.meta.created_by.id }}/"><img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{item.meta.created_by.avatar}}{% elif 'files' in item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
-				<div class="h4"><a href="/profiles/{{ item.meta.created_by.id }}/">{{ item.meta.created_by.profile_name|truncatechars:25 }}</a></div>
+				<a href="{% url 'single-profile' item.meta.created_by.id %}"><img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{item.meta.created_by.avatar}}{% elif 'files' in item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
+				<div class="h4"><a href="{% url 'single-profile' item.meta.created_by.id %}">{{ item.meta.created_by.profile_name|truncatechars:25 }}</a></div>
 			</div>
 
 			<div class="col col-sm-12">
@@ -46,8 +46,8 @@
 		<article id="comment{{ content.id }}" class="row">
 			
 			<div class="col col-sm-4">
-				<a href="/profiles/{{ content.meta.created_by.id }}/"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
-				<div class="h4"><a href="/profiles/{{ content.meta.created_by.id }}/">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a></div>
+				<a href="{% url 'single-profile' content.meta.created_by.id %}"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
+				<div class="h4"><a href="{% url 'single-profile' content.meta.created_by.id %}">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a></div>
 			</div>
 
 			<div class="col col-sm-12">
