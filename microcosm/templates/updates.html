@@ -70,7 +70,7 @@
                 {% elif update.item_type == "conversation" %}conversation
                 {% elif update.item_type == "event" %}event
                 {% elif update.item_type == "poll" %}poll
-                {% endif %}</a> • <time datetime="{{ update.item.meta.created|date:"c" }}"></time></small>
+                {% endif %}</a> • <time datetime="{{ update.meta.created|date:"c" }}"></time></small>
                 </div></td>
                     </tr>
                 </tbody>
