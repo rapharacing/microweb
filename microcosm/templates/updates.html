@@ -28,7 +28,7 @@
             {% endif %}{% endif %}</td>
                         <td>                    <span>
                         {% if update.update_type == "new_comment" %}
-                            <a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title }}</a></span><br />
+                            <a href="{{ update.parent_link }}/newest/">{{ update.item.title }}</a></span><br />
                         {% elif update.update_type == "reply_to_comment" %}
                             <a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name }}</a>
                             replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>

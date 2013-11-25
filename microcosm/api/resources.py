@@ -651,7 +651,7 @@ class Update(APIResource):
         update.item_link = '/%s/%s' % (RESOURCE_PLURAL[update.item_type], update.item.id)
 
         if update.update_type == 'new_comment':
-            update.parent_link = update.parent_item.meta.links['self']['href']
+            update.parent_link = update.item.meta.links['self']['href']
         elif update.update_type == 'reply_to_comment':
             update.profile_link = update.item.meta.created_by.meta.links['self']['href']
             update.parent_link = update.parent_item.meta.links['self']['href']
