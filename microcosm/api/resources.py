@@ -620,6 +620,7 @@ class Update(APIResource):
         update.id = data['id']
         update.update_type = data['updateType']
         update.item_type = data['itemType']
+        update.meta = Meta(data['meta'])
 
         if update.item_type == 'conversation':
             update.item = Conversation.from_summary(data['item'])
@@ -647,11 +648,13 @@ class Update(APIResource):
                 update.parent_item = Microcosm(data['parentItem'])
             else:
                 update.parent_item = None
+        else:
+            update.parent_item = update.item
 
         update.item_link = '/%s/%s' % (RESOURCE_PLURAL[update.item_type], update.item.id)
 
         if update.update_type == 'new_comment':
-            update.parent_link = update.item.meta.links['self']['href']
+            update.parent_link = update.parent_item.meta.links['self']['href']
         elif update.update_type == 'reply_to_comment':
             update.profile_link = update.item.meta.created_by.meta.links['self']['href']
             update.parent_link = update.parent_item.meta.links['self']['href']
