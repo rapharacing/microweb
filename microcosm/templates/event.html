@@ -110,7 +110,7 @@
 	<p>
 		{% for item in attendees.items.items %}
 			{% if item.rsvp == "yes" %}
-				<a href="/profiles/{{ item.attendee_id }}/">{{ item.attendee.profile_name|truncatechars:25 }}</a>
+				<a href="/profiles/{{ item.profile_id }}/">{{ item.profile.profile_name|truncatechars:25 }}</a>
 			{% endif %}
 		{% endfor %}
 	</p>

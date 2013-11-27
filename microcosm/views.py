@@ -715,10 +715,10 @@ class EventView(object):
 
         if request.method == 'POST':
             if user:
-                attendee = {
-                    'RSVP' : request.POST['rsvp'],
-                    'AttendeeId' : user.id
-                }
+                attendee = [{
+                    'rsvp' : request.POST['rsvp'],
+                    'profileId' : user.id
+                }]
                 Event.rsvp(
                     request.META['HTTP_HOST'],
                     event_id,
