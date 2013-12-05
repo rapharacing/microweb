@@ -1099,7 +1099,7 @@ class SearchView(object):
             search = Search.from_api_response(responses[url])
 
             view_data = {
-                'user': Profile(responses[request.whoami_url], summary=False),
+                'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
                 'site': request.site,
                 'content': search,
                 'pagination': build_pagination_links(responses[url]['results']['links'], search)
