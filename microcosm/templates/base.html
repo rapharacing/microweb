@@ -37,17 +37,13 @@
 			<header class="row">
 				<div class="col col-sm-16">
 					<div class="row">
-						<div id="logo" class="col col-sm-4 margin-top-half">	
+						<div id="logo" class="col col-sm-8 margin-top-half">	
 							<a href="/"><img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" /></a>
 						</div>
-	 						<form action="" method="POST" id="searchForm" class="col col-sm-6">{% csrf_token %}
-<!--							<input type="text" id="searchField" class="col col-sm-10" style="margin-top: 25px;">
-								<input class="btn btn-primary" type="submit" id="submit_search" value="Search" style="margin-top: 22px; margin-left: 5px;"> -->
-							</form>
 						<div id="whoami">
 						{% block whoami %}
 							{% if user %}
-								<div class="col col-sm-5 col-md-3 col-md-push-3 whoami">
+								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5 whoami">
 									<div class="row margin-top-half">
 										<a href="{% url 'edit-profile' user.id %}" id="edit_profile">
                                             <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" class="gravatar" align="left" />
