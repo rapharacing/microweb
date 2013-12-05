@@ -18,7 +18,7 @@
         {% for result in content.results.items %}
             {% if result.item_type == "conversation" or result.item_type == "event" %}
             <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
-                <table class="col col-md-10">
+                <table class="col col-md-16">
                     <tbody>
                         <tr>
                             <td rowspan="2" width="42">{% ifequal result.item_type "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>{% endifequal %}{% ifequal result.item_type "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>{% endifequal %}</td>
@@ -29,7 +29,7 @@
                         </tr>
                     </tbody>
                 </table>
-
+<!-- 
                 <table class="col col-md-6 text-muted">
                     <tbody>
                         <tr>
@@ -42,11 +42,11 @@
                             <td>{% if result.item.last_comment_created %}<small class="text-muted"><time datetime="{{ result.item.last_comment_created|date:"c" }}"></time></small>{% endif %}</td>
                         </tr>                   
                     </tbody>
-                </table>
+                </table> -->
             </section>
             {% elif result.item_type == "comment" %}
              <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
-                <table class="col col-md-10">
+                <table class="col col-md-16">
                 <tbody>
                         <tr>
                             <td rowspan="3" width="42"></td>
@@ -63,7 +63,7 @@
             </section>
             {% elif result.item_type == "profile" %}
              <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
-                <table class="col col-md-10">
+                <table class="col col-md-16">
                 <tbody>
                         <tr>
                             <td rowspan="2" width="42"><span class="glyphicon glyphicon-user text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span></td>
@@ -76,7 +76,7 @@
             </section>
             {% elif result.item_type == "microcosm" %}
              <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
-                <table class="col col-md-10">
+                <table class="col col-md-16">
                 <tbody>
                         <tr>
                            <td rowspan="2" width="42"></td><td><a href="{{ result.item.meta.links.self.href }}">{{ result.item.title }}</td>
