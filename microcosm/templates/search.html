@@ -11,7 +11,7 @@
     <section class="row margin-bottom-half">
     <h1>Search</h1>
     </section>
-    {% if not content.results %}
+    {% if content.results.items|length == 0 %}
         <p>No results found. Please try searching for different parameters.</p>
     {% else %}
         {% include "pagination_nav.html" %}
