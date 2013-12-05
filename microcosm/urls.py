@@ -14,6 +14,7 @@ from microcosm.views import ErrorView
 from microcosm.views import GeoView
 from microcosm.views import FaviconView
 from microcosm.views import RobotsView
+from microcosm.views import SearchView
 
 
 urlpatterns = patterns('',
@@ -70,6 +71,8 @@ urlpatterns = patterns('',
     url(r'^profiles/$', ProfileView.list, name='list-profiles'),
     url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),
     url(r'^profiles/(?P<profile_id>\d+)/edit/$', ProfileView.edit, name='edit-profile'),
+
+    url(r'^search/$', SearchView.single, name='single-search'),
 
     # Proxy geocoding requests to the backend
     url(r'^geocode/$', GeoView.geocode, name='geocode'),

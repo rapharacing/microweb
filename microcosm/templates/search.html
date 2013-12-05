@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li class="active"><a href='/search/'>Search</a></li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <section class="row margin-bottom-half">
+    <h1>Search</h1>
+    </section>
+    {% if not content.results %}
+        <p>No results found. Please try searching for different parameters.</p>
+    {% else %}
+        {% include "pagination_nav.html" %}
+        {% for result in content.results.items %}
+            {% if result.item_type == "conversation" or result.item_type == "event" %}
+            <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
+                <table class="col col-md-10">
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" width="42">{% ifequal result.item_type "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>{% endifequal %}{% ifequal result.item_type "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>{% endifequal %}</td>
+                            <td><strong><a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">{{ result.item.title }}</a></strong></td>
+                        </tr>
+                        <tr>
+                            <td><small class="text-muted">in <a href="{{ result.item.meta.links.microcosm.href }}">{{ result.item.meta.links.microcosm.title }}</a> • <time datetime="{{ result.item.meta.created|date:"c" }}"></time></small></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="col col-md-6 text-muted">
+                    <tbody>
+                        <tr>
+                            <td width="100"><small class="nowrap"><i class="glyphicon glyphicon-comment buffer-right"></i> {{ result.item.total_comments }}</small></td>
+                            <td rowspan="2" width="50">{% if result.item.last_comment_created %}<a href="{% url 'single-profile' result.item.last_comment_created_by.id %}"><img src="{% if 'gravatar' in result.item.last_comment_created_by.avatar %}{{result.item.last_comment_created_by.avatar}}{% elif 'files' in result.item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.last_comment_created_by.profile_name }}" align="left" class="gravatar-small" /></a>{% endif %}</td>
+                            <td>{% if result.item.last_comment_created %}<small><a href="{% url 'single-profile' result.item.last_comment_created_by.id %}">{{ result.item.last_comment_created_by.profile_name|truncatechars:25 }}</a></small>{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td><small class="nowrap"><i class="glyphicon glyphicon-eye-open buffer-right"></i> {{ result.item.total_views }}</small></td>
+                            <td>{% if result.item.last_comment_created %}<small class="text-muted"><time datetime="{{ result.item.last_comment_created|date:"c" }}"></time></small>{% endif %}</td>
+                        </tr>                   
+                    </tbody>
+                </table>
+            </section>
+            {% elif result.item_type == "comment" %}
+             <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
+                <table class="col col-md-10">
+                <tbody>
+                        <tr>
+                            <td rowspan="3" width="42"></td>
+                            <td><strong><a href="{{ result.parent_item.meta.links.self.href }}/{% if user %}newest/{% endif %}">{{ result.parent_item.title }}</a></strong></td>
+                        </tr>
+                        <tr>
+                            <td><small class="text-muted">in <a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title }}</a> • <time datetime="{{ result.item.meta.created|date:"c" }}"></time></small></td>
+                        </tr>
+                        <tr>
+                            <td><a href="{% url 'single-profile' result.item.meta.created_by.id %}"><img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="gravatar-small" style="width: 24px;"/></a>{{result.highlight|safe}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            {% elif result.item_type == "profile" %}
+             <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
+                <table class="col col-md-10">
+                <tbody>
+                        <tr>
+                            <td rowspan="2" width="42"><span class="glyphicon glyphicon-user text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span></td>
+                        </tr>
+                        <tr>
+                            <td><a href="{% url 'single-profile' result.item.id %}"><img src="{% if 'gravatar' in result.item.avatar %}{{result.item.avatar}}{% elif 'files' in result.item.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.profile_name }}" align="left" class="gravatar-small" style="width: 28px;"/> @{{ result.item.profile_name }}</td> 
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            {% elif result.item_type == "microcosm" %}
+             <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
+                <table class="col col-md-10">
+                <tbody>
+                        <tr>
+                           <td rowspan="2" width="42"></td><td><a href="{{ result.item.meta.links.self.href }}">{{ result.item.title }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ result.item.description }}</td> 
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            {% endif %}
+            <hr />
+        {% endfor %}
+        {% include "pagination_nav.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+    <a href="/updates/settings/">Update Settings</a>
+{% endblock %}
