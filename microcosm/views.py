@@ -1083,9 +1083,6 @@ class SearchView(object):
     @exception_handler
     def single(request):
 
-        if not request.access_token:
-            raise HttpResponseNotAllowed
-
         if request.method == 'GET':
             # pagination offset
             offset = int(request.GET.get('offset', 0))
