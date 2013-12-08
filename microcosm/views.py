@@ -1090,8 +1090,7 @@ class SearchView(object):
 
             url, params, headers = Search.build_request(
                 request.META['HTTP_HOST'],
-                offset=offset,
-                q=q,
+                params = request.GET.dict(),
                 access_token=request.access_token
             )
             request.view_requests.append(grequests.get(url, params=params, headers=headers))

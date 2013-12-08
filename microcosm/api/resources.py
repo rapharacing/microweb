@@ -1299,18 +1299,17 @@ class Search(object):
     def from_api_response(cls, data):
         search = cls()
         search.query = data['query']
-        search.time_elapsed = data['timeTakenInMs']
+        search.type = []
+        if data['query'].get('type'):
+            for t in data['query']['type']:
+                search.type.append(t)
+        search.time_elapsed = data['timeTakenInMs']/float(1000)
         search.results = PaginatedList(data['results'], SearchResult)
         return search
 
     @staticmethod
-    def build_request(host, offset=None, q=None, access_token=None):
+    def build_request(host, params=None, access_token=None):
         url = build_url(host, [Search.api_path_fragment])
-        params = {}
-        if offset:
-            params['offset'] = offset
-        if q:
-            params['q'] = q
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 

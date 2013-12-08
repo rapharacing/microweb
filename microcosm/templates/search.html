@@ -11,8 +11,16 @@
     <section class="row margin-bottom-half">
     <h1>Search</h1>
     </section>
+    <small class="text-muted">About {{ content.results.total }} matches.  Search took {{ content.time_elapsed }} seconds.</small>
     {% if content.results.items|length == 0 %}
-        <p>No results found. Please try searching for different parameters.</p>
+        <p>We couldn't find any items that matched your search:<br />
+        <blockquote>{{ content.query.searched|safe }}</blockquote>
+        
+        Suggestions:<br />
+
+        Make sure that all words are spelled correctly.<br />
+        Try different or more general keywords.<br />
+</p>
     {% else %}
         {% include "pagination_nav.html" %}
         {% for result in content.results.items %}
@@ -95,5 +103,37 @@
 {% endblock %}
 
 {% block sidebar %}
-    <a href="/updates/settings/">Update Settings</a>
+    Show me...<br />
+    <label><input name="filter_microcosms" id="filter_microcosms" type="checkbox" {% if "microcosm" in content.type %}checked="true"{% endif %} onclick="search()"> Microcosms</label><br />
+    <label><input name="filter_conversations" id="filter_conversations" type="checkbox" {% if "conversation" in content.type %}checked="true"{% endif %} onclick="search()"> Conversations</label><br />
+    <label><input name="filter_events" id="filter_events" type="checkbox" {% if "event" in content.type %}checked="true"{% endif %} onclick="search()"> Events</label><br />
+    <label><input name="filter_profiles" id="filter_profiles" type="checkbox" {% if "profile" in content.type %}checked="true"{% endif %} onclick="search()"> Profiles</label><br />
+    <script type="text/javascript">
+        function search(){
+            var query = "{{content.query.searched}}"
+            //Work out what was checked/unchecked and add/remove it from query
+            {% if "microcosm" in content.type %}
+                if(!document.getElementById('filter_microcosms').checked) {query = query.replace(" type:microcosm","")}
+            {% else %}
+                if(document.getElementById('filter_microcosms').checked) {query = query + " type:microcosm"}
+            {% endif %}
+            {% if "conversation" in content.type %}
+                if(!document.getElementById('filter_conversations').checked) {query = query.replace(" type:conversation","")}
+            {% else %}
+                if(document.getElementById('filter_conversations').checked) {query = query + " type:conversation"}
+            {% endif %}
+            {% if "event" in content.type %}
+                if(!document.getElementById('filter_events').checked) {query = query.replace(" type:event","")}
+            {% else %}
+                if(document.getElementById('filter_events').checked) {query = query + " type:event"}
+            {% endif %}
+            {% if "profile" in content.type %}
+                if(!document.getElementById('filter_profiles').checked) {query = query.replace(" type:profile","")}
+            {% else %}
+                if(document.getElementById('filter_profiles').checked) {query = query + " type:profile"}
+            {% endif %}
+            window.location.href = '/search/?q='+query
+        }
+    </script>
+
 {% endblock %}
