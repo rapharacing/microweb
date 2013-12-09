@@ -47,7 +47,7 @@
 		                        <div class="input-group-addon" id="searchbutton" onclick="focusOnClick()">
 		                          <span class="glyphicon glyphicon-search"></span>
 		                        </div>
-		                        <input type="text" id="searchbar" class="form-control" name="q" {% if content.query.searched %}value="{{content.query.searched|safe}}"{% endif %} placeholder="Search..."/>
+		                        <input type="search" id="searchbar" class="form-control" name="q" {% if content.query.searched %}value="{{content.query.searched|safe}}"{% endif %} placeholder="Search..."/>
 		                      </div>
 		                    </form>
 		                  </div>
