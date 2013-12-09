@@ -125,7 +125,7 @@
             {% else %}
                 if(document.getElementById('filter_titleonly').checked) {query = query + " inTitle:true"}
             {% endif %}
-            window.location.href = '/search/?q='+query
+            window.location.href = '/search/?q='+encodeURIComponent(query)
         }
     </script>
 
