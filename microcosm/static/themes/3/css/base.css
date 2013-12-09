@@ -73,3 +73,7 @@ pre code {
 .text-danger, .text-danger:link, .text-danger:visited, .text-danger:hover, .text-danger:active, .text-danger:focus {
   color: #b94a48 !important;
 }
+
+#searchform {
+	margin-top: 24px;
+}

@@ -41,7 +41,7 @@
 							<a href="/"><img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" /></a>
 						</div>
 						<div class="col col-sm-5 col-sm-push-1 col-md-push-0 col-lg-8">
-		                    <form class="navbar-form navbar-left" action="/search/" method="GET" onsubmit="return validateNotEmpty()">
+		                    <form id="searchform" class="navbar-form navbar-left" action="/search/" method="GET" onsubmit="return validateNotEmpty()">
 		                      <br />
 		                      <div class="input-group">
 		                        <div class="input-group-addon" id="searchbutton" onclick="focusOnClick()">
