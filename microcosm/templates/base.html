@@ -135,12 +135,10 @@
 			//if($("#searchbar").attr("value") == "")	$("#searchbar").attr("value", text);
 
 			$("#searchbar").focus(function() {
-				$(this).addClass("active");
 				if($(this).attr("value") == text) $(this).attr("value", "");
 			});
 			
 			$("#searchbar").blur(function() {
-				$(this).removeClass("active");
 				if($(this).attr("value") == "") $(this).attr("value", text);
 			});
 		});
