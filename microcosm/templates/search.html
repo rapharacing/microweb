@@ -44,7 +44,7 @@
                 <tbody>
                         <tr>
                             <td rowspan="3" width="42"></td>
-                            <td><strong><a href="{{ result.parent_item.meta.links.self.href }}/{% if user %}newest/{% endif %}">{{ result.parent_item.title }}</a></strong></td>
+                            <td><strong><a href="{{ result.item.meta.links.self.href }}/incontext/">{{ result.parent_item.title }}</a></strong></td>
                         </tr>
                         <tr>
                             <td><small class="text-muted">in <a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title }}</a> • <time datetime="{{ result.item.meta.created|date:"c" }}"></time></small></td>

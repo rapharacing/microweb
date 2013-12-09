@@ -909,6 +909,39 @@ class CommentView(object):
         else:
             return HttpResponseNotAllowed()
 
+    @staticmethod
+    @exception_handler
+    def incontext(request, comment_id):
+        """
+        Get redirected to the first unread post in a conversation
+        """
+        if request.method == 'GET':
+            response = Comment.incontext(
+                request.META['HTTP_HOST'],
+                comment_id,
+                access_token=request.access_token
+            )
+            #because redirects are always followed, we can't just get the 'location' value
+            response = response['comments']['links']
+            for link in response:
+                if link['rel'] == 'self':
+                    response = link['href']
+            response = str.replace(str(response),'/api/v1','')
+            pr = urlparse(response)
+            queries = parse_qs(pr[4])
+            frag = ""
+            if queries.get('comment_id'):
+                frag = 'comment' + queries['comment_id'][0]
+                del queries['comment_id']
+            # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
+            # urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
+            for (key, value) in queries.items():
+                queries[key] = value[0]
+            queries = urlencode(queries)
+            response = urlunparse((pr[0],pr[1],pr[2],pr[3],queries,frag))
+            return HttpResponseRedirect(response)
+        else:
+            return HttpResponseNotAllowed()
 
 class UpdateView(object):
 

@@ -1221,6 +1221,11 @@ class Comment(APIResource):
         if hasattr(self, 'meta'): repr['meta'] = self.meta
         return repr
 
+    @staticmethod
+    def incontext(host, id, access_token=None):
+        url = build_url(host, [Comment.api_path_fragment, id, "incontext"])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.json()['data']
 
 class GeoCode(object):
     """
