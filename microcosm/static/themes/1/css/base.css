@@ -61,23 +61,3 @@ pre code {
 .text-danger, .text-danger:link, .text-danger:visited, .text-danger:hover, .text-danger:active, .text-danger:focus {
   color: #b94a48 !important;
 }
-
-#searchbar {
-	width: 100%; 
-	height: 25px;
-	float: left; padding: 20px 60px 20px 15px;
-	background: #fff repeat-x;
-	border: 1px solid #c7c7c7;
-	border-radius: 100px; -moz-border-radius: 100px; -webkit-border-radius: 100px;
-	font-family: "Source Sans Pro",sans-serif;
-	color: #898989;
-	outline: none; /*Remove Chrome and Safari glows on focus*/
-}
-
-#searchbtn {
-	display: none;
-}
-
-#searchbtn:hover {
-	background-position: 0 -27px;
-}

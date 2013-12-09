@@ -40,14 +40,17 @@
 						<div id="logo" class="col col-sm-4 margin-top-half">	
 							<a href="/"><img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" /></a>
 						</div>
-						<div class="col col-sm-5 col-sm-push-1 col-md-push-0 col-lg-8" style="margin-top: 25px;">
-							<form action="/search/" method="GET" onsubmit="return validateNotEmpty()">
-								<fieldset>
-									<input type="text" id="searchbar" name="q" {% if content.query.searched %}value="{{content.query.searched|safe}}"{% else %}value="Search..."{% endif %}/>
-									<input type="submit" value="Search" id="searchbtn" />
-								</fieldset>
-							</form>
-						</div>
+						<div class="col col-sm-5 col-sm-push-1 col-md-push-0 col-lg-8">
+		                    <form class="navbar-form navbar-left" action="/search/" method="GET" onsubmit="return validateNotEmpty()">
+		                      <br />
+		                      <div class="input-group">
+		                        <div class="input-group-addon" id="searchbutton" onclick="focusOnClick()">
+		                          <span class="glyphicon glyphicon-search"></span>
+		                        </div>
+		                        <input type="text" id="searchbar" class="form-control" name="q" {% if content.query.searched %}value="{{content.query.searched|safe}}"{% else %}value="Search..."{% endif %}/>
+		                      </div>
+		                    </form>
+		                  </div>
 						<div id="whoami">
 						{% block whoami %}
 							{% if user %}
@@ -148,6 +151,10 @@
 		    if(!mystring.match(/\S/)) return false;
 		    return true;
 	    };
+
+	    function focusOnClick() {
+	    	document.getElementById('searchbar').focus();
+	    }
 	</script>
 
 	<!-- For custom page js (e.g. event.html) -->
