@@ -1073,7 +1073,7 @@ class UpdatePreferenceView(object):
             )
             return HttpResponseRedirect(reverse('updates-settings'))
         else:
-            return HttpResponseNotAllowed()
+            return HttpResponseNotAllowed(['GET'])
 
 
 class SearchView(object):
@@ -1105,26 +1105,6 @@ class SearchView(object):
             }
 
             return render(request, SearchView.single_template, view_data)
-
-        if request.method == 'POST':
-            if 'watcher_id' in request.POST:
-                watchers = request.POST.getlist('watcher_id')
-                for w in watchers:
-                    if request.POST.get('delete_watcher_' + str(w)):
-                        Watcher.delete(request.META['HTTP_HOST'], w, request.access_token)
-                    else:
-                        postdata = {
-                            'id': int(w),
-                            'sendEmail': bool(request.POST.get('send_email_'+str(w))),
-                            'receiveSMS': False,
-                        }
-                        Watcher.update(
-                            request.META['HTTP_HOST'],
-                            int(w),
-                            postdata,
-                            request.access_token
-                        )
-            return HttpResponseRedirect(reverse('list-watchers'))
         else:
             return HttpResponseNotAllowed(['POST',])
 
