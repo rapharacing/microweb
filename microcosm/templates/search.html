@@ -30,27 +30,13 @@
                     <tbody>
                         <tr>
                             <td rowspan="2" width="42">{% ifequal result.item_type "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>{% endifequal %}{% ifequal result.item_type "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>{% endifequal %}</td>
-                            <td><strong><a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">{{ result.item.title }}</a></strong></td>
+                            <td><a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">{{ result.highlight|safe }}</a></td>
                         </tr>
                         <tr>
                             <td><small class="text-muted">in <a href="{{ result.item.meta.links.microcosm.href }}">{{ result.item.meta.links.microcosm.title }}</a> • <time datetime="{{ result.item.meta.created|date:"c" }}"></time></small></td>
                         </tr>
                     </tbody>
                 </table>
-<!-- 
-                <table class="col col-md-6 text-muted">
-                    <tbody>
-                        <tr>
-                            <td width="100"><small class="nowrap"><i class="glyphicon glyphicon-comment buffer-right"></i> {{ result.item.total_comments }}</small></td>
-                            <td rowspan="2" width="50">{% if result.item.last_comment_created %}<a href="{% url 'single-profile' result.item.last_comment_created_by.id %}"><img src="{% if 'gravatar' in result.item.last_comment_created_by.avatar %}{{result.item.last_comment_created_by.avatar}}{% elif 'files' in result.item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.last_comment_created_by.profile_name }}" align="left" class="gravatar-small" /></a>{% endif %}</td>
-                            <td>{% if result.item.last_comment_created %}<small><a href="{% url 'single-profile' result.item.last_comment_created_by.id %}">{{ result.item.last_comment_created_by.profile_name|truncatechars:25 }}</a></small>{% endif %}</td>
-                        </tr>
-                        <tr>
-                            <td><small class="nowrap"><i class="glyphicon glyphicon-eye-open buffer-right"></i> {{ result.item.total_views }}</small></td>
-                            <td>{% if result.item.last_comment_created %}<small class="text-muted"><time datetime="{{ result.item.last_comment_created|date:"c" }}"></time></small>{% endif %}</td>
-                        </tr>                   
-                    </tbody>
-                </table> -->
             </section>
             {% elif result.item_type == "comment" %}
              <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
@@ -108,6 +94,8 @@
     <label><input name="filter_conversations" id="filter_conversations" type="checkbox" {% if "conversation" in content.type %}checked="true"{% endif %} onclick="search()"> Conversations</label><br />
     <label><input name="filter_events" id="filter_events" type="checkbox" {% if "event" in content.type %}checked="true"{% endif %} onclick="search()"> Events</label><br />
     <label><input name="filter_profiles" id="filter_profiles" type="checkbox" {% if "profile" in content.type %}checked="true"{% endif %} onclick="search()"> Profiles</label><br />
+    Options:<br />
+    <label><input name="filter_titleonly" id="filter_titleonly" type="checkbox" {% if content.query.inTitle %}checked="true"{% endif %} onclick="search()"> Only search titles</label><br />
     <script type="text/javascript">
         function search(){
             var query = "{{content.query.searched}}"
@@ -131,6 +119,11 @@
                 if(!document.getElementById('filter_profiles').checked) {query = query.replace(" type:profile","")}
             {% else %}
                 if(document.getElementById('filter_profiles').checked) {query = query + " type:profile"}
+            {% endif %}
+            {% if content.query.inTitle %}
+                if(!document.getElementById('filter_titleonly').checked) {query = query.replace(" inTitle:true","")}
+            {% else %}
+                if(document.getElementById('filter_titleonly').checked) {query = query + " inTitle:true"}
             {% endif %}
             window.location.href = '/search/?q='+query
         }
