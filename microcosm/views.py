@@ -50,6 +50,8 @@ from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
 from microcosm.api.resources import response_list_to_dict
 from microcosm.api.resources import GlobalOptions
 from microcosm.api.resources import ProfileList
+from microcosm.api.resources import Search
+from microcosm.api.resources import SearchResult
 
 from microcosm.forms.forms import EventCreate
 from microcosm.forms.forms import EventEdit
@@ -571,6 +573,14 @@ class EventView(object):
             responses = response_list_to_dict(grequests.map(request.view_requests))
             event = Event.from_api_response(responses[event_url])
             comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
+            attendees = AttendeeList(responses[att_url])
+            attendees_yes = []
+            attendees_invited = []
+            for attendee in attendees.items.items:
+                if attendee.rsvp == "yes":
+                    attendees_yes.append(attendee)
+                elif attendee.rsvp == "invited":
+                    attendees_invited.append(attendee)
 
             view_data = {
                 'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
@@ -579,7 +589,9 @@ class EventView(object):
                 'comment_form': comment_form,
                 'pagination': build_pagination_links(responses[event_url]['comments']['links'], event.comments),
                 'item_type': 'event',
-                'attendees': AttendeeList(responses[att_url])
+                'attendees': attendees,
+                'attendees_yes': attendees_yes,
+                'attendees_invited': attendees_invited
             }
 
             return render(request, EventView.single_template, view_data)
@@ -1061,7 +1073,40 @@ class UpdatePreferenceView(object):
             )
             return HttpResponseRedirect(reverse('updates-settings'))
         else:
-            return HttpResponseNotAllowed()
+            return HttpResponseNotAllowed(['GET'])
+
+
+class SearchView(object):
+
+    single_template = 'search.html'
+    @staticmethod
+    @exception_handler
+    def single(request):
+
+        if request.method == 'GET':
+            # pagination offset
+            offset = int(request.GET.get('offset', 0))
+            q = request.GET.get('q')
+
+            url, params, headers = Search.build_request(
+                request.META['HTTP_HOST'],
+                params = request.GET.dict(),
+                access_token=request.access_token
+            )
+            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            search = Search.from_api_response(responses[url])
+
+            view_data = {
+                'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+                'site': request.site,
+                'content': search,
+                'pagination': build_pagination_links(responses[url]['results']['links'], search)
+            }
+
+            return render(request, SearchView.single_template, view_data)
+        else:
+            return HttpResponseNotAllowed(['POST',])
 
 
 class ErrorView(object):

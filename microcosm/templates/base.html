@@ -37,13 +37,21 @@
 			<header class="row">
 				<div class="col col-sm-16">
 					<div class="row">
-						<div id="logo" class="col col-sm-8 margin-top-half">	
+						<div id="logo" class="col col-sm-4 margin-top-half">	
 							<a href="/"><img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" /></a>
+						</div>
+						<div class="col col-sm-5 col-sm-push-1 col-md-push-0 col-lg-8" style="margin-top: 25px;">
+							<form action="/search/" method="GET" onsubmit="return validateNotEmpty()">
+								<fieldset>
+									<input type="text" id="searchbar" name="q" {% if content.query.searched %}value="{{content.query.searched|safe}}"{% else %}value="Search..."{% endif %}/>
+									<input type="submit" value="Search" id="searchbtn" />
+								</fieldset>
+							</form>
 						</div>
 						<div id="whoami">
 						{% block whoami %}
 							{% if user %}
-								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5 whoami">
+								<div class="col col-sm-4 col-sm-push-2 col-md-4 col-md-push-1 col-lg-3 whoami">
 									<div class="row margin-top-half">
 										<a href="{% url 'edit-profile' user.id %}" id="edit_profile">
                                             <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" class="gravatar" align="left" />
@@ -54,7 +62,7 @@
 									</div>
 								</div>
 							{% else %}
-								<div class="col col-sm-5 col-md-3 col-sm-push-3 col-md-push-5 whoami">
+								<div class="col col-sm-4 col-sm-push-2 col-md-4 col-md-push-1 col-lg-3 whoami">
 									Browsing as a guest.
 									<a class="btn btn-primary btn-block" id="login_link" href="javascript:login()">Sign In or Register</a><br />
 								</div>
@@ -121,7 +129,27 @@
 	<script src="{{ STATIC_URL }}js/base.js"></script>
 
 	<script>
+		$(document).ready(function() {
+			var text = "Search...";
 
+			//if($("#searchbar").attr("value") == "")	$("#searchbar").attr("value", text);
+
+			$("#searchbar").focus(function() {
+				$(this).addClass("active");
+				if($(this).attr("value") == text) $(this).attr("value", "");
+			});
+			
+			$("#searchbar").blur(function() {
+				$(this).removeClass("active");
+				if($(this).attr("value") == "") $(this).attr("value", text);
+			});
+		});
+
+		function validateNotEmpty() { 
+		    var mystring = document.getElementById('searchbar').value; 
+		    if(!mystring.match(/\S/)) return false;
+		    return true;
+	    };
 	</script>
 
 	<!-- For custom page js (e.g. event.html) -->

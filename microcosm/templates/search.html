@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li class="active"><a href='/search/'>Search</a></li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <section class="row margin-bottom-half">
+    <h1>Search</h1>
+    </section>
+    <small class="text-muted">About {{ content.results.total }} matches.  Search took {{ content.time_elapsed }} seconds.</small>
+    {% if content.results.items|length == 0 %}
+        <p>We couldn't find any items that matched your search:<br />
+        <blockquote>{{ content.query.searched|safe }}</blockquote>
+        
+        Suggestions:<br />
+
+        Make sure that all words are spelled correctly.<br />
+        Try different or more general keywords.<br />
+</p>
+    {% else %}
+        {% include "pagination_nav.html" %}
+        {% for result in content.results.items %}
+            {% if result.item_type == "conversation" or result.item_type == "event" %}
+            <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
+                <table class="col col-md-16">
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" width="42">{% ifequal result.item_type "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>{% endifequal %}{% ifequal result.item_type "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>{% endifequal %}</td>
+                            <td><a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">{{ result.highlight|safe }}</a></td>
+                        </tr>
+                        <tr>
+                            <td><small class="text-muted">in <a href="{{ result.item.meta.links.microcosm.href }}">{{ result.item.meta.links.microcosm.title }}</a> • <time datetime="{{ result.item.meta.created|date:"c" }}"></time></small></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            {% elif result.item_type == "comment" %}
+             <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
+                <table class="col col-md-16">
+                <tbody>
+                        <tr>
+                            <td rowspan="3" width="42"></td>
+                            <td><strong><a href="{{ result.parent_item.meta.links.self.href }}/{% if user %}newest/{% endif %}">{{ result.parent_item.title }}</a></strong></td>
+                        </tr>
+                        <tr>
+                            <td><small class="text-muted">in <a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title }}</a> • <time datetime="{{ result.item.meta.created|date:"c" }}"></time></small></td>
+                        </tr>
+                        <tr>
+                            <td><a href="{% url 'single-profile' result.item.meta.created_by.id %}"><img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="gravatar-small" style="width: 24px;"/></a>{{result.highlight|safe}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            {% elif result.item_type == "profile" %}
+             <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
+                <table class="col col-md-16">
+                <tbody>
+                        <tr>
+                            <td rowspan="2" width="42"><span class="glyphicon glyphicon-user text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span></td>
+                        </tr>
+                        <tr>
+                            <td><a href="{% url 'single-profile' result.item.id %}"><img src="{% if 'gravatar' in result.item.avatar %}{{result.item.avatar}}{% elif 'files' in result.item.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.profile_name }}" align="left" class="gravatar-small" style="width: 28px;"/> @{{ result.item.profile_name }}</td> 
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            {% elif result.item_type == "microcosm" %}
+             <section id="{{ result.itemType }}{{ result.item.id }}" class="row margin-bottom-half">
+                <table class="col col-md-16">
+                <tbody>
+                        <tr>
+                           <td rowspan="2" width="42"></td><td><a href="{{ result.item.meta.links.self.href }}">{{ result.item.title }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ result.item.description }}</td> 
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            {% endif %}
+            <hr />
+        {% endfor %}
+        {% include "pagination_nav.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+    Show me...<br />
+    <label><input name="filter_microcosms" id="filter_microcosms" type="checkbox" {% if "microcosm" in content.type %}checked="true"{% endif %} onclick="search()"> Microcosms</label><br />
+    <label><input name="filter_conversations" id="filter_conversations" type="checkbox" {% if "conversation" in content.type %}checked="true"{% endif %} onclick="search()"> Conversations</label><br />
+    <label><input name="filter_events" id="filter_events" type="checkbox" {% if "event" in content.type %}checked="true"{% endif %} onclick="search()"> Events</label><br />
+    <label><input name="filter_profiles" id="filter_profiles" type="checkbox" {% if "profile" in content.type %}checked="true"{% endif %} onclick="search()"> Profiles</label><br />
+    Options:<br />
+    <label><input name="filter_titleonly" id="filter_titleonly" type="checkbox" {% if content.query.inTitle %}checked="true"{% endif %} onclick="search()"> Only search titles</label><br />
+    <script type="text/javascript">
+        function search(){
+            var query = "{{content.query.searched}}"
+            //Work out what was checked/unchecked and add/remove it from query
+            {% if "microcosm" in content.type %}
+                if(!document.getElementById('filter_microcosms').checked) {query = query.replace(" type:microcosm","")}
+            {% else %}
+                if(document.getElementById('filter_microcosms').checked) {query = query + " type:microcosm"}
+            {% endif %}
+            {% if "conversation" in content.type %}
+                if(!document.getElementById('filter_conversations').checked) {query = query.replace(" type:conversation","")}
+            {% else %}
+                if(document.getElementById('filter_conversations').checked) {query = query + " type:conversation"}
+            {% endif %}
+            {% if "event" in content.type %}
+                if(!document.getElementById('filter_events').checked) {query = query.replace(" type:event","")}
+            {% else %}
+                if(document.getElementById('filter_events').checked) {query = query + " type:event"}
+            {% endif %}
+            {% if "profile" in content.type %}
+                if(!document.getElementById('filter_profiles').checked) {query = query.replace(" type:profile","")}
+            {% else %}
+                if(document.getElementById('filter_profiles').checked) {query = query + " type:profile"}
+            {% endif %}
+            {% if content.query.inTitle %}
+                if(!document.getElementById('filter_titleonly').checked) {query = query.replace(" inTitle:true","")}
+            {% else %}
+                if(document.getElementById('filter_titleonly').checked) {query = query + " inTitle:true"}
+            {% endif %}
+            window.location.href = '/search/?q='+query
+        }
+    </script>
+
+{% endblock %}

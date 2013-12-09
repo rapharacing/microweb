@@ -444,6 +444,8 @@ class PaginatedList(object):
         self.type = item_list['type']
         if item_list.get('items'):
             self.items = [list_item_cls.from_summary(item) for item in item_list['items']]
+        else:
+            self.items = []
         self.links = {}
         for item in item_list['links']:
             if 'title' in item:
@@ -1285,3 +1287,75 @@ class Attachment(object):
         attachment = {'FileHash': file_hash}
         headers = APIResource.make_request_headers(access_token)
         return APIResource.process_response(url, requests.post(url, data=attachment, headers=headers))
+
+class Search(object):
+    """
+    Used for searching and search results
+    """
+
+    api_path_fragment = "search"
+
+    @classmethod
+    def from_api_response(cls, data):
+        search = cls()
+        search.query = data['query']
+        search.type = []
+        if data['query'].get('type'):
+            for t in data['query']['type']:
+                search.type.append(t)
+        search.time_elapsed = data['timeTakenInMs']/float(1000)
+        search.results = PaginatedList(data['results'], SearchResult)
+        return search
+
+    @staticmethod
+    def build_request(host, params=None, access_token=None):
+        url = build_url(host, [Search.api_path_fragment])
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+
+class SearchResult(object):
+    """
+    The search result object
+    """
+
+    @classmethod
+    def from_api_response(cls, data):
+        searchresult = cls()
+        searchresult.item_type = data['itemType']
+
+        if searchresult.item_type == 'conversation':
+            searchresult.item = Conversation.from_summary(data['item'])
+        elif searchresult.item_type == 'comment':
+            searchresult.item = Comment.from_summary(data['item'])
+        elif searchresult.item_type == 'event':
+            searchresult.item = Event.from_summary(data['item'])
+        elif searchresult.item_type == 'profile':
+            searchresult.item = Profile.from_summary(data['item'])
+        elif searchresult.item_type == 'microcosm':
+            searchresult.item = Microcosm.from_summary(data['item'])
+        else:
+            searchresult.item = None
+
+        if data.get('parentItem'):
+            searchresult.parent_item_type = data['parentItemType']
+
+            if searchresult.parent_item_type == 'conversation':
+                searchresult.parent_item = Conversation.from_summary(data['parentItem'])
+            elif searchresult.parent_item_type == 'event':
+                searchresult.parent_item = Event.from_summary(data['parentItem'])
+            elif searchresult.parent_item_type == 'profile':
+                searchresult.parent_item = Profile.from_summary(data['parentItem'])
+            elif searchresult.parent_item_type == 'microcosm':
+                searchresult.parent_item = Microcosm.from_summary(data['parentItem'])
+            else:
+                searchresult.parent_item = None
+
+        searchresult.rank = data['rank']
+        searchresult.last_modified = data['lastModified']
+        searchresult.highlight = data['highlight']
+        return searchresult
+
+    @classmethod
+    def from_summary(cls, data):
+        return SearchResult.from_api_response(data)
