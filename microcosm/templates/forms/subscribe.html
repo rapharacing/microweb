@@ -1,0 +1,26 @@
+{% if user %}
+  <div class="subscribe {% if content.meta.flags.watched %}active{% endif %}">
+
+  {% if not content.meta.flags.watched %}
+  <form method="POST" action="" id="subscribe_form">
+    {% csrf_token %}
+    <input type="hidden" name="update_type_id" value="8">
+  {% endif %}
+
+    <button class="btn btn-xsmall btn-primary {% if content.meta.flags.watched %}btn-success{% endif %}">
+      <span class="glyphicon glyphicon-ok"></span>
+      <strong>
+        {% if content.meta.flags.watched %}Subscribe{%else%}Added to updates{% endif %}
+      </strong>
+    </button>
+
+  {% if not content.meta.flags.watched %}
+  </form>
+  {% endif %}
+
+    <div class="subscribe-meta" {% if content.meta.flags.watched %}style="display:block"{% endif %}>
+      <span class="glyphicon glyphicon-arrow-right"></span>
+      <label><input type="checkbox" checked="checked"/> Instantly notify me by email</label>
+    </div>
+  </div>
+{% endif %}

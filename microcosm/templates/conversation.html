@@ -1,102 +1,228 @@
 {% extends 'base.html' %}
 
-{% block breadcrumb %}
-	<ol class="breadcrumb">
-		<li><a href="/">Home</a></li>
-		<li><a href='{{ content.meta.links.microcosm.href }}/'>{{ content.meta.links.microcosm.title }}</a></li>
-		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.title }}</a></li>
-	</ol>
-{% endblock %}
-
 {% block ga %},'dimension2': '{{ content.meta.created_by.id }}'
-			,'dimension3': '{{ content.microcosm_id }}'{% endblock%}
+      ,'dimension3': '{{ content.microcosm_id }}'{% endblock%}
 
 {% block content %}
-	<h1 id="conversation_title">{{ content.title }}</h1>
-	<br />
-	{% include "comments_block.html" %}
+<div class="content-header padded">
+  <div class="row">
+    <div class="col-sm-12">
+      {% include 'breadcrumbs.html' %}
+    </div>
+  </div>
+</div>
 
-{% endblock %}
+  <div class="content-body">
+    <div class="item">
+      <div class="item-header">
+        <h1>{{ content.title }}</h1>
+        <div class="item-meta">Posted on {{ content.meta.created|date:"D jS, F Y"}}</div>
+      </div>
+      {% include 'block_comments.html' %}
+    </div> <!-- item -->
+
+  </div> <!-- / content-body -->
+
+  {% if user %}
+  <div class="reply-container">
+    <ul class="list-comments">
+      <li class="comment-item">
+        <div class="comment-item-inner">
+          <div class="comment-item-header">
+            <div class="comment-item-author">
+                <img src="{{ STATIC_URL }}{{ member.avatar}}" />
+                <strong>Post a reply</strong>
+            </div>
+          </div>
+          <div class="comment-item-body">
+            {% include 'forms/block_comment_box.html' %}
+            <div class="pull-right">
+              <input type="submit" class="btn btn-primary" value="Post reply"/>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div> <!-- /reply-container -->
+  {% endif %}
+
+{% endblock content %}
 
 {% block sidebar %}
-	<p class="muted hidden-xs">
-		Created by <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
-		<time datetime="{{ content.meta.created|date:"c" }}"></time>
-	</p>
-	
-	{% if user %} {% if not content.meta.flags.watched %}
-	<form method="POST" action="" id="subscribe_form">
-		{% csrf_token %}
-		<input type="hidden" name="update_type_id" value="1">
-		<input class="btn btn-default btn-block" id="watch" type="submit" value="Watch this Conversation" />
-		<p/>
-	</form>
-	{% else %}
-	<p class="text-muted">You are <a href="/watchers/">watching</a> this conversation and you will receive <a href="/updates/">updates</a>.</p>
-	{% endif %}{% endif %}
 
-	{% if content.meta.permissions.update %}
-	<p class="hidden-xs">
-		<a id="edit_conversation" href="{% url 'edit-conversation' content.id %}" >Edit conversation</a>
+  <div class="metabar-module">
+    <h5>Got something to add?</h5>
+    <div class="metabar-module-primary-buttons">
+      <a href="#" class="btn btn-large btn-block btn-primary">
+        <span class="glyphicon glyphicon-comment"></span> Post a reply
+      </a>
+    </div>
+  </div> <!-- primary actions -->
 
-		{% if content.meta.permissions.delete %}
-			<form method="POST" action="{% url 'delete-conversation' content.id %}" id="conversation_delete_form" class="hidden-xs">
-				{% csrf_token %}
-				<a id="delete-conversation" href="#" onClick="if (confirm('Delete is a one-way action, are you sure?')) {$('#conversation_delete_form').submit()}" class="text-danger">Delete conversation</a>
-			</form>
-		{% endif %}
-	</p>
-	{% endif %}
+  <div class="metabar-module">
+    <h5>About</h5>
+    <div class="metabar-module-title">
+      <h3>
+        {{ content.title }}
+      </h3>
+
+      {% include 'forms/subscribe.html' %}
+
+      <p>
+        {{ content.description }}
+      </p>
+      <p class="metabar-module-author">
+        <a href="{% url 'single-profile' content.meta.created_by.id %}">
+          <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
+          @{{ content.meta.created_by.profile_name|truncatechars:25 }}
+        </a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+      </p>
+    </div>
+  </div> <!-- / about -->
+
 
 {% endblock %}
 
 {% block js %}
+<script type="text/javascript">
 
-	{% if user %}
-	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
-	<script type="text/javascript">
-		function isEmpty(e) {
-			return (e.val().trim() == '');
-		}
-		function checkEmpty(e) {
-			if (isEmpty($(e))) {
-				addError($(e))
-			} else {
-				removeError($(e))
-			}
-		}
-		function addError(e) {
-			e.parent().addClass('has-error')
-		}
-		function removeError(e) {
-			e.parent().removeClass('has-error')
-		}
+(function(){
 
-		$('#id_markdown').on('change', function() {
-			checkEmpty(this);
-		}).on('blur', function() {
-			checkEmpty(this);
-		});
+  var QuickReplyWidget = (function(){
 
-		$('#commentForm').submit(function() {
-			if (isEmpty($('#id_markdown'))) {
-				addError($('#id_markdown'))
-				return false;
-			}
+    var quickReplyWidget = function(opts){
 
-			// Client-side dupe check
-			md5 = hex_md5($('#id_markdown').val())
-			if (this.md5 && this.md5 == md5) {
-				return false
-			}
-			this.md5 = md5;
+      this.el = false;
+      if(typeof opts.el !== "undefined"){
+        this.el = document.querySelectorAll(opts.el);
+        this.$el = $(this.el);
+      }
 
-			return true;
-		});
+      this.defaultContainer = false;
+      if(typeof opts.defaultContainer !== "undefined"){
+        this.defaultContainer = $(opts.defaultContainer);
+      }
 
-		$(document).ready(function() {
-			$('#id_markdown').addClass('form-control').parent().addClass('form-group');
-		});
-	</script>
-	{% endif %}
-{% endblock %}
+      this.template = false;
+      if(typeof opts.template !== "undefined"){
+        this.template = opts.template;
+      }
+
+      this.stack = [];
+      this.bind();
+
+    }
+
+    quickReplyWidget.prototype.cleanup = function(e){
+
+      var view;
+
+      for(var i=0,j=this.stack.length;i<j;i++){
+        view = this.stack.pop();
+        view.off().remove();
+      }
+
+      var oldInstances = this.$el.find('.insertReplyBox.active');
+
+      if (oldInstances.length > 0){
+        for( i=0,j=oldInstances.length;i<j;i++){
+
+          if (typeof oldInstances[i].$ !== "undefined" &&
+              typeof oldInstances[i].$.quickReplyWidgetcontainer !== "undefined" &&
+              oldInstances[i].$.quickReplyWidgetcontainer){
+
+            oldInstances[i].$.quickReplyWidgetcontainer.remove();
+            oldInstances[i].$.quickReplyWidgetcontainer = false;
+            oldInstances.removeClass('active');
+          }
+        }
+      }
+
+    }
+
+    quickReplyWidget.prototype.toggleDefaultContainer = function(){
+
+      if (this.stack.length > 0){
+        this.defaultContainer.hide();
+      }else{
+        this.defaultContainer.show();
+      }
+
+    }
+    quickReplyWidget.prototype.generateNewInstance = function(e){
+
+      var instance = $( this.template );
+
+      this.cleanup();
+
+      instance.simpleEditor = new simpleEditor({
+        el : instance
+      });
+
+      this.stack.push(instance);
+
+      return instance;
+    }
+
+    quickReplyWidget.prototype.clickHandler = function(e){
+
+      var _this    = e.currentTarget;
+
+      if (typeof _this.$ == 'undefined'){
+        _this.$  = $(_this);
+      }
+
+      if (!_this.$.hasClass('active')){
+
+        _this.$.quickReplyWidgetcontainer = $('<div class="quickReplyWidget"></div>');
+        _this.$.quickReplyWidgetcontainer.append( this.generateNewInstance() );
+
+        _this.$
+          .addClass('active')
+          .after( _this.$.quickReplyWidgetcontainer );
+      }else{
+        console.log(_this.$);
+        _this.$.quickReplyWidgetcontainer.toggle();
+      }
+      this.toggleDefaultContainer();
+
+    }
+
+    quickReplyWidget.prototype.bind = function(){
+
+      var events = [
+        ['click', '.insertReplyBox', 'clickHandler']
+      ];
+
+      for(var i in events){
+        this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );
+      }
+
+    };
+
+    return quickReplyWidget;
+
+  })();
+
+  new QuickReplyWidget({
+    el               : '.content-body',
+    defaultContainer : '.reply-container',
+    template : $('.reply-container .comment-item-body').html()
+  });
+
+})();
+
+</script>
+
+
+<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+<script type="text/javascript">
+  (function(){
+
+    var se = new simpleEditor({
+      el : '.reply-box'
+    });
+
+  })();
+</script>
+{% endblock js %}
