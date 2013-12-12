@@ -1,38 +1,115 @@
 {% extends 'base.html' %}
-
-{% block breadcrumb %}
-	<ol class="breadcrumb">
-		<li><a href="/">Home</a></li>
-		<li class="active"><a href='{{ content.meta.links.self.href }}'>Profiles</a></li>
-    </ol>
-{% endblock %}
-
 {% block content %}
-        <section id="alphabet">
-            <ol class="breadcrumb">
-            {% if q == "" %}
-                <li>All</li>
-            {% else %}
-                <li><a href="/profiles/{% if top %}?top=true{% endif %}">All</a></li>
-            {% endif %}
-            {% for letter in alphabet %}<li>{% if letter != q %}<a href="/profiles/?q={{ letter }}{% if top %}&top=true{% endif %}">{{ letter }}</a>{% else %}{{ letter }}{% endif %}</li>
-            {% endfor %}
-            </ol>
-        </section>
-        {% include "pagination_nav.html" %}
-        <section id="headers" class="row">
-            <div class="col col-sm-2" ></div>
-            <div class="col col-sm-14"><a href="/profiles/{% if q != "" or not top %}?{% endif %}{% if q != "" %}q={{ q }}{% endif %}{% if q != "" and not top %}&{% endif %}{% if not top %}top=true{% endif %}">Sort {% if top %}alphabetically{% else %}by post count{% endif %}</a>
-            </div>
-        {% for item in content.profiles.items %}
-            <section id="profile{{item.id}}">
-                <div class="col col-sm-2">
-                    <img src="{% if 'gravatar' in item.avatar %}{{item.avatar}}{% elif 'files' in item.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ item.profile_name }}" />
-                </div>
-                <div class="col col-sm-6">
-                    <a href="{% url 'single-profile' item.id %}"><h1>{{ item.profile_name }}</h1></a>
-                </div>
-            </section>
+<div class="content-header padded">
+  <div class="row">
+    <div class="col-xs-12">
+      {% include 'breadcrumbs.html' %}
+    </div>
+  </div>
+  <h1>People</h1>
+</div>
 
-        {% endfor %}
-{% endblock %}
+          <div class="content-body">
+
+{% comment %}
+            <div class="profile-section">
+              <h2 class="padded">
+                Following
+              </h2>
+
+              <ul class="list-profiles">
+                {% for member in following_members %}
+                <li>
+                  <a href="{% url 'profile' member.name|slugify  %}">
+                    <img src="{{ STATIC_URL }}{{ member.avatar }}" />
+                    @{{ member.name }}
+                  </a>
+                </li>
+                {% endfor%}
+              </ul>
+            </div>
+{% endcomment %}
+            <div class="profile-section">
+              <div class="pull-right">
+                <a href="/profiles/{% if q != "" or not top %}?{% endif %}{% if q != "" %}q={{ q }}{% endif %}{% if q != "" and not top %}&{% endif %}{% if not top %}top=true{% endif %}">Sort {% if top %}alphabetically{% else %}by post count{% endif %}</a>
+              </div>
+              <div class="pagination">
+                <ul>
+                  <li>
+                    <a href="/profiles/{% if top %}?top=true{% endif %}">All</a>
+                  </li>
+                  {% for letter in alphabet %}
+                  <li>
+                    <a href="/profiles/?q={{ letter }}{% if top %}&top=true{% endif %}">{{ letter }}</a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+            <div class="profile-section">
+              <h2 class="padded">
+                Directory
+              </h2>
+              {% regroup content.profiles.items by profile_name|lower|slice:"1" as member_chunks %}
+              <ul class="list-profiles">
+              {% for member_chunk in member_chunks %}
+                <li class="list-profiles-divider">
+                  {{ member_chunk.grouper }}
+                </li>
+                {% for item in member_chunk.list %}
+                <li>
+                  <a href="{% url 'single-profile' item.id %}">
+                    <img src="{% if 'gravatar' in item.avatar %}{{item.avatar}}{% elif 'files' in item.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.profile_name }}"/>
+                    @{{ item.profile_name }}
+                  </a>
+                </li>
+                {% endfor%}
+              {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+
+
+
+{% endblock content %}
+{% block metabar %}
+
+          <div class="metabar-module">
+            <h5>About</h5>
+            <div class="metabar-module-title">
+              <h3>
+                People
+              </h3>
+              <p>
+                Find and discover other people in your community.
+              </p>
+            </div>
+          </div> <!-- / about -->
+
+
+          <div class="metabar-module">
+            <h5>Stats</h5>
+            <ul class="list-group">
+              <li class="list-group-item">
+                <span class="badge-alt">6385</span>
+                Total Members
+              </li>
+              <li class="list-group-item">
+                <span class="badge-alt">344</span>
+                Online Now
+              </li>
+            </ul>
+          </div> <!-- / stats -->
+
+
+          <div class="metabar-footer">
+            Powered by <a href="#">Microcosm</a>
+            <p>
+              <a href="#">About</a>
+              <a href="#">Help</a>
+              <a href="#">Developers</a>
+              <a href="#">Legal</a>
+            </p>
+          </div>
+{% endblock metabar %}

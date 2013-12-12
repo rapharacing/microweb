@@ -1,82 +1,206 @@
 {% extends 'base.html' %}
-
-{% block breadcrumb %}
-	<ol class="breadcrumb">
-		<li><a href="/">Home</a></li>
-		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.title }}</a></li>
-	</ol>
-{% endblock %}
-
 {% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
 
 {% block content %}
-	<a id="microcosm_title" href="{% url 'single-microcosm' content.id %}"><h1>{{ content.title }}</h1></a>
 
-	{% include "pagination_nav.html" %}
+<div class="content-header padded">
+  <div class="row">
+    <div class="col-sm-12">
+      {% include 'breadcrumbs.html' %}
+    </div>
+  </div>
+  <h1>{{ content.title }}</h1>
+</div>
 
-	{% for item in content.items.items %}
-		<section id="{{ item.itemType }}{{ item.id }}" class="row margin-bottom-half">
-			<table class="col col-md-10">
-				<tbody>
-					<tr>
-						<td rowspan="2" width="42">{% ifequal item.item_type "conversation" %}<span class="glyphicon glyphicon-comment text-muted" style="font-size:36px;line-height:48px;margin-top:-10px;"></span>{% endifequal %}{% ifequal item.item_type "event" %}<span class="glyphicon glyphicon-calendar text-muted" style="font-size:36px;line-height:48px;margin-top:-5px;"></span>{% endifequal %}</td>
-						<td><strong><a href="/{{ item.item_type }}s/{{ item.id }}/{% if user %}newest/{% endif %}">{{ item.title }}</a></strong></td>
-					</tr>
-					<tr>
-						<td><small class="text-muted">started by <a href="{% url 'single-profile' item.meta.created_by.id %}">{{ item.meta.created_by.profile_name|truncatechars:25 }}</a> <time datetime="{{ item.meta.created|date:"c" }}"></time></small></td>
-					</tr>
-				</tbody>
-			</table>
+<div class="content-body">
 
-			<table class="col col-md-6 text-muted">
-				<tbody>
-					<tr>
-						<td width="100"><small class="nowrap"><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.total_comments }}</small></td>
-						<td rowspan="2" width="50">{% if item.last_comment_created %}<a href="{% url 'single-profile' item.last_comment_created_by.id %}"><img src="{% if 'gravatar' in item.last_comment_created_by.avatar %}{{item.last_comment_created_by.avatar}}{% elif 'files' in item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.last_comment_created_by.profile_name }}" align="left" class="gravatar-small" /></a>{% endif %}</td>
-						<td>{% if item.last_comment_created %}<small><a href="{% url 'single-profile' item.last_comment_created_by.id %}">{{ item.last_comment_created_by.profile_name|truncatechars:25 }}</a></small>{% endif %}</td>
-					</tr>					
-					<tr>
-						<td><small class="nowrap"><i class="glyphicon glyphicon-eye-open buffer-right"></i> {{ item.total_views }}</small></td>
-						<td>{% if item.last_comment_created %}<small class="text-muted"><time datetime="{{ item.last_comment_created|date:"c" }}"></time></small>{% endif %}</td>
-					</tr>					
-				</tbody>
-			</table>
-		</section>
 
-		<!-- <hr class="col-offset-1 col col-sm-15" /> -->
-	{% endfor %}
+	<div class="list-items">
 
-	{% include "pagination_nav.html" %}
+	  <ul class="list-collection bordered padded">
+
+	  {% for item in content.items.items %}
+	  <li id="{{ item.itemType }}{{ item.id }}"
+	  		class="list-collection-row {% if item.is_pinned %}row-pinned{% endif %} {% if item.is_deleted %}row-deleted{% endif %}">
+
+	    <div class="row">
+	      <div class="col-sm-7">
+
+	        <div class="list-collection-row-icon">
+	          {% if item.flags.sticky %}
+	            <span class="glyphicon glyphicon-pushpin"></span>
+	          {% endif %}
+	          {% ifequal item.item_type "event" %}
+	            <span class="glyphicon glyphicon-calendar"></span>
+	          {% endifequal %}
+	        </div>
+
+	        <div class="list-collection-row-offset">
+
+
+	          <a href="/{{ item.item_type }}s/{{ item.id }}/{% if user %}newest/{% endif %}">
+	            <h3 class="row-title">{{ item.title }}</h3>
+	          </a>
+
+	          {% if not item.flags.sticky %}
+	          <div class="row-meta">
+
+	          	{% comment %}
+	            <a href="{% url 'profile' item.author.name|slugify %}">
+	              <img src="{{ STATIC_URL }}{{ item.author.avatar }}" />
+	            </a>
+	          	{% endcomment %}
+
+	            <a href="{% url 'single-profile' item.meta.created_by.id %}">
+	            	@{{ item.meta.created_by.profile_name|truncatechars:25 }}
+	            </a>
+
+	              {% if item.item_type == "event" %}
+	              <div class="pills-event">
+	                <span>
+	                  [FIXME]
+	                </span>
+	                <span>
+	                  [FIXME]
+	                </span>
+	              </div>
+	              {% else %}
+	              started <time datetime="{{ item.meta.created|date:"c" }}"></time>
+	              {% endif %}
+	          </div>
+	          {% endif %}
+	        </div>
+	      </div>
+
+	      <div class="col-sm-5">
+
+	        <div class="row-stats">
+	          {# if item.flags.sticky #}
+	          {# <input class="row-admin-checkbox" type="checkbox" /> #}
+	          {# endif #}
+
+	          <ul class="list-stats list-stats-sm">
+	            <li>
+	              {% if item.flags.unread %}
+	              <span class="label label-warning">New</span>
+	              {% endif %}
+	              <span>{{ item.total_comments }}</span>
+	              comment{{ item.total_comments|pluralize:",s"}}
+	            </li>
+	            <li>
+	              <span>{{ item.total_views }}</span>
+	              view{{ item.total_views|pluralize:",s"}}
+	            </li>
+	          </ul>
+
+	        </div>
+
+
+	        {% if not item.flags.sticky %}
+
+	          <div class="row-context">
+
+	            {# <input class="row-admin-checkbox" type="checkbox" /> #}
+
+	            {% if item.item_type == 'event' %}
+	              {% with this_attending=item.event_attendees %}
+
+	                {% if this_attending|length > 0 %}
+	                  <ul class="list-people list-people-sm">
+	                    {% for attendee in this_attending %}
+	                    <li>
+	                      <a href="{{ attendee.id }}">
+	                        <img src="{{ STATIC_URL}}{{ attendee.avatar }}" />
+	                      </a>
+	                    </li>
+	                    {% endfor %}
+	                  </ul>
+	                  {{ this_attending|length|pluralize:"is,are"}}
+	                  <a href="#">attending</a>
+	                {% else %}
+	                <div class="microcosm-item-recent-comment">
+	                  <a href="{% url 'profile' item.last_reply.author.name|slugify %}">
+	                    @{{ item.last_reply.author.name}}
+	                  </a> replied {{ item.last_reply.timeago }} ago
+	                </div>
+	                {% endif %}
+
+	              {% endwith %}
+	            {% else %}
+
+		            {% if item.last_comment_created %}
+		            	<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
+		            		@{{item.last_comment_created_by.profile_name }}
+		            	</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
+		            {% endif %}
+
+	            {% endif %}
+
+	          </div>
+
+	        {% endif %}
+
+	    	</div>
+	  	</div>
+	  	</li>
+	  {% endfor %}
+		</ul>
+	</div>
+
+</div>
+
+
+<div class="content-footer padded">
+  <div class="row">
+    <div class="col-sm-12">
+
+    </div>
+  </div>
+</div>
+
 
 {% endblock %}
 
 {% block sidebar%}
 
-	{% if content.meta.permissions.create %}
-		<p>
-			<a class="btn btn-primary btn-block" id="create_conversation" href="create/conversation/" style="text-align: left; padding-left: 12px;"><span class="glyphicon glyphicon-comment"></span> Start a conversation</a>
-			<a class="btn btn-primary btn-block" id="create_event" href="create/event/" style="text-align: left; padding-left: 12px;"><span class="glyphicon glyphicon-calendar"></span> Start an event</a>
-		</p>
-	{% endif %}
+	{# if content.meta.permissions.create #}
+		<div class="metabar-module">
+      <h5>Got something to add?</h5>
+      <div class="metabar-module-primary-buttons">
+        <a href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary">
+          <span class="glyphicon glyphicon-comment"></span> Start a conversation
+        </a>
+        <a href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary">
+          <span class="glyphicon glyphicon-calendar"></span> Start an event
+        </a>
+      </div>
+    </div> <!-- primary actions -->
+	{# endif #}
 
-	<p id="microcosm_description">{{ content.description }}</p>
 
-	<p class="text-muted hidden-xs">
-		Created by <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
-		<time datetime="{{ content.meta.created|date:"c" }}"></time>
-	</p>
+	<div class="metabar-module">
+    <h5>About</h5>
+    <div class="metabar-module-title">
+      <h3>
+        {{ content.title }}
+      </h3>
 
-	{% if user %} {% if content.meta.flags.watched %}
-	<p class="text-muted">You are <a href="/watchers/">watching</a> this microcosm and you will receive <a href="/updates/">updates</a>.</p>
-	{% else %}
-	<form method="POST" action="" id="subscribe_form">
-		{% csrf_token %}
-		<input type="hidden" name="update_type_id" value="8">
-		<input class="btn btn-default btn-block" id="watch" type="submit" value="Watch this microcosm" />
-		<p/>
-	</form>
-	{% endif %}{% endif %}
+      {% include 'forms/subscribe.html' %}
 
+      <p>
+        {{ content.description }}
+      </p>
+      <p class="metabar-module-author">
+        <a href="{% url 'single-profile' content.meta.created_by.id %}">
+        	<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
+        	@{{ content.meta.created_by.profile_name|truncatechars:25 }}
+      	</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+      </p>
+    </div>
+  </div> <!-- / about -->
+
+
+{% comment %}
 	{% if content.meta.permissions.update %}
 	<p class="hidden-xs">
 		<a id="edit_microcosm" href="{% url 'edit-microcosm' content.id %}">Edit Microcosm</a>
@@ -89,5 +213,6 @@
 		{% endif %}
 	</p>
 	{% endif %}
+{% endcomment %}
 
 {% endblock%}

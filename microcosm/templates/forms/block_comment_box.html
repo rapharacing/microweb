@@ -1,0 +1,19 @@
+<div class="reply-box">
+  <ul>
+    <li class="se-bold"><strong>Bold</strong></li>
+    <li class="se-italics"><i>Italics</i></li>
+    <li class="se-quote">Quote</li>
+    <li class="se-link"><span class="glyphicon glyphicon-link"></span> Link</li>
+    <li class="se-list"><span class="glyphicon glyphicon-th-list"></span> List</li>
+    <li class="se-image"><span class="glyphicon glyphicon-picture"></span> Image</li>
+  </ul>
+  <textarea id="{{ textarea_name|default:"reply-box-textarea" }}" name="{{ textarea_name|default:"textarea[]" }}"
+    placeholder="Enter your text here..."
+  ></textarea>
+</div>
+<div class="reply-box-footer">
+  <a href="javascript:void 0">
+    <span class="glyphicon glyphicon-question-sign"></span>
+    Formatting help
+  </a>
+</div>
