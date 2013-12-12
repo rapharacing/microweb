@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="content-header padded">
+  <div class="row">
+    <div class="col-sm-12">
+    {% include 'breadcrumbs.html' %}
+    </div>
+  </div>
+  <a href="{% url 'updates-settings' %}" class="pull-right">notification settings &rarr;</a>
+  <h1>
+    Edit Profile
+  </h1>
+  <div class="clearfix"></div>
+</div>
+
+    <div class="content-body">
+
+      <div class="row form-container">
+        <div class="col-lg-12">
+          <div class="form-container-inner padded">
+            <form role="form" method="POST" enctype="multipart/form-data">
+
+              {# username #}
+              <div class="form-group">
+                <div class="row">
+
+                  <label class="col-sm-12" for="title">
+                    {{ form.profileName.label }}
+                  </label>
+                  <div class="col-sm-6">
+                    {% if form.errors.profileName %}
+                      <div class="text-error">{{ form.errors.profileName.as_text }}</div>
+                    {% endif %}
+                    <input type="text"
+                           class="form-control"
+                           id="title"
+                           name="{{ form.profileName }}"
+                           placeholder="Enter username..." />
+                  </div>
+
+                </div>
+              </div> <!-- /form-group -->
+
+              {# profile picture #}
+              <div class="form-group">
+                <div class="row">
+                  <label class="col-sm-12" for="title">{{ form.avatar.label }}</label>
+                  <div class="col-sm-12">
+                    <div class="form-file-upload">
+                      <label>
+                        <span>Click here</span>
+                        <input name="{{ form.avatar.name }}"
+                               type="file"
+                               accept="image/*"
+                               capture="camera"/>
+                      </label>
+                      <div class="form-file-upload-text">
+                        <h3>Click on or drag a image over the box on the left to update your picture</h3>
+
+                        {% if avatar_error %}
+                          <p>{{ avatar_error }}</p>
+                        {% else %}
+                        <p>
+                          Your avatar should be a square image under 30KB with jpg, png or gif file extension.
+                        </p>
+                        {% endif %}
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div> <!-- /form-group -->
+
+              {# comment #}
+              {% comment %}
+              <div class="form-group">
+                <div class="row">
+
+                  <label class="col-sm-12" for="reply-box-textarea">Tell us about yourself</label>
+                  <div class="col-sm-12">
+                    {% include 'form_component_textarea.html' %}
+                  </div>
+
+                </div>
+              </div>
+              {% endcomment %}
+
+          </div> <!-- /form-container-inner -->
+
+          {# footer #}
+          <div class="form-group form-footer padded">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-footer-buttons">
+                  <input type="submit" class="btn btn-lg btn-primary" value="Save Changes">
+                  <input type="reset" class="btn btn-lg btn-default" value="Cancel">
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+    </div>
+  </div>
+
+</div>
+
+{% endblock content %}
+{% block metabar %}
+
+<div class="metabar-module">
+  <h5>About</h5>
+  <div class="metabar-module-title">
+    <h3>
+      Profile
+    </h3>
+  </div>
+</div> <!-- / about -->
+
+{% endblock metabar %}
+
+{% block js %}
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/profile_picture_handler.js"></script>
+
+<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+<script type="text/javascript">
+  (function(){
+
+    var se = new simpleEditor({
+      el : '.reply-box'
+    });
+
+  })();
+</script>
+{% endblock js %}
