@@ -20,7 +20,7 @@
 
     <nav class="navbar navbar-default" role="navigation">
 
-      <div class="navbar-header-wrapper tiling-bg">
+      <div class="navbar-header-wrapper">
         <div class="container">
           <div class="row">
 
@@ -60,24 +60,19 @@
                         <span class="badge">new</span>
                       </a>
                     {% else %}
-                      <button class="btn btn-primary btn-block btn-lg" id="login_link" onclick="login()">
+                      <button class="btn btn-primary btn-block" id="login_link" onclick="login()">
                         Sign In or Register
                       </button>
                     {% endif %}
                     </div><!-- /.navbar-profile -->
 
-                  <div class="col-sm-5 col-md-6 col-lg-6 navbar-search navbar-collapse">
+                  <div class="col-sm-5 col-md-6 col-lg-7 navbar-search navbar-collapse">
                     <form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
                       <div class="input-group">
-                        <label class="input-group-addon" for="navbar-search-input">
+                        <div class="input-group-addon">
                           <span class="glyphicon glyphicon-search"></span>
-                        </label>
-                        <input type="text"
-                               id="navbar-search-input"
-                               class="form-control"
-                               name="q"
-                               placeholder="Search conversations, events and people..."
-                               {% if content.query.searched %}value="{{content.query.searched|safe}}"{% endif %} />
+                        </div>
+                        <input type="text" class="form-control" name="q" placeholder="Search" {% if content.query.searched %}value="{{content.query.searched|safe}}"{% endif %} />
                       </div>
                     </form>
                   </div> <!-- /navbar-search -->
