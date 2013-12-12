@@ -1129,27 +1129,32 @@ class UpdateView(object):
     @exception_handler
     def list(request):
 
-        if not request.access_token:
-            raise HttpResponseNotAllowed
-
-        # pagination offset
-        offset = int(request.GET.get('offset', 0))
-
-        url, params, headers = UpdateList.build_request(
-            request.META['HTTP_HOST'],
-            offset=offset,
-            access_token=request.access_token
-        )
-        request.view_requests.append(grequests.get(url, params=params, headers=headers))
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-        updates_list = UpdateList(responses[url])
-
         view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': request.site,
-            'content': updates_list,
-            'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates)
+            'user': False,
+            'site': request.site
         }
+
+        if not request.access_token:
+            pass
+            # raise HttpResponseNotAllowed
+        else:
+            # pagination offset
+            offset = int(request.GET.get('offset', 0))
+
+            url, params, headers = UpdateList.build_request(
+                request.META['HTTP_HOST'],
+                offset=offset,
+                access_token=request.access_token
+            )
+            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            updates_list = UpdateList(responses[url])
+
+            view_data.update({
+                'user': Profile(responses[request.whoami_url], summary=False),
+                'content': updates_list,
+                'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates)
+            })
 
         return render(request, UpdateView.list_template, view_data)
 
