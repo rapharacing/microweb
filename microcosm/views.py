@@ -52,6 +52,8 @@ from microcosm.api.resources import GlobalOptions
 from microcosm.api.resources import ProfileList
 from microcosm.api.resources import Search
 from microcosm.api.resources import SearchResult
+from microcosm.api.resources import Huddle
+from microcosm.api.resources import HuddleList
 
 from microcosm.forms.forms import EventCreate
 from microcosm.forms.forms import EventEdit
@@ -61,6 +63,8 @@ from microcosm.forms.forms import ConversationCreate
 from microcosm.forms.forms import ConversationEdit
 from microcosm.forms.forms import CommentForm
 from microcosm.forms.forms import ProfileEdit
+from microcosm.forms.forms import HuddleCreate
+from microcosm.forms.forms import HuddleEdit
 
 
 def exception_handler(view_func):
@@ -238,6 +242,180 @@ class ConversationView(object):
             response = Conversation.newest(
                 request.META['HTTP_HOST'],
                 conversation_id,
+                access_token=request.access_token
+            )
+            #because redirects are always followed, we can't just get the 'location' value
+            response = response['comments']['links']
+            for link in response:
+                if link['rel'] == 'self':
+                    response = link['href']
+            response = str.replace(str(response),'/api/v1','')
+            pr = urlparse(response)
+            queries = parse_qs(pr[4])
+            frag = ""
+            if queries.get('comment_id'):
+                frag = 'comment' + queries['comment_id'][0]
+                del queries['comment_id']
+            # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
+            # urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
+            for (key, value) in queries.items():
+                queries[key] = value[0]
+            queries = urlencode(queries)
+            response = urlunparse((pr[0],pr[1],pr[2],pr[3],queries,frag))
+            return HttpResponseRedirect(response)
+        else:
+            return HttpResponseNotAllowed()
+
+
+class HuddleView(object):
+
+    create_form = HuddleCreate
+    edit_form = HuddleEdit
+    form_template = 'forms/huddle.html'
+    single_template = 'huddle.html'
+    list_template = 'huddles.html'
+
+    @staticmethod
+    @exception_handler
+    def single(request, huddle_id):
+        if request.method == 'GET':
+            # Offset for paging of event comments
+            offset = int(request.GET.get('offset', 0))
+
+            huddle_url, params, headers = Huddle.build_request(
+                request.META['HTTP_HOST'],
+                id=huddle_id,
+                offset=offset,
+                access_token=request.access_token
+            )
+            request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            huddle = Huddle.from_api_response(responses[huddle_url])
+            comment_form = CommentForm(initial=dict(itemId=huddle_id, itemType='huddle'))
+
+            view_data = {
+                'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+                'site': request.site,
+                'content': huddle,
+                'comment_form': comment_form,
+                'pagination': build_pagination_links(responses[huddle_url]['comments']['links'], huddle.comments),
+                'item_type': 'huddle'
+            }
+
+            return render(request, HuddleView.single_template, view_data)
+        elif request.method == 'POST':
+            postdata = {
+                'updateTypeId': int(request.POST.get('update_type_id')),
+                'itemTypeId': 5,
+                'itemId': int(huddle_id),
+            }
+            Watcher.create(
+                request.META['HTTP_HOST'],
+                postdata,
+                request.access_token
+            )
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+    @staticmethod
+    @exception_handler
+    def list(request):
+
+        # record offset for paging of huddles
+        offset = int(request.GET.get('offset', 0))
+
+        huddle_url, params, headers = HuddleList.build_request(
+            request.META['HTTP_HOST'],
+            offset=offset,
+            access_token=request.access_token
+        )
+
+        request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+
+        huddles = HuddleList(responses[huddle_url])
+
+        view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+            'site': request.site,
+            'content': huddles,
+            'pagination': build_pagination_links(responses[huddle_url]['huddles']['links'], huddles.huddles)
+        }
+
+        return render(request, HuddleView.list_template, view_data)
+
+
+    @staticmethod
+    @exception_handler
+    def create(request):
+        """
+        Create a huddle.
+        """
+
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+
+        if request.method == 'POST':
+            form = HuddleView.create_form(request.POST)
+            if form.is_valid():
+                hud_request = Huddle.from_create_form(form.cleaned_data)
+                hud_response = hud_request.create(request.META['HTTP_HOST'], request.access_token)
+                return HttpResponseRedirect(reverse('single-huddle', args=(hud_response.id,)))
+            else:
+                view_data['form'] = form
+                return render(request, HuddleView.form_template, view_data)
+
+        elif request.method == 'GET':
+            view_data['form'] = HuddleView.create_form(initial=dict())
+            return render(request, HuddleView.form_template, view_data)
+
+        else:
+            return HttpResponseNotAllowed(['GET', 'POST'])
+
+
+    @staticmethod
+    @exception_handler
+    def invite(request, huddle_id):
+        """
+        Invite participants to a huddle.
+        """
+
+        if request.method == 'POST':
+            ids = [int(x) for x in request.POST.get('invite_profile_id').split()]
+            Huddle.invite(request.META['HTTP_HOST'], huddle_id, ids, request.access_token)
+            return HttpResponseRedirect(reverse('single-huddle', args=(huddle_id,)))
+
+        else:
+            return HttpResponseNotAllowed(['POST'])
+
+    @staticmethod
+    @exception_handler
+    def delete(request, huddle_id):
+        """
+        Delete a huddle and be redirected to the parent microcosm.
+        """
+
+        if request.method == 'POST':
+            huddle = Huddle.retrieve(
+                request.META['HTTP_HOST'],
+                huddle_id,
+                access_token=request.access_token
+            )
+            huddle.delete(request.META['HTTP_HOST'], request.access_token)
+            return HttpResponseRedirect(reverse('list-huddle'))
+        else:
+            return HttpResponseNotAllowed()
+
+    @staticmethod
+    @exception_handler
+    def newest(request, huddle_id):
+        """
+        Get redirected to the first unread post in a huddle
+        """
+        if request.method == 'GET':
+            response = Huddle.newest(
+                request.META['HTTP_HOST'],
+                huddle_id,
                 access_token=request.access_token
             )
             #because redirects are always followed, we can't just get the 'location' value

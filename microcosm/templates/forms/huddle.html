@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+	<h3>New huddle</h3>
+
+	<form action="" method="POST" id="huddleForm">
+		{% csrf_token %}
+		{{ form.id }}
+
+		<h4><label for="id_title">{{ form.title.label }}</label></h4>
+		<div>
+			{{ form.title }}
+			{% if form.errors.title %}
+				<div class="text-error">{{ form.errors.title.as_text }}</div>
+			{% endif %}
+		</div>
+
+		<input class="btn btn-primary" id="submit" type="submit" value="Save Huddle" />
+
+	</form>
+
+{% endblock %}
+
+{% block js %}
+	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
+	<script type="text/javascript">
+		function isEmpty(e) {
+			return (e.val().trim() == '');
+		}
+		function checkEmpty(e) {
+			if (isEmpty($(e))) {
+				addError($(e))
+			} else {
+				removeError($(e))
+			}
+		}
+		function addError(e) {
+			e.parent().addClass('has-error')
+		}
+		function removeError(e) {
+			e.parent().removeClass('has-error')
+		}
+
+		$('#id_title').on('change', function() {
+			checkEmpty(this);
+		}).on('blur', function() {
+			checkEmpty(this);
+		});
+
+		$('#huddleForm').submit(function() {
+			if (isEmpty($('#id_title'))) {
+				addError($('#id_title'))
+				return false;
+			}
+
+			// Client-side dupe check
+			md5 = hex_md5($('#id_title').val())
+			if (this.md5 && this.md5 == md5) {
+				return false
+			}
+			this.md5 = md5;
+
+			return true;
+		});
+
+		$(document).ready(function() {
+			$('#id_title,#id_editReason').addClass('form-control').parent().addClass('form-group');
+		});
+	</script>
+{% endblock %}

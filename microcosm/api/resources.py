@@ -20,13 +20,15 @@ RESOURCE_PLURAL = {
     'user': 'users',
     'site': 'sites',
     'microcosm': 'microcosms',
+    'huddle': 'huddles',
 }
 
 # Item types that can have comments
 COMMENTABLE_ITEM_TYPES = [
     'event',
     'conversation',
-    'poll'
+    'poll',
+    'huddle'
 ]
 
 def discard_querystring(url):
@@ -483,7 +485,6 @@ class Meta(object):
                 else:
                     self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1','')}
 
-
 class PermissionSet(object):
     """
     Represents user permissions on a resource.
@@ -496,6 +497,7 @@ class PermissionSet(object):
         self.delete = data['delete']
         self.guest = data['guest']
         self.super_user = data['moderator']
+        self.owner = data['owner']
 
 
 class Watcher(APIResource):
@@ -888,6 +890,122 @@ class Conversation(APIResource):
         repr['microcosmId'] = self.microcosm_id
         repr['title'] = self.title
         return repr
+
+
+class Huddle(APIResource):
+    """
+    Represents a huddle (title and list of comments).
+    """
+
+    api_path_fragment = 'huddles'
+
+    @classmethod
+    def from_api_response(cls, data):
+        huddle = cls.from_summary(data)
+        huddle.comments = PaginatedList(data['comments'], Comment)
+        return huddle
+
+    @classmethod
+    def from_summary(cls, data):
+        huddle = cls()
+        huddle.id = data['id']
+        huddle.title = data['title']
+        if data.get('lastCommentId'): huddle.last_comment_id = data['lastCommentId']
+        if data.get('lastCommentCreatedBy'):
+            huddle.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
+        if data.get('lastCommentCreated'):
+            huddle.last_comment_created = parse_timestamp(data['lastCommentCreated'])
+        if data.get('totalComments'):
+            huddle.total_comments = data['totalComments']
+        huddle.meta = Meta(data['meta'])
+        huddle.participants = []
+        for p in data['participants']:
+            huddle.participants.append(Profile(p))
+        return huddle
+
+    @classmethod
+    def from_create_form(cls, data):
+        huddle = cls()
+        huddle.title = data['title']
+        return huddle
+
+    @classmethod
+    def from_edit_form(cls, data):
+        huddle = Huddle.from_create_form(data)
+        huddle.id = data['id']
+        huddle.meta = {'editReason': data['editReason']}
+        return huddle
+
+    @staticmethod
+    def build_request(host, id, offset=None, access_token=None):
+        url = build_url(host, [Huddle.api_path_fragment, id])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Huddle.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return Huddle.from_api_response(resource)
+
+    def create(self, host, access_token):
+        url = build_url(host, [Huddle.api_path_fragment])
+        payload = json.dumps(self.as_dict(), cls=DateTimeEncoder)
+        resource = APIResource.create(url, payload, {}, APIResource.make_request_headers(access_token))
+        return Huddle.from_api_response(resource)
+
+    def delete(self, host, access_token):
+        url = build_url(host, [Huddle.api_path_fragment, self.id])
+        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
+
+    @staticmethod
+    def newest(host, id, access_token=None):
+        url = build_url(host, [Huddle.api_path_fragment, id, "newcomment"])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.json()['data']
+
+    def as_dict(self, update=False):
+        repr = {}
+        if update:
+            repr['id'] = self.id
+            repr['meta'] = self.meta
+        repr['title'] = self.title
+        return repr
+
+    @staticmethod
+    def invite(host, id, profileIds, access_token=None):
+        url = build_url(host, [Huddle.api_path_fragment, id, "participants"])
+        payload = []
+        for pid in profileIds:
+            payload.append({'id': pid})
+        print json.dumps(payload)
+        resource = APIResource.update(url, json.dumps(payload), {}, APIResource.make_request_headers(access_token))
+        return Huddle.from_api_response(resource)
+
+class HuddleList(object):
+    """
+    Represents a list of microcosms for a given site.
+    """
+
+    api_path_fragment = 'huddles'
+
+    def __init__(self, data):
+        self.huddles = PaginatedList(data['huddles'], Huddle)
+        self.meta = Meta(data['meta'])
+
+    @staticmethod
+    def build_request(host, offset=None, access_token=None):
+        url = build_url(host, [HuddleList.api_path_fragment])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = HuddleList.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return HuddleList(resource)
 
 
 class Event(APIResource):

@@ -171,6 +171,42 @@ class ConversationEdit(ConversationCreate):
         return cls(repr)
 
 
+class HuddleCreate(django.forms.Form):
+    """
+    Form for creating huddles (a group of comments).
+    """
+
+    title = django.forms.CharField(
+        max_length='150',
+        label='What is the subject of the huddle?',
+        error_messages={
+            'required' : 'Please add a subject',
+            'max_length' : 'The subject may not be longer than 150 characters'
+        }
+    )
+
+
+class HuddleEdit(HuddleCreate):
+    """
+    Form for editing conversations.
+    """
+
+    id = django.forms.IntegerField(widget=django.forms.HiddenInput)
+    editReason = django.forms.CharField(label='Reason for editing')
+
+    @classmethod
+    def from_huddle_instance(cls, huddle):
+        """
+        Populate a huddle edit form from a huddle instance.
+        """
+
+        repr = {}
+        repr['id'] = huddle.id
+        repr['title'] = huddle.title
+
+        return cls(repr)
+
+
 class MicrocosmCreate(django.forms.Form):
     """
     Form for creating Microcosms.

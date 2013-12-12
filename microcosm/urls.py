@@ -15,6 +15,7 @@ from microcosm.views import GeoView
 from microcosm.views import FaviconView
 from microcosm.views import RobotsView
 from microcosm.views import SearchView
+from microcosm.views import HuddleView
 
 
 urlpatterns = patterns('',
@@ -60,6 +61,14 @@ urlpatterns = patterns('',
     url(r'comments/(?P<comment_id>\d+)/edit/$', CommentView.edit, name='edit-comment'),
     url(r'comments/(?P<comment_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
     url(r'comments/(?P<comment_id>\d+)/incontext/$', CommentView.incontext, name='incontext-comment'),
+
+    # Huddles
+    url(r'^huddles/$', HuddleView.list, name='list-huddle'),
+    url(r'^huddles/create/$', HuddleView.create, name='create-huddle'),
+    url(r'^huddles/(?P<huddle_id>\d+)/$' , HuddleView.single, name='single-huddle'),
+    url(r'^huddles/(?P<huddle_id>\d+)/leave/$', HuddleView.delete, name='delete-huddle'),
+    url(r'^huddles/(?P<huddle_id>\d+)/invite/$', HuddleView.invite, name='invite-huddle'),
+    url(r'^huddles/(?P<huddle_id>\d+)/newest/$', HuddleView.newest, name='newest-huddle'),
 
     # Updates
     url(r'^updates/$', UpdateView.list, name='list-updates'),
