@@ -29,7 +29,7 @@ urlpatterns = patterns('',
     url(r'^logout/$', AuthenticationView.logout, name='logout'),
 
     # Microcosms
-    url(r'^$', MicrocosmView.list),
+    url(r'^$', MicrocosmView.list, name='index'),
     url(r'^microcosms/$', MicrocosmView.list, name='list-microcosms'),
     url(r'^microcosms/create/$', MicrocosmView.create, name='create-microcosm'),
     url(r'^microcosms/(?P<microcosm_id>\d+)/$', MicrocosmView.single, name='single-microcosm'),
