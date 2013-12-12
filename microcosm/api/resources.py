@@ -979,7 +979,6 @@ class Huddle(APIResource):
         payload = []
         for pid in profileIds:
             payload.append({'id': pid})
-        print json.dumps(payload)
         resource = APIResource.update(url, json.dumps(payload), {}, APIResource.make_request_headers(access_token))
         return Huddle.from_api_response(resource)
 
