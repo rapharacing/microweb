@@ -176,6 +176,11 @@ class ConversationView(object):
 
         elif request.method == 'GET':
             view_data['form'] = ConversationView.create_form(initial=dict(microcosmId=microcosm_id))
+
+            # for primary action buttons
+            # TODO: maybe we can get more info about current microcosm or the ability to change microcosms from this page
+            view_data['microcosm_id'] = microcosm_id
+
             return render(request, ConversationView.form_template, view_data)
 
         else:
@@ -809,6 +814,10 @@ class EventView(object):
 
         elif request.method == 'GET':
             view_data['form'] = EventView.create_form(initial=dict(microcosmId=microcosm_id))
+
+            # for primary buttons
+            view_data['microcosm_id'] = microcosm_id
+
             return render(request, EventView.form_template, view_data)
 
         else:
