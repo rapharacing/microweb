@@ -1232,8 +1232,8 @@ class Attendee(object):
     @classmethod
     def from_summary(cls, data):
         attendee = cls()
-        attendee.attendee_id = data['attendeeId']
-        attendee.attendee = Attendee.AttendeeRecord(data['attendee'])
+        attendee.attendee_id = data['profileId']
+        attendee.attendee = Profile(data['profile'])
         attendee.rsvp = data['rsvp']
         attendee.rsvpd_on = data['rsvpdOn']
         attendee.meta = Meta(data['meta'])
