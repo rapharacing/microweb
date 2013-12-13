@@ -9,6 +9,7 @@ from settings import API_DOMAIN_NAME
 CNAMED_HOST_MAPPINGS = {
     'forum.espruino.com': 'espruino.microco.sm',
     'forum.pixelcharter.com': 'sandbox.microco.sm',
+    'www.bowlie.com': 'bowlie.microco.sm',
 }
 
 def build_url(host, path_fragments):
