@@ -1,90 +1,158 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
-	{% if form.id > 0 %}
-		<h3>Edit conversation</h3>
-	{% else %}
-		<h3>New conversation</h3>
-	{% endif %}
+  <div class="content-header padded">
+    <div class="row">
+      <div class="col-sm-12">
+      </div>
+    </div>
+    <h1>
+      {% if form.id > 0 %}
+      Start a conversation
+      {% else %}
+      Edit conversation
+      {% endif %}
+    </h1>
+  </div>
 
-	<form action="" method="POST" id="conversationForm">
-		{% csrf_token %}
-		{{ form.microcosmId }}
-		{{ form.id }}
-		{{ form.sticky }}
-		{{ form.moderated }}
-		{{ form.visible }}
-		{{ form.deleted }}
+  <div class="content-body">
 
-		<h4><label for="id_title">{{ form.title.label }}</label></h4>
-		<div>
-			{{ form.title }}
-			{% if form.errors.title %}
-				<div class="text-error">{{ form.errors.title.as_text }}</div>
-			{% endif %}
-		</div>
+    <div class="row form-container">
+      <div class="col-lg-12">
+        <div class="form-container-inner padded">
+          <form role="form" action="" method="POST" id="conversationForm">
 
-		{% if form.id > 0 %}
-			<div>
-				<label for="id_editReason">{{ form.editReason.label }}</label>
-				{{ form.editReason }}
-				{% if form.errors.editReason %}
-					<div class="text-error">{{ form.errors.editReason.as_text }}</div>
-				{% endif %}
-			</div>
-		{% endif %}
+            {% csrf_token %}
+            {{ form.microcosmId }}
+            {{ form.id }}
+            {{ form.sticky }}
+            {{ form.moderated }}
+            {{ form.visible }}
+            {{ form.deleted }}
 
-		<input class="btn btn-primary" id="submit" type="submit" value="Save Conversation" />
 
-	</form>
+            {# title #}
+            <div class="form-group">
+              <div class="row">
+
+                <label class="col-sm-12" for="title">
+                  {{ form.title.label }}
+                </label>
+                <div class="col-sm-12">
+                  {% if form.errors.title %}
+                    <div class="text-error">{{ form.errors.title.as_text }}</div>
+                  {% endif %}
+                  <input type="text"
+                         class="form-control {% if form.errors.title %}error{% endif %}"
+                         id="title"
+                         name="{{ form.title.name }}" placeholder="Title of conversation" />
+                </div>
+
+              </div>
+            </div> <!-- /form-group -->
+
+            {# reason #}
+            {% if form.id > 0 %}
+            <div class="form-group">
+              <div class="row">
+                <label class="col-sm-12" for="editReason">
+                  {{ form.editReason.label }}
+                </label>
+                <div class="col-sm-12">
+                  {% if form.errors.editReason %}
+                    <div class="text-error">{{ form.errors.editReason.as_text }}</div>
+                  {% endif %}
+                  <input type="text"
+                         class="form-control {% if form.errors.editReason %}error{% endif %}"
+                         id="editReason"
+                         name="{{ form.editReason.name }}"
+                         placeholder="Reason for editing" />
+                </div>
+              </div>
+            </div> <!-- /form-group -->
+            {% endif %}
+
+            <div class="form-group">
+              <div class="row">
+
+                <label class="col-sm-12" for="reply-box-textarea">
+                  What is it you want to say?
+                </label>
+                <div class="col-sm-12">
+
+                  <div class="reply-box">
+                    <ul>
+                      <li class="se-bold"><strong>Bold</strong></li>
+                      <li class="se-italics"><i>Italics</i></li>
+                      <li class="se-quote">Quote</li>
+                      <li class="se-link"><span class="glyphicon glyphicon-link"></span> Link</li>
+                      <li class="se-list"><span class="glyphicon glyphicon-th-list"></span> List</li>
+                      <li class="se-image"><span class="glyphicon glyphicon-picture"></span> Image</li>
+                    </ul>
+
+                    <textarea id="reply-box-textarea"
+                              name="{{ form.markdown.name }}"
+                              placeholder="Enter your text here..."></textarea>
+                    <div class="reply-box-footer">
+                      <a href="javascript:void 0">
+                        <span class="glyphicon glyphicon-question-sign"></span>
+                        Formatting help
+                      </a>
+                    </div>
+                  </div>
+                </div> <!-- /reply-box -->
+
+              </div>
+            </div>
+
+            </div> <!-- /form-container-inner -->
+            <div class="form-group form-footer padded">
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-footer-buttons">
+                    <input type="submit" class="btn btn-lg btn-primary" value="Start conversation">
+                    <input type="reset" class="btn btn-lg btn-default" value="Cancel">
+                  </div>
+                </div>
+              </div>
+            </div> <!-- /form_footer -->
+
+          </form>
+
+        </div>
+      </div>
+
+</div>
+{% endblock %}
+{% block sidebar %}
+
+  {# if content.meta.permissions.create #}
+    <div class="metabar-module">
+      <h5>Got something to add?</h5>
+      <div class="metabar-module-primary-buttons">
+        <a href="{% url 'create-conversation' microcosm_id %}" class="btn btn-large btn-block btn-primary">
+          <span class="glyphicon glyphicon-comment"></span> Start a conversation
+        </a>
+        <a href="{% url 'create-event' microcosm_id %}" class="btn btn-large btn-block btn-primary">
+          <span class="glyphicon glyphicon-calendar"></span> Start an event
+        </a>
+      </div>
+    </div> <!-- primary actions -->
+  {# endif #}
 
 {% endblock %}
 
+
 {% block js %}
-	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
-	<script type="text/javascript">
-		function isEmpty(e) {
-			return (e.val().trim() == '');
-		}
-		function checkEmpty(e) {
-			if (isEmpty($(e))) {
-				addError($(e))
-			} else {
-				removeError($(e))
-			}
-		}
-		function addError(e) {
-			e.parent().addClass('has-error')
-		}
-		function removeError(e) {
-			e.parent().removeClass('has-error')
-		}
 
-		$('#id_title').on('change', function() {
-			checkEmpty(this);
-		}).on('blur', function() {
-			checkEmpty(this);
-		});
+<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+<script type="text/javascript">
+  (function(){
 
-		$('#conversationForm').submit(function() {
-			if (isEmpty($('#id_title'))) {
-				addError($('#id_title'))
-				return false;
-			}
+    var se = new simpleEditor({
+      el : '.reply-box'
+    });
 
-			// Client-side dupe check
-			md5 = hex_md5($('#id_title').val())
-			if (this.md5 && this.md5 == md5) {
-				return false
-			}
-			this.md5 = md5;
-
-			return true;
-		});
-
-		$(document).ready(function() {
-			$('#id_title,#id_editReason').addClass('form-control').parent().addClass('form-group');
-		});
-	</script>
+  })();
+</script>
 {% endblock %}
