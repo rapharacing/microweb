@@ -740,9 +740,9 @@ class EventView(object):
 
             event_url, event_params, event_headers = Event.build_request(
                 request.META['HTTP_HOST'],
-                id=event_id,
-                offset=offset,
-                access_token=request.access_token
+                id           = event_id,
+                offset       = offset,
+                access_token = request.access_token
             )
             request.view_requests.append(grequests.get(event_url, params=event_params, headers=event_headers))
 
@@ -754,27 +754,53 @@ class EventView(object):
             request.view_requests.append(grequests.get(att_url, params=att_params, headers=att_headers))
 
             responses = response_list_to_dict(grequests.map(request.view_requests))
+
             event = Event.from_api_response(responses[event_url])
             comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
-            attendees = AttendeeList(responses[att_url])
-            attendees_yes = []
-            attendees_invited = []
+
+            attendees           = AttendeeList(responses[att_url])
+            attendees_yes       = []
+            attendees_invited   = []
             for attendee in attendees.items.items:
                 if attendee.rsvp == "yes":
                     attendees_yes.append(attendee)
                 elif attendee.rsvp == "invited":
                     attendees_invited.append(attendee)
 
+
+            # dates
+            import datetime as dt
+            end_date = event.when + dt.timedelta(minutes=event.duration)
+
+            is_same_day = False
+            if (end_date.strftime('%d%m%y') == event.when.strftime('%d%m%y') ):
+                is_same_day = True
+
+            event_dates = {
+                'type'  : 'multiple' if not is_same_day else 'single',
+                'end'   : end_date
+            }
+
+            #attendees
+            rsvp_attending = len(attendees_yes)
+            rsvp_percentage = int((len(attendees_yes)/event.rsvp_limit)*100)
+
+
             view_data = {
-                'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-                'site': request.site,
-                'content': event,
-                'comment_form': comment_form,
-                'pagination': build_pagination_links(responses[event_url]['comments']['links'], event.comments),
-                'item_type': 'event',
-                'attendees': attendees,
-                'attendees_yes': attendees_yes,
-                'attendees_invited': attendees_invited
+                'user'              : Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+                'site'              : request.site,
+                'content'           : event,
+                'comment_form'      : comment_form,
+                'pagination'        : build_pagination_links(responses[event_url]['comments']['links'], event.comments),
+                'item_type'         : 'event',
+                'attendees'         : attendees,
+                'attendees_yes'     : attendees_yes,
+                'attendees_invited' : attendees_invited,
+
+                'event_dates'       : event_dates,
+
+                'rsvp_attending'    : rsvp_attending,
+                'rsvp_percentage'   : rsvp_percentage
             }
 
             return render(request, EventView.single_template, view_data)
@@ -810,6 +836,9 @@ class EventView(object):
                 return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
             else:
                 view_data['form'] = form
+                # for primary buttons
+                view_data['microcosm_id'] = microcosm_id
+
                 return render(request, EventView.form_template, view_data)
 
         elif request.method == 'GET':
@@ -841,11 +870,16 @@ class EventView(object):
                 return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
             else:
                 view_data['form'] = form
+                # for primary buttons
+                view_data['microcosm_id'] = microcosm_id
+
                 return render(request, EventView.form_template, view_data)
 
         elif request.method == 'GET':
             event = Event.retrieve(request.META['HTTP_HOST'], id=event_id, access_token=request.access_token)
             view_data['form'] = EventView.edit_form.from_event_instance(event)
+            # for primary buttons
+            view_data['microcosm_id'] = microcosm_id
             return render(request, EventView.form_template, view_data)
 
         else:
