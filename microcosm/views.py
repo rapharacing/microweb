@@ -782,9 +782,6 @@ class EventView(object):
             }
 
             #attendees
-            rsvp_attending = len(attendees_yes)
-            rsvp_percentage = int((len(attendees_yes)/event.rsvp_limit)*100)
-
 
             view_data = {
                 'user'              : Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
@@ -799,9 +796,13 @@ class EventView(object):
 
                 'event_dates'       : event_dates,
 
-                'rsvp_attending'    : rsvp_attending,
-                'rsvp_percentage'   : rsvp_percentage
+                'rsvp_num_attending': len(attendees_yes),
+                'rsvp_num_invited'  : len(attendees_invited)
+
             }
+
+            if event.rsvp_limit:
+                view_data['rsvp_percentage'] = int((len(attendees_yes)/event.rsvp_limit)*100)
 
             return render(request, EventView.single_template, view_data)
 
