@@ -118,11 +118,14 @@
 	                  {{ this_attending|length|pluralize:"is,are"}}
 	                  <a href="#">attending</a>
 	                {% else %}
-	                <div class="microcosm-item-recent-comment">
-	                  <a href="{% url 'profile' item.last_reply.author.name|slugify %}">
-	                    @{{ item.last_reply.author.name}}
-	                  </a> replied {{ item.last_reply.timeago }} ago
-	                </div>
+
+                    {% if item.last_reply %}
+  	                <div class="microcosm-item-recent-comment">
+  	                  <a href="{% url 'profile' item.last_reply.author.name|slugify %}">
+  	                    @{{ item.last_reply.author.name}}
+  	                  </a> replied {{ item.last_reply.timeago }} ago
+  	                </div>
+                    {% endif %}
 	                {% endif %}
 
 	              {% endwith %}
