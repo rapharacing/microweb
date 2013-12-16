@@ -1,125 +1,160 @@
 {% extends 'base.html' %}
-
 {% block content %}
-    <h4>Showing single comment</h4>
-    <div class='text-muted'>
-    {% for item in content.meta.parents %}
-		<article id="comment{{ item.id }}" class="row">
-			
-			<div class="col col-sm-4">
-				<a href="{% url 'single-profile' item.meta.created_by.id %}"><img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{item.meta.created_by.avatar}}{% elif 'files' in item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
-				<div class="h4"><a href="{% url 'single-profile' item.meta.created_by.id %}">{{ item.meta.created_by.profile_name|truncatechars:25 }}</a></div>
-			</div>
+<div class="row content-header">
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-sm-6">
+        {% include 'breadcrumbs.html' %}
+      </div>
+    </div>
+  </div>
+</div>
 
-			<div class="col col-sm-12">
-				<div class="row">
-					<section class="col col-sm-16 ugc" id="comment{{ item.id }}body">
-						{{ item.html|safe }}
-					</section>
-				</div>
-				<div class="row">
-					<div class="col col-sm-4 pull-left">
-						<small class="text-muted"><time datetime="{{ item.meta.created|date:"c" }}"></time></small>
-					</div>
+<div class="content-body">
+  <div class="item">
 
-					<section class="pull-right" id="item{{ v.id }}controls">
-						{% if item.meta.created_by.id == user.id or user.admin or user.moderator %}
-							<form method="POST" action="{% url 'delete-comment' item.id %}" style="display:inline;" onsubmit="return (confirm('Delete is a one-way action, are you sure?'))">
-								{% csrf_token %}
-								<input type="hidden" name="item_id" value="{{item.item_id}}"/>
-								<input type="hidden" name="item_type" value="{{item.item_type}}"/>
-								<input type="submit" value="Delete" class="btn btn-small btn-link text-danger" id="comment{{ item.id }}delete"/>
-							</form>
-							<a class="btn btn-small btn-link" href="/comments/{{item.id}}/edit" id="comment{{ item.id }}edit">Edit</a>
-						{% endif %}
-						{% if user %}
-						<a class="btn btn-small btn-primary" href="/comments/create?itemId={{item.id}}&itemType={{item_type}}&inReplyTo={{item.id}}" id="comment{{ item.id }}reply">Reply</a>
-						{% else %}
-						<a class="btn btn-small btn-primary" href="javascript:login()" id="comment{{ item.id }}reply">Reply</a>
-						{% endif %}
-					</section>
-				</div>
-			</div>
-		</article><br/>
-		{% endfor %}</div>
-			<hr /><br />
-		<article id="comment{{ content.id }}" class="row">
-			
-			<div class="col col-sm-4">
-				<a href="{% url 'single-profile' content.meta.created_by.id %}"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
-				<div class="h4"><a href="{% url 'single-profile' content.meta.created_by.id %}">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a></div>
-			</div>
+    <div class="item-header">
+      <h1>{{content.title}}</h1>
+      <div class="item-meta">Posted on {{ content.meta.created|date:"D jS, F Y"}}</div>
+    </div>
+    {% if content.itemType == 'event' %}
+    	{% include 'event_header_small.html' %}
+    {% endif %}
+  </div> <!-- item -->
 
-			<div class="col col-sm-12">
-				<div class="row">
-					<section class="col col-sm-16 ugc" id="comment{{ content.id }}body">
-						{{ content.html|safe }}
-					</section>
-				</div>
-				<div class="row">
-					<div class="col col-sm-4 pull-left">
-						<small class="text-muted"><time datetime="{{ content.meta.created|date:"c" }}"></time></small>
-					</div>
+  {% with comments as content.meta.parents %}
+      {% include 'block_comments.html' %}
+    {% endwith %}
 
-					<section class="pull-right" id="content{{ v.id }}controls">
-						{% if content.meta.created_by.id == user.id or user.admin or user.moderator %}
-							<form method="POST" action="{% url 'delete-comment' content.id %}" style="display:inline;" onsubmit="return (confirm('Delete is a one-way action, are you sure?'))">
-								{% csrf_token %}
-								<input type="hidden" name="item_id" value="{{content.item_id}}"/>
-								<input type="hidden" name="item_type" value="{{content.item_type}}"/>
-								<input type="submit" value="Delete" class="btn btn-small btn-link text-danger" id="comment{{ content.id }}delete"/>
-							</form>
-							<a class="btn btn-small btn-link" href="/comments/{{content.id}}/edit" id="comment{{ content.id }}edit">Edit</a>
-						{% endif %}
-						{% if user %}
-						<a class="btn btn-small btn-primary" href="/comments/create?itemId={{content.id}}&itemType={{item_type}}&inReplyTo={{content.id}}" id="comment{{ content.id }}reply">Reply</a>
-						{% else %}
-						<a class="btn btn-small btn-primary" href="javascript:login()" id="comment{{ content.id }}reply">Reply</a>
-						{% endif %}
-					</section>
-				</div>
-			</div>
-		</article>
-	<br /><hr />
-	<div class='text-muted'>
-    {% for item in content.meta.children %}
-		<article id="comment{{ item.id }}" class="row">
-			
-			<div class="col col-sm-4">
-				<a href="/profiles/{{ item.meta.created_by.id }}/"><img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{item.meta.created_by.avatar}}{% elif 'files' in item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.meta.created_by.profile_name }}" align="left" class="gravatar" /></a>
-				<div class="h4"><a href="/profiles/{{ item.meta.created_by.id }}/">{{ item.meta.created_by.profile_name|truncatechars:25 }}</a></div>
-			</div>
+    <ul class="list-comments">
+      <li id="comment{{ content.id }}" class="comment-item">
+        <div class="comment-item-inner">
+          <div class="comment-item-header">
 
-			<div class="col col-sm-12">
-				<div class="row">
-					<section class="col col-sm-16 ugc" id="comment{{ item.id }}body">
-						{{ item.html|safe }}
-					</section>
-				</div>
-				<div class="row">
-					<div class="col col-sm-4 pull-left">
-						<small class="text-muted"><time datetime="{{ item.meta.created|date:"c" }}"></time></small>
-					</div>
+            <div class="comment-item-permalink">
+              {% comment %}
+              <div class="comment-item-header-admin">
+                <input type="checkbox" />
+              </div>
+              {% endcomment %}
 
-					<section class="pull-right" id="item{{ v.id }}controls">
-						{% if item.meta.created_by.id == user.id or user.admin or user.moderator %}
-							<form method="POST" action="{% url 'delete-comment' item.id %}" style="display:inline;" onsubmit="return (confirm('Delete is a one-way action, are you sure?'))">
-								{% csrf_token %}
-								<input type="hidden" name="item_id" value="{{item.item_id}}"/>
-								<input type="hidden" name="item_type" value="{{item.item_type}}"/>
-								<input type="submit" value="Delete" class="btn btn-small btn-link text-danger" id="comment{{ item.id }}delete"/>
-							</form>
-							<a class="btn btn-small btn-link" href="/comments/{{item.id}}/edit" id="comment{{ item.id }}edit">Edit</a>
-						{% endif %}
-						{% if user %}
-						<a class="btn btn-small btn-primary" href="/comments/create?itemId={{item.id}}&itemType={{item_type}}&inReplyTo={{item.id}}" id="comment{{ item.id }}reply">Reply</a>
-						{% else %}
-						<a class="btn btn-small btn-primary" href="javascript:login()" id="comment{{ item.id }}reply">Reply</a>
-						{% endif %}
-					</section>
-				</div>
-			</div>
-		</article><br/>
-		{% endfor %}
-		</div>
+              <time datetime="{{ content.meta.created|date:"c" }}">
+                {{ content.meta.created|timesince }}
+              </time>
+            </div>
+
+            <div class="comment-item-author">
+
+              <a href="{% url 'single-profile' content.meta.created_by.id %}">
+                <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" align="left" class="gravatar" />
+                <strong>
+                  {{ content.meta.created_by.profile_name|truncatechars:25 }}
+                </strong>
+              </a>
+
+              {% comment %}
+              {% if content.is_in_reply_to %}
+              <span class="glyphicon glyphicon-arrow-right"></span>
+              <span>
+                in reply to
+                <a href="{% url 'comments' content.replied_to_parent_content.item.microcosm.name|slugify content.replied_to_parent_content.item.name|slugify content.replied_to_parent_content.id %}">
+                  {{ content.replied_to_parent_content.author.name }}
+                </a>
+              </span>
+              {% endif %}
+              {% endcomment %}
+            </div>
+
+          </div>
+          <div class="comment-item-body">
+            {{ content.html|safe }}
+          </div>
+
+          {% if user %}
+          <div class="comment-item-footer">
+            <a class="insertReplyBox" href="javascript:void 0">
+              <span class="glyphicon glyphicon-arrow-left"></span>
+              Reply to
+              <strong>@{{ content.meta.created_by.profile_name|truncatechars:25 }}</strong>
+            </a>
+          </div>
+          {% endif %}
+
+        </div>
+      </li>
+    </ul>
+
+    {% with comments as content.meta.children %}
+      {% include 'block_comments.html' %}
+    {% endwith %}
+
+</div> <!-- / content-body -->
+
+<div class="reply-container">
+    <ul class="list-comments">
+      <li class="comment-item">
+        <div class="comment-item-inner">
+          <div class="comment-item-header">
+            <div class="comment-item-author">
+                <img src="{{ STATIC_URL }}{{ member.avatar}}" />
+                <strong>Post a reply</strong>
+            </div>
+          </div>
+          <div class="comment-item-body">
+            {% include 'forms/block_comment_box.html' %}
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div> <!-- /reply-container -->
+
 {% endblock content %}
+
+{% block sidebar %}
+
+  <div class="metabar-module">
+    <h5>Got something to add?</h5>
+    <div class="metabar-module-primary-buttons">
+      <a href="#" class="btn btn-large btn-block btn-primary">
+        <span class="glyphicon glyphicon-comment"></span> Post a reply
+      </a>
+    </div>
+  </div> <!-- primary actions -->
+
+  <div class="metabar-module">
+    <h5>About</h5>
+    <div class="metabar-module-title">
+      <h3>
+        {{ content.title }}
+      </h3>
+
+      {% include 'forms/subscribe.html' %}
+
+      <p>
+        {{ content.description }}
+      </p>
+      <p class="metabar-module-author">
+        <a href="{% url 'single-profile' content.meta.created_by.id %}">
+          <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
+          @{{ content.meta.created_by.profile_name|truncatechars:25 }}
+        </a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+      </p>
+    </div>
+  </div> <!-- / about -->
+
+
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+<script type="text/javascript">
+  (function(){
+
+    var se = new simpleEditor({
+      el : '.reply-box'
+    });
+
+  })();
+</script>
+{% endblock %}

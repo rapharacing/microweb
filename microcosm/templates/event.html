@@ -27,158 +27,12 @@
       <h1>{{content.title}}</h1>
       <div class="item-meta">Posted on {{ content.meta.created|date:"D jS, F Y"}}</div>
     </div>
-    <div class="item-event">
-      <div class="row">
-        <div class="col-xs-12">
-          <ul class="item-event-inner">
 
-            <li class="item-event-map-container">
-              <div id="map-canvas" class="item-event-map"></div>
-            </li>
-
-            <li class="item-event-date-container">
-              <div class="item-event-icon">
-                <span class="glyphicon glyphicon-calendar"></span>
-              </div>
-              <div class="item-event-icon-offset">
-                <div class="item-event-date">
-                  <span class="item-event-date-digit">{{ content.when|date:"j"}}</span>
-                  <span class="item-event-date-day">
-                    {{ content.when|date:"l" }}
-                    <strong>{{ content.when|date:"F Y" }}</strong>
-                  </span>
-                  <span class="item-event-date-time">
-
-                    {{ content.when|date:"g:i  A" }}
-                    {% if event_dates.type == 'single' %}
-                    - {{ event_dates.end|date:"g:i  A" }}
-                    {% endif %}
-                  </span>
-                </div>
-              </div>
-            </li>
-
-            {% if event_dates.type == 'multiple' %}
-            <li class="item-event-date-container">
-              <div class="item-event-icon">
-                <span class="glyphicon glyphicon-calendar"></span>
-              </div>
-              <div class="item-event-icon-offset">
-                <div class="item-event-date">
-                  <span class="item-event-date-digit">{{ event_dates.end|date:"j"}}</span>
-                  <span class="item-event-date-day">
-                    {{ event_dates.end|date:"l" }}
-                    <strong>{{ event_dates.end|date:"F Y" }}</strong>
-                  </span>
-                  <span class="item-event-date-time">
-                    {{ event_dates.end|date:"g:i  A" }}
-                  </span>
-                </div>
-              </div>
-            </li>
-            {% endif %}
-
-
-            <li>
-              <div class="item-event-icon">
-                <span class="glyphicon glyphicon-map-marker"></span>
-              </div>
-              <div class="item-event-icon-offset">
-                <div class="item-event-location">
-                  {% if content.where %}
-                    {{ content.where }}
-                  {% else %}
-                    TBA
-                  {% endif %}
-                </div>
-              </div>
-            </li>
-
-
-            <li class="item-event-attending-container">
-
-              {% if content.rsvp_attend %}
-              <div class="item-event-attending-people">
-                <ul class="list-people list-people-sm">
-                {% for item in attendees.items.items %}
-                  {% if item.rsvp == "yes" %}
-                    <li>
-                      <a href="{% url 'single-profile' item.attendee_id %}">
-                        <img src="{% if 'gravatar' in item.attendee.avatar %}{{ item.attendee.avatar }}{% elif 'files' in  item.attendee.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ item.attendee.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.attendee.profile_name }}" />
-                      </a>
-                    </li>
-                  {% endif %}
-                {% endfor %}
-                </ul>
-                {{ content.rsvp_attend }}
-                <span>and <a href="javascript:void 0">{{ attendees.items|length }} others</a> are attending this event</span>
-              </div>
-              {% endif %}
-
-
-              {%if content.rsvp_limit %}
-              <div class="item-event-icon">
-                <span class="glyphicon glyphicon-user"></span>
-              </div>
-              <div class="item-event-icon-offset">
-                <div class="item-event-attending">
-
-                  <div class="progress">
-                    <div class="progress-bar"
-                         role="progressbar"
-                         aria-valuenow="60"
-                         aria-valuemin="0"
-                         aria-valuemax="100"
-                         style="width: {{rsvp_percentage}}%;">
-                      <span class="sr-only">60% Complete</span>
-                    </div>
-                  </div>
-                  <strong>
-                    {{ rsvp_attending }}/{{ content.rsvp_limit }}
-                  </strong>
-                </div>
-              </div>
-              {% endif %}
-            </li>
-          </ul> <!-- /item-event-inner -->
-
-          <div class="item-event-actions">
-            <ul class="list-stats">
-              <li>
-                going
-                <span>13</span>
-              </li>
-              <li>
-                maybe
-                <span>24</span>
-              </li><li>
-                not going
-                <span>4</span>
-              </li>
-            </ul>
-
-            <h3>Are you attending this event?</h3>
-            {% if user %}
-              {% if content.rsvp_limit == 0 or content.rsvp_limit > content.rsvp_attend %}
-              <form method="POST" action="{% url 'rsvp-event' content.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="rsvp" value="yes" />
-                <input type="submit" class="btn btn-lg btn-primary" value="Yes, I'm attending!" />
-              </form>
-              {% endif %}
-
-              <form method="POST" action="{% url 'rsvp-event' content.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="rsvp" value="no" />
-                <input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default">
-              </form>
-            {% endif %}
-          </div>
-
-        </div> <!-- /col-xs-12 -->
-      </div> <!-- /row -->
-    </div> <!-- /item-event -->
-
+    {% if content.comments.page > 1 %}
+      {% include 'event_header_small.html' %}
+    {% else %}
+      {% include 'event_header_large.html' %}
+    {% endif %}
 
     {% include 'block_comments.html' %}
 
@@ -214,88 +68,40 @@
 
 {% endblock content %}
 
-{% block metabar %}
-<div class="metabar-module">
-  <h5>Got something to add?</h5>
-  <div class="metabar-module-primary-buttons">
-    <a href="#" class="btn btn-large btn-block btn-primary">
-      <span class="glyphicon glyphicon-comment"></span> Post a reply
-    </a>
-  </div>
-</div> <!-- primary actions -->
+{% block sidebar %}
 
-
-<div class="metabar-module">
-  <h5>About</h5>
-  <div class="metabar-module-title">
-    <h3>
-      {{ item.name }}
-    </h3>
-    <p>
-      in <a href="{% url 'site' %}{{ item.microcosm.name|slugify }}/{{ item.name|slugify }}">
-      {{ item.microcosm.name }}
+  <div class="metabar-module">
+    <h5>Got something to add?</h5>
+    <div class="metabar-module-primary-buttons">
+      <a href="#" class="btn btn-large btn-block btn-primary">
+        <span class="glyphicon glyphicon-comment"></span> Post a reply
       </a>
-    </p>
+    </div>
+  </div> <!-- primary actions -->
 
-    {% include 'forms/subscribe.html' %}
+  <div class="metabar-module">
+    <h5>About</h5>
+    <div class="metabar-module-title">
+      <h3>
+        {{ content.title }}
+      </h3>
 
-    <p class="metabar-module-author">
-      <a href="#"><img src="{{ STATIC_URL }}{{ item.author.avatar}}" /></a>
-      <a href="#">@{{ item.author.name}}</a> started {{ item.timeago }} ago
-    </p>
-  </div>
-</div> <!-- / about -->
+      {% include 'forms/subscribe.html' %}
+
+      <p>
+        {{ content.description }}
+      </p>
+      <p class="metabar-module-author">
+        <a href="{% url 'single-profile' content.meta.created_by.id %}">
+          <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
+          @{{ content.meta.created_by.profile_name|truncatechars:25 }}
+        </a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+      </p>
+    </div>
+  </div> <!-- / about -->
 
 
-<div class="metabar-module">
-  <h5>Following online now</h5>
-
-  <ul class="list-people list-people-sm">
-    {% for follow in item.microcosm.following %}
-    <li><a href="#"><img src="{{ STATIC_URL }}{{ follow.avatar}}" /></a></li>
-    {% endfor %}
-  </ul>
-
-</div> <!-- / Following online -->
-
-<div class="metabar-module">
-  <h5>Stats</h5>
-  <ul class="list-group">
-    <li class="list-group-item">
-      <span class="badge-alt">{{ item.num_comments }}</span>
-      Comments
-    </li>
-    <li class="list-group-item">
-      <span class="badge-alt">{{ item.num_views }}</span>
-      Views
-    </li>
-  </ul>
-</div> <!-- / stats -->
-
-<div class="metabar-module">
-  <h5>Admins</h5>
-
-  <ul class="list-people list-people-sm">
-    {% for admin in item.microcosm.admins %}
-    <li><a href="#"><img src="{{ STATIC_URL }}{{ admin.avatar}}" /></a></li>
-    {% endfor %}
-  </ul>
-  <p>
-    <a href="#">See all membership groups</a>
-  </p>
-</div> <!-- / admin -->
-
-<div class="metabar-footer">
-  Powered by <a href="#">Microcosm</a>
-  <p>
-    <a href="#">About</a>
-    <a href="#">Help</a>
-    <a href="#">Developers</a>
-    <a href="#">Legal</a>
-  </p>
-</div>
-
-{% endblock metabar %}
+{% endblock %}
 
 {% block js %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.js"></script>
