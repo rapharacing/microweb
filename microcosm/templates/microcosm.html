@@ -103,32 +103,30 @@
 	            {# <input class="row-admin-checkbox" type="checkbox" /> #}
 
 	            {% if item.item_type == 'event' %}
-	              {% with this_attending=item.event_attendees %}
 
-	                {% if this_attending|length > 0 %}
-	                  <ul class="list-people list-people-sm">
-	                    {% for attendee in this_attending %}
-	                    <li>
-	                      <a href="{{ attendee.id }}">
-	                        <img src="{{ STATIC_URL}}{{ attendee.avatar }}" />
-	                      </a>
-	                    </li>
-	                    {% endfor %}
-	                  </ul>
-	                  {{ this_attending|length|pluralize:"is,are"}}
-	                  <a href="#">attending</a>
-	                {% else %}
+                {% if item.rsvp_attend %}
+                  <ul class="list-people list-people-sm">
+                    {% for attendee in item.rsvp_attend %}
+                    <li>
+                      <a href="{{ attendee.id }}">
+                        <img src="{{ STATIC_URL}}{{ attendee.avatar }}" />
+                      </a>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {{ item.rsvp_attend|length|pluralize:"is,are"}}
+                  <a href="#">attending</a>
+                {% else %}
 
-                    {% if item.last_reply %}
-  	                <div class="microcosm-item-recent-comment">
-  	                  <a href="{% url 'profile' item.last_reply.author.name|slugify %}">
-  	                    @{{ item.last_reply.author.name}}
-  	                  </a> replied {{ item.last_reply.timeago }} ago
-  	                </div>
-                    {% endif %}
-	                {% endif %}
+                  {% if item.last_reply.author %}
+	                <div class="microcosm-item-recent-comment">
+	                  <a href="{% url 'profile' item.last_reply.author.name|slugify %}">
+	                    @{{ item.last_reply.author.name}}
+	                  </a> replied {{ item.last_reply.timeago }} ago
+	                </div>
+                  {% endif %}
+                {% endif %}
 
-	              {% endwith %}
 	            {% else %}
 
 		            {% if item.last_comment_created %}
