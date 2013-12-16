@@ -473,11 +473,11 @@
     el       : '.event-form-dates',
 
     {% if form.when.value %}
-    startDate : {{ form.when.value }},
+    startDate : '{{ form.when.value }}',
     {% endif %}
 
     {% if form.duration.value %}
-    duration  : {{ form.duration.value }},
+    duration  : {{ form.duration.value|floatformat:"0" }},
     {% endif %}
 
     // controls
