@@ -13,7 +13,7 @@
 
           <time datetime="{{ comment.meta.created|date:"c" }}"></time>
           <span style="color:#eee">&bull;</span>
-          <a href="#">
+          <a href="{% url 'single-comment' comment.id %}">
             #{{ forloop.counter }}
           </a>
         </div>
