@@ -114,21 +114,32 @@
     };
 
 
+    eventFormMap.prototype.updateMapBounds = function(){
+      // Get the bounds (map box)
+      var b  = this.map.getBounds(),
+          sw = b.getSouthWest(),
+          ne = b.getNorthEast();
+
+      this.mappings['north'].value  = ne.lat;
+      this.mappings['south'].value  = ne.lng;
+      this.mappings['east'].value   = sw.lat;
+      this.mappings['west'].value   = sw.lng;
+
+      return this;
+    };
+    eventFormMap.prototype.updateLatlng = function(latlng){
+
+      this.mappings['lat'].value    = latlng.lat;
+      this.mappings['lng'].value    = latlng.lng;
+
+      return this;
+    };
+
     eventFormMap.prototype.update = function(latlng){
 
-        // Get the bounds (map box)
-        var b  = this.map.getBounds(),
-            sw = b.getSouthWest(),
-            ne = b.getNorthEast();
-
-        this.mappings['lat'].value    = latlng.lat;
-        this.mappings['lng'].value    = latlng.lng;
-        this.mappings['north'].value  = ne.lat;
-        this.mappings['south'].value  = ne.lng;
-        this.mappings['east'].value   = sw.lat;
-        this.mappings['west'].value   = sw.lng;
-
-        return this;
+      this.updateLatlng(latlng);
+      this.updateMapBounds();
+      this.save();
     };
 
     eventFormMap.prototype.save = function(){
@@ -143,6 +154,11 @@
       }
       return this;
     };
+
+    eventFormMap.prototype.onMapDragHandler = function(e){
+      this.updateMapBounds().save();
+    };
+
 
     // resets location inputs, clears markers
     eventFormMap.prototype.reset = function(){
@@ -175,6 +191,7 @@
 
       // for map object
       this.map.on('click', $.proxy(this.dropMarker,this) );
+      this.map.on('dragend', $.proxy(this.onMapDragHandler, this));
 
     };
 
