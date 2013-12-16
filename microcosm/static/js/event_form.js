@@ -809,28 +809,82 @@ L.Google = L.Class.extend({
 (function(){
   'use strict';
 
-  var attendee_limit_options = $('.attendee-options input[name=attendee-limit-option]'),
-      attendee_limit_value   = $('.attendee-options input[name=attendee-limit-value]'),
-      has_attendees_limit = false;
 
-  // toggles the able/disable of the attendee limit input box
-  function toggleAttendeeLimit(){
+  var AttendeesForm = (function(){
 
-    if (has_attendees_limit){
-      attendee_limit_value.attr('disabled',false);
-      attendee_limit_value.focus();
-    }else{
-      attendee_limit_value.attr('disabled',true);
-    }
-  }
+    var attendeesForm = function(options){
 
-  // bind change event to radio buttons
-  attendee_limit_options.on('change',function(e){
-    var _this = $(e.currentTarget);
-    has_attendees_limit = parseInt(_this.val(),10) === 1 ? true : false;
-    toggleAttendeeLimit();
-  });
+      this.el = null;
+      if(typeof options.el !== 'undefined'){
+        this.$el = $(options.el);
+      }
+
+      this.controls = {
+        choices : null
+      };
+      if(typeof options.choices !== 'undefined'){
+        this.controls.choices = $(options.choices);
+      }
+
+      this.form = {
+        attendees : null
+      };
+      if(typeof options.attendees){
+        this.form.attendees = $(options.attendees);
+      }
+
+      this.has_attendees_limit = false;
+      if(this.form.attendees.val() !== "" || this.form.attendees.val() !== 0 ){
+        this.has_attendees_limit = true;
+      }
+
+      console.log(options);
+      console.log(this);
+
+      this.bind();
+
+    };
 
 
+    attendeesForm.prototype.enabledAttendeeLimitField = function(){
+      this.form.attendees.attr('disabled',false).focus();
+    };
+    attendeesForm.prototype.disableAttendeeLimitField = function(){
+      this.form.attendees.val(0).attr('disabled',true);
+    };
+
+    attendeesForm.prototype.onChangeChoiceHandler = function(e){
+
+      var radio = $(e.currentTarget);
+
+      if (radio.val() == "1"){
+        this.has_attendees_limit = 1;
+        this.enabledAttendeeLimitField();
+      }else{
+        this.has_attendees_limit = 0;
+        this.disableAttendeeLimitField();
+      }
+
+    };
+
+    attendeesForm.prototype.bind = function(){
+
+      var events = [
+        ['change', 'input[name='+this.controls.choices[0].name+']', 'onChangeChoiceHandler' ]
+      ];
+
+      if (events.length>0){
+        for(var i=0,j=events.length;i<j;i++){
+          this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );
+        }
+      }
+
+    };
+
+    return attendeesForm;
+
+  })();
+
+  window.AttendeesForm = AttendeesForm;
 
 })();
