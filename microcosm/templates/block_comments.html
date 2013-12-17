@@ -22,7 +22,7 @@
 
           <a href="{% url 'single-profile' comment.meta.created_by.id %}">
             <img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" />
-            <strong>
+            <strong class="comment-item-author-name">
               {{ comment.meta.created_by.profile_name|truncatechars:25 }}
             </strong>
           </a>
@@ -45,15 +45,21 @@
         {{ comment.html|safe }}
       </div>
 
-      {% if user %}
       <div class="comment-item-footer">
-        <a class="insertReplyBox" href="javascript:void 0">
-          <span class="glyphicon glyphicon-arrow-left"></span>
-          Reply to
-          <strong>@{{ comment.meta.created_by.profile_name|truncatechars:25 }}</strong>
-        </a>
-      </div>
+        <div class="comment-item-attachments">
+        </div>
+      {% if user %}
+        {% if not comment.meta.created_by.id == user.id %}
+            <a class="insertReplyBox" data-ref="{{ comment.meta.created_by.id }}" href="javascript:void 0">
+              <span class="glyphicon glyphicon-arrow-left"></span>
+              Reply to
+              <strong>@{{ comment.meta.created_by.profile_name|truncatechars:25 }}</strong>
+            </a>
+        {%else%}
+          <a class="insertReplyBox" href="javascript:void 0">Edit</a>
+        {% endif %}
       {% endif %}
+      </div>
 
     </div>
   </li>
