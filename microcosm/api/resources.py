@@ -20,13 +20,15 @@ RESOURCE_PLURAL = {
     'user': 'users',
     'site': 'sites',
     'microcosm': 'microcosms',
+    'huddle': 'huddles',
 }
 
 # Item types that can have comments
 COMMENTABLE_ITEM_TYPES = [
     'event',
     'conversation',
-    'poll'
+    'poll',
+    'huddle'
 ]
 
 def discard_querystring(url):
@@ -444,6 +446,8 @@ class PaginatedList(object):
         self.type = item_list['type']
         if item_list.get('items'):
             self.items = [list_item_cls.from_summary(item) for item in item_list['items']]
+        else:
+            self.items = []
         self.links = {}
         for item in item_list['links']:
             if 'title' in item:
@@ -481,7 +485,6 @@ class Meta(object):
                 else:
                     self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1','')}
 
-
 class PermissionSet(object):
     """
     Represents user permissions on a resource.
@@ -494,6 +497,7 @@ class PermissionSet(object):
         self.delete = data['delete']
         self.guest = data['guest']
         self.super_user = data['moderator']
+        self.owner = data['owner']
 
 
 class Watcher(APIResource):
@@ -888,6 +892,121 @@ class Conversation(APIResource):
         return repr
 
 
+class Huddle(APIResource):
+    """
+    Represents a huddle (title and list of comments).
+    """
+
+    api_path_fragment = 'huddles'
+
+    @classmethod
+    def from_api_response(cls, data):
+        huddle = cls.from_summary(data)
+        huddle.comments = PaginatedList(data['comments'], Comment)
+        return huddle
+
+    @classmethod
+    def from_summary(cls, data):
+        huddle = cls()
+        huddle.id = data['id']
+        huddle.title = data['title']
+        if data.get('lastCommentId'): huddle.last_comment_id = data['lastCommentId']
+        if data.get('lastCommentCreatedBy'):
+            huddle.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
+        if data.get('lastCommentCreated'):
+            huddle.last_comment_created = parse_timestamp(data['lastCommentCreated'])
+        if data.get('totalComments'):
+            huddle.total_comments = data['totalComments']
+        huddle.meta = Meta(data['meta'])
+        huddle.participants = []
+        for p in data['participants']:
+            huddle.participants.append(Profile(p))
+        return huddle
+
+    @classmethod
+    def from_create_form(cls, data):
+        huddle = cls()
+        huddle.title = data['title']
+        return huddle
+
+    @classmethod
+    def from_edit_form(cls, data):
+        huddle = Huddle.from_create_form(data)
+        huddle.id = data['id']
+        huddle.meta = {'editReason': data['editReason']}
+        return huddle
+
+    @staticmethod
+    def build_request(host, id, offset=None, access_token=None):
+        url = build_url(host, [Huddle.api_path_fragment, id])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, id, offset=None, access_token=None):
+        url, params, headers = Huddle.build_request(host, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return Huddle.from_api_response(resource)
+
+    def create(self, host, access_token):
+        url = build_url(host, [Huddle.api_path_fragment])
+        payload = json.dumps(self.as_dict(), cls=DateTimeEncoder)
+        resource = APIResource.create(url, payload, {}, APIResource.make_request_headers(access_token))
+        return Huddle.from_api_response(resource)
+
+    def delete(self, host, access_token):
+        url = build_url(host, [Huddle.api_path_fragment, self.id])
+        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
+
+    @staticmethod
+    def newest(host, id, access_token=None):
+        url = build_url(host, [Huddle.api_path_fragment, id, "newcomment"])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.json()['data']
+
+    def as_dict(self, update=False):
+        repr = {}
+        if update:
+            repr['id'] = self.id
+            repr['meta'] = self.meta
+        repr['title'] = self.title
+        return repr
+
+    @staticmethod
+    def invite(host, id, profileIds, access_token=None):
+        url = build_url(host, [Huddle.api_path_fragment, id, "participants"])
+        payload = []
+        for pid in profileIds:
+            payload.append({'id': pid})
+        resource = APIResource.update(url, json.dumps(payload), {}, APIResource.make_request_headers(access_token))
+        return Huddle.from_api_response(resource)
+
+class HuddleList(object):
+    """
+    Represents a list of microcosms for a given site.
+    """
+
+    api_path_fragment = 'huddles'
+
+    def __init__(self, data):
+        self.huddles = PaginatedList(data['huddles'], Huddle)
+        self.meta = Meta(data['meta'])
+
+    @staticmethod
+    def build_request(host, offset=None, access_token=None):
+        url = build_url(host, [HuddleList.api_path_fragment])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = HuddleList.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return HuddleList(resource)
+
+
 class Event(APIResource):
     """
     Represents an event (event details and list of comments).
@@ -1181,6 +1300,11 @@ class Comment(APIResource):
         if hasattr(self, 'meta'): repr['meta'] = self.meta
         return repr
 
+    @staticmethod
+    def incontext(host, id, access_token=None):
+        url = build_url(host, [Comment.api_path_fragment, id, "incontext"])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.json()['data']
 
 class GeoCode(object):
     """
@@ -1247,3 +1371,75 @@ class Attachment(object):
         attachment = {'FileHash': file_hash}
         headers = APIResource.make_request_headers(access_token)
         return APIResource.process_response(url, requests.post(url, data=attachment, headers=headers))
+
+class Search(object):
+    """
+    Used for searching and search results
+    """
+
+    api_path_fragment = "search"
+
+    @classmethod
+    def from_api_response(cls, data):
+        search = cls()
+        search.query = data['query']
+        search.type = []
+        if data['query'].get('type'):
+            for t in data['query']['type']:
+                search.type.append(t)
+        search.time_elapsed = data['timeTakenInMs']/float(1000)
+        search.results = PaginatedList(data['results'], SearchResult)
+        return search
+
+    @staticmethod
+    def build_request(host, params=None, access_token=None):
+        url = build_url(host, [Search.api_path_fragment])
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+
+class SearchResult(object):
+    """
+    The search result object
+    """
+
+    @classmethod
+    def from_api_response(cls, data):
+        searchresult = cls()
+        searchresult.item_type = data['itemType']
+
+        if searchresult.item_type == 'conversation':
+            searchresult.item = Conversation.from_summary(data['item'])
+        elif searchresult.item_type == 'comment':
+            searchresult.item = Comment.from_summary(data['item'])
+        elif searchresult.item_type == 'event':
+            searchresult.item = Event.from_summary(data['item'])
+        elif searchresult.item_type == 'profile':
+            searchresult.item = Profile.from_summary(data['item'])
+        elif searchresult.item_type == 'microcosm':
+            searchresult.item = Microcosm.from_summary(data['item'])
+        else:
+            searchresult.item = None
+
+        if data.get('parentItem'):
+            searchresult.parent_item_type = data['parentItemType']
+
+            if searchresult.parent_item_type == 'conversation':
+                searchresult.parent_item = Conversation.from_summary(data['parentItem'])
+            elif searchresult.parent_item_type == 'event':
+                searchresult.parent_item = Event.from_summary(data['parentItem'])
+            elif searchresult.parent_item_type == 'profile':
+                searchresult.parent_item = Profile.from_summary(data['parentItem'])
+            elif searchresult.parent_item_type == 'microcosm':
+                searchresult.parent_item = Microcosm.from_summary(data['parentItem'])
+            else:
+                searchresult.parent_item = None
+
+        searchresult.rank = data['rank']
+        searchresult.last_modified = data['lastModified']
+        searchresult.highlight = data['highlight']
+        return searchresult
+
+    @classmethod
+    def from_summary(cls, data):
+        return SearchResult.from_api_response(data)

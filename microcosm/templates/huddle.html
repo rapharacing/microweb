@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb %}
+	<ol class="breadcrumb">
+		<li><a href="/">Home</a></li>
+		<li><a href="/huddles/">Huddles</a></li>
+		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.title }}</a></li>
+	</ol>
+{% endblock %}
+
+{% block ga %},'dimension2': '{{ content.meta.created_by.id }}'
+			,'dimension3': '{{ content.microcosm_id }}'{% endblock%}
+
+{% block content %}
+	<h1 id="huddle_title">{{ content.title }}</h1>
+	<br />
+	{% include "comments_block.html" %}
+
+{% endblock %}
+
+{% block sidebar %}
+	<p class="muted hidden-xs">
+		Created by <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
+		<time datetime="{{ content.meta.created|date:"c" }}"></time>
+	</p>
+	
+	{% if user %} {% if not content.meta.flags.watched %}
+	<form method="POST" action="" id="subscribe_form">
+		{% csrf_token %}
+		<input type="hidden" name="update_type_id" value="1">
+		<input class="btn btn-default btn-block" id="watch" type="submit" value="Watch this Huddle" />
+		<p/>
+	</form>
+	{% else %}
+	<p class="text-muted">You are <a href="/watchers/">watching</a> this huddle and you will receive <a href="/updates/">updates</a>.</p>
+	{% endif %}{% endif %}
+
+	<form method="POST" action="{% url 'delete-huddle' content.id %}" id="huddle_delete_form" class="hidden-xs">
+		{% csrf_token %}
+		<p class="text-muted"><a id="delete-huddle" href="#" onClick="if (confirm('Leaving a huddle is a one-way action, are you sure?')) {$('#huddle_delete_form').submit()}" class="text-danger">Leave</a> this huddle (warning: this can not be undone)</p>
+	</form>
+
+	<p class="muted">Participants:</p>
+	{% for profile in content.participants %}
+	<p><a href="{% url 'single-profile' profile.id %}"><img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name }}" align="left" class="gravatar-small" style="width: 24px;"/>{{profile.profile_name}}</a></p>
+	{% endfor %}
+
+	{% if content.meta.permissions.owner %}
+	<p>Invite another participant:</p>
+	<form method="POST" action="{{ content.meta.links.self.href }}/invite/" id="invite_form">
+		{% csrf_token %}
+		<input type="text" name="invite_profile_id">
+		<input class="btn btn-default btn-block" id="invite" type="submit" value="invite user" />
+	</form>
+	{% endif %}
+
+{% endblock %}
+
+{% block js %}
+
+	{% if user %}
+	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
+	<script type="text/javascript">
+		function isEmpty(e) {
+			return (e.val().trim() == '');
+		}
+		function checkEmpty(e) {
+			if (isEmpty($(e))) {
+				addError($(e))
+			} else {
+				removeError($(e))
+			}
+		}
+		function addError(e) {
+			e.parent().addClass('has-error')
+		}
+		function removeError(e) {
+			e.parent().removeClass('has-error')
+		}
+
+		$('#id_markdown').on('change', function() {
+			checkEmpty(this);
+		}).on('blur', function() {
+			checkEmpty(this);
+		});
+
+		$('#commentForm').submit(function() {
+			if (isEmpty($('#id_markdown'))) {
+				addError($('#id_markdown'))
+				return false;
+			}
+
+			// Client-side dupe check
+			md5 = hex_md5($('#id_markdown').val())
+			if (this.md5 && this.md5 == md5) {
+				return false
+			}
+			this.md5 = md5;
+
+			return true;
+		});
+
+		$(document).ready(function() {
+			$('#id_markdown').addClass('form-control').parent().addClass('form-group');
+		});
+	</script>
+	{% endif %}
+{% endblock %}

@@ -14,6 +14,8 @@ from microcosm.views import ErrorView
 from microcosm.views import GeoView
 from microcosm.views import FaviconView
 from microcosm.views import RobotsView
+from microcosm.views import SearchView
+from microcosm.views import HuddleView
 
 
 urlpatterns = patterns('',
@@ -58,6 +60,15 @@ urlpatterns = patterns('',
     url(r'comments/(?P<comment_id>\d+)/$', CommentView.single, name='single-comment'),
     url(r'comments/(?P<comment_id>\d+)/edit/$', CommentView.edit, name='edit-comment'),
     url(r'comments/(?P<comment_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
+    url(r'comments/(?P<comment_id>\d+)/incontext/$', CommentView.incontext, name='incontext-comment'),
+
+    # Huddles
+    url(r'^huddles/$', HuddleView.list, name='list-huddle'),
+    url(r'^huddles/create/$', HuddleView.create, name='create-huddle'),
+    url(r'^huddles/(?P<huddle_id>\d+)/$' , HuddleView.single, name='single-huddle'),
+    url(r'^huddles/(?P<huddle_id>\d+)/leave/$', HuddleView.delete, name='delete-huddle'),
+    url(r'^huddles/(?P<huddle_id>\d+)/invite/$', HuddleView.invite, name='invite-huddle'),
+    url(r'^huddles/(?P<huddle_id>\d+)/newest/$', HuddleView.newest, name='newest-huddle'),
 
     # Updates
     url(r'^updates/$', UpdateView.list, name='list-updates'),
@@ -70,6 +81,8 @@ urlpatterns = patterns('',
     url(r'^profiles/$', ProfileView.list, name='list-profiles'),
     url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),
     url(r'^profiles/(?P<profile_id>\d+)/edit/$', ProfileView.edit, name='edit-profile'),
+
+    url(r'^search/$', SearchView.single, name='single-search'),
 
     # Proxy geocoding requests to the backend
     url(r'^geocode/$', GeoView.geocode, name='geocode'),
