@@ -60,40 +60,53 @@
 
     };
 
-    comments.prototype.generateNewInstanceCommentBox = function(e){
+    comments.prototype.generateNewInstanceCommentBox = function(options){
 
-      var instance = $( this.template );
+      var fragment = $( this.template ),
+          replyto_id = "";
+
+      if(typeof options.ref !== 'undefined'){
+        replyto_id = options.ref;
+      }
+      fragment.find('input[name=inReplyTo]').val(replyto_id);
+
+      console.log('replyTo_id', replyto_id);
+      console.log(fragment.find('input[name=inReplyTo]').val());
 
       this.cleanup();
 
-      instance.simpleEditor = new simpleEditor({
-        el : instance
+      fragment.simpleEditor = new simpleEditor({
+        el : fragment
       });
 
-      this.stack.push(instance);
+      this.stack.push(fragment);
 
-      return instance;
+      return fragment;
     };
 
     comments.prototype.clickHandler = function(e){
 
-      var _this    = e.currentTarget;
+      var _this = e.currentTarget,
+          commentBoxOptions;
 
       if (typeof _this.$ == 'undefined'){
         _this.$  = $(_this);
       }
 
-      if (!_this.$.hasClass('active')){
+      commentBoxOptions = {
+        ref : _this.$.attr('data-ref') || ""
+      };
 
+
+      if (!_this.$.hasClass('active')){
         _this.$.comment_box = $('<div class="generated-comment-box"></div>');
-        _this.$.comment_box.append( this.generateNewInstanceCommentBox() );
+        _this.$.comment_box.append( this.generateNewInstanceCommentBox(commentBoxOptions) );
 
         _this.$
           .addClass('active')
           .after( _this.$.comment_box );
       }else{
-        console.log(_this.$);
-        _this.$.comment_box.toggle();
+        this.cleanup();
       }
       this.toggleDefaultContainer();
 

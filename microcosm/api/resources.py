@@ -1185,42 +1185,14 @@ class Event(APIResource):
         """
 
         collection_url = build_url(host, [cls.api_path_fragment, event_id, 'attendees'])
-        item_url = '%s/%d' % (collection_url, profile_id)
-
-        # See if there is an attendance entry for this profile
-        try:
-            response = requests.get(item_url, params={'access_token': access_token})
-        except RequestException:
-            raise
 
         # If it is not found, POST an attendance
-        if response.status_code == 404:
-            try:
-                post_response = requests.post(collection_url, attendance_data, params={'access_token': access_token})
-            except RequestException:
-                raise
-            try:
-                post_response.json()
-            except ValueError:
-                raise APIException('Invalid JSON returned')
-            return
-        # Attendance record exists, so update it with PUT
-        elif response.status_code >= 200 and response.status_code < 400:
-            try:
-                put_response = requests.post(
-                    item_url,
-                    data=attendance_data,
-                    params={'method': 'PUT', 'access_token': access_token}
-                )
-            except RequestException:
-                raise
-            try:
-                put_response.json()
-            except ValueError:
-                raise APIException('Invalid JSON returned')
-            return
-        else:
-            raise APIException(response.content)
+        try:
+            resource = APIResource.update(collection_url, json.dumps(attendance_data), {'access_token': access_token}, {})
+            print json.dumps(attendance_data)
+        except RequestException:
+            raise
+        return Event.from_api_response(resource)
 
 
 class AttendeeList(object):
@@ -1238,22 +1210,12 @@ class Attendee(object):
     @classmethod
     def from_summary(cls, data):
         attendee = cls()
-        attendee.attendee_id = data['profileId']
-        attendee.attendee = Profile(data['profile'])
+        attendee.profile_id = data['profileId']
+        attendee.profile = Profile.from_summary(data['profile'])
         attendee.rsvp = data['rsvp']
         attendee.rsvpd_on = data['rsvpdOn']
         attendee.meta = Meta(data['meta'])
         return attendee
-
-    class AttendeeRecord(object):
-        def __init__(self, data):
-            self.site_id = data['siteId']
-            self.user_id = data['userId']
-            self.profile_name = data['profileName']
-            self.visible = data['visible']
-            if data.get('avatar'):
-                self.avatar = data['avatar']
-            self.meta = Meta(data['meta'])
 
 
 class Comment(APIResource):
