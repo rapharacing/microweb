@@ -758,12 +758,21 @@ class EventView(object):
             event = Event.from_api_response(responses[event_url])
             comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
 
+
+            user = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
+
+
             attendees           = AttendeeList(responses[att_url])
             attendees_yes       = []
             attendees_invited   = []
+            user_is_attending   = False
             for attendee in attendees.items.items:
                 if attendee.rsvp == "yes":
                     attendees_yes.append(attendee)
+
+                    if (attendee.profile.id == user.id):
+                        user_is_attending = True
+
                 elif attendee.rsvp == "invited":
                     attendees_invited.append(attendee)
 
@@ -781,28 +790,34 @@ class EventView(object):
                 'end'   : end_date
             }
 
-            #attendees
+            #rsvp
+            rsvp_limit    = int(responses[event_url]['rsvpLimit'])
+            num_attending = len(attendees_yes)
+            rsvp_percentage = (num_attending/float(rsvp_limit))*100 if rsvp_limit > 0 else 0
+
+            if (num_attending > 0 and rsvp_percentage < 10):
+                rsvp_percentage = 10
+
 
             view_data = {
-                'user'              : Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+                'user'              : user,
                 'site'              : request.site,
                 'content'           : event,
                 'comment_form'      : comment_form,
                 'pagination'        : build_pagination_links(responses[event_url]['comments']['links'], event.comments),
                 'item_type'         : 'event',
+
                 'attendees'         : attendees,
                 'attendees_yes'     : attendees_yes,
                 'attendees_invited' : attendees_invited,
+                'user_is_attending' : user_is_attending,
 
                 'event_dates'       : event_dates,
 
-                'rsvp_num_attending': len(attendees_yes),
-                'rsvp_num_invited'  : len(attendees_invited)
-
+                'rsvp_num_attending': num_attending,
+                'rsvp_num_invited'  : len(attendees_invited),
+                'rsvp_percentage'   : rsvp_percentage
             }
-
-            if event.rsvp_limit:
-                view_data['rsvp_percentage'] = int((len(attendees_yes)/event.rsvp_limit)*100)
 
             return render(request, EventView.single_template, view_data)
 

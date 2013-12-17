@@ -70,19 +70,25 @@
 
           {% if content.rsvp_attend %}
           <div class="item-event-attending-people">
-            <ul class="list-people list-people-sm">
-            {% for item in attendees.items.items %}
-              {% if item.rsvp == "yes" %}
+            <ul class="list-people list-people-md">
+            {% for attendee in attendees.items.items %}
+              {% if attendee.rsvp == "yes" %}
                 <li>
-                  <a href="{% url 'single-profile' item.attendee_id %}">
-                    <img src="{% if 'gravatar' in item.attendee.avatar %}{{ item.attendee.avatar }}{% elif 'files' in  item.attendee.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ item.attendee.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.attendee.profile_name }}" />
+                  <a href="{% url 'single-profile' attendee.profile_id %}" title="{{ attendee.profile.profile_name }}">
+                    <img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name }}" />
                   </a>
                 </li>
               {% endif %}
             {% endfor %}
             </ul>
-            {{ content.rsvp_attend }}
-            <span>and <a href="javascript:void 0">{{ attendees.items|length }} others</a> are attending this event</span>
+            <span>
+              {% if rsvp_num_attending > 4 %}
+              and <a href="javascript:void 0">{{ rsvp_num_attending|add:"-4" }} others</a> are
+              {% else %}
+              is
+              {% endif %}
+              attending this event.
+            </span>
           </div>
           {% endif %}
 
@@ -101,7 +107,7 @@
                      aria-valuemin="0"
                      aria-valuemax="100"
                      style="width: {{rsvp_percentage}}%;">
-                  <span class="sr-only">60% Complete</span>
+                  <span class="sr-only">{{rsvp_percentage}}% Complete</span>
                 </div>
               </div>
               <strong>
@@ -125,21 +131,22 @@
           </li>
         </ul>
 
-        <h3>Are you attending this event?</h3>
-        {% if user %}
-          <form method="POST" action="{% url 'rsvp-event' content.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="rsvp" value="yes" />
-            <input type="submit" class="btn btn-lg btn-primary" value="Yes, I'm attending!" />
-          </form>
-
-          {% comment %}
+        {% if user_is_attending %}
+          <h3>You attending this event.</h3>
           <form method="POST" action="{% url 'rsvp-event' content.id %}">
             {% csrf_token %}
             <input type="hidden" name="rsvp" value="no" />
             <input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default">
           </form>
-          {% endcomment %}
+        {% else %}
+          <h3>Are you attending this event?</h3>
+          {% if user %}
+            <form method="POST" action="{% url 'rsvp-event' content.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="rsvp" value="yes" />
+              <input type="submit" class="btn btn-lg btn-primary" value="Yes, I'm attending!" />
+            </form>
+          {% endif %}
         {% endif %}
       </div>
 
