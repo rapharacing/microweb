@@ -146,6 +146,38 @@
       _this.style.minHeight = _this.scrollHeight + 'px';
     };
 
+
+    simpleEditor.prototype.clearAttachmentGallery = function(e){
+      this.$el.find('.reply-box-attachments-gallery').html("");
+      this.fileHandler.clear();
+    };
+
+
+    simpleEditor.prototype.renderAttachmentGallery = function(files){
+      var ul,li,img;
+
+      ul = document.createElement('ul');
+
+      if(files.length>0){
+        for(var i=0,j=files.length;i<j;i++){
+          img = document.createElement('img');
+          img.src = files[i].data;
+          li = document.createElement('li');
+          li.appendChild(img);
+          ul.appendChild(li);
+        }
+      }
+      this.$el.find('.reply-box-attachments-gallery').html(ul);
+    };
+
+
+    simpleEditor.prototype.removeAttachmentFile = function(e){
+      var self = $(e.currentTarget);
+      console.log(self, this.fileHandler, self.index());
+      this.fileHandler.removeFile(self.index());
+    };
+
+
     simpleEditor.prototype.bind = function(){
 
       // only binds for elements inside this.$el.display
@@ -157,15 +189,36 @@
         ['click',    '.se-link',    'link'],
         ['click',    '.se-list',    'list'],
         ['click',    '.se-image',   'image'],
-        ['keyup',    'textarea',    'calcTextareaHeight']
+        ['keyup',    'textarea',    'calcTextareaHeight'],
+        ['reset',    'form',        'clearAttachmentGallery'],
+
+        ['click',    '.reply-box-attachments-gallery li', 'removeAttachmentFile']
+
       ];
 
       for(var i in events){
         this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );
       }
 
+      // add validation
       if (typeof Validator !== 'undefined'){
         new Validator( this.form[0], { rules : { 'markdown' : 'not_empty' } });
+      }
+
+      // add attachments
+      if (typeof FileHandler !== 'undefined'){
+        this.fileHandler = new FileHandler({
+          el : this.$el.find('.reply-box-attachments')[0],
+          dropzone : '.reply-box-drop-zone, .reply-box-attachments-gallery'
+        });
+
+        this.fileHandler.onDragged($.proxy(function(files){
+          this.renderAttachmentGallery(files);
+        },this));
+
+        this.fileHandler.onRemove($.proxy(function(files){
+          this.renderAttachmentGallery(files);
+        },this));
       }
 
     };
