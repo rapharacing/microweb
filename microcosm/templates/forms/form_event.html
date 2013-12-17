@@ -1,0 +1,393 @@
+{% extends 'microweb_templates/base.html' %}
+{% block content %}
+<div class="content-header padded">
+  <div class="row">
+    <div class="col-sm-12">
+    </div>
+  </div>
+  <h1>
+    {% if form.id > 0 %}
+    Edit event
+    {% else %}
+    Start an event
+    {% endif %}
+  </h1>
+
+</div>
+
+<div class="content-body">
+
+  <div class="row form-container">
+    <div class="col-xs-12">
+      <div class="form-container-inner padded">
+
+        <form class="form-create-event" role="form" action="" method="POST">
+
+          {% csrf_token %}
+          {{ form.microcosmId }}
+          {{ form.id }}
+
+          {{ form.sticky }}
+          {{ form.moderated }}
+          {{ form.visible }}
+          {{ form.deleted }}
+
+
+          <!-- Hidden fields hard-coded for integration with the JavaScript UI.
+          Check /microcosm/forms/forms.py for what fields should exist. -->
+          <input type="hidden" name="lat"      id="id_lat"      value="{{ form.lat.value }}" />
+          <input type="hidden" name="lon"      id="id_lon"      value="{{ form.lon.value }}" />
+          <input type="hidden" name="north"    id="id_north"    value="{{ form.north.value }}" />
+          <input type="hidden" name="east"     id="id_east"     value="{{ form.east.value }}" />
+          <input type="hidden" name="south"    id="id_south"    value="{{ form.south.value }}" />
+          <input type="hidden" name="west"     id="id_west"     value="{{ form.west.value }}" />
+
+          <input type="hidden" name="when"     id="id_when"     value="{{ form.when.value|date:"c\Z" }}" />
+          <input type="hidden" name="duration" id="id_duration" value="{{ form.duration.value }}" />
+
+          {# title #}
+          <div class="form-group">
+            <div class="row">
+              <label class="col-sm-12" for="title">
+                {{ form.title.label }}
+              </label>
+
+              <div class="col-sm-12">
+                {% if form.errors.title %}
+                  <div class="text-error">{{ form.errors.title.as_text }}</div>
+                {% endif %}
+                <input type="text"
+                       class="form-control"
+                       id="title"
+                       name="{{ form.title.name }}"
+                       value="{{ form.title.value }}"
+                       placeholder="Title of event" />
+              </div>
+            </div>
+          </div> <!-- /form-group -->
+
+          {# reason #}
+          {% if form.id > 0 %}
+          <div class="form-group">
+            <div class="row">
+              <label class="col-sm-12" for="editReason">
+                {{ form.editReason.label }}
+              </label>
+              <div class="col-sm-12">
+                {% if form.errors.editReason %}
+                  <div class="text-error">{{ form.errors.editReason.as_text }}</div>
+                {% endif %}
+                <input type="text"
+                       class="form-control {% if form.errors.editReason %}error{% endif %}"
+                       id="editReason"
+                       name="{{ form.editReason.name }}"
+                       placeholder="Reason for editing" />
+              </div>
+            </div>
+          </div> <!-- /form-group -->
+          {% endif %}
+
+          {# event date options #}
+          <div class="form-group">
+            <div class="row" id="event-date-type-options">
+              <label class="col-sm-12">When does your event begin?</label>
+              {% if form.errors.when %}
+                <div class="text-error">{{ form.errors.when.as_text }}</div>
+              {% endif %}
+              <div class="col-sm-3 col-lg-2">
+                <div class="radio">
+                  <label>
+                    <input type="radio" id="date-type" name="date-type" value="1" checked="checked" /> Single day
+                  </label>
+                </div>
+              </div>
+              <div class="col-sm-3 col-lg-2">
+                <div class="radio">
+                  <label>
+                    <input type="radio" id="date-type" name="date-type" value="2"/> Multiple days
+                  </label>
+                </div>
+              </div>
+              <div class="col-sm-3 col-lg-2">
+                <div class="radio">
+                  <label>
+                    <input type="radio" id="date-type" name="date-type" value="0"/>
+                    <abbr title="To Be Announced - select this option if you have not yet set a date">TBA</abbr>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div> <!-- /form-group -->
+
+          {# event date start #}
+          <div class="form-group form-datepicker">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div id="event-start-calendar">
+                      <div class="event-start-calendar-label">Start</div>
+                      <div class="event-start-calendar-contents"  data-date="2013-01-01"></div>
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                      <select>
+                        <option>Select a time</option>
+                        {% for hour in '123456789012345678901234'%}
+                          {% for minute in '1234'%}
+                            <option value="{% if forloop.parentloop.counter0 < 10 %}0{% endif %}{{ forloop.parentloop.counter0 }}{% cycle '00' '15' '30' '45' %}">
+                              {% if forloop.parentloop.counter0 < 10 %}0{% endif %}{{ forloop.parentloop.counter0 }}:{% cycle '00' '15' '30' '45' %}
+                            </option>
+                          {% endfor %}
+                        {% endfor %}
+                      </select>
+                      <span class="form-datepicker-single">to</span>
+                      <select class="form-datepicker-single">
+                        <option>Select a time</option>
+                        {% for hour in '123456789012345678901234'%}
+                          {% for minute in '1234'%}
+                            <option value="{% if forloop.parentloop.counter0 < 10 %}0{% endif %}{{ forloop.parentloop.counter0 }}{% cycle '00' '15' '30' '45' %}">
+                              {% if forloop.parentloop.counter0 < 10 %}0{% endif %}{{ forloop.parentloop.counter0 }}:{% cycle '00' '15' '30' '45' %}
+                            </option>
+                          {% endfor %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                </div>
+              </div>
+
+              {# event date end #}
+              <div class="col-sm-6 form-datepicker form-datepicker-multiple">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div id="event-end-calendar">
+                      <div class="event-start-calendar-label">Finish</div>
+                      <div class="event-start-calendar-contents" data-date="2013-01-01"></div>
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                      <select>
+                        <option>Select a time</option>
+                        {% for hour in '123456789012345678901234'%}
+                          {% for minute in '1234'%}
+                            <option value="{% if forloop.parentloop.counter0 < 10 %}0{% endif %}{{ forloop.parentloop.counter0 }}{% cycle '00' '15' '30' '45' %}">
+                              {% if forloop.parentloop.counter0 < 10 %}0{% endif %}{{ forloop.parentloop.counter0 }}:{% cycle '00' '15' '30' '45' %}
+                            </option>
+                          {% endfor %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <!-- /form-group -->
+
+          <div class="clearfix"></div>
+
+          {# event location options #}
+          <div class="form-group">
+            <div class="row" id="location-options">
+              <label class="col-sm-12">Where is your event being held?</label>
+
+              <div class="col-sm-3 col-lg-2">
+                {% if form.errors.where %}
+                    <div class="text-error">{{ form.errors.where.as_text }}</div>
+                {% endif %}
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="location-type" value="1" checked="checked" /> Enter a location
+                  </label>
+                </div>
+              </div>
+              <div class="col-sm-3 col-lg-2">
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="location-type" value="0"/>
+                    <abbr title="To Be Announced - select this option if you have not yet set a location">TBA</abbr>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div> <!-- /form-group -->
+
+          {# event location #}
+          <div class="form-group form-location">
+            <div class="row">
+              <div class="col-sm-6">
+                <textarea id="location"
+                          class="form-control event-location-textarea"
+                          name="{{ form.where.name }}">{{ form.where.value }}</textarea>
+                <div class="row">
+                  <div class="col-sm-5 col-sm-offset-7">
+                    <a href="javascript:void 0"
+                       id="locate"
+                       class="btn btn-block btn-default">Show on map</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div id="map-canvas"></div>
+              </div>
+
+            </div>
+          </div> <!-- /form-group -->
+
+          {# event attendees #}
+          <div class="form-group attendee-options">
+            <div class="row">
+              <label class="col-sm-12" for="location">
+                {{ form.rsvpLimit.label }}
+              </label>
+              <div class="col-sm-2">
+                {% if form.errors.rsvpLimit %}
+                    <div class="text-error">{{ form.errors.rsvpLimit.as_text }}</div>
+                  {% endif %}
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="attendee-limit-option" value="0" checked="checked"/>
+                    No limit
+                  </label>
+                </div>
+
+              </div>
+              <div class="col-sm-5">
+                <div class="row">
+                  <div class="col-xs-8">
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="attendee-limit-option" value="1"/>
+                        Max number of attendees is
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-xs-4">
+                    <input type="number"
+                           class="form-control"
+                           name="{{ form.rsvpLimit.name }}"
+                           min="0"
+                           max="999"
+                           value="{{ form.rsvpLimit.value }}"
+                           disabled />
+                  </div>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- /form-group -->
+
+
+        {# event invites #}
+        <div class="form-group">
+          <div class="row">
+
+            <label class="col-sm-12" for="invite"><span>Optional.</span> Do you wish to invite others to your event?</label>
+
+            <div class="col-sm-6">
+              <div class="input-group">
+                <div class="input-group-addon">
+                  <span class="glyphicon glyphicon-search"></span>
+                </div>
+                <input id="invite" name="invite" class="form-control" placeholder="Type in a user's name"/>
+              </div>
+            </div>
+
+          </div>
+        </div> <!-- /form-group -->
+
+        {# comment #}
+        <div class="form-group">
+          <div class="row">
+            <label class="col-sm-12" for="reply-box-textarea">What is it you want to say?</label>
+            <div class='col-sm-12'>
+              {% include 'microweb_templates/form_component_textarea.html' %}
+            </div>
+          </div>
+        </div> <!-- /form-group -->
+
+
+      </div> <!-- /form-container-inner -->
+
+        <div class="form-group form-footer padded">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-footer-buttons">
+                <input type="submit" class="btn btn-lg btn-primary" value="Create event">
+                <input type="reset" class="btn btn-lg btn-default" value="Cancel">
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+
+    </div>
+  </div>
+</div>
+
+<div class="row content-footer">
+</div>
+
+{% endblock content %}
+{% block sidebar %}
+  {# if content.meta.permissions.create #}
+    <div class="metabar-module">
+      <h5>Got something to add?</h5>
+      <div class="metabar-module-primary-buttons">
+        <a href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary">
+          <span class="glyphicon glyphicon-comment"></span> Start a conversation
+        </a>
+        <a href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary">
+          <span class="glyphicon glyphicon-calendar"></span> Start an event
+        </a>
+      </div>
+    </div> <!-- primary actions -->
+  {# endif #}
+
+
+  <div class="metabar-module">
+    <h5>About</h5>
+    <div class="metabar-module-title">
+      <h3>
+        {{ content.title }}
+      </h3>
+
+      {% include 'forms/subscribe.html' %}
+
+      <p>
+        {{ content.description }}
+      </p>
+      <p class="metabar-module-author">
+        <a href="{% url 'single-profile' content.meta.created_by.id %}">
+          <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
+          @{{ content.meta.created_by.profile_name|truncatechars:25 }}
+        </a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+      </p>
+    </div>
+  </div> <!-- / about -->
+{% endblock metabar %}
+
+
+
+{% block js %}
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap_datepicker.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/event_form.js"></script>
+
+<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+<script type="text/javascript">
+  (function(){
+
+    var se = new simpleEditor({
+      el : '.reply-box'
+    });
+
+  })();
+</script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.js"></script>
+<script src="https://maps.google.com/maps/api/js?v=3.2&key=AIzaSyAQiDoalPm41b4e-tuIecK39xoaPPV5k3E&sensor=false"></script>
+
+
+
+
