@@ -44,6 +44,7 @@
       for(var i=0,j=this.stack.length;i<j;i++){
         this.stack.pop();
       }
+      this.input.files = this.stack;
     };
 
     fileHandler.prototype.parse = function(files){
@@ -57,6 +58,8 @@
       this.input.files = files;
       this.callback_counter = this.input.files.length;
 
+      // ugly way of keeping track of the reader.onload async events
+      // we only want to call our ondragged callback when all "files" have been loaded
       callback = $.proxy(function(e,i){
         this.stack.push($.extend({},this.input.files[i],{data:e.target.result}));
 
@@ -68,10 +71,15 @@
         }
       },this);
 
+
+      // loops and reads through all files recieved, skips files which are not images
       for(var i=0,j=files.length;i<j;i++){
         if (files[i].type.match('image.*')){
 
           reader = new FileReader();
+
+          // we want to call the callback but keep this context of "this" within this
+          // object and pass through "i" as a counter
           reader.onload = (function(i){
             return function(e){
               callback(e,i);

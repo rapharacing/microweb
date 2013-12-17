@@ -211,7 +211,7 @@
           el : this.$el.find('.reply-box-attachments')[0],
           dropzone : '.reply-box-drop-zone, .reply-box-attachments-gallery'
         });
-
+        // this callback fires when dropped event fires and all files are collected
         this.fileHandler.onDragged($.proxy(function(files){
           this.renderAttachmentGallery(files);
         },this));

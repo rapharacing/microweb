@@ -32,7 +32,7 @@
       this.$form  = $(this.form);
 
       this.errors = [];
-      this.initalState = this.getSerializedForm();
+      this.initialState = this.getSerializedForm();
 
       // tests
       this.tests = {
@@ -69,11 +69,11 @@
       for(var i=0,j=serializedArray.length;i<j;i++){
         serializedArrayToString.push( serializedArray[i].name + '=' + serializedArray[i].value );
       }
-      return serializedArrayToString.join('&');
+      return $.trim(serializedArrayToString.join('&'));
     };
 
     validator.prototype.not_duplicate = function(value){
-      return this.getSerializedForm() !== this.initialState;
+      return this.getSerializedForm() === this.initialState;
     };
 
 
@@ -111,6 +111,7 @@
 
       if (this.errors.length>0){
         e.preventDefault();
+        console.log(this.errors);
         return this.errors;
       }
     };
