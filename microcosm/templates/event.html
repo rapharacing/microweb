@@ -104,6 +104,8 @@
 {% endblock %}
 
 {% block js %}
+
+{% if content.comments.page == 1 %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.js"></script>
 <script src="https://maps.google.com/maps/api/js?v=3.2&key=AIzaSyAQiDoalPm41b4e-tuIecK39xoaPPV5k3E&sensor=false"></script>
 
@@ -123,7 +125,7 @@ eventMap.restore(
     [ {{ content.south|default:"null" }}, {{ content.east|default:"null" }} ]
   ]
 );
-
+{% endif %}
 </script>
 
 <script type="text/javascript" src="{{STATIC_URL}}js/comments.js"></script>
@@ -138,4 +140,23 @@ eventMap.restore(
 
   })();
 </script>
+
+{% if content.comments.page > 1 %}
+{% comment %}
+Toggle for event single page item event div for small screens
+{% endcomment %}
+<script type="text/javascript">
+  (function(){
+    // expanding item-event-div
+    $('.item-event-expand-handle').on('click',function(){
+      if ($('.item-event-compact').hasClass('item-event-expanded')){
+        $('.item-event-compact').removeClass('item-event-expanded');
+      }else{
+        $('.item-event-compact').addClass('item-event-expanded');
+      }
+    });
+  })();
+</script>
+{% endif %}
+
 {% endblock js %}
