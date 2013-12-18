@@ -27,17 +27,15 @@
             </strong>
           </a>
 
-          {% comment %}
-          {% if comment.is_in_reply_to %}
+          {% if comment.in_reply_to %}
           <span class="glyphicon glyphicon-arrow-right"></span>
           <span>
             in reply to
-            <a href="{% url 'comments' comment.replied_to_parent_comment.item.microcosm.name|slugify comment.replied_to_parent_comment.item.name|slugify comment.replied_to_parent_comment.id %}">
-              {{ comment.replied_to_parent_comment.author.name }}
+            <a href="{% url 'single-comment' comment.in_reply_to %}">
+              [FIXME]
             </a>
           </span>
           {% endif %}
-          {% endcomment %}
         </div>
 
       </div>
