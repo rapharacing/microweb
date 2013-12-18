@@ -68,7 +68,7 @@
 
         <li class="item-event-attending-container">
 
-          {% if content.rsvp_attend %}
+          {% if rsvp_num_attending > 0 %}
           <div class="item-event-attending-people">
             <ul class="list-people list-people-md">
             {% for attendee in attendees.items.items %}
@@ -132,7 +132,7 @@
         </ul>
 
         {% if user_is_attending %}
-          <h3>You attending this event.</h3>
+          <h3>You are attending this event.</h3>
           <form method="POST" action="{% url 'rsvp-event' content.id %}">
             {% csrf_token %}
             <input type="hidden" name="rsvp" value="no" />

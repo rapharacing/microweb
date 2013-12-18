@@ -112,10 +112,16 @@
 
     };
 
+    comments.prototype.reset = function(){
+      this.cleanup();
+      this.toggleDefaultContainer();
+    };
+
     comments.prototype.bind = function(){
 
       var events = [
-        ['click', '.insertReplyBox', 'clickHandler']
+        ['click', '.insertReplyBox', 'clickHandler'],
+        ['reset', 'form',            'reset']
       ];
 
       for(var i in events){
