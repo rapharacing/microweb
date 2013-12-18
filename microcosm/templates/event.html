@@ -39,13 +39,14 @@
   </div> <!-- item -->
 </div> <!-- / content-body -->
 
+<a name="reply"></a>
 <div class="reply-container">
   <ul class="list-comments">
     <li class="comment-item">
       <div class="comment-item-inner">
         <div class="comment-item-header">
           <div class="comment-item-author">
-              <img src="{{ STATIC_URL }}{{ user.avatar}}" />
+              <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
               <strong>Post a reply</strong>
           </div>
         </div>
@@ -73,7 +74,7 @@
   <div class="metabar-module">
     <h5>Got something to add?</h5>
     <div class="metabar-module-primary-buttons">
-      <a href="#" class="btn btn-large btn-block btn-primary">
+      <a id="post-a-reply-handle" href="#reply" class="btn btn-large btn-block btn-primary">
         <span class="glyphicon glyphicon-comment"></span> Post a reply
       </a>
     </div>
@@ -128,19 +129,37 @@ eventMap.restore(
 {% endif %}
 </script>
 
+{% if user %}
 <script type="text/javascript" src="{{STATIC_URL}}js/comments.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+
 <script type="text/javascript">
-  (function(){
+(function(){
 
-    var se = new simpleEditor({
-      el : '.reply-box'
-    });
+  var comments = new Comments({
+    el               : '.content-body',
+    defaultContainer : '.reply-container',
+    template         : $('.reply-container .comment-item-body').html().trim()
+  });
 
-  })();
+  var replyBox = new simpleEditor({
+    el : '.reply-box'
+  });
+
+  $('#post-a-reply-handle').on('click',function(e){
+    var selectedText = Comments.prototype.getWindowSelectedText();
+    if (selectedText){
+      replyBox.textarea.value = selectedText;
+      replyBox.quote();
+    }
+  });
+
+})();
 </script>
+
+{% endif %} {# endif user #}
 
 {% if content.comments.page > 1 %}
 {% comment %}
@@ -158,6 +177,6 @@ Toggle for event single page item event div for small screens
     });
   })();
 </script>
-{% endif %}
+{% endif %} {# endif contents.comments.page > 1 #}
 
 {% endblock js %}
