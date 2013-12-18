@@ -1180,6 +1180,23 @@ class CommentView(object):
         else:
             return HttpResponseNotAllowed()
 
+
+    @staticmethod
+    @exception_handler
+    def source(request, comment_id):
+        """
+        Retrieve the markdown source for a comment.
+        """
+        if request.access_token is None:
+            raise PermissionDenied
+        response = Comment.source(
+            request.META['HTTP_HOST'],
+            comment_id,
+            request.access_token
+        )
+        return HttpResponse(response, content_type='application/json')
+
+
 class UpdateView(object):
 
     list_template = 'updates.html'
