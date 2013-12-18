@@ -23,10 +23,11 @@
 
         {% else %} {# else has content.updates.items #}
 
-        <ul class="list-collection">
+        <ul class="list-collection bordered padded">
           {% for update in content.updates.items %}
             <li class="list-collection-row">
               <div class="row">
+
                 <div class="col-sm-10">
 
                   <div class="list-collection-row-icon">
@@ -49,14 +50,16 @@
                   </div> <!--/list-collection-row-icon -->
 
                   <div class="list-collection-row-offset">
-                    <div class="row-title-wrapper">
 
+
+                    <div class="row-title-wrapper">
                       {# new comment #}
                       {% if update.update_type == "new_comment" %}
 
                         <a href="{{ update.parent_link }}/newest/">
                           <h3 class="row-title">{{ update.parent_item.title }}</h3>
                         </a>
+                        <span class="label label-warning">NEW COMMENT</span>
 
                       {# reply to comment #}
                       {% elif update.update_type == "reply_to_comment" %}
@@ -77,8 +80,17 @@
                         </a> mentioned you in
                         <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
 
-                        <div class="microcosm-item-update-text">
-                          {{ update.item.html|safe }}
+                        <div class="row-meta">
+
+                          <div class="row-meta-excerpt">
+                            <a href="{% url 'single-profile' update.item.meta.created_by.id %}">
+                              <img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
+                            </a>
+                            <div class="row-meta-excerpt-text">
+                              {{ update.item.html|safe }}
+                            </div>
+                          </div>
+
                         </div>
 
                       {# new comment in huddle #}
@@ -150,11 +162,18 @@
                         {% elif update.item_type == "poll" %}
                           poll
                         {% endif %}
-                      </a> • <time datetime="{{ update.meta.created|date:"c" }}">{{ update.meta.created|timesince }}</time>
+                      </a>
                     </div> <!-- /row-meta -->
 
                   </div> <!-- /list-row-collection-offset -->
                 </div>
+
+                <div class="col-sm-2">
+                  <div class="row-timesince">
+                    <time datetime="{{ update.meta.created|date:"c" }}">{{ update.meta.created|timesince }}</time>
+                  </div>
+                </div>
+
               </div> <!-- /row -->
             <li>
           {% endfor %}

@@ -130,7 +130,9 @@
                     <a href="{% url 'single-profile' result.item.meta.created_by.id %}">
                       <img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
                     </a>
-                    <p>{{ result.highlight|safe }}</p>
+                    <div class="row-meta-excerpt-text">
+                      {{ result.highlight|safe }}
+                    </div>
                   </div>
                   {% endif %}
 
