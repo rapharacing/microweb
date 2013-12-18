@@ -141,6 +141,7 @@ class Site(object):
         self.subdomain_key = data['subdomainKey']
         self.domain = data['domain']
         self.owned_by = Profile(data['ownedBy'])
+        self.meta = Meta(data['meta'])
 
         # Custom tracking is optional
         if data.get('gaWebPropertyId'): self.ga_web_property_id = data['gaWebPropertyId']
@@ -484,6 +485,11 @@ class Meta(object):
                     self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1',''), 'title': item['title']}
                 else:
                     self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1','')}
+        if data.get('stats'):
+            self.stats = {}
+            for stat in data['stats']:
+                if stat.get('metric'):
+                    self.stats[stat.get('metric')] = stat['metric']
 
 class PermissionSet(object):
     """
