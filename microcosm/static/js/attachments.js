@@ -25,6 +25,8 @@
       }
       this.input = this.$el.find('input[type=file]')[0];
 
+      this.event_type = false;
+
       this.stack = [];
       this.bind();
 
@@ -68,6 +70,7 @@
           if(typeof this.onDragged !== 'undefined' && typeof this.onDragged === 'function'){
             this.onDragged(this.stack);
           }
+          this.event_type = false;
         }
       },this);
 
@@ -109,7 +112,11 @@
     };
 
     fileHandler.prototype.changeHandler = function(e){
-      //this.parse(e.target.files);
+        if (!this.event_type){
+          console.log('change event');
+          this.event_type = "changed";
+          this.parse(e.target.files);
+        }
     };
 
     fileHandler.prototype.dragHandler = function(e){
@@ -120,20 +127,28 @@
     fileHandler.prototype.dropHandler = function(e){
       e.stopPropagation();
       e.preventDefault();
-      this.parse(e.originalEvent.dataTransfer.files);
+      if (!this.event_type){
+        this.event_type = "dropped";
+        console.log('drop event');
+        this.parse(e.originalEvent.dataTransfer.files);
+      }
     };
 
     fileHandler.prototype.bind = function(){
 
       var events = [
-        ['change',    'input[type=file]', 'changeHandler'],
-        ['drop',      this.dropzone,      'dropHandler'],
-        ['dragover',  this.dropzone,      'dragHandler']
+        ['change',    'input[type=file]', 'changeHandler']
+        // ['drop',      this.dropzone,      'dropHandler'],
+        // ['dragover',  this.dropzone,      'dragHandler']
       ];
 
       for(var i in events){
         this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );
       }
+
+      this.$el.on('dragover', $.proxy(this.dragHandler,this));
+      this.$el.on('drop', $.proxy(this.dropHandler,this));
+
     };
 
     return fileHandler;
