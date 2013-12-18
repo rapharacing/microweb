@@ -1312,6 +1312,13 @@ class Comment(APIResource):
         response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
         return response.json()['data']
 
+    @staticmethod
+    def source(host, id, access_token=None):
+        url = build_url(host, [Comment.api_path_fragment, id])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.content
+
+
 class GeoCode(object):
     """
     Used for proxying geocode requests to the backend.
