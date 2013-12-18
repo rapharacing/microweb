@@ -50,13 +50,16 @@
         </div>
       {% if user %}
         {% if not comment.meta.created_by.id == user.id %}
-            <a class="insertReplyBox" data-ref="{{ comment.meta.created_by.id }}" href="javascript:void 0">
+            <a class="insertReplyBox"
+               data-ref="{{ comment.meta.created_by.id }}" href="javascript:void 0">
               <span class="glyphicon glyphicon-arrow-left"></span>
               Reply to
               <strong>@{{ comment.meta.created_by.profile_name|truncatechars:25 }}</strong>
             </a>
         {%else%}
-          <a class="insertReplyBox" href="javascript:void 0">Edit</a>
+          <a class="insertReplyBox"
+             data-comment-id="{{ comment.id }}"
+             href="javascript:void 0">Edit</a>
         {% endif %}
       {% endif %}
       </div>

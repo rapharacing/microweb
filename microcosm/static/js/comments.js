@@ -84,6 +84,17 @@
       return fragment;
     };
 
+    comments.prototype.fetchCommentSource = function(comment_id){
+
+      // FIXME: possible bug with relative path, need to get absolute
+      return $.ajax({
+        url  : 'comments/'+comment_id+"/source",
+        type : 'GET'
+      });
+
+    };
+
+
     comments.prototype.clickHandler = function(e){
 
       var _this = e.currentTarget,
@@ -94,17 +105,37 @@
       }
 
       commentBoxOptions = {
-        ref : _this.$.attr('data-ref') || ""
+        ref   : _this.$.attr('data-ref') || ""
       };
 
-
       if (!_this.$.hasClass('active')){
+
         _this.$.comment_box = $('<div class="generated-comment-box"></div>');
         _this.$.comment_box.append( this.generateNewInstanceCommentBox(commentBoxOptions) );
 
         _this.$
           .addClass('active')
           .after( _this.$.comment_box );
+
+        // FIXME: not flexible, could be better
+        if(_this.$.attr('data-comment-id')){
+
+          _this.$.comment_box.find('textarea').attr('placeholder','Loading... Please wait...');
+
+          this.fetchCommentSource(_this.$.attr('data-comment-id'))
+              .success($.proxy(function(response){
+                this.$.comment_box
+                      .find('textarea')
+                      .attr('placeholder','Enter your text here...')
+                      .val(response.data.markdown);
+              },_this))
+              .error($.proxy(function(){
+                this.$.comment_box
+                      .find('textarea')
+                      .attr('placeholder','Enter your text here...');
+              },_this));
+        }
+
       }else{
         this.cleanup();
       }
