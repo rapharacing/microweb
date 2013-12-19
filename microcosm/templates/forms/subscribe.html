@@ -1,26 +1,26 @@
 {% if user %}
   <div class="subscribe {% if content.meta.flags.watched %}active{% endif %}">
 
-  {% if not content.meta.flags.watched %}
   <form method="POST" action="" id="subscribe_form">
     {% csrf_token %}
-    <input type="hidden" name="update_type_id" value="8">
-  {% endif %}
+    <input type="hidden" name="update_type_id" value="1">
 
-    <button class="btn btn-xsmall btn-primary {% if content.meta.flags.watched %}btn-success{% endif %}">
+    <button id="subscribe_button" class="btn btn-xsmall btn-primary {% if content.meta.flags.watched %}btn-success{% endif %}">
       <span class="glyphicon glyphicon-ok"></span>
       <strong>
-        {% if content.meta.flags.watched %}Subscribe{%else%}Added to updates{% endif %}
+        {% if content.meta.flags.watched %}Added to updates{%else%}Subscribe{% endif %}
       </strong>
     </button>
 
-  {% if not content.meta.flags.watched %}
   </form>
-  {% endif %}
 
-    <div class="subscribe-meta" {% if content.meta.flags.watched %}style="display:block"{% endif %}>
+    <div class="subscribe-meta" {% if content.meta.flags.watched %}style="display: block;"{% else %}style="display: none;"{% endif %}>
+      <form method="POST" action="" id="email_me_form">
+      {% csrf_token %}
       <span class="glyphicon glyphicon-arrow-right"></span>
-      <label><input type="checkbox" checked="checked"/> Instantly notify me by email</label>
+        <label><input type="checkbox" id="emailme" /> Instantly notify me by email</label>
+      </form>
     </div>
   </div>
 {% endif %}
+

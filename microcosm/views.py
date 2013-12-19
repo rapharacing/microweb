@@ -66,7 +66,6 @@ from microcosm.forms.forms import ProfileEdit
 from microcosm.forms.forms import HuddleCreate
 from microcosm.forms.forms import HuddleEdit
 
-
 def exception_handler(view_func):
     """
     Decorator for view functions that raises appropriate
@@ -462,6 +461,7 @@ class ProfileView(object):
         responses = response_list_to_dict(grequests.map(request.view_requests))
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+            'item_type': 'profile',
             'site': request.site
         }
 
@@ -588,6 +588,7 @@ class MicrocosmView(object):
                 'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
                 'site': request.site,
                 'content': microcosm,
+                'item_type': 'microcosm',
                 'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
             }
 
@@ -629,6 +630,7 @@ class MicrocosmView(object):
             'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site,
             'content': microcosms,
+            'item_type': 'site',
             'pagination': build_pagination_links(responses[microcosms_url]['microcosms']['links'], microcosms.microcosms)
         }
 
@@ -1302,6 +1304,48 @@ class WatcherView(object):
             return HttpResponseRedirect(reverse('list-watchers'))
         else:
             return HttpResponseNotAllowed(['POST',])
+
+
+    @staticmethod
+    @exception_handler
+    def single(request):
+        if request.method == 'POST':
+            postdata = {
+                'updateTypeId': 1,
+                'itemType': request.POST.get('itemType'),
+                'itemId': int(request.POST.get('itemId')),
+            }
+            if request.POST.get('delete'):
+                response = Watcher.delete(
+                    request.META['HTTP_HOST'],
+                    postdata,
+                    request.access_token
+                )
+                return HttpResponse()
+            elif request.POST.get('patch'):
+                postdata = {
+                    'itemType': request.REQUEST.get('itemType'),
+                    'itemId': int(request.REQUEST.get('itemId')),
+                    'sendEmail': "true" == request.REQUEST.get('emailMe')
+                }
+                response = Watcher.update(
+                    request.META['HTTP_HOST'],
+                    postdata,
+                    request.access_token
+                )
+                if response.status_code == requests.codes.ok:
+                    return HttpResponse()
+                else:
+                    return HttpResponseBadRequest()
+            else:
+                responsedata = Watcher.create(
+                    request.META['HTTP_HOST'],
+                    postdata,
+                    request.access_token
+                )
+                return HttpResponse(responsedata, content_type='application/json')
+        else:
+            return HttpResponseNotAllowed(['POST','PATCH'])
 
 
 class UpdatePreferenceView(object):

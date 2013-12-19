@@ -10,7 +10,6 @@
         this.$el    = $(this.el);
         this.button = this.$el.find('button');
         this.meta   = this.$el.find('.subscribe-meta');
-        this.meta.hide();
       }
       this.bind();
     };

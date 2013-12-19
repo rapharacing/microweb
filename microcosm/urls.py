@@ -76,7 +76,7 @@ urlpatterns = patterns('',
     url(r'^updates/settings/$', UpdatePreferenceView.settings, name='updates-settings'),
 
     # Watchers
-    url(r'^watchers/$', WatcherView.list, name='list-watchers'),
+    url(r'^watchers/$', WatcherView.single, name='single-watcher'),
 
     # User profiles
     url(r'^profiles/$', ProfileView.list, name='list-profiles'),

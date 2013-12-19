@@ -10,6 +10,9 @@ from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
 from microweb.helpers import build_url
 
+import logging
+
+logger = logging.getLogger('microcosm.middleware')
 
 RESOURCE_PLURAL = {
     'event': 'events',
@@ -118,7 +121,7 @@ class APIResource(object):
         """
 
         params['method'] = 'DELETE'
-        response = requests.post(url, params=params, headers=headers)
+        response = requests.delete(url, params=params, headers=headers)
         try:
             resource = response.json()
         except ValueError:
@@ -553,19 +556,27 @@ class Watcher(APIResource):
         return cls(data)
 
     @staticmethod
-    def delete(host, watcher_id, access_token):
-        url = build_url(host, [Watcher.api_path_fragment, watcher_id])
-        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
+    def delete(host, data, access_token):
+        url = build_url(host, [Watcher.api_path_fragment, "delete"])
+        APIResource.delete(url, data, APIResource.make_request_headers(access_token))
 
     @staticmethod
-    def update(host, watcher_id, data, access_token):
-        url = build_url(host, [Watcher.api_path_fragment, watcher_id])
-        resource = APIResource.update(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
+    def update(host, data, access_token):
+        url = build_url(host, [Watcher.api_path_fragment, "patch"])
+        params = {}
+        params['method'] = 'PATCH'
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        response = requests.patch(url, data=json.dumps(data), params=params, headers=headers)
+        return response
 
     @staticmethod
     def create(host, data, access_token):
         url = build_url(host, [Watcher.api_path_fragment])
-        APIResource.create(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        response = requests.post(url, json.dumps(data), params={}, headers=headers)
+        return response.content
 
 
 class WatcherList(object):
