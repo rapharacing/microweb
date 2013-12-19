@@ -70,14 +70,20 @@
       }
       fragment.find('input[name=inReplyTo]').val(replyto_id);
 
-      console.log('replyTo_id', replyto_id);
-      console.log(fragment.find('input[name=inReplyTo]').val());
-
       this.cleanup();
 
       fragment.simpleEditor = new simpleEditor({
         el : fragment
       });
+
+      if(typeof options.ref !== 'undefined' && options.ref !== ""){
+        // auto quote if applicable
+        var selectedText = this.getWindowSelectedText();
+        if (selectedText){
+          fragment.simpleEditor.textarea.value = selectedText;
+          fragment.simpleEditor.quote();
+        }
+      }
 
       this.stack.push(fragment);
 
@@ -143,6 +149,24 @@
 
     };
 
+    comments.prototype.getWindowSelectedText = function(){
+
+      var selection     = window.getSelection(),
+          selectedRange = null,
+          selectedText  = false;
+
+      if (selection.type.toLowerCase() === 'range'){
+        selectedRange = selection.getRangeAt(0);
+        // selected text must be within a div.comment-item-body
+        if (selectedRange.commonAncestorContainer.className === "comment-item-body" ||
+            selectedRange.commonAncestorContainer.nodeName === "#text"){
+          selectedText = selection.getRangeAt(0).cloneContents().textContent;
+        }
+      }
+
+      return selectedText;
+    };
+
     comments.prototype.reset = function(){
       this.cleanup();
       this.toggleDefaultContainer();
@@ -165,10 +189,6 @@
 
   })();
 
-  new Comments({
-    el               : '.content-body',
-    defaultContainer : '.reply-container',
-    template         : $('.reply-container .comment-item-body').html().trim()
-  });
+  window.Comments = Comments;
 
 })();

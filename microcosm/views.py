@@ -772,8 +772,9 @@ class EventView(object):
                 if attendee.rsvp == "yes":
                     attendees_yes.append(attendee)
 
-                    if (attendee.profile.id == user.id):
-                        user_is_attending = True
+                    if user:
+                        if (attendee.profile.id == user.id):
+                            user_is_attending = True
 
                 elif attendee.rsvp == "invited":
                     attendees_invited.append(attendee)

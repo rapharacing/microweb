@@ -85,7 +85,7 @@
               {% if rsvp_num_attending > 4 %}
               and <a href="javascript:void 0">{{ rsvp_num_attending|add:"-4" }} others</a> are
               {% else %}
-              is
+              {{ rsvp_num_attending|pluralize:"is,are" }}
               {% endif %}
               attending this event.
             </span>
