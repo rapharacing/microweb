@@ -420,18 +420,23 @@ class Item(object):
     @classmethod
     def from_summary(cls, data):
         item = cls()
-        item.id = data['id']
+        item.id = data['item']['id']
         item.item_type = data['itemType']
-        item.microcosm_id = data['microcosmId']
-        item.title = data['title']
-        item.total_comments = data['totalComments']
-        item.total_views = data['totalViews']
-        if data.get('lastCommentId'): item.last_comment_id = data['lastCommentId']
-        if data.get('lastCommentCreatedBy'):
-            item.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
-        if data.get('lastCommentCreated'):
-            item.last_comment_created = parse_timestamp(data['lastCommentCreated'])
-        item.meta = Meta(data['meta'])
+        item.microcosm_id = data['item']['microcosmId']
+        item.title = data['item']['title']
+        item.total_comments = data['item']['totalComments']
+        item.total_views = data['item']['totalViews']
+ 
+        if data['item'].get('lastComment'):
+            if data['item']['lastComment'].get('id'):
+                item.last_comment_id = data['item']['lastComment']['id']
+            if data['item']['lastComment'].get('createdBy'):
+                item.last_comment_created_by = Profile(data['item']['lastComment']['createdBy'])
+            if data['item']['lastComment'].get('created'):
+                item.last_comment_created = parse_timestamp(data['item']['lastComment']['created'])
+
+        item.meta = Meta(data['item']['meta'])
+
         return item
 
 
