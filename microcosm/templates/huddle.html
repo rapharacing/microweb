@@ -156,47 +156,45 @@
   });
 
 
-
-
 })();
 </script>
 
-<script type="text/javascript" src="{{ STATIC_URL }}js/people_widget.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
 <script type="text/javascript">
 
-var dummy_data = [
-    {id : 0, name : 'jim',   image : "xxx"},
-    {id : 1, name : 'paul',  image : "xxx"},
-    {id : 2, name : 'steve', image : "xxx"},
-    {id : 3, name : 'harry', image : "xxx"},
-    {id : 4, name : 'larry', image : "xxx"},
-    {id : 5, name : 'john',  image : "xxx"}
-  ];
+  var dummy_data = [
+      {id : 0, name : 'jim',   image : "xxx"},
+      {id : 1, name : 'paul',  image : "xxx"},
+      {id : 2, name : 'steve', image : "xxx"},
+      {id : 3, name : 'harry', image : "xxx"},
+      {id : 4, name : 'larry', image : "xxx"},
+      {id : 5, name : 'john',  image : "xxx"}
+    ];
 
-var p = new PeopleWidget({
-  el     : '.people-widget-trigger',
-  people : dummy_data
-}).onSelection(function(invited){
+  var p = new PeopleWidget({
+    el     : '.people-widget-trigger',
+    people : dummy_data
+  });
 
-  console.log('invited', invited);
+  p.onSelection(function(invited){
 
-  var form = $('#invite-form');
+    var form = $('#invite-form');
 
-  var input = document.createElement('input');
-  input.type = 'hidden';
-  input.name = 'invite_profile_id';
-  input.value = invited[0].id;
-  form.append(input);
-  form.submit();
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'invite_profile_id';
+    input.value = invited[0].id;
+    form.append(input);
+    form.submit();
 
-});
+  });
 
 
-var q = new PeopleWidget({
-  el : 'input[name=invite_profile_id]',
-  people : dummy_data,
-  is_textbox : true
-});
+  var q = new PeopleWidget({
+    el         : 'input[name=invite_profile_id]',
+    people     : dummy_data,
+    is_textbox : true
+  });
 
 </script>
 
