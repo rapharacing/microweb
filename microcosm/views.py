@@ -140,18 +140,6 @@ class ConversationView(object):
             }
 
             return render(request, ConversationView.single_template, view_data)
-        elif request.method == 'POST':
-            postdata = {
-                'updateTypeId': int(request.POST.get('update_type_id')),
-                'itemTypeId': 6,
-                'itemId': int(conversation_id),
-            }
-            Watcher.create(
-                request.META['HTTP_HOST'],
-                postdata,
-                request.access_token
-            )
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     @staticmethod
     @exception_handler
@@ -168,7 +156,18 @@ class ConversationView(object):
             if form.is_valid():
                 conv_request = Conversation.from_create_form(form.cleaned_data)
                 conv_response = conv_request.create(request.META['HTTP_HOST'], request.access_token)
-                return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
+                if conv_response.id > 0:
+                    payload = {
+                        'itemType': 'conversation',
+                        'itemId': conv_response.id,
+                        'markdown': request.POST.get('firstcomment'),
+                        'inReplyTo': 0
+                    }
+                    comment = Comment.from_create_form(payload)
+                    comment.create(request.META['HTTP_HOST'], request.access_token)
+                    return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
+                else:
+                    return HttpResponseServerError()
             else:
                 view_data['form'] = form
                 return render(request, ConversationView.form_template, view_data)
@@ -307,19 +306,6 @@ class HuddleView(object):
             }
 
             return render(request, HuddleView.single_template, view_data)
-        elif request.method == 'POST':
-            postdata = {
-                'updateTypeId': int(request.POST.get('update_type_id')),
-                'itemTypeId': 5,
-                'itemId': int(huddle_id),
-            }
-            Watcher.create(
-                request.META['HTTP_HOST'],
-                postdata,
-                request.access_token
-            )
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
 
     @staticmethod
     @exception_handler
@@ -594,20 +580,6 @@ class MicrocosmView(object):
 
             return render(request, MicrocosmView.single_template, view_data)
 
-        elif request.method == 'POST':
-            postdata = {
-                'updateTypeId': int(request.POST.get('update_type_id')),
-                'itemTypeId': 2,
-                'itemId': int(microcosm_id),
-            }
-            Watcher.create(
-                request.META['HTTP_HOST'],
-                postdata,
-                request.access_token
-            )
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
     @staticmethod
     @exception_handler
     def list(request):
@@ -824,19 +796,6 @@ class EventView(object):
 
             return render(request, EventView.single_template, view_data)
 
-        elif request.method == 'POST':
-            postdata = {
-                'updateTypeId': int(request.POST.get('update_type_id')),
-                'itemTypeId': 9,
-                'itemId': int(event_id),
-            }
-            Watcher.create(
-                request.META['HTTP_HOST'],
-                postdata,
-                request.access_token
-            )
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
     @staticmethod
     @exception_handler
     def create(request, microcosm_id):
@@ -852,7 +811,18 @@ class EventView(object):
             if form.is_valid():
                 event_request = Event.from_create_form(form.cleaned_data)
                 event_response = event_request.create(request.META['HTTP_HOST'], request.access_token)
-                return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
+                if event_response.id > 0:
+                    payload = {
+                        'itemType': 'event',
+                        'itemId': event_response.id,
+                        'markdown': request.POST.get('firstcomment'),
+                        'inReplyTo': 0
+                    }
+                    comment = Comment.from_create_form(payload)
+                    comment.create(request.META['HTTP_HOST'], request.access_token)
+                    return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
+                else:
+                    return HttpResponseServerError()
             else:
                 view_data['form'] = form
                 # for primary buttons

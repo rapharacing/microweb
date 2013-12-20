@@ -1039,19 +1039,7 @@ class Event(APIResource):
         event.when = parse_timestamp(data['when'])
         event.duration = data['duration']
         event.status = data['status']
-
-        # Event location
-        event.where = data['where']
-        if data.get('lat'): event.lat = data['lat']
-        if data.get('lon'): event.lon = data['lon']
-        if data.get('north'): event.north = data['north']
-        if data.get('east'): event.east = data['east']
-        if data.get('south'): event.south = data['south']
-        if data.get('west'): event.west = data['west']
-
-        # RSVP limit is always returned, even if zero
-        event.rsvp_limit = data['rsvpLimit']
-
+        
         return event
 
     @classmethod
@@ -1070,6 +1058,9 @@ class Event(APIResource):
         # RSVP attend / spaces are only returned if non-zero
         if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
         if data.get('rsvpSpaces'): event.rsvp_spaces = data['rsvpSpaces']
+
+        # RSVP limit is always returned, even if zero
+        event.rsvp_limit = data['rsvpLimit']
 
         if data.get('where'): event.where = data['where']
         if data.get('lat'): event.lat = data['lat']
