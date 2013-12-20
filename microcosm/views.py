@@ -274,7 +274,7 @@ class HuddleView(object):
 
     create_form = HuddleCreate
     edit_form = HuddleEdit
-    form_template = 'forms/huddle.html'
+    form_template = 'forms/form_huddle.html'
     single_template = 'huddle.html'
     list_template = 'huddles.html'
 
@@ -350,6 +350,17 @@ class HuddleView(object):
             if form.is_valid():
                 hud_request = Huddle.from_create_form(form.cleaned_data)
                 hud_response = hud_request.create(request.META['HTTP_HOST'], request.access_token)
+                if hud_response.id > 0:
+                    ids = [int(x) for x in request.POST.get('invite').split(',')]
+                    Huddle.invite(request.META['HTTP_HOST'], hud_response.id, ids, request.access_token)
+                    payload = {
+                        'itemType': 'huddle',
+                        'itemId': hud_response.id,
+                        'markdown': request.POST.get('firstcomment'),
+                        'inReplyTo': 0
+                    }
+                    comment = Comment.from_create_form(payload)
+                    comment.create(request.META['HTTP_HOST'], request.access_token)
                 return HttpResponseRedirect(reverse('single-huddle', args=(hud_response.id,)))
             else:
                 view_data['form'] = form
