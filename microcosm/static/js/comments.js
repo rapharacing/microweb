@@ -62,8 +62,21 @@
 
     comments.prototype.generateNewInstanceCommentBox = function(options){
 
-      var fragment = $( this.template ),
-          replyto_id = "";
+      var fragment   = $( this.template ),
+          action     = "",
+          replyto_id = "",
+          id         = "";
+
+      if (typeof options.action !== 'undefined'){
+        action = options.action;
+      }
+      fragment.find('form').attr('action',action);
+
+
+      if (typeof options.id !== 'undefined'){
+        id = options.id;
+      }
+      fragment.find('input[name=id]').val(id);
 
       if(typeof options.ref !== 'undefined'){
         replyto_id = options.ref;
@@ -90,11 +103,11 @@
       return fragment;
     };
 
-    comments.prototype.fetchCommentSource = function(comment_id){
+    comments.prototype.fetchCommentSource = function(url){
 
       // FIXME: possible bug with relative path, need to get absolute
       return $.ajax({
-        url  : 'comments/'+comment_id+"/source",
+        url  : url,
         type : 'GET'
       });
 
@@ -111,7 +124,9 @@
       }
 
       commentBoxOptions = {
-        ref   : _this.$.attr('data-ref') || ""
+        action : _this.$.attr('data-action') || "create",
+        ref    : _this.$.attr('data-ref') || "",
+        id     : _this.$.attr('data-comment-id') || ""
       };
 
       if (!_this.$.hasClass('active')){
@@ -124,11 +139,11 @@
           .after( _this.$.comment_box );
 
         // FIXME: not flexible, could be better
-        if(_this.$.attr('data-comment-id')){
+        if(_this.$.attr('data-source')){
 
           _this.$.comment_box.find('textarea').attr('placeholder','Loading... Please wait...');
 
-          this.fetchCommentSource(_this.$.attr('data-comment-id'))
+          this.fetchCommentSource(_this.$.attr('data-source'))
               .success($.proxy(function(response){
                 this.$.comment_box
                       .find('textarea')

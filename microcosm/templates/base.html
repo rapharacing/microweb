@@ -53,7 +53,7 @@
                         <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
                         <strong>{{ user.profile_name }}</strong>
                       </a>
-                      <a href="#">
+                      <a href="{% url 'list-huddle'%}">
                         <span class="glyphicon glyphicon-envelope"></span>
                         <strong>Huddles</strong>
                         <span class="badge">new</span>

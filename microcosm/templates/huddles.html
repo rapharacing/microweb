@@ -6,7 +6,7 @@
 <div class="content-header padded">
   <div class="row">
     <div class="col-sm-12">
-    {% include 'microweb_templates/breadcrumbs.html' %}
+    {% include 'breadcrumbs.html' %}
     </div>
   </div>
   <h1>Huddles</h1>
@@ -40,9 +40,11 @@
 	          		:
 	          		"{{ item.last_reply.text|striptags|truncatechars:40}}"
 	          		&bull;
-		            <time datetime="{{ item.last_comment_created|date:"c" }}">{{ item.last_comment_created|timesince }}</time>
+		            <time datetime="{{ item.last_comment_created|date:"c" }}">
+                  {{ item.last_comment_created|timesince }}
+                </time>
 
-	          	{% elif %}
+	          	{% else %}
 
 		            <a href="{% url 'single-profile' item.meta.created_by.id %}">
 		            	<img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{item.meta.created_by.avatar}}{% elif 'files' in item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.meta.created_by.profile_name }}" />
@@ -94,7 +96,7 @@
 	You currently have no messages
 </p>
 {% endif %}
-
+</div>
 
 {% endblock %}
 

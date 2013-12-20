@@ -10,6 +10,7 @@
   </ul>
   <form action="{% url 'create-comment' %}" method="POST">
     {% csrf_token %}
+    {{ comment_form.id }}
     {{ comment_form.inReplyTo }}
     {{ comment_form.itemId }}
     {{ comment_form.itemType }}

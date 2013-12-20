@@ -8,7 +8,7 @@
 <div class="content-header padded">
   <div class="row">
     <div class="col-sm-12">
-    {% include 'microweb_templates/breadcrumbs.html' %}
+    {% include 'breadcrumbs.html' %}
     </div>
   </div>
   <h1>{{ content.title }}</h1>
@@ -19,10 +19,7 @@
   <div class="row">
     <div class="col-sm-12">
 
-      <ul class="list-people list-people-sm">
-        <li>
-          <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{user.profile_name }}" />
-        </li>
+      <ul class="list-people list-people-md">
     		{% for profile in content.participants %}
     		<li>
           <a href="{% url 'single-profile' profile.id %}">
@@ -37,9 +34,23 @@
       </a>
       <div class="btn-group-responsive huddle-actions">
       	{% if content.meta.permissions.owner %}
-        <button type="button" class="btn btn-primary">Invite People</button>
+        <button type="button" class="btn btn-primary people-widget-trigger" value="Invite People">Invite people</button>
+
+        <div class="people-widget" style="display:none">
+          <div class="people-widget-input">
+            <div class="input-group">
+              <label class="input-group-addon">?</label>
+              <input type="text" class="form-control" />
+            </div>
+          </div>
+          <div class="people-widget-list"></div>
+        </div>
+
         {% endif %}
-        <button type="button" class="btn btn-primary">leave huddle</button>
+        <form action="{% url 'delete-huddle' content.id %}" method="POST">
+          {% csrf_token %}
+          <input type="submit" class="btn btn-primary" value="Leave huddle" />
+        </form>
       </div>
     </div>
   </div>
@@ -47,35 +58,33 @@
 
 
 <div class="content-body">
-  <div class="item">
-    <div class="item-header">
-      <h1>{{ content.title }}</h1>
-      <div class="item-meta">Posted on {{ content.meta.created|date:"D jS, F Y"}}</div>
-    </div>
-    {% include 'block_comments.html' %}
-  </div> <!-- item -->
+  {% include 'block_comments.html' %}
 </div> <!-- / content-body -->
 
-<div class="reply-container">
-  <ul class="list-comments">
-    <li class="comment-item">
-      <div class="comment-item-inner">
-        <div class="comment-item-header">
-          <div class="comment-item-author">
-              <img src="{{ STATIC_URL }}{{ member.avatar}}" />
-              <strong>Post a reply</strong>
+<a name="reply"></a>
+  <div class="reply-container">
+    <ul class="list-comments">
+      <li class="comment-item">
+        <div class="comment-item-inner">
+          <div class="comment-item-header">
+            <div class="comment-item-author">
+                <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
+                <strong>Post a reply</strong>
+            </div>
+          </div>
+          <div class="comment-item-body">
+            {% include 'forms/block_comment_box.html' %}
           </div>
         </div>
-        <div class="comment-item-body">
-          {% include 'forms/block_comment_box.html' %}
-          <div class="pull-right">
-            <input type="submit" class="btn btn-primary" value="Post reply"/>
-          </div>
-        </div>
-      </div>
-    </li>
-  </ul>
-</div> <!-- /reply-container -->
+      </li>
+    </ul>
+  </div> <!-- /reply-container -->
+
+  {% if content.meta.permissions.owner %}
+  <form id="invite-form" action="{% url 'invite-huddle' content.id %}" method="POST">
+    {% csrf_token %}
+  </form>
+  {% endif %}
 
 {% endblock %}
 
@@ -117,3 +126,78 @@
 {% endif %}
 
 {% endblock %}
+
+
+{% block js %}
+{% if user %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/comments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
+<script type="text/javascript">
+(function(){
+
+  var comments = new Comments({
+    el               : '.content-body',
+    defaultContainer : '.reply-container',
+    template         : $('.reply-container .comment-item-body').html().trim()
+  });
+
+  var replyBox = new simpleEditor({
+    el : '.reply-box'
+  });
+
+  $('#post-a-reply-handle').on('click',function(e){
+    var selectedText = Comments.prototype.getWindowSelectedText();
+    if (selectedText){
+      replyBox.textarea.value = selectedText;
+      replyBox.quote();
+    }
+  });
+
+
+})();
+</script>
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
+<script type="text/javascript">
+
+  var dummy_data = [
+      {id : 0, name : 'jim',   image : "xxx"},
+      {id : 1, name : 'paul',  image : "xxx"},
+      {id : 2, name : 'steve', image : "xxx"},
+      {id : 3, name : 'harry', image : "xxx"},
+      {id : 4, name : 'larry', image : "xxx"},
+      {id : 5, name : 'john',  image : "xxx"}
+    ];
+
+  var p = new PeopleWidget({
+    el     : '.people-widget-trigger',
+    people : dummy_data
+  });
+
+  p.onSelection(function(invited){
+
+    var form = $('#invite-form');
+
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'invite_profile_id';
+    input.value = invited[0].id;
+    form.append(input);
+    form.submit();
+
+  });
+
+
+  var q = new PeopleWidget({
+    el         : 'input[name=invite_profile_id]',
+    people     : dummy_data,
+    is_textbox : true
+  });
+
+</script>
+
+
+{% endif %}
+{% endblock js %}
