@@ -1063,6 +1063,7 @@ class Event(APIResource):
         # RSVP limit is always returned, even if zero
         event.rsvp_limit = data['rsvpLimit']
 
+        if data.get('when'): event.when = parse_timestamp(data['when'])
         if data.get('where'): event.where = data['where']
         if data.get('lat'): event.lat = data['lat']
         if data.get('lon'): event.lon = data['lon']
