@@ -24,7 +24,7 @@
 	  		class="list-collection-row {% if item.is_pinned %}row-pinned{% endif %} {% if item.is_deleted %}row-deleted{% endif %}">
 
 	    <div class="row">
-	      <div class="col-sm-7">
+	      <div class="col-sm-8 col-md-8">
 
 	        <div class="list-collection-row-icon">
 	          {% if item.flags.sticky %}
@@ -37,42 +37,42 @@
 
 	        <div class="list-collection-row-offset">
 
-
-	          <a href="/{{ item.item_type }}s/{{ item.id }}/{% if user %}newest/{% endif %}">
-	            <h3 class="row-title">{{ item.title }}</h3>
-	          </a>
+            <div class="row-title-wrapper">
+  	          <a href="/{{ item.item_type }}s/{{ item.id }}/{% if user %}newest/{% endif %}">
+  	            <h3 class="row-title">{{ item.title }}</h3>
+                {% if item.item_type == "event" %}
+                <div class="pills-event">
+                  <span>
+                    {{ item.item.when|date:"N jS" }}
+                  </span>
+                  <span>
+                    {{ item.item.where }}
+                  </span>
+                </div>
+                {% endif %}
+  	          </a>
+            </div>
 
 	          {% if not item.flags.sticky %}
 	          <div class="row-meta">
 
-	          	{% comment %}
-	            <a href="{% url 'profile' item.author.name|slugify %}">
-	              <img src="{{ STATIC_URL }}{{ item.author.avatar }}" />
-	            </a>
-	          	{% endcomment %}
+              {% comment %}
+              <a href="{% url 'single-profile' item.meta.created_by.id %}">
+                <img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{ item.meta.created_by.avatar }}{% elif 'files' in  item.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ item.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.meta.created_by.profile_name }}" />
+                @{{ item.meta.created_by.profile_name|truncatechars:25 }}
+              </a>
+              {% endcomment %}
+              <a href="{% url 'single-profile' item.meta.created_by.id %}">
+                {{ item.meta.created_by.profile_name|truncatechars:25 }}
+              </a>
 
-	            <a href="{% url 'single-profile' item.meta.created_by.id %}">
-	            	@{{ item.meta.created_by.profile_name|truncatechars:25 }}
-	            </a>
-
-	              {% if item.item_type == "event" %}
-	              <div class="pills-event">
-	                <span>
-	                  [FIXME]
-	                </span>
-	                <span>
-	                  {{ item.item.where }}
-	                </span>
-	              </div>
-	              {% else %}
-	              started <time datetime="{{ item.meta.created|date:"c" }}"></time>
-	              {% endif %}
+                started <time datetime="{{ item.meta.created|date:"c" }}"></time>
 	          </div>
 	          {% endif %}
 	        </div>
 	      </div>
 
-	      <div class="col-sm-5">
+	      <div class="col-sm-4 col-md-4">
 
 	        <div class="row-stats">
 	          {# if item.flags.sticky #}
@@ -121,7 +121,7 @@
                   {% if item.last_reply.author %}
 	                <div class="microcosm-item-recent-comment">
 	                  <a href="{% url 'profile' item.last_reply.author.name|slugify %}">
-	                    @{{ item.last_reply.author.name}}
+	                    {{ item.last_reply.author.name}}
 	                  </a> replied {{ item.last_reply.timeago }} ago
 	                </div>
                   {% endif %}
@@ -131,7 +131,7 @@
 
 		            {% if item.last_comment_created %}
 		            	<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
-		            		@{{item.last_comment_created_by.profile_name }}
+		            		{{item.last_comment_created_by.profile_name }}
 		            	</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
 		            {% endif %}
 

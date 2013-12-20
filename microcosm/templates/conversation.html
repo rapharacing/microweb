@@ -16,7 +16,9 @@
     <div class="item">
       <div class="item-header">
         <h1>{{ content.title }}</h1>
-        <div class="item-meta">Posted on {{ content.meta.created|date:"D jS, F Y"}}</div>
+        <div class="item-meta">
+          Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
+        </div>
       </div>
       {% include 'block_comments.html' %}
     </div> <!-- item -->
