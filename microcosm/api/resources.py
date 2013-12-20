@@ -299,12 +299,13 @@ class ProfileList(object):
         self.meta = Meta(data['meta'])
 
     @staticmethod
-    def build_request(host, offset=None, top=False, q="", access_token=None):
+    def build_request(host, offset=None, top=False, q="", following=False, access_token=None):
         url = build_url(host, [ProfileList.api_path_fragment])
         params = {}
         if offset: params['offset'] = offset
         if top: params['top'] = top
         if q: params['q'] = q
+        if following: params['following'] = following
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
@@ -1039,7 +1040,7 @@ class Event(APIResource):
         event.when = parse_timestamp(data['when'])
         event.duration = data['duration']
         event.status = data['status']
-        
+
         return event
 
     @classmethod

@@ -469,12 +469,14 @@ class ProfileView(object):
         offset = int(request.GET.get('offset', 0))
         top = bool(request.GET.get('top', False))
         q = request.GET.get('q', "")
+        following = bool(request.GET.get('following', False))
 
         profiles_url, params, headers = ProfileList.build_request(
             request.META['HTTP_HOST'],
             offset=offset,
             top=top,
             q=q,
+            following=following,
             access_token=request.access_token
         )
 
@@ -490,6 +492,7 @@ class ProfileView(object):
             'pagination': build_pagination_links(responses[profiles_url]['profiles']['links'], profiles.profiles),
             'q': q,
             'top': top,
+            'following': following,
             'alphabet': string.ascii_lowercase
         }
 
