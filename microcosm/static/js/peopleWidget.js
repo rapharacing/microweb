@@ -389,3 +389,60 @@
   window.PeopleWidget = PeopleWidget;
 
 })();
+
+(function(){
+
+  var Participating = (function(){
+
+    var participating = function(options){
+      if (typeof options !== 'undefined'){
+        this.$el = $(options.el);
+      }
+      if(typeof options.static_url !== 'undefined'){
+        this.static_url = options.static_url;
+      }
+      if (typeof options.className !== 'undefined'){
+        this.className = options.className;
+      }
+    };
+
+    participating.prototype.show = function(){
+      this.$el.show();
+      return this;
+    };
+
+    participating.prototype.hide = function(){
+      this.$el.hide();
+      return this;
+    };
+
+    participating.prototype.render = function(peopleList){
+
+      var ul, li;
+
+      if (peopleList.length > 0){
+        ul = document.createElement('ul');
+        if (this.className){
+          ul.className = this.className;
+        }
+
+        for(var i=0,j=peopleList.length;i<j;i++){
+          li = document.createElement('li');
+          li.rel = peopleList[i].id;
+          li.appendChild( PeopleWidget.prototype.ItemPerson.apply(this,[peopleList[i]]) );
+          ul.appendChild(li);
+        }
+
+        this.$el.html(ul);
+      }
+
+      return this;
+    };
+
+    return participating;
+
+  })();
+
+  window.Participating = Participating;
+
+})();

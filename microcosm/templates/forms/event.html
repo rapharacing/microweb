@@ -340,12 +340,18 @@
 
             <label class="col-sm-12" for="invite"><span>Optional.</span> Do you wish to invite others to your event?</label>
 
+            <input type="hidden" name="invite" value="" />
+
+            <div class="col-sm-12">
+              <div class="list-participants"></div>
+            </div>
+
             <div class="col-sm-6">
               <div class="input-group">
                 <div class="input-group-addon">
                   <span class="glyphicon glyphicon-search"></span>
                 </div>
-                <input id="invite" name="invite" class="form-control" placeholder="Type in a user's name"/>
+                <input id="invite" class="form-control" placeholder="Type in a user's name" autocomplete="off"/>
               </div>
             </div>
 
@@ -434,8 +440,14 @@
 
 <script src="{{ STATIC_URL }}js/leaflet.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/event_form.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/peopleWidget.js"></script>
 <script type="text/javascript">
+(function(){
 
+  ////////////////////
+  //  event map   //
+  ///////////////////
   var formMap = new EventFormMap({
     el : '.event-form-map',
     mappings : {
@@ -506,18 +518,65 @@
     choices   : 'input[name=attendee-limit-option]',
     attendees : 'input[name={{ form.rsvpLimit.name }}]'
   });
-</script>
 
 
-<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
-<script type="text/javascript">
-  (function(){
+  ////////////////////
+  //  comment box  //
+  ///////////////////
+  var replyBox = new simpleEditor({
+    el : '.reply-box'
+  });
 
-    var se = new simpleEditor({
-      el : '.reply-box'
-    });
 
-  })();
+  /////////////////////
+  //  people widget  //
+  ////////////////////
+
+  var subdomain = $('meta[name="subdomain"]').attr('content');
+
+  var participating = new Participating({
+    el         : '.list-participants',
+    className  : 'list-people list-people-sm',
+    static_url : subdomain
+  });
+
+  var peopleWidget = new PeopleWidget({
+    el         : '#invite',
+    is_textbox : true,
+    static_url : subdomain,
+    dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q='
+  });
+
+  // update the hidden input box
+  var invite_input_field = $('input[name="invite"]');
+  var updateInvitedField = function(){
+    invite_input_field.val(peopleWidget.invitedListToDelimitedString());
+  };
+
+  // triggers when user clicks on a person in the autocomplete dropdown
+  peopleWidget.onSelection(function(invited){
+    if (invited.length > 0){
+      participating.render(invited).show();
+    }else{
+      participating.hide();
+    }
+    peopleWidget.show();
+    updateInvitedField();
+  });
+
+  // triggers when the user clicks on a person in the participants list
+  participating.$el.on('click', 'li', function(e){
+    var id = e.currentTarget.rel;
+    peopleWidget.removePersonFromInvitedById(id).render();
+    if (peopleWidget.people_invited.length>0){
+      participating.render(peopleWidget.people_invited).show();
+    }else{
+      participating.hide();
+    }
+    updateInvitedField();
+  });
+
+})();
 </script>
 
 {% endblock %}
