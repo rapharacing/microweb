@@ -30,6 +30,9 @@ def activate_virtualenv():
 def dev_env():
     env.hosts.append('wpy01.dev.microcosm.cc:2020')
 
+def int_env():
+    env.hosts.append('wpy02.microcosm.cc:2020')
+
 def prod_env():
     env.hosts.append('wpy01.microcosm.cc:2020')
 
