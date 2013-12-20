@@ -1,30 +1,31 @@
 (function(w,d,$,undefined){
 
-  var FileHandler = (function(){
+  var ProfilePicture = (function(){
 
-    var fileHandler = function(opts){
+    var profilePicture = function(opts){
       this.el = false;
       if (typeof opts.el !== 'undefined'){
-        this.el    = document.querySelectorAll(opts.el);
-        this.$el   = $(this.el);
+        this.$el   = $(opts.el);
+        this.el    = this.$el[0];
         this.label = this.$el.find('label');
+        this.input = this.$el.find('input[type=file]');
       }
       this.bind();
     };
 
-    fileHandler.prototype.activateLabel = function(backgroundImage){
+    profilePicture.prototype.activateLabel = function(backgroundImage){
       this.label
         .addClass('active')
         .css('background-image', "url(" + backgroundImage + ")");
     };
 
-    fileHandler.prototype.deactivateLabel = function(){
+    profilePicture.prototype.deactivateLabel = function(){
       this.label
         .removeClass('active')
         .css('background-image', "");
     };
 
-    fileHandler.prototype.update = function(files){
+    profilePicture.prototype.update = function(files){
 
       var file;
 
@@ -50,22 +51,22 @@
 
     };
 
-    fileHandler.prototype.changeHandler = function(e){
+    profilePicture.prototype.changeHandler = function(e){
       this.update(e.target.files);
     };
 
-    fileHandler.prototype.dragHandler = function(e){
+    profilePicture.prototype.dragHandler = function(e){
       e.stopPropagation();
       e.preventDefault();
     };
 
-    fileHandler.prototype.dropHandler = function(e){
+    profilePicture.prototype.dropHandler = function(e){
       e.stopPropagation();
       e.preventDefault();
       this.update(e.originalEvent.dataTransfer.files);
     };
 
-    fileHandler.prototype.bind = function(){
+    profilePicture.prototype.bind = function(){
 
       var events = [
         ['change',  'input[type=file]', 'changeHandler'],
@@ -78,14 +79,12 @@
       }
     };
 
-    return fileHandler;
+    return profilePicture;
 
   })();
 
   if (window.File && window.FileReader && window.FileList && window.Blob){
-    var file = new FileHandler({
-      el : '.form-file-upload'
-    });
+    window.ProfilePicture = ProfilePicture;
   }
 
 })(window, document, jQuery);
