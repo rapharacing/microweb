@@ -17,6 +17,16 @@
         this.people_invited = options.invited;
       }
 
+      this.dataSource = null;
+      if (typeof options.dataSource !== 'undefined'){
+        this.dataSource = options.dataSource;
+      }
+
+      this.static_url = "";
+      if (typeof options.static_url !== 'undefined'){
+        this.static_url = options.static_url;
+      }
+
       this.isActive = false; // flag to keep the popover from closing
 
       this.container    = this.createWidgetContainer();
@@ -92,8 +102,8 @@
           name    = document.createTextNode(),
           avatar  = document.createElement('img');
 
-      avatar.src       = descriptor.image;
-      name.textContent = descriptor.name;
+      avatar.src       = this.static_url + descriptor.avatar;
+      name.textContent = descriptor.profileName;
 
       link.id          = descriptor.id;
       link.appendChild(avatar);
@@ -111,13 +121,32 @@
         return person.id === query_id;
       });
 
-      this.people_invited.push(invited[0]);
-      this.render();
-
-      if(typeof this.onSelection !== 'undefined' &&
-        typeof this.onSelection === 'function'){
-        this.onSelection(this.people_invited);
+      if (invited.length>0){
+        this.people_invited.push(invited[0]);
+        this.render();
+        if(typeof this.onSelection !== 'undefined' &&
+          typeof this.onSelection === 'function'){
+          this.onSelection(this.people_invited);
+        }
       }
+
+      return this;
+    };
+
+    peopleWidget.prototype.removePersonFromInvitedById = function(id){
+
+      var index_to_remove = false;
+      if (this.people_invited.length>0){
+        for(var i=0,j=this.people_invited.length;i<j;i++){
+          if(this.people_invited[i].id === id){
+            index_to_remove = i;
+          }
+        }
+        if (index_to_remove !== false){
+          this.people_invited.splice(index_to_remove,1);
+        }
+      }
+      return this;
     };
 
     peopleWidget.prototype.excludeInvitedPeople = function(list){
@@ -127,7 +156,9 @@
 
       if (this.people_invited.length > 0){
         for(var i=0,j=this.people_invited.length;i<j;i++){
-          invited_ids.push(this.people_invited[i].id);
+          if (typeof this.people_invited !== 'undefined'){
+            invited_ids.push(this.people_invited[i].id);
+          }
         }
         new_list = list.filter(function(person){
           return invited_ids.indexOf(person.id) === -1;
@@ -139,17 +170,6 @@
       return new_list;
     };
 
-    peopleWidget.prototype.filterPeopleListByName = function(name){
-      var filteredPeople = [];
-      if(this.people.length>0){
-        for(var i=0,j=this.people.length;i<j;i++){
-          if (this.people[i].name.indexOf(name)>-1){
-            filteredPeople.push(this.people[i]);
-          }
-        }
-      }
-      return filteredPeople;
-    };
 
     peopleWidget.prototype.sortPeopleListByName = function(list){
       return list.sort(function(a,b){ return b.name < a.name; });
@@ -188,23 +208,24 @@
 
       this.clearPeopleList();
 
-      list = this.sortPeopleListByName(this.people_invited);
-      this.renderPeopleList(list,{ className : 'invited'});
+      /* renders the invited list */
+      // if (this.people_invited.length > 0){
+      //   list = this.sortPeopleListByName(this.people_invited);
+      //   this.renderPeopleList(list,{ className : 'invited'});
+      // }
 
       query = this.widget_input.value;
 
       if ($.trim(query)!==""){
-        list = this.filterPeopleListByName(query);
-        list = this.excludeInvitedPeople(list);
+
+        list = this.excludeInvitedPeople(this.people);
 
         if (list.length>0){
           this.renderPeopleList(this.sortPeopleListByName(list));
         }else{
-          if (this.people_invited.length === 0){
-            var empty = document.createElement('li');
-            empty.textContent = "No results";
-            this.widget_list.appendChild(empty);
-          }
+          var empty = document.createElement('li');
+          empty.textContent = "No results";
+          this.widget_list.appendChild(empty);
         }
       }
     };
@@ -251,8 +272,68 @@
       this.popover.style.display = "none";
     };
 
+    peopleWidget.prototype.queryDataSource = function(query, success, error){
+
+      var ajaxOptions;
+
+      if (typeof this.dataSource !== 'undefined'){
+        ajaxOptions = {
+          url     : this.dataSource + query,
+          type    : 'GET',
+          success : success,
+          error   : error
+        };
+
+        $.ajax(ajaxOptions);
+      }
+
+      return this;
+    };
+
+    peopleWidget.prototype.parseAPIResponse = function(data){
+
+      if (typeof data.profiles !== 'undefined'){
+        this.people = data.profiles.items;
+      }
+      return this;
+    };
+
+    peopleWidget.prototype.invitedListToDelimitedString = function(){
+      var result;
+      result = $.map(this.people_invited,function(person){ return person.id; });
+      result = result.join(',');
+      return result;
+    };
+
     peopleWidget.prototype.changeHandler = function(e){
-      this.render();
+      e.preventDefault();
+      e.stopPropagation();
+
+      if ([13].indexOf(e.which)!== -1){
+
+        if (e.which === 13){
+          var currentList = this.excludeInvitedPeople(this.people);
+          if (currentList.length > 0){
+            this.addPersonToInvitedById(currentList[0].id);
+          }
+          this.show();
+        }
+
+      }else{
+        if ($.trim(this.widget_input.value) !== ''){
+          this.queryDataSource(
+            this.widget_input.value,
+            $.proxy(function(data){
+              this.parseAPIResponse(data).render();
+            },this),
+            function(e){ console.log(e);
+          });
+        }else{
+          this.people = [];
+          this.render();
+        }
+      }
+
     };
 
     peopleWidget.prototype.clickHandler = function(e){
@@ -277,6 +358,7 @@
     peopleWidget.prototype.bind = function(){
 
       $(this.widget_input).on('keyup', $.proxy(this.changeHandler,this));
+
       $(this.container).on('click', 'li:not(.invited)', $.proxy(this.clickHandler,this));
 
 
