@@ -9,6 +9,8 @@
 
     <link href="{{ STATIC_URL }}themes/{{ site.theme_id|default:"1" }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
+    <meta name="subdomain" content="https://{{ site.subdomain_key }}.microco.sm" />
+
     <style type="text/css">
     .headBand {
       background-image: url('{% if site.header_background_url %}{{ site.header_background_url }}{% else %}{{ STATIC_URL }}themes/1/background.png{% endif %}');
