@@ -56,6 +56,20 @@ def response_list_to_dict(responses):
             response_dict[discard_querystring(response.url)] = APIResource.process_response(response.url, response)
     return response_dict
 
+def populate_item(itemtype, itemdata):
+    if itemtype == 'conversation':
+        item = Conversation.from_summary(itemdata)
+    elif itemtype == 'comment':
+        item = Comment.from_summary(itemdata)
+    elif itemtype == 'event':
+        item = Event.from_summary(itemdata)
+    elif itemtype == 'profile':
+        item = Profile.from_summary(itemdata)
+    elif itemtype == 'microcosm':
+        item = Microcosm.from_summary(itemdata)
+    else:
+        item = None
+    return item
 
 class APIResource(object):
     """
@@ -285,12 +299,13 @@ class ProfileList(object):
         self.meta = Meta(data['meta'])
 
     @staticmethod
-    def build_request(host, offset=None, top=False, q="", access_token=None):
+    def build_request(host, offset=None, top=False, q="", following=False, access_token=None):
         url = build_url(host, [ProfileList.api_path_fragment])
         params = {}
         if offset: params['offset'] = offset
         if top: params['top'] = top
         if q: params['q'] = q
+        if following: params['following'] = following
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
@@ -436,6 +451,8 @@ class Item(object):
                 item.last_comment_created = parse_timestamp(data['item']['lastComment']['created'])
 
         item.meta = Meta(data['item']['meta'])
+
+        item.item = populate_item(item.item_type, data['item'])
 
         return item
 
@@ -648,32 +665,12 @@ class Update(APIResource):
         update.item_type = data['itemType']
         update.meta = Meta(data['meta'])
 
-        if update.item_type == 'conversation':
-            update.item = Conversation.from_summary(data['item'])
-        elif update.item_type == 'comment':
-            update.item = Comment.from_summary(data['item'])
-        elif update.item_type == 'event':
-            update.item = Event.from_summary(data['item'])
-        elif update.item_type == 'profile':
-            update.item = Profile.from_api_response(data['item'])
-        elif update.item_type == 'microcosm':
-            update.item = Microcosm(data['item'])
-        else:
-            update.item = None
+
+        update.item = populate_item(update.item_type, data['item'])
 
         if data.get('parentItem'):
             update.parent_item_type = data['parentItemType']
-
-            if update.parent_item_type == 'conversation':
-                update.parent_item = Conversation.from_summary(data['parentItem'])
-            elif update.parent_item_type == 'event':
-                update.parent_item = Event.from_summary(data['parentItem'])
-            elif update.parent_item_type == 'profile':
-                update.parent_item = Profile.from_api_response(data['parentItem'])
-            elif update.parent_item_type == 'microcosm':
-                update.parent_item = Microcosm(data['parentItem'])
-            else:
-                update.parent_item = None
+            update.parent_item = populate_item(update.parent_item_type, data['parentItem'])
         else:
             update.parent_item = update.item
 
@@ -1044,18 +1041,6 @@ class Event(APIResource):
         event.duration = data['duration']
         event.status = data['status']
 
-        # Event location
-        event.where = data['where']
-        if data.get('lat'): event.lat = data['lat']
-        if data.get('lon'): event.lon = data['lon']
-        if data.get('north'): event.north = data['north']
-        if data.get('east'): event.east = data['east']
-        if data.get('south'): event.south = data['south']
-        if data.get('west'): event.west = data['west']
-
-        # RSVP limit is always returned, even if zero
-        event.rsvp_limit = data['rsvpLimit']
-
         return event
 
     @classmethod
@@ -1074,6 +1059,17 @@ class Event(APIResource):
         # RSVP attend / spaces are only returned if non-zero
         if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
         if data.get('rsvpSpaces'): event.rsvp_spaces = data['rsvpSpaces']
+
+        # RSVP limit is always returned, even if zero
+        event.rsvp_limit = data['rsvpLimit']
+
+        if data.get('where'): event.where = data['where']
+        if data.get('lat'): event.lat = data['lat']
+        if data.get('lon'): event.lon = data['lon']
+        if data.get('north'): event.north = data['north']
+        if data.get('east'): event.east = data['east']
+        if data.get('south'): event.south = data['south']
+        if data.get('west'): event.west = data['west']
         return event
 
     @classmethod
@@ -1437,32 +1433,11 @@ class SearchResult(object):
         searchresult = cls()
         searchresult.item_type = data['itemType']
 
-        if searchresult.item_type == 'conversation':
-            searchresult.item = Conversation.from_summary(data['item'])
-        elif searchresult.item_type == 'comment':
-            searchresult.item = Comment.from_summary(data['item'])
-        elif searchresult.item_type == 'event':
-            searchresult.item = Event.from_summary(data['item'])
-        elif searchresult.item_type == 'profile':
-            searchresult.item = Profile.from_summary(data['item'])
-        elif searchresult.item_type == 'microcosm':
-            searchresult.item = Microcosm.from_summary(data['item'])
-        else:
-            searchresult.item = None
+        searchresult.item = populate_item(searchresult.item_type, data['item'])
 
         if data.get('parentItem'):
             searchresult.parent_item_type = data['parentItemType']
-
-            if searchresult.parent_item_type == 'conversation':
-                searchresult.parent_item = Conversation.from_summary(data['parentItem'])
-            elif searchresult.parent_item_type == 'event':
-                searchresult.parent_item = Event.from_summary(data['parentItem'])
-            elif searchresult.parent_item_type == 'profile':
-                searchresult.parent_item = Profile.from_summary(data['parentItem'])
-            elif searchresult.parent_item_type == 'microcosm':
-                searchresult.parent_item = Microcosm.from_summary(data['parentItem'])
-            else:
-                searchresult.parent_item = None
+            searchresult.parent_item = populate_item(searchresult.parent_item_type, data['parentItem'])
 
         searchresult.rank = data['rank']
         searchresult.last_modified = data['lastModified']

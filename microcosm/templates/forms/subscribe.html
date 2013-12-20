@@ -18,7 +18,7 @@
       <form method="POST" action="" id="email_me_form">
       {% csrf_token %}
       <span class="glyphicon glyphicon-arrow-right"></span>
-        <label><input type="checkbox" id="emailme" /> Instantly notify me by email</label>
+        <label><input type="checkbox" id="emailme" {% if content.meta.flags.sendEmail %} checked{% endif %} /> Instantly notify me by email</label>
       </form>
     </div>
   </div>
