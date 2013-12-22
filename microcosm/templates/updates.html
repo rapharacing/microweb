@@ -37,11 +37,11 @@
 
                         {% if update.parent_item_type == "conversation" or update.item_type == "conversation" %}
 
-                          <span class="glyphicon glyphicon-comment"></span>
+                          <span class="sprite sprite-speech-bubble"></span>
 
                         {% elif update.parent_item_type == "event" or update.item_type == "event" %}
 
-                          <span class="glyphicon glyphicon-calendar"></span>
+                          <span class="sprite sprite-calendar"></span>
 
                         {% endif %}
                       {% endif %}
@@ -145,7 +145,7 @@
 
                     <div class="row-meta">
 
-                      <span class="glyphicon glyphicon-arrow-right"></span>
+                      <span class="sprite sprite-arrow-right"></span>
 
                       <a href="{{ update.parent_link }}">
                         view

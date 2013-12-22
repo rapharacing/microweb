@@ -28,7 +28,7 @@
           </a>
 
           {% if comment.in_reply_to %}
-          <span class="glyphicon glyphicon-arrow-right"></span>
+          <span class="sprite sprite-arrow-forward"></span>
           <span>
             in reply to
             <a href="{% url 'single-comment' comment.in_reply_to %}">
@@ -50,7 +50,7 @@
         {% if not comment.meta.created_by.id == user.id %}
             <a class="insertReplyBox"
                data-ref="{{ comment.meta.created_by.id }}" href="javascript:void 0">
-              <span class="glyphicon glyphicon-arrow-left"></span>
+              <span class="sprite sprite-arrow-left"></span>
               Reply to
               <strong>@{{ comment.meta.created_by.profile_name|truncatechars:25 }}</strong>
             </a>

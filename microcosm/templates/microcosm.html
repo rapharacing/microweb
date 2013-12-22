@@ -28,10 +28,15 @@
 
 	        <div class="list-collection-row-icon">
 	          {% if item.flags.sticky %}
-	            <span class="glyphicon glyphicon-pushpin"></span>
+	            <span class="sprite sprite-pushpin"></span>
 	          {% endif %}
-	          {% ifequal item.item_type "event" %}
-	            <span class="glyphicon glyphicon-calendar"></span>
+            {% comment %}
+            {% ifequal item.item_type "conversation" %}
+              <span class="sprite sprite-speech-bubble"></span>
+            {% endifequal %}
+            {% endcomment %}
+            {% ifequal item.item_type "event" %}
+	            <span class="sprite sprite-calendar"></span>
 	          {% endifequal %}
 	        </div>
 
@@ -40,33 +45,34 @@
             <div class="row-title-wrapper">
   	          <a href="/{{ item.item_type }}s/{{ item.id }}/{% if user %}newest/{% endif %}">
   	            <h3 class="row-title">{{ item.title }}</h3>
-                {% if item.item_type == "event" %}
-                <div class="pills-event">
-                  <span>
-                    {{ item.item.when|date:"N jS" }}
-                  </span>
-                  <span>
-                    {{ item.item.where }}
-                  </span>
-                </div>
-                {% endif %}
   	          </a>
             </div>
 
 	          {% if not item.flags.sticky %}
 	          <div class="row-meta">
 
-              {% comment %}
               <a href="{% url 'single-profile' item.meta.created_by.id %}">
                 <img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{ item.meta.created_by.avatar }}{% elif 'files' in  item.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ item.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.meta.created_by.profile_name }}" />
                 @{{ item.meta.created_by.profile_name|truncatechars:25 }}
               </a>
-              {% endcomment %}
+              {% comment %}
               <a href="{% url 'single-profile' item.meta.created_by.id %}">
                 {{ item.meta.created_by.profile_name|truncatechars:25 }}
               </a>
+              {% endcomment %}
 
                 started <time datetime="{{ item.meta.created|date:"c" }}"></time>
+
+              {% if item.item_type == "event" %}
+              <div class="pills-event">
+                <span>
+                  {{ item.item.when|date:"N jS" }}
+                </span>
+                <span>
+                  {{ item.item.where }}
+                </span>
+              </div>
+              {% endif %}
 	          </div>
 	          {% endif %}
 	        </div>
@@ -121,7 +127,7 @@
                   {% if item.last_reply.author %}
 	                <div class="microcosm-item-recent-comment">
 	                  <a href="{% url 'profile' item.last_reply.author.name|slugify %}">
-	                    {{ item.last_reply.author.name}}
+	                    @{{ item.last_reply.author.name}}
 	                  </a> replied {{ item.last_reply.timeago }} ago
 	                </div>
                   {% endif %}
@@ -131,7 +137,7 @@
 
 		            {% if item.last_comment_created %}
 		            	<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
-		            		{{item.last_comment_created_by.profile_name }}
+		            		@{{item.last_comment_created_by.profile_name }}
 		            	</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
 		            {% endif %}
 
@@ -169,10 +175,10 @@
       <h5>Got something to add?</h5>
       <div class="metabar-module-primary-buttons">
         <a href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary">
-          <span class="glyphicon glyphicon-comment"></span> Start a conversation
+          <span class="sprite sprite-speech-bubble-small"></span> Start a conversation
         </a>
         <a href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary">
-          <span class="glyphicon glyphicon-calendar"></span> Start an event
+          <span class="sprite sprite-calendar-small"></span> Start an event
         </a>
       </div>
     </div> <!-- primary actions -->
