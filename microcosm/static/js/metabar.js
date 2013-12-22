@@ -132,10 +132,10 @@
 
   $('.metabar-toggle').on('click',function(){
     var metabar = $('.metabar');
-    if (metabar[0].style.left === '0px'){
-      metabar.css('left','100%');
+    if (metabar[0].style.right === '0px'){
+      metabar[0].style.right = '-350px';
     }else{
-      metabar.css('left','0');
+      metabar[0].style.right = '0px';
     }
   });
 
