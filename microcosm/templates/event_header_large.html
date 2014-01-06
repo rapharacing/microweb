@@ -130,23 +130,29 @@
             <span>{{ rsvp_num_invited|default:"0" }}</span>
           </li>
         </ul>
-
-        {% if user_is_attending %}
-          <h3>You are attending this event.</h3>
-          <form method="POST" action="{% url 'rsvp-event' content.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="rsvp" value="no" />
-            <input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default">
-          </form>
-        {% else %}
-          <h3>Are you attending this event?</h3>
-          {% if user %}
+        {% if user %}
+          {% if user_is_attending %}
+            <h3>You are attending this event.</h3>
             <form method="POST" action="{% url 'rsvp-event' content.id %}">
               {% csrf_token %}
-              <input type="hidden" name="rsvp" value="yes" />
-              <input type="submit" class="btn btn-lg btn-primary" value="Yes, I'm attending!" />
+              <input type="hidden" name="rsvp" value="no" />
+              <input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default">
             </form>
+          {% else %}
+            <h3>Are you attending this event?</h3>
+              <form method="POST" action="{% url 'rsvp-event' content.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="rsvp" value="yes" />
+                <input type="submit" class="btn btn-lg btn-primary" value="Yes, I'm attending!" />
+              </form>
           {% endif %}
+        {% else %}
+          <h3>Sign in to reserve your place in this event!</h3>
+          <p>
+            <button class="btn btn-primary btn-lg" id="login_link" onclick="login()">
+              Sign In or Register to attend!
+            </button>
+          </p>
         {% endif %}
       </div>
 
