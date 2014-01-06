@@ -1188,7 +1188,6 @@ class Event(APIResource):
         # If it is not found, POST an attendance
         try:
             resource = APIResource.update(collection_url, json.dumps(attendance_data), {'access_token': access_token}, {})
-            print json.dumps(attendance_data)
         except RequestException:
             raise
         return Event.from_api_response(resource)
