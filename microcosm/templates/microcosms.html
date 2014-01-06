@@ -111,11 +111,34 @@
       <h3>
         {{ site.title }}
       </h3>
-
       <p>
         {{ site.description }}
       </p>
     </div>
   </div> <!-- / about -->
+
+
+  <div class="metabar-module">
+    <h5>Population</h5>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <span class="badge-alt">{{ site.meta.totalProfiles }}</span>
+        Members
+      </li>
+      <li class="list-group-item">
+        <span class="badge-alt">{{ site.meta.totalConversations }}</span>
+        Conversations
+      </li>
+      <li class="list-group-item">
+        <span class="badge-alt">{{ site.meta.totalComments }}</span>
+        Comments
+      </li>
+      <li class="list-group-item">
+        <span class="badge-alt">{{ site.meta.onlineProfiles }}</span>
+        Members online now
+      </li>
+    </ul>
+  </div> <!-- / population -->
+
 
 {% endblock%}
