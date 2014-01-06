@@ -55,7 +55,7 @@
 
                   <div class="input-group">
                     <div class="input-group-addon">
-                      <span class="glyphicon glyphicon-search"></span>
+                      <span class="sprite sprite-search-small"></span>
                     </div>
                     <input id="invite"
                            class="form-control"
@@ -80,9 +80,9 @@
                         <li class="se-bold"><strong>Bold</strong></li>
                         <li class="se-italics"><i>Italics</i></li>
                         <li class="se-quote">Quote</li>
-                        <li class="se-link"><span class="glyphicon glyphicon-link"></span> Link</li>
-                        <li class="se-list"><span class="glyphicon glyphicon-th-list"></span> List</li>
-                        <li class="se-image"><span class="glyphicon glyphicon-picture"></span> Image</li>
+                        <li class="se-link"><span class="sprite sprite-format-link"></span> Link</li>
+                        <li class="se-list"><span class="sprite sprite-format-list"></span> List</li>
+                        <li class="se-image"><span class="sprite sprite-format-img"></span> Image</li>
                       </ul>
                       <textarea id="reply-box-textarea"
                                 name="firstcomment"
@@ -97,7 +97,7 @@
                           <input type="file" id="reply-box-attachments" name="attachments" multiple/>
                         </div>
                         <a href="javascript:void 0" class="formatting-help-handle">
-                          <span class="glyphicon glyphicon-question-sign"></span>
+                          <span class="sprite sprite-help-small"></span>
                           Formatting help
                         </a>
                       </div>
@@ -106,6 +106,27 @@
 
               </div>
             </div> <!-- /form-group -->
+
+            <div class="form-group form-group-highlighted">
+              <div class="row">
+                <label class="col-sm-12">Is this huddle confidential?</label>
+                <div class="col-sm-12">
+                  <p>
+                    Confidential huddles disable the ability to invite more people later on.
+                  </p>
+                  <p>
+                  <label>
+                    <input type="radio" name="confidential" value="yes" />
+                    Yes
+                  </label>
+                  <label>
+                    <input type="radio" name="confidential" value="no" />
+                    No
+                  </label>
+                  </p>
+                </div>
+              </div>
+            </div>
 
         </div> <!-- /form-container-inner -->
 
