@@ -1180,12 +1180,9 @@ class Event(APIResource):
     def rsvp(cls, host, event_id, profile_id, attendance_data, access_token):
         """
         Create or update attendance to an event.
-        TODO: This is obviously pretty nasty but it'll be changed when PATCH support is added.
         """
 
         collection_url = build_url(host, [cls.api_path_fragment, event_id, 'attendees'])
-
-        # If it is not found, POST an attendance
         try:
             resource = APIResource.update(collection_url, json.dumps(attendance_data), {'access_token': access_token}, {})
         except RequestException:
