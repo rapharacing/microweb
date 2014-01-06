@@ -48,7 +48,11 @@
       <div class="comment-item-inner">
         <div class="comment-item-header">
           <div class="comment-item-author">
+            {% if user %}
               <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
+            {% else %}
+              <img src="/static/img/avatar.gif" />
+            {% endif %}
               <strong>Post a reply</strong>
           </div>
         </div>
