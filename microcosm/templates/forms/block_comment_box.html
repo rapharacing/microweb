@@ -4,9 +4,9 @@
     <li class="se-bold"><strong>Bold</strong></li>
     <li class="se-italics"><i>Italics</i></li>
     <li class="se-quote">Quote</li>
-    <li class="se-link"><span class="glyphicon glyphicon-link"></span> Link</li>
-    <li class="se-list"><span class="glyphicon glyphicon-th-list"></span> List</li>
-    <li class="se-image"><span class="glyphicon glyphicon-picture"></span> Image</li>
+    <li class="se-link"><span class="sprite sprite-format-link"></span> Link</li>
+    <li class="se-list"><span class="sprite sprite-format-list"></span> List</li>
+    <li class="se-image"><span class="sprite sprite-format-img"></span> Image</li>
   </ul>
   <form action="{% url 'create-comment' %}" method="POST">
     {% csrf_token %}
@@ -29,7 +29,7 @@
       <input type="submit" class="btn btn-primary" value="Post reply">
       <input type="reset" class="btn btn-default" value="Cancel">
       <a href="javascript:void 0" class="formatting-help-handle">
-        <span class="glyphicon glyphicon-question-sign"></span>
+        <span class="sprite sprite-help-small"></span>
         Formatting help
       </a>
     </div>
@@ -39,9 +39,9 @@
     <li><strong>Bold</strong></li>
     <li><i>Italics</i></li>
     <li>Quote</li>
-    <li><span class="glyphicon glyphicon-link"></span> Link</li>
-    <li><span class="glyphicon glyphicon-th-list"></span> List</li>
-    <li><span class="glyphicon glyphicon-picture"></span> Image</li>
+    <li><span class="sprite sprite-format-link"></span> Link</li>
+    <li><span class="sprite sprite-format-list"></span> List</li>
+    <li><span class="sprite sprite-format-img"></span> Image</li>
   </ul>
   <div class="dummy-textarea">
     <button class="btn btn-primary" onclick="login()">Sign-in to post a reply</button>

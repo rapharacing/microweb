@@ -6,7 +6,7 @@
     <input type="hidden" name="update_type_id" value="1">
 
     <button id="subscribe_button" class="btn btn-xsmall btn-primary {% if content.meta.flags.watched %}btn-success{% endif %}">
-      <span class="glyphicon glyphicon-ok"></span>
+      <span class="sprite sprite-ok-small"></span>
       <strong>
         {% if content.meta.flags.watched %}Added to updates{%else%}Subscribe{% endif %}
       </strong>
@@ -17,7 +17,7 @@
     <div class="subscribe-meta" {% if content.meta.flags.watched %}style="display: block;"{% else %}style="display: none;"{% endif %}>
       <form method="POST" action="" id="email_me_form">
       {% csrf_token %}
-      <span class="glyphicon glyphicon-arrow-right"></span>
+      <span class="sprite sprite-arrow-right"></span>
         <label><input type="checkbox" id="emailme" {% if content.meta.flags.sendEmail %} checked{% endif %} /> Instantly notify me by email</label>
       </form>
     </div>

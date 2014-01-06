@@ -49,14 +49,14 @@
                   </div>
 
 
-                    <div class="col-sm-3 col-md-3 col-lg-2 navbar-profile navbar-collapse">
+                    <div class="col-sm-3 col-md-3 col-lg-2 navbar-profile">
                     {% if user %}
                       <a href="{% url 'edit-profile' user.id %}" title="Edit your profile">
                         <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
                         <strong>{{ user.profile_name }}</strong>
                       </a>
                       <a href="{% url 'list-huddle'%}">
-                        <span class="glyphicon glyphicon-envelope"></span>
+                        <span class="sprite sprite-envelope-small"></span>
                         <strong>Huddles</strong>
                         <span class="badge">new</span>
                       </a>
@@ -66,11 +66,11 @@
                       </button>
                     {% endif %}
                     </div><!-- /.navbar-profile -->
-                  <div class="col-sm-5 col-md-6 col-lg-6 navbar-search navbar-collapse">
+                  <div class="col-sm-5 col-md-6 col-lg-6 navbar-search">
                     <form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
                       <div class="input-group">
                         <label class="input-group-addon" for="navbar-search-input">
-                          <span class="glyphicon glyphicon-search"></span>
+                          <span class="sprite sprite-search-small"></span>
                         </label>
                         <input type="text"
                                id="navbar-search-input"
