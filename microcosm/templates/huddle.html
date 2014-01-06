@@ -95,35 +95,17 @@
   <h5>About</h5>
   <div class="metabar-module-title">
     <h3>
-      {{ huddle.name }}
+      {{ content.title }}
     </h3>
-
-    {% include 'forms/subscribe.html' %}
 
     <p class="metabar-module-author">
       <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by">
       	<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name }}" />
-      	{{ content.meta.created_by.profile_name|truncatechars:25 }}
+      	@{{ content.meta.created_by.profile_name|truncatechars:25 }}
       </a> Started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
     </p>
   </div>
 </div> <!-- / about -->
-
-
-<form method="POST" action="{% url 'delete-huddle' content.id %}" id="huddle_delete_form" class="hidden-xs">
-	{% csrf_token %}
-	<p class="text-muted"><a id="delete-huddle" href="#" onClick="if (confirm('Leaving a huddle is a one-way action, are you sure?')) {$('#huddle_delete_form').submit()}" class="text-danger">Leave</a> this huddle (warning: this can not be undone)</p>
-</form>
-
-
-{% if content.meta.permissions.owner %}
-<p>Invite another participant:</p>
-<form method="POST" action="{{ content.meta.links.self.href }}/invite/" id="invite_form">
-	{% csrf_token %}
-	<input type="text" name="invite_profile_id">
-	<input class="btn btn-default btn-block" id="invite" type="submit" value="invite user" />
-</form>
-{% endif %}
 
 {% endblock %}
 

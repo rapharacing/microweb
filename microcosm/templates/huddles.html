@@ -37,8 +37,6 @@
 	          			<img src="{% if 'gravatar' in item.last_comment_created_by.avatar %}{{item.last_comment_created_by.avatar}}{% elif 'files' in item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.last_comment_created_by.profile_name }}"/>
 	          			@{{ item.last_comment_created_by.profile_name|truncatechars:25 }}
 	          		</a>
-	          		:
-	          		"{{ item.last_reply.text|striptags|truncatechars:40}}"
 	          		&bull;
 		            <time datetime="{{ item.last_comment_created|date:"c" }}">
                   {{ item.last_comment_created|timesince }}
@@ -62,27 +60,30 @@
           <div class="row-stats">
             <ul class="list-stats list-stats-sm">
               <li>
+              {% comment %}
                 <span class="label label-warning">New</span>
-                <span>{{ item.total_comments }}</span>
+              {% endcomment %}
+                <span>{{ item.total_comments|default:"0" }}</span>
                 comment{{ item.total_comments|pluralize:",s"}}
               </li>
             </ul>
           </div>
           <div class="row-context">
-          	{% comment %}
             <ul class="list-people list-people-sm pull-right">
               <li>
-                <img src="{{ STATIC_URL }}{{ member.avatar }}" />
+                <img src="https://{{site.subdomain_key}}.microco.sm{{ user.avatar }}" />
               </li>
-              {% for other_member in participating %}
-              <li>
-                <a href="{% url 'profile' other_member.name|slugify %}">
-                  <img src="{{ STATIC_URL }}{{ other_member.avatar }}" />
-                </a>
-              </li>
+              {% for participant in item.participants %}
+                {% if participant.id != user.id %}
+                <li>
+                  <a href="{% url 'single-profile' participant.id %}">
+                    <img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name }}"/>
+                    @{{ participant.profile_name }}
+                  </a>
+                </li>
+                {% endif %}
               {% endfor %}
             </ul>
-            {% endcomment %}
           </div>
         </div> <!-- /col-sm-4 -->
       </div> <!--/row -->
@@ -105,7 +106,7 @@
   <h5>Got something to add?</h5>
   <div class="metabar-module-primary-buttons">
     <a href="{% url 'create-huddle' %}" class="btn btn-large btn-block btn-primary">
-      <span class="glyphicon glyphicon-comment"></span> Send a Message
+      <span class="sprite sprite-envelope-small"></span> Send a Message
     </a>
   </div>
 </div> <!-- primary actions -->
