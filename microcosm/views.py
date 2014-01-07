@@ -98,10 +98,29 @@ def build_pagination_links(request, paged_list):
     and generates a dictionary of navigation links based on that.
     """
 
-    page_nav = {}
+    try:
+        paged_list.page
+    except AttributeError:
+        return {}
+
+    page_nav = {
+        'page'        : paged_list.page,
+        'total_pages' : paged_list.total_pages,
+        'limit'       : paged_list.limit
+    }
 
     for item in request:
         page_nav[item['rel']] = str.replace(str(item['href']),'/api/v1','')
+
+    page_nav['numbers'] = [
+        ( paged_list.page, ("?offset=%s" % paged_list.offset if paged_list.offset > 0 else "") )
+    ]
+
+    if paged_list.page > 1:
+        page_nav['numbers'].insert(0, (paged_list.page-1, page_nav['prev'] ) )
+
+    if paged_list.page < paged_list.total_pages:
+        page_nav['numbers'].append( (paged_list.page+1, page_nav['next'] ) )
 
     return page_nav
 
@@ -444,7 +463,7 @@ class HuddleView(object):
 class ProfileView(object):
 
     edit_form = ProfileEdit
-    form_template = 'forms/profile.html'
+    form_template = 'forms/form_profile.html'
     single_template = 'profile.html'
     list_template = 'profiles.html'
 
@@ -1422,7 +1441,7 @@ class SearchView(object):
                 'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
                 'site': request.site,
                 'content': search,
-                'pagination': build_pagination_links(responses[url]['results']['links'], search)
+                'pagination': build_pagination_links(responses[url]['results']['links'], search.results)
             }
 
             return render(request, SearchView.single_template, view_data)

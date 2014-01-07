@@ -21,8 +21,11 @@
 
 
   <div class="row">
-    <div class="col-sm-12">
-    {% include 'breadcrumbs.html' %}
+    <div class="col-sm-6">
+      {% include 'breadcrumbs.html' %}
+    </div>
+    <div class="col-sm-6">
+      {% include 'pagination.html' %}
     </div>
   </div>
   <h1>Search results for &quot;{{ content.query.searched|safe }}&quot;</h1>
@@ -107,7 +110,7 @@
 
                   {% if result.item_type == 'conversation' or result.item_type == 'event'%}
                   <a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">
-                    <h3 class="row-title">{{ result.item.title }}</h3>
+                    <h3 class="row-title">{{ result.highlight|safe }}</h3>
                   </a>
                   {% else %}
                   <a href="{{ result.item.meta.links.self.href }}/incontext/">
@@ -131,7 +134,7 @@
                       <img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
                     </a>
                     <div class="row-meta-excerpt-text">
-                      {{ result.highlight|safe }}
+                      &quot;{{ result.highlight|safe }}&quot;
                     </div>
                   </div>
                   {% endif %}

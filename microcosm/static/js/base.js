@@ -42,10 +42,33 @@ $('document').ready(function() {
 			$(this).addClass('lang-' + lang);
 		}
 	});
-	
+
 	prettyPrint();
 
 
 	// Make tables in user generated content look pretty
 	$('.ugc table').addClass('table').addClass('table-hover');
 });
+
+
+
+////////////////////
+//	pagination    //
+////////////////////
+(function(){
+	$('form[name=paginationByOffset]').submit(function(e){
+		var self   = $(e.currentTarget),
+				limit  = self.attr('data-limit'),
+				max    = self.attr('data-max'),
+				value  = self.find('input[type=text]').val(),
+				hidden = self.find('input[name=offset]');
+
+		if (isNaN(value) || value < 1 || value > max){
+			e.preventDefault();
+		}else{
+			if (limit && value){
+				hidden.val( limit * (value-1) );
+			}
+		}
+	});
+})();
