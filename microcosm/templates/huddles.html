@@ -63,9 +63,9 @@
           <div class="row-stats">
             <ul class="list-stats list-stats-sm">
               <li>
-              {% comment %}
+              {% if item.meta.flags.unread %}
                 <span class="label label-warning">New</span>
-              {% endcomment %}
+              {% endif %}
                 <span>{{ item.total_comments|default:"0" }}</span>
                 comment{{ item.total_comments|pluralize:",s"}}
               </li>
