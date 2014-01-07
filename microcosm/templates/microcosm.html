@@ -5,10 +5,10 @@
 
 <div class="content-header padded">
   <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-8">
       {% include 'breadcrumbs.html' %}
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-4">
       {% include 'pagination.html' %}
     </div>
   </div>
@@ -33,11 +33,9 @@
 	          {% if item.flags.sticky %}
 	            <span class="sprite sprite-pushpin"></span>
 	          {% endif %}
-            {% comment %}
             {% ifequal item.item_type "conversation" %}
               <span class="sprite sprite-speech-bubble"></span>
             {% endifequal %}
-            {% endcomment %}
             {% ifequal item.item_type "event" %}
 	            <span class="sprite sprite-calendar"></span>
 	          {% endifequal %}
@@ -194,12 +192,12 @@
       <h3>
         {{ content.title }}
       </h3>
-
-      {% include 'forms/subscribe.html' %}
-
       <p>
         {{ content.description }}
       </p>
+
+      {% include 'forms/subscribe.html' %}
+
       <p class="metabar-module-author">
         <a href="{% url 'single-profile' content.meta.created_by.id %}">
         	<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
