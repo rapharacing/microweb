@@ -49,6 +49,7 @@
       {% if user %}
         {% if not comment.meta.created_by.id == user.id %}
             <a class="insertReplyBox"
+               data-action="{% url 'create-comment' %}"
                data-ref="{{ comment.meta.created_by.id }}" href="javascript:void 0">
               <span class="sprite sprite-arrow-left"></span>
               Reply to
