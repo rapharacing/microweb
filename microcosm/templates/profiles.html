@@ -36,8 +36,8 @@
               <div class="pull-right">
                 <a href="/profiles/{% if q != "" or not top %}?{% endif %}{% if q != "" %}q={{ q }}{% endif %}{% if q != "" and not top %}&{% endif %}{% if not top %}top=true{% endif %}">Sort {% if top %}alphabetically{% else %}by post count{% endif %}</a>
               </div>
-              <div class="pagination">
-                <ul>
+              <div class="pagination-wrapper">
+                <ul class="pagination">
                   <li>
                     <a href="/profiles/{% if top %}?top=true{% endif %}">All</a>
                   </li>
