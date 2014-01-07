@@ -23,10 +23,23 @@
           Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
         </div>
       </div>
+      {% with content.comments.items as comments %}
       {% include 'block_comments.html' %}
+      {% endwith %}
     </div> <!-- item -->
 
   </div> <!-- / content-body -->
+
+<div class="content-footer padded">
+  <div class="row">
+    <div class="col-sm-8">
+      {% include 'breadcrumbs.html' %}
+    </div>
+    <div class="col-sm-4">
+      {% include 'pagination.html' %}
+    </div>
+  </div>
+</div>
 
 <a name="reply"></a>
   <div class="reply-container">
@@ -35,7 +48,11 @@
         <div class="comment-item-inner">
           <div class="comment-item-header">
             <div class="comment-item-author">
-                <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
+                {% if user %}
+                  <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
+                {% else %}
+                  <img src="/static/img/avatar.gif" />
+                {% endif %}
                 <strong>Post a reply</strong>
             </div>
           </div>
@@ -47,13 +64,7 @@
     </ul>
   </div> <!-- /reply-container -->
 
-<div class="content-footer padded">
-  <div class="row">
-    <div class="col-sm-12">
-      {% include 'breadcrumbs.html' %}
-    </div>
-  </div>
-</div>
+
 {% endblock content %}
 
 {% block sidebar %}

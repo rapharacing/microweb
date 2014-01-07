@@ -39,10 +39,23 @@
       {% include 'event_header_large.html' %}
     {% endif %}
 
-    {% include 'block_comments.html' %}
+    {% with content.comments.items as comments %}
+      {% include 'block_comments.html' %}
+    {% endwith %}
 
   </div> <!-- item -->
 </div> <!-- / content-body -->
+
+<div class="content-footer padded">
+  <div class="row">
+    <div class="col-sm-8">
+      {% include 'breadcrumbs.html' %}
+    </div>
+    <div class="col-sm-4">
+      {% include 'pagination.html' %}
+    </div>
+  </div>
+</div> <!-- /content-footer -->
 
 <a name="reply"></a>
 <div class="reply-container">
@@ -68,13 +81,7 @@
 </div> <!-- /reply-container -->
 
 
-<div class="content-footer padded">
-  <div class="row">
-    <div class="col-sm-12">
-    {% include 'breadcrumbs.html' %}
-    </div>
-  </div>
-</div> <!-- /content-footer -->
+
 
 {% endblock content %}
 
