@@ -514,7 +514,8 @@ class Meta(object):
             self.stats = {}
             for stat in data['stats']:
                 if stat.get('metric'):
-                    self.stats[stat.get('metric')] = stat['metric']
+                    self.stats[stat['metric']] = stat['value']
+
 
 class PermissionSet(object):
     """
