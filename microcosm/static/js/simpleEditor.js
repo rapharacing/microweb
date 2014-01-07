@@ -135,7 +135,7 @@
 
     simpleEditor.prototype.image = function(){
 
-      var output = this.insertLinkWith("!(%s)[%s]");
+      var output = this.insertLinkWith("![%s](%s)");
       if (output){
         this.textarea.value = output;
       }
