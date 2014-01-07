@@ -1,6 +1,7 @@
 <ul class="list-comments">
-  {% for comment in content.comments.items %}
+  {% for comment in comments %}
   <li id="comment{{ comment.id }}" class="comment-item">
+    <a name="{{ comment.id }}"></a>
     <div class="comment-item-inner">
       <div class="comment-item-header">
 
@@ -19,20 +20,21 @@
         </div>
 
         <div class="comment-item-author">
-
+        {% if comment.meta.created_by %}
           <a href="{% url 'single-profile' comment.meta.created_by.id %}">
             <img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" />
             <strong class="comment-item-author-name">
               {{ comment.meta.created_by.profile_name|truncatechars:25 }}
             </strong>
           </a>
+          {% endif %}
 
           {% if comment.in_reply_to %}
           <span class="sprite sprite-arrow-forward"></span>
           <span>
             in reply to
-            <a href="{% url 'single-comment' comment.in_reply_to %}">
-              [FIXME]
+            <a href="{% url 'incontext-comment' comment.in_reply_to %}">
+              #{{ comment.in_reply_to }}
             </a>
           </span>
           {% endif %}
@@ -50,7 +52,7 @@
         {% if not comment.meta.created_by.id == user.id %}
             <a class="insertReplyBox"
                data-action="{% url 'create-comment' %}"
-               data-ref="{{ comment.meta.created_by.id }}" href="javascript:void 0">
+               data-ref="{{ comment.id }}" href="javascript:void 0">
               <span class="sprite sprite-arrow-left"></span>
               Reply to
               <strong>@{{ comment.meta.created_by.profile_name|truncatechars:25 }}</strong>
