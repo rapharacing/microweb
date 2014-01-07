@@ -98,6 +98,7 @@ def build_pagination_links(request, paged_list):
     and generates a dictionary of navigation links based on that.
     """
 
+    # trips if paged_list is not paginatedList object.
     try:
         paged_list.page
     except AttributeError:
@@ -1050,11 +1051,14 @@ class CommentView(object):
         )
         request.view_requests.append(grequests.get(url, params=params, headers=headers))
         responses = response_list_to_dict(grequests.map(request.view_requests))
+        content = Comment.from_api_response(responses[url])
+        comment_form = CommentForm(initial=dict(itemId=content.item_id, itemType=content.item_type))
 
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': request.site,
-            'content': Comment.from_api_response(responses[url]),
+            'content': content,
+            'comment_form' : comment_form
         }
 
         return render(request, CommentView.single_template, view_data)
