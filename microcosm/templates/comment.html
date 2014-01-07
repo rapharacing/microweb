@@ -1,32 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row content-header">
-  <div class="col-xs-12">
-    <div class="row">
-      <div class="col-sm-6">
-        {% include 'breadcrumbs.html' %}
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="content-body">
-  <div class="item">
-
-    <div class="item-header">
-      <h1>{{content.title}}</h1>
-      <div class="item-meta">Posted on {{ content.meta.created|date:"D jS, F Y"}}</div>
+    <div class="alert alert-warning">
+      You are reading a single comment and it's replies.
+      <a href="{{ content.meta.links.commentPage.href }}#{{ content.id }}">Click here to read the full conversation.</a>
     </div>
-    {% if content.itemType == 'event' %}
-    	{% include 'event_header_small.html' %}
-    {% endif %}
-  </div> <!-- item -->
 
-  {% with comments as content.meta.parents %}
-      {% include 'block_comments.html' %}
-    {% endwith %}
+  {% if content.meta.parents %}
+    <div class="list-comments-dull">
+  {% with content.meta.parents as comments %}
+    {% include 'block_comments.html' %}
+  {% endwith %}
+    </div>
+  {% endif %}
 
-    <ul class="list-comments">
+    <ul class="list-comments list-comments-highlighted">
       <li id="comment{{ content.id }}" class="comment-item">
         <div class="comment-item-inner">
           <div class="comment-item-header">
@@ -44,25 +33,24 @@
             </div>
 
             <div class="comment-item-author">
-
+            {% if content.meta.created_by %}
               <a href="{% url 'single-profile' content.meta.created_by.id %}">
                 <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" align="left" class="gravatar" />
-                <strong>
+                <strong class="comment-item-author-name">
                   {{ content.meta.created_by.profile_name|truncatechars:25 }}
                 </strong>
               </a>
+              {% endif %}
 
-              {% comment %}
-              {% if content.is_in_reply_to %}
-              <span class="glyphicon glyphicon-arrow-right"></span>
+              {% if content.in_reply_to %}
+              <span class="sprite sprite-arrow-forward"></span>
               <span>
                 in reply to
-                <a href="{% url 'comments' content.replied_to_parent_content.item.microcosm.name|slugify content.replied_to_parent_content.item.name|slugify content.replied_to_parent_content.id %}">
-                  {{ content.replied_to_parent_content.author.name }}
+                <a href="{% url 'incontext-comment' content.in_reply_to %}">
+                  #{{ content.in_reply_to }}
                 </a>
               </span>
               {% endif %}
-              {% endcomment %}
             </div>
 
           </div>
@@ -70,23 +58,38 @@
             {{ content.html|safe }}
           </div>
 
-          {% if user %}
           <div class="comment-item-footer">
-            <a class="insertReplyBox" href="javascript:void 0">
-              <span class="glyphicon glyphicon-arrow-left"></span>
-              Reply to
-              <strong>@{{ content.meta.created_by.profile_name|truncatechars:25 }}</strong>
-            </a>
-          </div>
+            <div class="comment-item-attachments">
+            </div>
+          {% if user %}
+            {% if not content.meta.created_by.id == user.id %}
+                <a class="insertReplyBox"
+                   data-action="{% url 'create-comment' %}"
+                   data-ref="{{ content.id }}" href="javascript:void 0">
+                  <span class="sprite sprite-arrow-left"></span>
+                  Reply to
+                  <strong>@{{ content.meta.created_by.profile_name|truncatechars:25 }}</strong>
+                </a>
+            {%else%}
+              <a class="insertReplyBox"
+                 data-action="{% url 'edit-comment' content.id %}"
+                 data-source="{% url 'source-comment' content.id %}"
+                 data-comment-id="{{ content.id }}"
+                 href="javascript:void 0">Edit</a>
+            {% endif %}
           {% endif %}
+          </div>
 
         </div>
       </li>
     </ul>
-
-    {% with comments as content.meta.children %}
-      {% include 'block_comments.html' %}
-    {% endwith %}
+    {% if content.meta.children %}
+    <div class="list-comments-dull">
+      {% with content.meta.children as comments%}
+        {% include 'block_comments.html' %}
+      {% endwith %}
+    </div>
+    {% endif %}
 
 </div> <!-- / content-body -->
 
@@ -96,7 +99,11 @@
         <div class="comment-item-inner">
           <div class="comment-item-header">
             <div class="comment-item-author">
-                <img src="{{ STATIC_URL }}{{ member.avatar}}" />
+              {% if user %}
+                <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
+              {% else %}
+                <img src="/static/img/avatar.gif" />
+              {% endif %}
                 <strong>Post a reply</strong>
             </div>
           </div>
@@ -113,23 +120,11 @@
 {% block sidebar %}
 
   <div class="metabar-module">
-    <h5>Got something to add?</h5>
-    <div class="metabar-module-primary-buttons">
-      <a href="#" class="btn btn-large btn-block btn-primary">
-        <span class="glyphicon glyphicon-comment"></span> Post a reply
-      </a>
-    </div>
-  </div> <!-- primary actions -->
-
-  <div class="metabar-module">
     <h5>About</h5>
     <div class="metabar-module-title">
       <h3>
         {{ content.title }}
       </h3>
-
-      {% include 'forms/subscribe.html' %}
-
       <p>
         {{ content.description }}
       </p>
@@ -146,15 +141,26 @@
 {% endblock %}
 
 {% block js %}
-
-<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+{% if user %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/comments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
 <script type="text/javascript">
-  (function(){
+(function(){
 
-    var se = new simpleEditor({
-      el : '.reply-box'
-    });
+  var comments = new Comments({
+    el               : '.content-body',
+    defaultContainer : '.reply-container',
+    template         : $('.reply-container .comment-item-body').html().trim()
+  });
 
-  })();
+  var replyBox = new simpleEditor({
+    el : '.reply-box'
+  });
+
+
+})();
 </script>
+{% endif %}
 {% endblock %}
