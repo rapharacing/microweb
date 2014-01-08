@@ -28,7 +28,7 @@
       </div>
       <input type="submit" class="btn btn-primary" value="Post reply">
       <input type="reset" class="btn btn-default" value="Cancel">
-      <a href="javascript:void 0" class="formatting-help-handle">
+      <a href="javascript:void 0" class="formatting-help-handle" data-toggle="modal" data-target="#formatting-help-modal">
         <span class="sprite sprite-help-small"></span>
         Formatting help
       </a>
@@ -48,3 +48,4 @@
   </div>
 {% endif %}
 </div>
+{% include 'modal_formatting_help.html' %}
