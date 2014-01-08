@@ -15,81 +15,17 @@
     </div>
   {% endif %}
 
-    <ul class="list-comments list-comments-highlighted">
-      <li id="comment{{ content.id }}" class="comment-item">
-        <div class="comment-item-inner">
-          <div class="comment-item-header">
+  <ul class="list-comments list-comments-highlighted">
+    {% with content as comment %}
+      {% include 'block_comment_single.html' %}
+    {% endwith %}
+  </ul>
 
-            <div class="comment-item-permalink">
-              {% comment %}
-              <div class="comment-item-header-admin">
-                <input type="checkbox" />
-              </div>
-              {% endcomment %}
-
-              <time datetime="{{ content.meta.created|date:"c" }}">
-                {{ content.meta.created|timesince }}
-              </time>
-            </div>
-
-            <div class="comment-item-author">
-            {% if content.meta.created_by %}
-              <a href="{% url 'single-profile' content.meta.created_by.id %}">
-                <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" align="left" class="gravatar" />
-                <strong class="comment-item-author-name">
-                  {{ content.meta.created_by.profile_name|truncatechars:25 }}
-                </strong>
-              </a>
-              {% endif %}
-
-              {% if content.in_reply_to %}
-              <span class="sprite sprite-arrow-forward"></span>
-              <span>
-                in reply to
-                <a href="{% url 'incontext-comment' content.in_reply_to %}">
-                  #{{ content.in_reply_to }}
-                </a>
-              </span>
-              {% endif %}
-            </div>
-
-          </div>
-          <div class="comment-item-body">
-            {{ content.html|safe }}
-          </div>
-
-          <div class="comment-item-footer">
-            <div class="comment-item-attachments">
-            </div>
-          {% if user %}
-            {% if not content.meta.created_by.id == user.id %}
-                <a class="insertReplyBox"
-                   data-action="{% url 'create-comment' %}"
-                   data-ref="{{ content.id }}" href="javascript:void 0">
-                  <span class="sprite sprite-arrow-left"></span>
-                  Reply to
-                  <strong>@{{ content.meta.created_by.profile_name|truncatechars:25 }}</strong>
-                </a>
-            {%else%}
-              <a class="insertReplyBox"
-                 data-action="{% url 'edit-comment' content.id %}"
-                 data-source="{% url 'source-comment' content.id %}"
-                 data-comment-id="{{ content.id }}"
-                 href="javascript:void 0">Edit</a>
-            {% endif %}
-          {% endif %}
-          </div>
-
-        </div>
-      </li>
-    </ul>
-    {% if content.meta.children %}
-    <div class="list-comments-dull">
-      {% with content.meta.children as comments%}
-        {% include 'block_comments.html' %}
-      {% endwith %}
-    </div>
-    {% endif %}
+  {% if content.meta.children %}
+    {% with content.meta.children as comments %}
+      {% include 'block_comments.html' %}
+    {% endwith %}
+  {% endif %}
 
 </div> <!-- / content-body -->
 
