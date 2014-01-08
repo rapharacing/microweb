@@ -34,11 +34,9 @@
                 <span class="icon-bar"></span>
               </button>
 
-              <button type="button" class="navbar-toggle metabar-toggle">
+              <button type="button" class="metabar-toggle">
                 <span class="sr-only">Toggle metabar</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
+                <span class="sprite sprite-menu-2"></span>
               </button>
 
                 <div class="row">
@@ -49,7 +47,23 @@
                   </div>
 
 
-                    <div class="col-sm-3 col-md-3 col-lg-2 navbar-profile">
+                  <div class="col-sm-8 col-md-6 col-lg-6 navbar-search">
+                    <form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
+                      <div class="input-group">
+                        <label class="input-group-addon" for="navbar-search-input">
+                          <span class="sprite sprite-search-small"></span>
+                        </label>
+                        <input type="text"
+                               id="navbar-search-input"
+                               class="form-control"
+                               name="q"
+                               placeholder="Search conversations, events and people..."
+                               {% if content.query.searched %}value="{{content.query.searched|safe}}"{% endif %} />
+                      </div>
+                    </form>
+                  </div> <!-- /navbar-search -->
+
+                  <div class="col-md-3 col-lg-2 navbar-profile">
                     {% if user %}
                       <div class="navbar-profile-row-1">
                         <a href="{% url 'edit-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">
@@ -83,24 +97,6 @@
                       </div>
                     {% endif %}
                     </div><!-- /.navbar-profile -->
-
-                  <div class="col-sm-5 col-md-6 col-lg-6 navbar-search">
-                    <form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
-                      <div class="input-group">
-                        <label class="input-group-addon" for="navbar-search-input">
-                          <span class="sprite sprite-search-small"></span>
-                        </label>
-                        <input type="text"
-                               id="navbar-search-input"
-                               class="form-control"
-                               name="q"
-                               placeholder="Search conversations, events and people..."
-                               {% if content.query.searched %}value="{{content.query.searched|safe}}"{% endif %} />
-                      </div>
-                    </form>
-                  </div> <!-- /navbar-search -->
-
-                <div class="clearfix"></div>
               </div>
             </div>
 
