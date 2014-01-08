@@ -32,7 +32,6 @@
       this.container    = this.createWidgetContainer();
       this.widget_form  = this.createWidgetForm();
       this.widget_list  = this.createWidgetList();
-      this.popover      = this.createPopover();
 
       this.is_textbox = false;
       if (typeof options.is_textbox !== 'undefined' &&
@@ -43,6 +42,8 @@
         this.widget_input = this.createWidgetInput();
         this.container.appendChild(this.widget_input);
       }
+
+      this.popover      = this.createPopover();
 
       this.widget_form.appendChild(this.widget_list);
       this.container.appendChild(this.widget_form);
@@ -371,8 +372,6 @@
         if (this.cursor > currentList.length-1 ){
           this.cursor = currentList.length-1;
         }
-
-        console.log(this.cursor);
 
         this.renderCursor();
 
