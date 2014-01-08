@@ -66,6 +66,9 @@ from microcosm.forms.forms import ProfileEdit
 from microcosm.forms.forms import HuddleCreate
 from microcosm.forms.forms import HuddleEdit
 
+import logging
+logger = logging.getLogger('microcosm.views')
+
 def exception_handler(view_func):
     """
     Decorator for view functions that raises appropriate
@@ -165,7 +168,7 @@ class ConversationView(object):
     @exception_handler
     def create(request, microcosm_id):
         """
-        Create a conversation.
+        Create a conversation and first comment in the conversation.
         """
 
         responses = response_list_to_dict(grequests.map(request.view_requests))
@@ -194,11 +197,7 @@ class ConversationView(object):
 
         elif request.method == 'GET':
             view_data['form'] = ConversationView.create_form(initial=dict(microcosmId=microcosm_id))
-
-            # for primary action buttons
-            # TODO: maybe we can get more info about current microcosm or the ability to change microcosms from this page
             view_data['microcosm_id'] = microcosm_id
-
             return render(request, ConversationView.form_template, view_data)
 
         else:
@@ -267,7 +266,7 @@ class ConversationView(object):
                 conversation_id,
                 access_token=request.access_token
             )
-            #because redirects are always followed, we can't just get the 'location' value
+            # because redirects are always followed, we can't just get the 'location' value
             response = response['comments']['links']
             for link in response:
                 if link['rel'] == 'self':
@@ -859,17 +858,12 @@ class EventView(object):
                     return HttpResponseServerError()
             else:
                 view_data['form'] = form
-                # for primary buttons
                 view_data['microcosm_id'] = microcosm_id
-
                 return render(request, EventView.form_template, view_data)
 
         elif request.method == 'GET':
             view_data['form'] = EventView.create_form(initial=dict(microcosmId=microcosm_id))
-
-            # for primary buttons
             view_data['microcosm_id'] = microcosm_id
-
             return render(request, EventView.form_template, view_data)
 
         else:
@@ -893,7 +887,6 @@ class EventView(object):
                 return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
             else:
                 view_data['form'] = form
-                # for primary buttons
                 view_data['microcosm_id'] = microcosm_id
 
                 return render(request, EventView.form_template, view_data)
@@ -901,7 +894,6 @@ class EventView(object):
         elif request.method == 'GET':
             event = Event.retrieve(request.META['HTTP_HOST'], id=event_id, access_token=request.access_token)
             view_data['form'] = EventView.edit_form.from_event_instance(event)
-            # for primary buttons
             view_data['microcosm_id'] = microcosm_id
             return render(request, EventView.form_template, view_data)
 
@@ -938,7 +930,7 @@ class EventView(object):
                 event_id,
                 access_token=request.access_token
             )
-            #because redirects are always followed, we can't just get the 'location' value
+            # Because redirects are always followed, we can't just use Location.
             response = response['comments']['links']
             for link in response:
                 if link['rel'] == 'self':
@@ -950,8 +942,8 @@ class EventView(object):
             if queries.get('comment_id'):
                 frag = 'comment' + queries['comment_id'][0]
                 del queries['comment_id']
-            # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
-            # urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
+            # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string).
+            # urlencode will encode the lists into the url (offset=[25]) etc. So get the values straight.
             for (key, value) in queries.items():
                 queries[key] = value[0]
             queries = urlencode(queries)
