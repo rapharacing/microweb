@@ -1,4 +1,4 @@
-{% if pagination %}
+{% if pagination and pagination.total_pages > 1 %}
 <ul class="pagination pull-right">
   {% if pagination.first %}
     <li><a href="{{ pagination.first }}">First</a></li>
