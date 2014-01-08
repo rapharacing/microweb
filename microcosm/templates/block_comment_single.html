@@ -52,8 +52,10 @@
              data-action="{% url 'create-comment' %}"
              data-ref="{{ comment.id }}" href="javascript:void 0">
             <span class="sprite sprite-arrow-left"></span>
-            Reply to
-            <strong>@{{ comment.meta.created_by.profile_name|truncatechars:25 }}</strong>
+            Reply
+            {% comment %}
+            to <strong>@{{ comment.meta.created_by.profile_name|truncatechars:25 }}</strong>
+            {% endcomment %}
           </a>
       {%else%}
         <a class="insertReplyBox"
