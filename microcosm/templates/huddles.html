@@ -73,18 +73,12 @@
           </div>
           <div class="row-context">
             <ul class="list-people list-people-sm pull-right">
-              <li>
-                <img src="https://{{site.subdomain_key}}.microco.sm{{ user.avatar }}" />
-              </li>
               {% for participant in item.participants %}
-                {% if participant.id != user.id %}
                 <li>
                   <a href="{% url 'single-profile' participant.id %}">
                     <img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name }}"/>
-                    @{{ participant.profile_name }}
                   </a>
                 </li>
-                {% endif %}
               {% endfor %}
             </ul>
           </div>

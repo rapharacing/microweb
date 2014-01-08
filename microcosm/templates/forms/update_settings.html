@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="content-header padded">
+  <div class="row">
+    <div class="col-sm-12">
+    {% include 'breadcrumbs.html' %}
+    </div>
+  </div>
+  <a href="{% url 'edit-profile' user.id %}" class="pull-right">Edit Profile &rarr;</a>
+  <h1>
+    Update Settings
+  </h1>
+  <div class="clearfix"></div>
+</div>
+
+
+<div class="content-body">
+  <div class="row form-container">
+    <div class="col-sm-12">
+      <div class="form-container-inner padded">
+
+      <form action="" method="POST">
+      {% csrf_token %}
+
+          <div class="form-group">
+            <div class="row">
+              <div class="col-sm-12">
+
+
+
+
+                <div class="form-table-checkbox">
+                  <table cellspacing=0 cellpadding=0 border=0>
+                    <tr>
+                      <th>Configure which updates you receive with the controls below.</th>
+                      <th>By Email</th>
+                    </tr>
+                    <tr class="highlight">
+                      <td>Enable notifications</td>
+                      <td><label>
+                      <input name="profile_receive_email"
+                             class="master"
+                             type="checkbox" {% if globaloptions.emailNotifications %}checked="true"{% endif %}
+                             data-group="email" />
+                      </label></td>
+                    </tr>
+
+                    {% for preference in content %}
+                    <tr>
+                      <td><span></span><p>{{ preference.description }}</p></td>
+                      <td>
+                        <input type="hidden" name="id_{{ preference.id }}" value="{{ preference.id }}">
+                        <label>
+                          <input name="send_email_{{ preference.id }}"
+                                 type="checkbox"
+                                 {% if preference.send_email %}checked="true"{% endif %}
+                                 data-group="email" />
+                        </label>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                  </table>
+                </div>
+
+
+              {% comment %}
+                <div class="form-table-checkbox">
+                  <table cellspacing=0 cellpadding=0 border=0>
+                    <tr>
+                      <th>How would you like to recieve notifications?</th>
+                      <th>By Email</th>
+                      <th>By SMS</th>
+                    </tr>
+                    <tr class="highlight">
+                      <td>Enable notifications</td>
+                      <td><label><input class="master" data-group="email" type="checkbox" /></label></td>
+                      <td><label><input class="master" data-group="sms" type="checkbox" /></label></td>
+                    </tr>
+                    <tr>
+                      <td><span></span><p>When a new conversation or event has been posted in a subscribed microcosm</p></td>
+                      <td><label><input data-group="email" type="checkbox" /></label></td>
+                      <td><label><input data-group="sms"  type="checkbox" /></label></td>
+                    </tr>
+                    <tr>
+                      <td><span></span><p>When a new comment is posted in a subscribed conversation or event</p></td>
+                      <td><label><input data-group="email" type="checkbox" /></label></td>
+                      <td><label><input data-group="sms"  type="checkbox" /></label></td>
+                    </tr>
+                    <tr>
+                      <td><span></span><p>When someone replies to your comment</p></td>
+                      <td><label><input data-group="email" type="checkbox" /></label></td>
+                      <td><label><input data-group="sms"  type="checkbox" /></label></td>
+                    </tr>
+                    <tr>
+                      <td><span></span><p>When someone mentions you in a comment</p></td>
+                      <td><label><input data-group="email" type="checkbox" /></label></td>
+                      <td><label><input data-group="sms"  type="checkbox" /></label></td>
+                    </tr>
+                    <tr>
+                      <td><span></span><p>When a new comment is made in a huddle</p></td>
+                      <td><label><input data-group="email" type="checkbox" /></label></td>
+                      <td><label><input data-group="sms"  type="checkbox" /></label></td>
+                    </tr>
+                    <tr>
+                      <td><span></span><p>When someone joins an event you are attending</p></td>
+                      <td><label><input data-group="email" type="checkbox" /></label></td>
+                      <td><label><input data-group="sms" type="checkbox" /></label></td>
+                    </tr>
+                    <tr>
+                      <td><span></span><p>When an event you are attending is due</p></td>
+                      <td><label><input data-group="email" type="checkbox" /></label></td>
+                      <td><label><input data-group="sms" type="checkbox" /></label></td>
+                    </tr>
+                  </table>
+                </div>
+              {% endcomment %}
+
+
+              </div>
+            </div>
+          </div> <!-- /form-group -->
+
+
+      </div> <!-- /form-container-inner -->
+      <div class="form-group form-footer padded">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-footer-buttons">
+              <input type="submit" class="btn btn-lg btn-primary" value="Save Changes">
+              <input type="reset" class="btn btn-lg btn-default" value="Cancel">
+            </div>
+          </div>
+        </div>
+      </div>
+
+        </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+(function(){
+
+  var FormCheckboxTable = (function(){
+
+    var formCheckboxTable = function(opts){
+
+      this.el = false;
+      if ( typeof opts.el !== "undefined"){
+        this.el  = document.querySelectorAll(opts.el);
+        this.$el = $(this.el);
+      }
+
+      this.bind();
+    }
+
+
+    formCheckboxTable.prototype.toggleGroup = function(group, enabled){
+
+      var group = this.$el.find('input[type=checkbox][data-group='+group+']');
+
+      for(var i=0,j=group.length;i<j;i++){
+        group[i].checked = enabled;
+        if (group[i].className.indexOf('master') === -1 ){
+          group[i].disabled = !enabled;
+        }
+      }
+
+    }
+
+    formCheckboxTable.prototype.changeHandler = function(e){
+
+      var _this     = e.currentTarget,
+          _$this    = $(e.currentTarget),
+          dataGroup = _$this.attr('data-group');
+
+      this.toggleGroup(dataGroup, _this.checked);
+    }
+
+    formCheckboxTable.prototype.bind = function(){
+
+      var events = [
+        ['change', 'input[type=checkbox].master', 'changeHandler']
+      ];
+      for(var i in events){
+        this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );
+      }
+    };
+
+    return formCheckboxTable;
+  })();
+
+  var checkboxTable = new FormCheckboxTable({
+    el : '.form-table-checkbox'
+  });
+
+})();
+
+</script>
+
+
+{% endblock %}

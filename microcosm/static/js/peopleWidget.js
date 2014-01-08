@@ -51,6 +51,9 @@
 
       document.body.appendChild(this.popover);
 
+      // used for cursor select
+      this.cursor = 0;
+
       this.bind();
     };
 
@@ -58,6 +61,7 @@
     peopleWidget.prototype.createWidgetContainer = function(){
       var widget_container = document.createElement('div');
       widget_container.className = "people-widget";
+
       return widget_container;
     };
 
@@ -91,9 +95,15 @@
     peopleWidget.prototype.createPopover = function(){
 
       var popover = document.createElement('div');
-      popover.className       = "people-widget-popover";
+      popover.className      = "people-widget-popover";
       popover.style.display  = 'none';
       popover.style.position = 'absolute';
+
+      if (!this.is_textbox){
+        nib = document.createElement('span');
+        nib.className = 'sprite sprite-nib-up';
+        popover.appendChild(nib);
+      }
       return popover;
     };
 
@@ -129,7 +139,8 @@
           this.onSelection(this.people_invited);
         }
       }
-
+      this.cursor = -1;
+      this.renderCursor();
       return this;
     };
 
@@ -146,6 +157,8 @@
           this.people_invited.splice(index_to_remove,1);
         }
       }
+      this.cursor = -1;
+      this.renderCursor();
       return this;
     };
 
@@ -204,7 +217,7 @@
 
     peopleWidget.prototype.render = function(){
 
-      var query, list;
+      var query, list, nib;
 
       this.clearPeopleList();
 
@@ -222,13 +235,31 @@
 
         if (list.length>0){
           this.renderPeopleList(this.sortPeopleListByName(list));
+
+          if (this.is_textbox){
+            nib = document.createElement('span');
+            nib.className = 'sprite sprite-nib-up';
+            this.widget_list.appendChild(nib);
+          }
         }else{
           var empty = document.createElement('li');
           empty.textContent = "No results";
           this.widget_list.appendChild(empty);
         }
+
       }
     };
+
+    peopleWidget.prototype.renderCursor = function(){
+
+      var rows = $(this.widget_list).find('li');
+
+      if (rows.length>0){
+        rows.removeClass('active');
+        $(rows[this.cursor]).addClass('active');
+      }
+      return this;
+    }
 
     peopleWidget.prototype.reset = function(){
       this.widget_input.value = "";
@@ -253,7 +284,7 @@
         offset.left = offset.left - (this.$el.outerWidth()/2);
       }else{
         offset.top = offset.top + 10;
-        offset.left = offset.left - (this.popover.offsetWidth/2);
+        offset.left = offset.left - (this.$el.outerWidth()/2);//- (this.popover.offsetWidth/2);
       }
 
       this.popover.style.top  = offset.top + 'px';
@@ -309,26 +340,57 @@
       e.preventDefault();
       e.stopPropagation();
 
+      var currentList = this.excludeInvitedPeople(this.people);
+
+
       if ([13].indexOf(e.which)!== -1){
 
         if (e.which === 13){
-          var currentList = this.excludeInvitedPeople(this.people);
-          if (currentList.length > 0){
-            this.addPersonToInvitedById(currentList[0].id);
+          if (currentList.length > 0 && this.cursor > -1){
+            this.addPersonToInvitedById(currentList[this.cursor].id);
           }
           this.show();
         }
+
+      }else if ( [38, 40].indexOf(e.which)!==-1 ){
+
+        switch (e.which){
+          case 38:
+            this.cursor = this.cursor - 1;
+            break;
+          case 40:
+            this.cursor = this.cursor + 1;
+            break;
+          default:
+            break;
+        }
+
+        if (this.cursor < 0){
+          this.cursor = 0;
+        }
+        if (this.cursor > currentList.length-1 ){
+          this.cursor = currentList.length-1;
+        }
+
+        console.log(this.cursor);
+
+        this.renderCursor();
 
       }else{
         if ($.trim(this.widget_input.value) !== ''){
           this.queryDataSource(
             this.widget_input.value,
             $.proxy(function(data){
-              this.parseAPIResponse(data).render();
+              this.parseAPIResponse(data);
+              this.render();
+              this.renderCursor();
             },this),
-            function(e){ console.log(e);
-          });
+            function(e){
+              console.log(e);
+            }
+          );
         }else{
+          this.cursor = 0;
           this.people = [];
           this.render();
         }
@@ -357,7 +419,14 @@
 
     peopleWidget.prototype.bind = function(){
 
-      $(this.widget_input).on('keyup', $.proxy(this.changeHandler,this));
+      $(this.widget_input)
+        .on('keyup',    $.proxy(this.changeHandler,this))
+        .on('keypress', function(e){
+          if (e.which === 13){
+            e.preventDefault();
+          }
+        });
+
 
       $(this.container).on('click', 'li:not(.invited)', $.proxy(this.clickHandler,this));
 
@@ -389,6 +458,12 @@
   window.PeopleWidget = PeopleWidget;
 
 })();
+
+//////////////////////
+//   Participants   //
+//////////////////////
+
+// used to render attendee/invitees lists
 
 (function(){
 
