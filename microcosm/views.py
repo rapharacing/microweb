@@ -1358,7 +1358,7 @@ class WatcherView(object):
 
 class UpdatePreferenceView(object):
 
-    list_template = 'update_preferences.html'
+    list_template = 'forms/update_settings.html'
 
     @staticmethod
     @exception_handler
