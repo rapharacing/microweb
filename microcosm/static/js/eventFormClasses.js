@@ -139,7 +139,8 @@
 
       this.updateLatlng(latlng);
       this.updateMapBounds();
-      this.save();
+
+      return this;
     };
 
     eventFormMap.prototype.save = function(){
@@ -207,9 +208,9 @@
 })();
 
 
-/**
-*   event date and time controls
-*/
+/////////////////////////////////////////
+//   event calendar and time controls  //
+/////////////////////////////////////////
 (function(){
   'use strict';
 
@@ -290,7 +291,6 @@
         this.endDate.setHours(this.endDate.getHours()+1);
       }
       this.updateEndTimesUI(getTimeStringFromDate(this.endDate));
-
 
 
       this.controls.start_calendar.date   = new Date(this.startDate.getTime());

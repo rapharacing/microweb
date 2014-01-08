@@ -69,7 +69,8 @@
       .clearMarkers()
       .addMarker(newLatLng)
       .renderMarkers()
-      .update(newLatLng);
+      .update(newLatLng)
+      .save();
   }
 
   locationControl.on('click', '#locate', function(e){
