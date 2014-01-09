@@ -1,7 +1,12 @@
+# Virtualenv created by dependencies script.
 ENV
+
+# Compiled python files.
 *.pyc
-.idea
+
+# IDE project files.
+.idea/
 *.iml
-local_settings.py
+
+# Local settings.
 microweb/local_settings.py
-microweb/application.log
