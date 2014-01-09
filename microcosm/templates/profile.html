@@ -126,23 +126,32 @@
 {% endblock content %}
 {% block sidebar %}
 
-          <div class="metabar-module">
-            <h5>Got something to add?</h5>
-            <div class="metabar-module-primary-buttons">
-              <a href="#" class="btn btn-large btn-block btn-primary">
-                <span class="glyphicon glyphicon-envelope"></span> Send message
-              </a>
-            </div>
-          </div> <!-- primary actions -->
+  <div class="metabar-module">
+    <h5>Got something to add?</h5>
+    <div class="metabar-module-primary-buttons">
+      <a href="#" class="btn btn-large btn-block btn-primary">
+        <span class="glyphicon glyphicon-envelope"></span> Send message
+      </a>
+    </div>
+  </div> <!-- primary actions -->
 
-          <div class="metabar-module">
-            <h5>Profile</h5>
-            <div class="metabar-module-title">
-              <h3>
-                {{ content.profile_name }}
-              </h3>
-              {% include 'forms/subscribe.html' %}
-            </div>
-          </div> <!-- / about -->
+  <div class="metabar-module">
+    <h5>Profile</h5>
+    <div class="metabar-module-body">
+      {% include 'forms/subscribe.html' %}
+    </div>
+  </div> <!-- / about -->
 
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+  var subscribe = new Subscribe({
+    el    : '.subscribe',
+    url   : '{% url 'single-watcher' %}',
+    id    : {{ content.id }},
+    type  : '{{ item_type }}',
+    token : '{{ csrf_token }}',
+    is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
+  });
+</script>
 {% endblock %}

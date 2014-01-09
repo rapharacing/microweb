@@ -5,22 +5,41 @@
     {% csrf_token %}
     <input type="hidden" name="update_type_id" value="1">
 
-    <button id="subscribe_button" class="btn btn-xsmall btn-primary {% if content.meta.flags.watched %}btn-success{% endif %}">
-      <span class="sprite sprite-ok-small"></span>
-      <strong>
-        {% if content.meta.flags.watched %}Added to updates{%else%}Subscribe{% endif %}
-      </strong>
-    </button>
+    <div id="subscribe-button" class="btn-switch {% if content.meta.flags.watched %}on{%else%}off{%endif%}">
+
+      <div class="btn-switch-state loading">
+        <img src="/static/img/preloader.gif" />
+      </div>
+      <div class="btn-switch-state off">
+        <a class="btn-switch-on" href="javascript:void 0">
+        <strong>
+          {% if item_type == 'profile'%}Follow @{{ content.profile_name }}{%else%}Subscribe{%endif%}
+        </strong>
+        </a>
+      </div>
+      <div class="btn-switch-state on">
+        <span class="sprite sprite-ok-small"></span>
+        {% if item_type == 'profile'%}
+        <strong>Following</strong>
+        (<a class="btn-switch-off" href="javascript:void 0">Unfollow?</a>)
+        {% else %}
+        <strong>Added to updates</strong>
+        (<a class="btn-switch-off" href="javascript:void 0">Unsubscribe?</a>)
+        {% endif %}
+      </div>
+    </div>
 
   </form>
+    <div class="subscribe-meta {% if content.meta.flags.watched %}active{%endif%}">
 
-    <div class="subscribe-meta" {% if content.meta.flags.watched %}style="display: block;"{% else %}style="display: none;"{% endif %}>
       <form method="POST" action="" id="email_me_form">
       {% csrf_token %}
-      <span class="sprite sprite-arrow-right"></span>
-        <label><input type="checkbox" id="emailme" {% if content.meta.flags.sendEmail %} checked{% endif %} /> Instantly notify me by email</label>
+      <span class="sprite sprite-branch-arrow-right"></span>
+        <label>
+          <input type="checkbox" name="emailme" {% if content.meta.flags.sendEmail %}checked{% endif %} />
+            Instantly notify me by email
+        </label>
       </form>
     </div>
   </div>
 {% endif %}
-
