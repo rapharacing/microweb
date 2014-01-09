@@ -1,0 +1,31 @@
+<div class="content-body-admin padded">
+  <form class="content-body-admin-actions" action="" method="post">
+    <label for="content-body-admin-actions">
+      With selected:
+    </label>
+    <select id="content-body-admin-actions" class="cselect cselect-xs" name="action">
+
+
+    {% if content.comments %}
+      <option>Move selected comments</option>
+      <option>Delete selected comments</option>
+      <option>Undelete selected comments</option>
+      <option>Approve selected comments</option>
+      <option>Unapprove selected comments</option>
+    {% elif content.items %}
+      <option>Move selected items</option>
+      <option>Delete selected items</option>
+      <option>Undelete selected items</option>
+      <option>Approve selected items</option>
+      <option>Unapprove selected items</option>
+      <option>Pin selected items</option>
+      <option>Unpin selected items</option>
+    {% else %}
+      <option>Delete selected microcosms</option>
+      <option>Pin selected microcosms</option>
+      <option>Unpin selected microcosms</option>
+    {% endif %}
+    </select>
+    <input type="submit" value="Go" class="btn btn-primary btn-xs"/>
+  </form>
+</div> <!-- /content-body-admin -->

@@ -39,9 +39,13 @@
       {% include 'event_header_large.html' %}
     {% endif %}
 
+    {% include "forms/content-moderation.html" %}
+
     {% with content.comments.items as comments %}
       {% include 'block_comments.html' %}
     {% endwith %}
+
+    {% include "forms/content-moderation.html" %}
 
   </div> <!-- item -->
 </div> <!-- / content-body -->
@@ -117,6 +121,7 @@
     </div>
   </div> <!-- / about -->
 
+  {% include 'forms/metabar-moderation.html' %}
 
 {% endblock %}
 

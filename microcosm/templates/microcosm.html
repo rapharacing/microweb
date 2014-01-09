@@ -17,6 +17,7 @@
 
 <div class="content-body">
 
+{% include "forms/content-moderation.html" %}
 
 	<div class="list-items">
 
@@ -27,7 +28,7 @@
 	  		class="list-collection-row {% if item.is_pinned %}row-pinned{% endif %} {% if item.is_deleted %}row-deleted{% endif %}">
 
 	    <div class="row">
-	      <div class="col-sm-8 col-md-8">
+	      <div class="col-sm-8 col-md-7 col-lg-8">
 
 	        <div class="list-collection-row-icon">
 	          {% if item.flags.sticky %}
@@ -79,12 +80,13 @@
 	        </div>
 	      </div>
 
-	      <div class="col-sm-4 col-md-4">
+	      <div class="col-sm-4 col-md-5 col-lg-4">
 
-	        <div class="row-stats">
-	          {# if item.flags.sticky #}
-	          {# <input class="row-admin-checkbox" type="checkbox" /> #}
-	          {# endif #}
+          <div class="list-collection-row-admin">
+            <input class="row-admin-checkbox" type="checkbox" />
+          </div>
+
+          <div class="row-stats">
 
 	          <ul class="list-stats list-stats-sm">
 	            <li>
@@ -106,8 +108,6 @@
 	        {% if not item.flags.sticky %}
 
 	          <div class="row-context">
-
-	            {# <input class="row-admin-checkbox" type="checkbox" /> #}
 
 	            {% if item.item_type == 'event' %}
 
@@ -157,11 +157,16 @@
 
 </div>
 
+{% include "forms/content-moderation.html" %}
+
 
 <div class="content-footer padded">
   <div class="row">
-    <div class="col-sm-12">
-
+    <div class="col-sm-8">
+      {% include 'breadcrumbs.html' %}
+    </div>
+    <div class="col-sm-4">
+      {% include 'pagination.html' %}
     </div>
   </div>
 </div>
@@ -195,6 +200,7 @@
       <p>
         {{ content.description }}
       </p>
+
 
       {% include 'forms/subscribe.html' %}
 
