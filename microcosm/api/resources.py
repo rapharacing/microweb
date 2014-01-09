@@ -8,7 +8,12 @@ from dateutil.parser import parse as parse_timestamp
 
 from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
-from microweb.helpers import build_url
+
+from settings import API_VERSION
+from settings import API_PATH
+from settings import API_SCHEME
+from settings import API_DOMAIN_NAME
+from settings import DEBUG
 
 import logging
 
@@ -34,8 +39,50 @@ COMMENTABLE_ITEM_TYPES = [
     'huddle'
 ]
 
+
+def build_url(host, path_fragments):
+    """
+    urljoin and os.path.join don't behave exactly as we want, so
+    here's a different wheel.
+
+    As per RFC 3986, authority is composed of hostname[:port] (and optionally
+    userinfo, but the microcosm API will never accept these in the URL, so
+    we ignore their presence).
+
+    path should be a list of URL fragments. This function will strip separators and
+    insert them where needed to form a valid URL.
+
+    The use of + for string concat is deemed acceptable because it is 'fast enough'
+    on CPython and we are not going to change interpreter.
+    """
+
+    host = host.split(':')[0]
+    if host.endswith(API_DOMAIN_NAME):
+        url = API_SCHEME + host
+    else:
+        url = API_SCHEME + Site.resolve_cname(host)
+    path_fragments = [API_PATH, API_VERSION] + path_fragments
+    url += join_path_fragments(path_fragments)
+    return url
+
+
+def join_path_fragments(path_fragments):
+    path = ''
+
+    for fragment in path_fragments:
+        if not isinstance(fragment, str):
+            fragment = str(fragment)
+        if '/' in fragment:
+            fragment = fragment.strip('/')
+            if '/' in fragment:
+                raise AssertionError('Do not use path fragments containing slashes')
+        path += ('/' + fragment)
+    return path
+
+
 def discard_querystring(url):
     return url.split('?')[0]
+
 
 def response_list_to_dict(responses):
     """
@@ -56,6 +103,7 @@ def response_list_to_dict(responses):
             response_dict[discard_querystring(response.url)] = APIResource.process_response(response.url, response)
     return response_dict
 
+
 def populate_item(itemtype, itemdata):
     if itemtype == 'conversation':
         item = Conversation.from_summary(itemdata)
@@ -70,6 +118,7 @@ def populate_item(itemtype, itemdata):
     else:
         item = None
     return item
+
 
 class APIResource(object):
     """
@@ -174,6 +223,15 @@ class Site(object):
         url = build_url(host, [Site.api_path_fragment])
         resource = APIResource.retrieve(url, {}, {})
         return Site(resource)
+
+    @staticmethod
+    def resolve_cname(host):
+        url = 'https://microco.sm/api/v1/hosts/' + host
+        response = requests.get(url)
+        if response.status_code != 200:
+            raise APIException('Error resolving CNAME %s' % host, response.status_code)
+        print(response.content)
+        return response.content
 
 
 class User(object):
