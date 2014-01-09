@@ -23,19 +23,27 @@
 		{% endif %}
 	{% else %}
 
+{% include "forms/content-moderation.html" %}
+
 		<div class="list-microcosms">
 		  <ul class="list-collection bordered padded">
 		  {% for item in content.microcosms.items %}
 		      <li class="list-collection-row">
 		        <div class="row">
 
-		          <div class="col-sm-7">
+		          <div class="col-sm-8 col-md-7">
 		            <!--<div class="list-collection-row-icon">
 
 		            </div> /list-collection-row-icon -->
 		            <div class="list-collection-row-offset">
 		              <a href="{% url 'single-microcosm' item.id %}">
-		                <h2 class="row-title">{{ item.title }}</h2>
+		                <h2 class="row-title">
+                      {{ item.title }}
+                      {% if item.meta.flags.unread %}
+                      <span class="label label-warning">NEW</span>
+                      {% endif %}
+                    </h2>
+
 		              </a>
 		              <div class="row-meta">
 		                <p class="microcosm-item-description">
@@ -45,7 +53,12 @@
 		            </div>
 		          </div>
 
-		          <div class="col-sm-5">
+		          <div class="col-sm-4 col-md-5">
+
+                <div class="list-collection-row-admin">
+                  <input class="row-admin-checkbox" type="checkbox" />
+                </div>
+
 		            <div class="row-stats">
 		              <ul class="list-stats">
 		                <li>
@@ -61,10 +74,6 @@
 		            <div class="row-context">
 		              {#<input type="checkbox" class="row-admin-checkbox" /> #}
 		              {% if item.most_recent_update %}
-
-                    {% if item.meta.flags.unread %}
-                    <span class="label label-warning">NEW</span>
-                    {% endif %}
 
 			              <a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">
 			              	{{ item.most_recent_update.title|truncatechars:30 }}
@@ -92,10 +101,15 @@
 {% endif %}
 </div>
 
+{% include "forms/content-moderation.html" %}
+
 <div class="content-footer padded">
   <div class="row">
-    <div class="col-sm-12">
-
+    <div class="col-sm-8">
+      {% include 'breadcrumbs.html' %}
+    </div>
+    <div class="col-sm-4">
+      {% include 'pagination.html' %}
     </div>
   </div>
 </div>
