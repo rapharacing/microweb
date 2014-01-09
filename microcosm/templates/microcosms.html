@@ -61,6 +61,11 @@
 		            <div class="row-context">
 		              {#<input type="checkbox" class="row-admin-checkbox" /> #}
 		              {% if item.most_recent_update %}
+
+                    {% if item.meta.flags.unread %}
+                    <span class="label label-warning">NEW</span>
+                    {% endif %}
+
 			              <a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">
 			              	{{ item.most_recent_update.title|truncatechars:30 }}
 			              </a>
