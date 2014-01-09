@@ -106,18 +106,15 @@
       <h3>
         {{ content.title }}
       </h3>
-
-      {% include 'forms/subscribe.html' %}
-
-      <p>
-        {{ content.description }}
-      </p>
       <p class="metabar-module-author">
         <a href="{% url 'single-profile' content.meta.created_by.id %}">
           <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
           @{{ content.meta.created_by.profile_name|truncatechars:25 }}
         </a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
       </p>
+    </div>
+    <div class="metabar-module-body">
+      {% include 'forms/subscribe.html' %}
     </div>
   </div> <!-- / about -->
 
@@ -177,6 +174,15 @@ eventMap.restore(
     }
   });
 
+  var subscribe = new Subscribe({
+    el    : '.subscribe',
+    url   : '{% url 'single-watcher' %}',
+    id    : {{ content.id }},
+    type  : '{{ item_type }}',
+    token : '{{ csrf_token }}',
+    is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
+  });
+
 })();
 </script>
 
@@ -199,5 +205,6 @@ Toggle for event single page item event div for small screens
   })();
 </script>
 {% endif %} {# endif contents.comments.page > 1 #}
+
 
 {% endblock js %}
