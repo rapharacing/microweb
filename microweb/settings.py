@@ -98,6 +98,8 @@ INSTALLED_APPS = (
     'microcosm',
     'gunicorn',
     'microcosm.templatetags.comments',
+    'microcosm.templatetags.conversation',
+    'microcosm.templatetags.event',
 )
 
 # The values below in must be initialised in local_settings.py
