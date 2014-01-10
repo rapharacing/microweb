@@ -2,7 +2,7 @@
 set -e
 
 # logfile and location
-LOGFILE=/var/log/gunicorn/microweb.log
+LOGFILE=/var/log/django/microweb.log
 LOGDIR=$(dirname $LOGFILE)
 
 # number of gunicorn workers

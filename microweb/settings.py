@@ -2,20 +2,17 @@ import os
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-# Do not change these! Override them in local_settings.py if necessary.
+# Do not change these settings. Override them in local_settings.py if necessary.
 DEBUG = False
 TEMPLATE_DEBUG = False
 
-ADMINS = ()
-MANAGERS = ADMINS
-
 # ALLOWED_HOSTS is required in >Django 1.5. Since we allow customers to CNAME their domain
-# to microcosm, we cannot make use of this feature. Host is verified in the API.
+# to a microcosm site, we cannot make use of this feature. Host is verified in the API.
 ALLOWED_HOSTS = [
     '*',
 ]
 
-# Test runner gets unhappy if there's no database defined.
+# Test runner requires a database. This should never be used to store anything.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -33,6 +30,7 @@ LANGUAGE_CODE = 'en-gb'
 # For Django sites framework, not used for anything in microcosm.
 SITE_ID = 1
 
+# Internationalisation settings.
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -44,6 +42,7 @@ MEDIA_ROOT = ''
 MEDIA_URL = ''
 
 # Absolute path to the directory static files should be collected to.
+# In production these are served by nginx.
 STATIC_ROOT = '/srv/www/django/microweb/static/'
 
 # URL prefix for static files.
@@ -54,33 +53,26 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '!ygb2(@l&amp;h1+iy6z6jwiak3e**e3ljb=1fc5#i&amp;1fk#0ve!+!&amp;'
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 )
-
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
 )
+TEMPLATE_DIRS = ()
 
 MIDDLEWARE_CLASSES = (
-
     # Redirect to custom domain, if one exists for the site
     'microcosm.middleware.redirect.DomainRedirectMiddleware',
 
     # Note: if using messages, enable the sessions middleware too
     'django.middleware.common.CommonMiddleware',
-    #'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # CSRF protection on form submission
     'django.middleware.csrf.CsrfViewMiddleware',
-    #'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # convenience for request context like site, user account, etc.
     'microcosm.middleware.context.ContextMiddleware',
@@ -93,7 +85,6 @@ MIDDLEWARE_CLASSES = (
 
     # push exceptions to riemann
     'microcosm.middleware.exception.ExceptionMiddleware',
-
 )
 
 ROOT_URLCONF = 'microweb.urls'
@@ -101,79 +92,47 @@ ROOT_URLCONF = 'microweb.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'microweb.wsgi.application'
 
-TEMPLATE_DIRS = ()
-
 INSTALLED_APPS = (
-    'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
     'microcosm',
     'gunicorn',
 )
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
-    'handlers': {
-        'file':{
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'formatter': 'verbose',
-            'filename' : os.path.join('/var/log/django/microweb.log'),
-        }
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'microcosm.views': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate' : True,
-        },
-        'microcosm.middleware': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate' : True,
-        }
-    }
-}
+# The values below in must be initialised in local_settings.py
+# Example values can be found in local_settings.py.example
 
-# Populate the settings below in local_settings.py (see the README for example values).
-CLIENT_ID = ''
-CLIENT_SECRET = ''
-API_SCHEME = ''
-API_DOMAIN_NAME = ''
-RIEMANN_ENABLED = False
-RIEMANN_HOST = ''
-MEMCACHE_HOST = '127.0.0.1'
-MEMCACHE_PORT = 11211
+# Details given when registering an application.
+from local_settings import CLIENT_ID
+from local_settings import CLIENT_SECRET
 
-PAGE_SIZE = 25
-
-# Clobber any settings with those defined in local_settings.py
-try:
-    from local_settings import *
-except ImportError:
-    pass
+# Microcosm API settings.
+from local_settings import API_SCHEME
+from local_settings import API_DOMAIN_NAME
+from local_settings import API_PATH
+from local_settings import API_VERSION
 
 if API_SCHEME == '' or API_DOMAIN_NAME == '' or API_PATH == '' or API_VERSION == '':
-    raise AssertionError('Please define API settings in local_settings.py')
+    raise Exception('Please define API settings in local_settings.py')
+
+# Riemann is used for exception reporting and metrics. Can be assigned empty
+# values in local_settings for local development.
+from local_settings import RIEMANN_ENABLED
+from local_settings import RIEMANN_HOST
+
+# Mostly used for site information cache. Compulsory.
+from local_settings import MEMCACHE_HOST
+from local_settings import MEMCACHE_PORT
+
+# Page size for list views: Microcosms, Huddles, etc.
+from local_settings import PAGE_SIZE
+
+# In production, all logging goes to stdout which is redirected by gunicorn.
+# This isn't ideal (we can't route to mulitple places), but works well enough.
+from local_settings import LOGGING
+
+# Make this unique, and don't share it with anybody.
+from local_settings import SECRET_KEY
+
+# Allows shadowing of DEBUG for development.
+from local_settings import DEBUG

@@ -5,8 +5,7 @@ import string
 from functools import wraps
 from microweb import settings
 from microweb.settings import PAGE_SIZE
-from microweb.helpers import join_path_fragments
-from microweb.helpers import build_url
+
 from urllib import urlencode
 from urlparse import parse_qs
 from urlparse import urlparse
@@ -55,6 +54,9 @@ from microcosm.api.resources import SearchResult
 from microcosm.api.resources import Huddle
 from microcosm.api.resources import HuddleList
 
+from microcosm.api.resources import build_url
+from microcosm.api.resources import join_path_fragments
+
 from microcosm.forms.forms import EventCreate
 from microcosm.forms.forms import EventEdit
 from microcosm.forms.forms import MicrocosmCreate
@@ -85,6 +87,7 @@ def exception_handler(view_func):
         try:
             return view_func(request, *args, **kwargs)
         except APIException as e:
+            logger.error(str(e))
             if e.status_code == 401 or e.status_code == 403:
                 raise PermissionDenied
             elif e.status_code == 404:
