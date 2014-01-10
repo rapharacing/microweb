@@ -154,12 +154,26 @@
 
 (function(){
 
+  var onscreen = {
+    '-webkit-transform' : 'translateX(-350px)',
+       '-moz-transform' : 'translateX(-350px)',
+            'transform' : 'translateX(-350px)'
+  }
+
+  var offscreen = {
+    '-webkit-transform' : 'translateX(0)',
+       '-moz-transform' : 'translateX(0)',
+            'transform' : 'translateX(0)'
+  }
+
   $('.metabar-toggle').on('click',function(){
     var metabar = $('.metabar');
-    if (metabar[0].style.right === '0px'){
-      metabar[0].style.right = '-350px';
+    if (metabar.hasClass('onscreen')){
+      metabar.removeClass('onscreen');
+      metabar.css(offscreen);
     }else{
-      metabar[0].style.right = '0px';
+      metabar.addClass('onscreen');
+      metabar.css(onscreen);
     }
   });
 
