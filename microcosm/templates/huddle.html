@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load comments %}
 {% block ga %},'dimension2': '{{ content.meta.created_by.id }}'
 			,'dimension3': '{{ content.microcosm_id }}'{% endblock%}
 
@@ -61,9 +61,9 @@
 
 
 <div class="content-body">
-  {% with content.comments.items as comments %}
-    {% include 'block_comments.html' %}
-  {% endwith %}
+  <ul class="list-comments">
+    {% comments content.comments.items %}
+  </ul>
 </div> <!-- / content-body -->
 
 <div class="content-footer padded">

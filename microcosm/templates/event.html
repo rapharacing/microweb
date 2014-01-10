@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load comments %}
 
 {% block ga %},'dimension2': '{{ content.meta.created_by.id }}','dimension3': '{{ content.microcosm_id }}'{% endblock%}
 
@@ -41,9 +42,9 @@
 
     {% include "forms/content-moderation.html" %}
 
-    {% with content.comments.items as comments %}
-      {% include 'block_comments.html' %}
-    {% endwith %}
+    <ul class="list-comments">
+      {% comments content.comments.items %}
+    </ul>
 
     {% include "forms/content-moderation.html" %}
 
