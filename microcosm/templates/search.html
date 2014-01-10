@@ -2,24 +2,6 @@
 {% block content %}
 
 <div class="content-header padded">
-
-  <div class="search-mobile">
-    <div class="search-mobile-inner">
-      <form role="search" action="{% url 'single-search' %}">
-        <div class="input-group">
-          <label class="input-group-addon">?</label>
-          <input type="text"
-                 class="form-control"
-                 name="q"
-                 placeholder="Search..."
-                 value="{{ content.query.searched|safe }}"/>
-        </div>
-      </form>
-      <button class="btn btn-default metabar-toggle">Filters</button>
-    </div>
-  </div>
-
-
   <div class="row">
     <div class="col-sm-8">
       {% include 'breadcrumbs.html' %}
@@ -28,7 +10,7 @@
       {% include 'pagination.html' %}
     </div>
   </div>
-  <h1>Search results for &quot;{{ content.query.searched|safe }}&quot;</h1>
+  <h1>Search results for: {{ content.query.searched|escape }}</h1>
   <p class="text-muted">
     {{ content.results.total }} matches.  Search took {{ content.time_elapsed }} seconds.
   </p>
@@ -134,7 +116,7 @@
                       <img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
                     </a>
                     <div class="row-meta-excerpt-text">
-                      &quot;{{ result.highlight|safe }}&quot;
+                      {{ result.highlight|safe }}
                     </div>
                   </div>
                   {% endif %}
@@ -229,7 +211,7 @@
 (function(){
   new Filters({
     el     : '.metabar-filters',
-    query  : '{{ content.query.searched|safe }}',
+    query  : '{{ content.query.searched|escape }}',
     url    : '?q=$1'
   });
 })();

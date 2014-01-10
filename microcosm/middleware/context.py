@@ -52,7 +52,7 @@ class ContextMiddleware():
                     # Cached for 5 minutes to spare useless requests but still
                     # provide a useful indication in the stats of how many people
                     # are online now
-                    self.mc.set(request.get_host(), site, time=5 * 60)
+                    self.mc.set(request.get_host(), site, time=5*60)
                 except memcache.Error as e:
                     logger.error('Memcached error: %s' % str(e))
             except APIException, e:
