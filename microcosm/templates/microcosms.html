@@ -55,9 +55,11 @@
 
 		          <div class="col-sm-4 col-md-5">
 
+              {% if content.meta.permissions.moderator %}
                 <div class="list-collection-row-admin">
                   <input class="row-admin-checkbox" type="checkbox" />
                 </div>
+              {% endif %}
 
 		            <div class="row-stats">
 		              <ul class="list-stats">
