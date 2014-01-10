@@ -75,7 +75,7 @@
             <ul class="list-people list-people-sm pull-right">
               {% for participant in item.participants %}
                 <li>
-                  <a href="{% url 'single-profile' participant.id %}">
+                  <a href="{% url 'single-profile' participant.id %}" data-toggle="tooltip" title="@{{ participant.profile_name }}">
                     <img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name }}"/>
                   </a>
                 </li>

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load comments %}
 {% block content %}
 
 <div class="content-body">
@@ -9,26 +10,25 @@
 
   {% if content.meta.parents %}
     <div class="list-comments-dull">
-  {% with content.meta.parents as comments %}
-    {% include 'block_comments.html' %}
-  {% endwith %}
+      <ul class="list-comments">
+        {% comments content.meta.parents hide_permalink=True %}
+      </ul>
     </div>
   {% endif %}
 
   <ul class="list-comments list-comments-highlighted">
-    {% with content as comment %}
-      {% include 'block_comment_single.html' %}
-    {% endwith %}
+    {% comments content hide_permalink=True %}
   </ul>
 
   {% if content.meta.children %}
-    {% with content.meta.children as comments %}
-      {% include 'block_comments.html' %}
-    {% endwith %}
+    <ul class="list-comments">
+      {% comments content.meta.children hide_permalink=True %}
+    </ul>
   {% endif %}
 
 </div> <!-- / content-body -->
 
+<!--
 <div class="reply-container">
     <ul class="list-comments">
       <li class="comment-item">
@@ -44,12 +44,12 @@
             </div>
           </div>
           <div class="comment-item-body">
-            {% include 'forms/block_comment_box.html' %}
+
           </div>
         </div>
       </li>
     </ul>
-  </div> <!-- /reply-container -->
+  </div>  /reply-container -->
 
 {% endblock content %}
 
@@ -82,21 +82,22 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
+<script id="template-reply-box" type="text/template">
+  {% include 'forms/block_comment_box.html' %}
+</script>
 <script type="text/javascript">
 (function(){
 
   var comments = new Comments({
     el               : '.content-body',
     defaultContainer : '.reply-container',
-    template         : $('.reply-container .comment-item-body').html().trim()
-  });
-
-  var replyBox = new simpleEditor({
-    el : '.reply-box'
+    template         : $('#template-reply-box').html().trim()
   });
 
 
+  $('.list-comments-highlighted').find('.insertReplyBox').click();
 })();
 </script>
+
 {% endif %}
 {% endblock %}

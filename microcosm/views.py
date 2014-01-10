@@ -113,7 +113,8 @@ def build_pagination_links(request, paged_list):
     page_nav = {
         'page'        : paged_list.page,
         'total_pages' : paged_list.total_pages,
-        'limit'       : paged_list.limit
+        'limit'       : paged_list.limit,
+        'offset'      : paged_list.offset
     }
 
     for item in request:

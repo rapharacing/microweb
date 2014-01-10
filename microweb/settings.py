@@ -97,6 +97,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'microcosm',
     'gunicorn',
+    'microcosm.templatetags.comments',
 )
 
 # The values below in must be initialised in local_settings.py
