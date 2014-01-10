@@ -58,7 +58,7 @@
                                class="form-control"
                                name="q"
                                placeholder="Search conversations, events and people..."
-                               {% if content.query.searched %}value="{{content.query.searched|safe}}"{% endif %} />
+                               {% if content.query.searched %}value="{{content.query.searched|escape}}"{% endif %} />
                       </div>
                     </form>
                   </div> <!-- /navbar-search -->
