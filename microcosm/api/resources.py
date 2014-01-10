@@ -14,10 +14,15 @@ from settings import API_PATH
 from settings import API_SCHEME
 from settings import API_DOMAIN_NAME
 from settings import DEBUG
+from settings import MEMCACHE_HOST
+from settings import MEMCACHE_PORT
 
 import logging
 
+import pylibmc as memcache
+
 logger = logging.getLogger('microcosm.middleware')
+mc = memcache.Client(['%s:%d' % (MEMCACHE_HOST, MEMCACHE_PORT)])
 
 RESOURCE_PLURAL = {
     'event': 'events',
@@ -60,7 +65,17 @@ def build_url(host, path_fragments):
     if host.endswith(API_DOMAIN_NAME):
         url = API_SCHEME + host
     else:
-        url = API_SCHEME + Site.resolve_cname(host)
+        mc_key = host + '_cname'
+        resolved_name = None
+        try:
+            resolved_name = mc.get(mc_key)
+        except memcache.Error as e:
+            logger.error('Memcached error: %s' % str(e))
+
+        if resolved_name is None:
+            resolved_name = Site.resolve_cname(host)
+            mc.set(mc_key, resolved_name)
+        url = API_SCHEME + resolved_name
     path_fragments = [API_PATH, API_VERSION] + path_fragments
     url += join_path_fragments(path_fragments)
     return url
@@ -226,6 +241,8 @@ class Site(object):
 
     @staticmethod
     def resolve_cname(host):
+        # TODO: separation of root site API and others
+        # TODO: get rid of this string
         url = 'https://microco.sm/api/v1/hosts/' + host
         response = requests.get(url)
         if response.status_code != 200:
