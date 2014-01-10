@@ -11,4 +11,6 @@ def event(context, item, **kwargs):
 
     context['rsvp_percentage'] = rsvp_percentage
 
+  context['item'] = item
+
   return context
