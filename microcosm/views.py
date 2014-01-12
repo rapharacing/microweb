@@ -1566,12 +1566,13 @@ def echo_headers(request):
 class FaviconView(RedirectView):
 
     def get_redirect_url(self, **kwargs):
-        return settings.STATIC_URL + '/img/favico.png'
+        return settings.STATIC_URL + 'img/favico.png'
 
 
 class RobotsView(TemplateView):
 
-    template = 'robots.txt'
+    template_name = 'robots.txt'
+    content_type = 'text/plain'
 
     def get_context_data(self, **kwargs):
         return super(RobotsView, self).get_context_data(**kwargs)
