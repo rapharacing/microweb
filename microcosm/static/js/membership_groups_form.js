@@ -206,3 +206,64 @@
   criteria.render();
 
 })(window,document,jQuery,undefined);
+
+
+(function(){
+  'use strict';
+
+  /////////////////////
+  //  people widget  //
+  ////////////////////
+  (function(){
+
+    'use strict'
+
+    var subdomain = $('meta[name="subdomain"]').attr('content');
+
+    var participating = new Participating({
+      el         : '.list-participants',
+      className  : 'list-people list-people-sm',
+      static_url : subdomain
+    });
+
+    var peopleWidget = new PeopleWidget({
+      el         : '#invite',
+      is_textbox : true,
+      static_url : subdomain,
+      dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q='
+    });
+
+    // update the hidden input box
+    var invite_input_field = $('input[name="invite"]');
+    var updateInvitedField = function(){
+      invite_input_field.val(peopleWidget.invitedListToDelimitedString());
+    };
+
+    // triggers when user clicks on a person in the autocomplete dropdown
+    peopleWidget.onSelection(function(invited){
+      if (invited.length > 0){
+        participating.render(invited).show();
+      }else{
+        participating.hide();
+      }
+      peopleWidget.show();
+      updateInvitedField();
+    });
+
+    // triggers when the user clicks on a person in the participants list
+    participating.$el.on('click', 'li', function(e){
+      var id = e.currentTarget.rel;
+      peopleWidget.removePersonFromInvitedById(id).render();
+      if (peopleWidget.people_invited.length>0){
+        participating.render(peopleWidget.people_invited).show();
+      }else{
+        participating.hide();
+      }
+      updateInvitedField();
+    });
+
+  })();
+
+
+
+})();

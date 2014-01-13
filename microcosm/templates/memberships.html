@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="content-header padded">
+  <div class="row">
+    <div class="col-sm-8">
+      {% include 'breadcrumbs.html' %}
+    </div>
+    <div class="col-sm-4">
+      {% include 'pagination.html' %}
+    </div>
+  </div>
+  <h1>Membership Groups</h1>
+</div>
+
+<div class="content-body">
+
+  <div class="list-memberships">
+
+    <ul class="list-collection bordered padded">
+    {% for membership in memberships %}
+        <li class="list-collection-row">
+          <div class="row">
+
+            <div class="col-sm-8">
+              <!--<div class="list-collection-row-icon">
+
+              </div> /list-collection-row-icon -->
+              <div class="list-collection-row-offset">
+                <h2 class="row-title">{{ membership.name }}</h2>
+                <div class="row-meta">
+
+                    <ul class="list-people list-people-sm">
+                      {% for member in membership.members %}
+                      <li><a href="{% url 'profile' member.name|slugify  %}">
+                        <img src="{{ STATIC_URL }}{{ member.avatar}}" />
+                      </a></li>
+                      {% endfor %}
+                    </ul>
+
+                  <p class="list-membership-description">
+
+                    A <strong>{{ membership.name }}</strong>
+                    {% if membership.can_read %}
+                    <span class="green bold">can access</span>
+                    {%else%}
+                    <span class="red bold">cannot access</span>
+                    {% endif %}
+                    this microcosm.
+
+                    {% if membership.can|length %}
+                      They <span class="green bold">can {{ membership.can|join:", " }}</span>
+                      their own conversations, events and comments.
+                    {% endif %}
+                    {% if membership.cannot|length %}
+                      They <span class="red bold">cannot {{ membership.cannot|join:", " }}</span>
+                      their own conversations, events and comments.
+                    {% endif %}
+                    {% if membership.is_moderator %}
+                      As moderator,
+                      {% if membership.can|length %}
+                      they <span class="green bold">can also {{ membership.can|join:", " }}</span>
+                      the conversations, events and comments of others.
+                      {% endif %}
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-4">
+              <div class="row-stats">
+                <a href="{% url 'form_edit_memberships' membership.microcosm.name|slugify membership.id %}" class="btn btn-default pull-right">Edit Group</a>
+              </div>
+              <div class="row-context">
+              </div>
+
+            </div>
+          </div>
+        </li>
+    {% endfor %}
+    </ul>
+  </div>
+
+</div>
+
+
+<div class="row content-footer">
+  <div class="col-sm-8">
+      {% include 'breadcrumbs.html' %}
+    </div>
+    <div class="col-sm-4">
+      {% include 'pagination.html' %}
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block metabar %}
+
+<div class="metabar-module">
+  <h5>About</h5>
+  <div class="metabar-module-title">
+    <h3>
+      Membership groups
+    </h3>
+    <p>
+      Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
+      doloremque laudantium, totam rem aperiam.
+    </p>
+  </div>
+</div> <!-- / about -->
+
+
+
+{% endblock metabar %}
