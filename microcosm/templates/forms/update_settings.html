@@ -21,14 +21,11 @@
 			<div class="form-container-inner padded">
 
 			<form action="" method="POST">
-			{% csrf_token %}
+				{% csrf_token %}
 
 					<div class="form-group">
 						<div class="row">
 							<div class="col-sm-12">
-
-
-
 
 								<div class="form-table-checkbox">
 									<table cellspacing=0 cellpadding=0 border=0>
@@ -64,8 +61,8 @@
 									</table>
 								</div>
 
+								{% comment %}
 
-							{% comment %}
 								<div class="form-table-checkbox">
 									<table cellspacing=0 cellpadding=0 border=0>
 										<tr>
@@ -115,13 +112,12 @@
 										</tr>
 									</table>
 								</div>
-							{% endcomment %}
 
+								{% endcomment %}
 
 							</div>
 						</div>
 					</div> <!-- /form-group -->
-
 
 			</div> <!-- /form-container-inner -->
 			<div class="form-group form-footer padded">

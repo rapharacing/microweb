@@ -31,11 +31,14 @@
 									{% if form.errors.title %}
 										<div class="text-error">{{ form.errors.title.as_text }}</div>
 									{% endif %}
-									<input type="text"
-												class="form-control"
-												id="title"
-												name="{{ form.title.name }}"
-												placeholder="Title of huddle" />
+									<input
+										type="text"
+										class="form-control"
+										id="title"
+										name="{{ form.title.name }}"
+										placeholder="Title of huddle"
+										maxlength="150"
+									/>
 								</div>
 
 							</div>
@@ -57,11 +60,12 @@
 										<div class="input-group-addon">
 											<span class="sprite sprite-search-small"></span>
 										</div>
-										<input id="invite"
-													class="form-control"
-													autocomplete="off"
-													placeholder="Type in a user's name"/>
-
+										<input
+											id="invite"
+											class="form-control"
+											autocomplete="off"
+											placeholder="Type in a user's name"
+										/>
 									</div>
 								</div>
 
@@ -115,14 +119,12 @@
 										Confidential huddles disable the ability to invite more people later on.
 									</p>
 									<p>
-									<label>
-										<input type="radio" name="confidential" value="yes" />
-										Yes
-									</label>
-									<label>
-										<input type="radio" name="confidential" value="no" />
-										No
-									</label>
+										<label>
+											<input type="radio" name="confidential" value="yes" /> Yes
+										</label>
+										<label>
+											<input type="radio" name="confidential" value="no" /> No
+										</label>
 									</p>
 								</div>
 							</div>

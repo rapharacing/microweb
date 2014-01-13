@@ -35,12 +35,15 @@
 										{% if form.errors.profileName %}
 											<div class="text-error">{{ form.errors.profileName.as_text }}</div>
 										{% endif %}
-										<input type="text"
-													 class="form-control"
-													 id="title"
-													 name="{{ form.profileName.name }}"
-													 value="{{ form.profileName.value }}"
-													 placeholder="Enter username..." />
+										<input
+											type="text"
+											class="form-control"
+											id="title"
+											name="{{ form.profileName.name }}"
+											value="{{ form.profileName.value }}"
+											placeholder="Enter username..."
+											maxlength="50"
+										/>
 									</div>
 								</div>
 							</div> <!-- /form-group -->
@@ -53,10 +56,12 @@
 										<div class="form-file-upload">
 											<label>
 												<span>Click here</span>
-												<input name="{{ form.avatar.name }}"
-															 type="file"
-															 accept="image/*"
-															 capture="camera"/>
+												<input
+													name="{{ form.avatar.name }}"
+													type="file"
+													accept="image/*"
+													capture="camera"
+												/>
 											</label>
 											<div class="form-file-upload-text">
 												<h3>Click on or drag a image over the box on the left to update your picture</h3>
@@ -64,9 +69,7 @@
 												{% if avatar_error %}
 													<p>{{ avatar_error }}</p>
 												{% else %}
-												<p>
-													Your avatar should be a square image under 30KB with jpg, png or gif file extension.
-												</p>
+												<p>Your avatar should be a square image under 30KB with jpg, png or gif file extension.</p>
 												{% endif %}
 											</div>
 										</div>
@@ -92,16 +95,17 @@
 													<li class="se-list"><span class="glyphicon glyphicon-th-list"></span> List</li>
 													<li class="se-image"><span class="glyphicon glyphicon-picture"></span> Image</li>
 												</ul>
-												<textarea id="reply-box-textarea"
-																	name="{{ comment_form.markdown.name }}"
-																	placeholder="Enter your text here..."></textarea>
+												<textarea
+													id="reply-box-textarea"
+													name="{{ comment_form.markdown.name }}"
+													placeholder="Enter your text here..."
+													maxlength="5000"
+												></textarea>
 												<div class="reply-box-footer">
 													<div class="reply-box-attachments">
 														<div class="reply-box-attachments-gallery"></div>
 														<span class="reply-box-drop-zone">Drag your files into this area</span> or
-														<label for="reply-box-attachments">
-															upload a file
-														</label>
+														<label for="reply-box-attachments">upload a file</label>
 														<input type="file" id="reply-box-attachments" name="attachments" multiple/>
 													</div>
 													<a href="javascript:void 0" class="formatting-help-handle">

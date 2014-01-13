@@ -12,17 +12,9 @@
 
 <div class="content-header padded">
 	<div class="row">
-		<div class="col-sm-12">
-		</div>
+		<div class="col-sm-12"></div>
 	</div>
-	<h1>
-		{% if form.id > 0 %}
-		Edit event
-		{% else %}
-		Start an event
-		{% endif %}
-	</h1>
-
+	<h1>{% if form.id > 0 %}Edit event{% else %}Start an event{% endif %}</h1>
 </div>
 
 <div class="content-body">
@@ -66,12 +58,15 @@
 								{% if form.errors.title %}
 									<div class="text-error">{{ form.errors.title.as_text }}</div>
 								{% endif %}
-								<input type="text"
-											 class="form-control"
-											 id="title"
-											 name="{{ form.title.name }}"
-											 value="{{ form.title.value|default:"" }}"
-											 placeholder="Title of event" />
+								<input
+									type="text"
+									class="form-control"
+									id="title"
+									name="{{ form.title.name }}"
+									value="{{ form.title.value|default:"" }}"
+									placeholder="Title of event"
+									maxlength="150"
+								/>
 							</div>
 						</div>
 					</div> <!-- /form-group -->
@@ -87,11 +82,14 @@
 								{% if form.errors.editReason %}
 									<div class="text-error">{{ form.errors.editReason.as_text }}</div>
 								{% endif %}
-								<input type="text"
-											 class="form-control {% if form.errors.editReason %}error{% endif %}"
-											 id="editReason"
-											 name="{{ form.editReason.name }}"
-											 placeholder="Reason for editing" />
+								<input
+									type="text"
+									class="form-control {% if form.errors.editReason %}error{% endif %}"
+									id="editReason"
+									name="{{ form.editReason.name }}"
+									placeholder="Reason for editing"
+									maxlength="150"
+								/>
 							</div>
 						</div>
 					</div> <!-- /form-group -->
@@ -109,25 +107,27 @@
 							<div class="col-sm-3 col-lg-2">
 								<div class="radio">
 									<label>
-										<input type="radio"
-													 id="date-type"
-													 name="date-type"
-													 value="1"
-													 checked="checked" /> Single day
+										<input
+											type="radio"
+											id="date-type"
+											name="date-type"
+											value="1"
+											checked="checked"
+										/> Single day
 									</label>
 								</div>
 							</div>
 							<div class="col-sm-3 col-lg-2">
 								<div class="radio">
 									<label>
-										<input type="radio" id="date-type" name="date-type" value="2"/> Multiple days
+										<input type="radio" id="date-type" name="date-type" value="2" /> Multiple days
 									</label>
 								</div>
 							</div>
 							<div class="col-sm-3 col-lg-2">
 								<div class="radio">
 									<label>
-										<input type="radio" id="date-type" name="date-type" value="0"/>
+										<input type="radio" id="date-type" name="date-type" value="0" />
 										<abbr title="To Be Announced - select this option if you have not yet set a date">TBA</abbr>
 									</label>
 								</div>
@@ -250,18 +250,23 @@
 							<div class="col-sm-6">
 								<div id="location-control">
 								{% spaceless %}
-									<textarea id="location"
-														class="form-control event-location-textarea"
-														name="{{ form.where.name }}"
-														placeholder="Eg. Street, station, landmark, country...">
+									<textarea
+										id="location"
+										class="form-control event-location-textarea"
+										name="{{ form.where.name }}"
+										placeholder="Eg. Street, station, landmark, country..."
+										maxlength="150"
+									>
 									{{ form.where.value|default:"" }}
 									</textarea>
 								{% endspaceless %}
 									<div class="row">
 										<div class="col-sm-5 col-sm-offset-7">
-											<a href="javascript:void 0"
-												 id="locate"
-												 class="btn btn-block btn-default">Show on map</a>
+											<a
+												href="javascript:void 0"
+												id="locate"
+												class="btn btn-block btn-default"
+											>Show on map</a>
 										</div>
 									</div>
 								</div>
@@ -287,14 +292,12 @@
 									{% endif %}
 								<div class="radio">
 									<label>
-										<input type="radio"
-													 name="attendee-limit-option"
-													 value="0"
-													 {% if not form.rsvpLimit.value %}
-															 checked="checked"
-													 {% endif %}
-													 />
-										No limit
+										<input
+											type="radio"
+											name="attendee-limit-option"
+											value="0"
+											{% if not form.rsvpLimit.value %}checked="checked"{% endif %}
+										/> No limit
 									</label>
 								</div>
 
@@ -304,28 +307,25 @@
 									<div class="col-xs-9">
 										<div class="radio">
 											<label>
-												<input type="radio"
-															 name="attendee-limit-option"
-															 value="1"
-															 {% if form.rsvpLimit.value %}
-															 checked="checked"
-															 {% endif %}
-															 />
-												Max number of attendees is
+												<input
+													type="radio"
+													name="attendee-limit-option"
+													value="1"
+													{% if form.rsvpLimit.value %}checked="checked"{% endif %}
+												/> Max number of attendees is
 											</label>
 										</div>
 									</div>
 									<div class="col-xs-3">
-										<input type="number"
-													 class="form-control"
-													 name="{{ form.rsvpLimit.name }}"
-													 min="1"
-													 max="999"
-													 value="{{ form.rsvpLimit.value|default:"0" }}"
-													 {% if not form.rsvpLimit.value %}
-													 disabled="disabled"
-													 {% endif %}
-													/>
+										<input
+											type="number"
+											class="form-control"
+											name="{{ form.rsvpLimit.name }}"
+											min="1"
+											max="999"
+											value="{{ form.rsvpLimit.value|default:"0" }}"
+											{% if not form.rsvpLimit.value %}disabled="disabled"{% endif %}
+										/>
 									</div>
 							</div>
 						</div>
@@ -374,9 +374,12 @@
 									<li class="se-image"><span class="sprite sprite-format-img"></span> Image</li>
 								</ul>
 
-								<textarea id="reply-box-textarea"
-													name="firstcomment"
-													placeholder="Enter your text here..."></textarea>
+								<textarea
+									id="reply-box-textarea"
+									name="firstcomment"
+									placeholder="Enter your text here..."
+									maxlength="5000"
+								></textarea>
 								<div class="reply-box-footer">
 									<a href="javascript:void 0">
 										<span class="sprite sprite-help-small"></span>

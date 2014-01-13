@@ -56,12 +56,15 @@
 								{% if form.errors.title %}
 									<div class="text-error">{{ form.errors.title.as_text }}</div>
 								{% endif %}
-								<input type="text"
-											 class="form-control"
-											 id="title"
-											 name="{{ form.title.name }}"
-											 value="{{ form.title.value }}"
-											 placeholder="Title of event" />
+								<input
+									type="text"
+									class="form-control"
+									id="title"
+									name="{{ form.title.name }}"
+									value="{{ form.title.value }}"
+									placeholder="Title of event"
+									maxlength="150"
+								/>
 							</div>
 						</div>
 					</div> <!-- /form-group -->
@@ -77,11 +80,14 @@
 								{% if form.errors.editReason %}
 									<div class="text-error">{{ form.errors.editReason.as_text }}</div>
 								{% endif %}
-								<input type="text"
-											 class="form-control {% if form.errors.editReason %}error{% endif %}"
-											 id="editReason"
-											 name="{{ form.editReason.name }}"
-											 placeholder="Reason for editing" />
+								<input
+									type="text"
+									class="form-control {% if form.errors.editReason %}error{% endif %}"
+									id="editReason"
+									name="{{ form.editReason.name }}"
+									placeholder="Reason for editing"
+									maxlength="150"
+								/>
 							</div>
 						</div>
 					</div> <!-- /form-group -->
@@ -220,9 +226,11 @@
 													name="{{ form.where.name }}">{{ form.where.value }}</textarea>
 								<div class="row">
 									<div class="col-sm-5 col-sm-offset-7">
-										<a href="javascript:void 0"
-											 id="locate"
-											 class="btn btn-block btn-default">Show on map</a>
+										<a
+											href="javascript:void 0"
+											id="locate"
+											class="btn btn-block btn-default"
+										>Show on map</a>
 									</div>
 								</div>
 							</div>
@@ -262,13 +270,15 @@
 										</div>
 									</div>
 									<div class="col-xs-4">
-										<input type="number"
-													 class="form-control"
-													 name="{{ form.rsvpLimit.name }}"
-													 min="0"
-													 max="999"
-													 value="{{ form.rsvpLimit.value }}"
-													 disabled />
+										<input
+											type="number"
+											class="form-control"
+											name="{{ form.rsvpLimit.name }}"
+											min="0"
+											max="999"
+											value="{{ form.rsvpLimit.value }}"
+											disabled
+										/>
 									</div>
 							</div>
 						</div>
