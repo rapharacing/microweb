@@ -154,7 +154,7 @@
 				Comments
 			</li>
 			<li class="list-group-item">
-				<span class="badge-alt">{{ site.meta.stats.onlineProfiles }}</span>
+				<span class="badge-alt">{% if site.meta.stats.onlineProfiles > 1 %}{{ site.meta.stats.onlineProfiles }}{% else %}1{% endif %}</span>
 				Members online now
 			</li>
 		</ul>
