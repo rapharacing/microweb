@@ -200,11 +200,6 @@
         this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );
       }
 
-      // add validation
-      if (typeof Validator !== 'undefined'){
-        new Validator( this.form[0], { rules : { 'markdown' : 'not_empty' } });
-      }
-
       // add attachments
       if (typeof FileHandler !== 'undefined'){
         this.fileHandler = new FileHandler({

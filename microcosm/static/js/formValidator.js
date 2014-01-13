@@ -47,11 +47,17 @@
       if (typeof options.rules !== 'undefined'){
         user_rules = options.rules;
       }
-      this.rules = $.extend({},user_rules);
+      this.rules = user_rules;
 
+      // messages
+      var error_messages = {};
+      if (typeof options.error_messages !== 'undefined'){
+        error_messages = options.error_messages;
+      }
+      this.error_messages = error_messages;
 
-      this.$form.on('submit', $.proxy(this.validate,this));
-
+      this.bind();
+      
       return this;
     };
 
@@ -112,13 +118,94 @@
       if (this.errors.length>0){
         e.preventDefault();
         console.log(this.errors);
+        this.applyErrorsToForm(this.errors);
         return this.errors;
       }
     };
+
+    validator.prototype.applyErrorsToForm = function(errors){
+
+      var field;
+
+      if (errors.length > 0){
+        for(var i=0,j=errors.length;i<j;i++){
+
+          field = errors[i].split(':');
+          if (field.length > 1){
+            this.addError(field[0],errors[i]);
+            this.addErrorStyles(field[0]);
+          }
+        }
+      }
+
+    };
+
+    validator.prototype.addError = function(field_name, error_name){
+
+      var field_input = this.$form.find('[name="'+field_name+'"]'),
+          parent      = field_input.parent(),
+          error_label;
+          
+      if (parent.find('.control-label').length < 1){
+	      error_label = document.createElement('label');
+	      error_label.className    = "control-label";
+	      error_label.textContent = this.error_messages[error_name];
+	      parent.prepend(error_label);
+      }
+
+    };
+
+    validator.prototype.removeError = function(field_name){
+      var field_input = this.$form.find('[name="'+field_name+'"]'),
+          parent      = field_input.parent(),
+          error_label = parent.find('.control-label');
+
+      if (error_label.length>0){
+      	error_label.remove();	
+      }
+      
+    };
+
+    validator.prototype.addErrorStyles = function(field_name){
+      var self   = this.$form.find('[name="'+field_name+'"]'),
+          parent = self.parent();
+      if (!parent.hasClass('has-error')){
+      	parent.addClass('has-error');	
+      }
+      
+    };
+
+    validator.prototype.removeErrorStyles = function(field_name){
+
+      var self   = this.$form.find('[name="'+field_name+'"]'),
+          parent = self.parent();
+
+      if (parent.hasClass('has-error')){
+      	parent.removeClass('has-error');	
+      }
+      
+    };
+
+    validator.prototype.onChangeHandler = function(e){
+
+      var self       = $(e.currentTarget),
+          field_name = self.attr('name');
+      
+      this.removeError(field_name)
+      this.removeErrorStyles(field_name);
+      
+    };
+    
+    validator.prototype.bind = function(){
+
+      this.$form.on('submit', $.proxy(this.validate,this));
+      this.$form.on('change', '.has-error input', $.proxy(this.onChangeHandler,this));
+
+    }
 
     return validator;
 
   })();
 
-  window.Validator = Validator;
+  window.FormValidator = Validator;
 })();
