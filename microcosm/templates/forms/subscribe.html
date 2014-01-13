@@ -1,45 +1,45 @@
 {% if user %}
-  <div class="subscribe {% if content.meta.flags.watched %}active{% endif %}">
+	<div class="subscribe {% if content.meta.flags.watched %}active{% endif %}">
 
-  <form method="POST" action="" id="subscribe_form">
-    {% csrf_token %}
-    <input type="hidden" name="update_type_id" value="1">
+	<form method="POST" action="" id="subscribe_form">
+		{% csrf_token %}
+		<input type="hidden" name="update_type_id" value="1">
 
-    <div id="subscribe-button" class="btn-switch {% if content.meta.flags.watched %}on{%else%}off{%endif%}">
+		<div id="subscribe-button" class="btn-switch {% if content.meta.flags.watched %}on{%else%}off{%endif%}">
 
-      <div class="btn-switch-state loading">
-        <img src="/static/img/preloader.gif" />
-      </div>
-      <div class="btn-switch-state off">
-        <a class="btn-switch-on" href="javascript:void 0">
-        <strong>
-          {% if item_type == 'profile'%}Follow @{{ content.profile_name }}{%else%}Subscribe{%endif%}
-        </strong>
-        </a>
-      </div>
-      <div class="btn-switch-state on">
-        <span class="sprite sprite-ok-small"></span>
-        {% if item_type == 'profile'%}
-        <strong>Following</strong>
-        (<a class="btn-switch-off" href="javascript:void 0">Unfollow?</a>)
-        {% else %}
-        <strong>Added to updates</strong>
-        (<a class="btn-switch-off" href="javascript:void 0">Unsubscribe?</a>)
-        {% endif %}
-      </div>
-    </div>
+			<div class="btn-switch-state loading">
+				<img src="/static/img/preloader.gif" />
+			</div>
+			<div class="btn-switch-state off">
+				<a class="btn-switch-on" href="javascript:void 0">
+				<strong>
+					{% if item_type == 'profile'%}Follow @{{ content.profile_name }}{%else%}Subscribe{%endif%}
+				</strong>
+				</a>
+			</div>
+			<div class="btn-switch-state on">
+				<span class="sprite sprite-ok-small"></span>
+				{% if item_type == 'profile'%}
+				<strong>Following</strong>
+				(<a class="btn-switch-off" href="javascript:void 0">Unfollow?</a>)
+				{% else %}
+				<strong>Added to updates</strong>
+				(<a class="btn-switch-off" href="javascript:void 0">Unsubscribe?</a>)
+				{% endif %}
+			</div>
+		</div>
 
-  </form>
-    <div class="subscribe-meta {% if content.meta.flags.watched %}active{%endif%}">
+	</form>
+		<div class="subscribe-meta {% if content.meta.flags.watched %}active{%endif%}">
 
-      <form method="POST" action="" id="email_me_form">
-      {% csrf_token %}
-      <span class="sprite sprite-branch-arrow-right"></span>
-        <label>
-          <input type="checkbox" name="emailme" {% if content.meta.flags.sendEmail %}checked{% endif %} />
-            Instantly notify me by email
-        </label>
-      </form>
-    </div>
-  </div>
+			<form method="POST" action="" id="email_me_form">
+			{% csrf_token %}
+			<span class="sprite sprite-branch-arrow-right"></span>
+				<label>
+					<input type="checkbox" name="emailme" {% if content.meta.flags.sendEmail %}checked{% endif %} />
+						Instantly notify me by email
+				</label>
+			</form>
+		</div>
+	</div>
 {% endif %}

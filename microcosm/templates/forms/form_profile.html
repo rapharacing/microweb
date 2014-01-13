@@ -2,136 +2,136 @@
 {% block content %}
 
 <div class="content-header padded">
-  <div class="row">
-    <div class="col-sm-12">
-    {% include 'breadcrumbs.html' %}
-    </div>
-  </div>
-  <a href="{% url 'updates-settings' %}" class="pull-right">Update settings &rarr;</a>
-  <h1>
-    Edit Profile
-  </h1>
-  <div class="clearfix"></div>
+	<div class="row">
+		<div class="col-sm-12">
+		{% include 'breadcrumbs.html' %}
+		</div>
+	</div>
+	<a href="{% url 'updates-settings' %}" class="pull-right">Update settings &rarr;</a>
+	<h1>
+		Edit Profile
+	</h1>
+	<div class="clearfix"></div>
 </div>
 
-    <div class="content-body">
+		<div class="content-body">
 
-      <div class="row form-container">
-        <div class="col-lg-12">
-          <div class="form-container-inner padded">
-            <form role="form" action="{% url 'edit-profile' user.id %}" method="POST" enctype="multipart/form-data">
+			<div class="row form-container">
+				<div class="col-lg-12">
+					<div class="form-container-inner padded">
+						<form role="form" action="{% url 'edit-profile' user.id %}" method="POST" enctype="multipart/form-data">
 
-              {% csrf_token %}
-              {{ form.id }}
+							{% csrf_token %}
+							{{ form.id }}
 
-              {# username #}
-              <div class="form-group">
-                <div class="row">
+							{# username #}
+							<div class="form-group">
+								<div class="row">
 
-                  <label class="col-sm-12" for="profileName">
-                    {{ form.profileName.label }}
-                  </label>
-                  <div class="col-sm-6">
-                    {% if form.errors.profileName %}
-                      <div class="text-error">{{ form.errors.profileName.as_text }}</div>
-                    {% endif %}
-                    <input type="text"
-                           class="form-control"
-                           id="title"
-                           name="{{ form.profileName.name }}"
-                           value="{{ form.profileName.value }}"
-                           placeholder="Enter username..." />
-                  </div>
-                </div>
-              </div> <!-- /form-group -->
+									<label class="col-sm-12" for="profileName">
+										{{ form.profileName.label }}
+									</label>
+									<div class="col-sm-6">
+										{% if form.errors.profileName %}
+											<div class="text-error">{{ form.errors.profileName.as_text }}</div>
+										{% endif %}
+										<input type="text"
+													 class="form-control"
+													 id="title"
+													 name="{{ form.profileName.name }}"
+													 value="{{ form.profileName.value }}"
+													 placeholder="Enter username..." />
+									</div>
+								</div>
+							</div> <!-- /form-group -->
 
-              {# profile picture #}
-              <div class="form-group">
-                <div class="row">
-                  <label class="col-sm-12" for="title">{{ form.avatar.label }}</label>
-                  <div class="col-sm-12">
-                    <div class="form-file-upload">
-                      <label>
-                        <span>Click here</span>
-                        <input name="{{ form.avatar.name }}"
-                               type="file"
-                               accept="image/*"
-                               capture="camera"/>
-                      </label>
-                      <div class="form-file-upload-text">
-                        <h3>Click on or drag a image over the box on the left to update your picture</h3>
+							{# profile picture #}
+							<div class="form-group">
+								<div class="row">
+									<label class="col-sm-12" for="title">{{ form.avatar.label }}</label>
+									<div class="col-sm-12">
+										<div class="form-file-upload">
+											<label>
+												<span>Click here</span>
+												<input name="{{ form.avatar.name }}"
+															 type="file"
+															 accept="image/*"
+															 capture="camera"/>
+											</label>
+											<div class="form-file-upload-text">
+												<h3>Click on or drag a image over the box on the left to update your picture</h3>
 
-                        {% if avatar_error %}
-                          <p>{{ avatar_error }}</p>
-                        {% else %}
-                        <p>
-                          Your avatar should be a square image under 30KB with jpg, png or gif file extension.
-                        </p>
-                        {% endif %}
-                      </div>
-                    </div>
+												{% if avatar_error %}
+													<p>{{ avatar_error }}</p>
+												{% else %}
+												<p>
+													Your avatar should be a square image under 30KB with jpg, png or gif file extension.
+												</p>
+												{% endif %}
+											</div>
+										</div>
 
-                  </div>
+									</div>
 
-                </div>
-              </div> <!-- /form-group -->
+								</div>
+							</div> <!-- /form-group -->
 
-              {# comment #}
-              <div class="form-group">
-                <div class="row">
+							{# comment #}
+							<div class="form-group">
+								<div class="row">
 
-                  <label class="col-sm-12" for="reply-box-textarea">Tell us about yourself</label>
-                  <div class="col-sm-12">
+									<label class="col-sm-12" for="reply-box-textarea">Tell us about yourself</label>
+									<div class="col-sm-12">
 
-                    <div class="reply-box">
-                        <ul>
-                          <li class="se-bold"><strong>Bold</strong></li>
-                          <li class="se-italics"><i>Italics</i></li>
-                          <li class="se-quote">Quote</li>
-                          <li class="se-link"><span class="glyphicon glyphicon-link"></span> Link</li>
-                          <li class="se-list"><span class="glyphicon glyphicon-th-list"></span> List</li>
-                          <li class="se-image"><span class="glyphicon glyphicon-picture"></span> Image</li>
-                        </ul>
-                        <textarea id="reply-box-textarea"
-                                  name="{{ comment_form.markdown.name }}"
-                                  placeholder="Enter your text here..."></textarea>
-                        <div class="reply-box-footer">
-                          <div class="reply-box-attachments">
-                            <div class="reply-box-attachments-gallery"></div>
-                            <span class="reply-box-drop-zone">Drag your files into this area</span> or
-                            <label for="reply-box-attachments">
-                              upload a file
-                            </label>
-                            <input type="file" id="reply-box-attachments" name="attachments" multiple/>
-                          </div>
-                          <a href="javascript:void 0" class="formatting-help-handle">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                            Formatting help
-                          </a>
-                        </div>
-                      </div>
-                  </div>
+										<div class="reply-box">
+												<ul>
+													<li class="se-bold"><strong>Bold</strong></li>
+													<li class="se-italics"><i>Italics</i></li>
+													<li class="se-quote">Quote</li>
+													<li class="se-link"><span class="glyphicon glyphicon-link"></span> Link</li>
+													<li class="se-list"><span class="glyphicon glyphicon-th-list"></span> List</li>
+													<li class="se-image"><span class="glyphicon glyphicon-picture"></span> Image</li>
+												</ul>
+												<textarea id="reply-box-textarea"
+																	name="{{ comment_form.markdown.name }}"
+																	placeholder="Enter your text here..."></textarea>
+												<div class="reply-box-footer">
+													<div class="reply-box-attachments">
+														<div class="reply-box-attachments-gallery"></div>
+														<span class="reply-box-drop-zone">Drag your files into this area</span> or
+														<label for="reply-box-attachments">
+															upload a file
+														</label>
+														<input type="file" id="reply-box-attachments" name="attachments" multiple/>
+													</div>
+													<a href="javascript:void 0" class="formatting-help-handle">
+														<span class="glyphicon glyphicon-question-sign"></span>
+														Formatting help
+													</a>
+												</div>
+											</div>
+									</div>
 
-                </div>
-              </div> <!-- /form-group -->
+								</div>
+							</div> <!-- /form-group -->
 
-          </div> <!-- /form-container-inner -->
+					</div> <!-- /form-container-inner -->
 
-          {# footer #}
-          <div class="form-group form-footer padded">
-            <div class="row">
-              <div class="col-sm-12">
-                <div class="form-footer-buttons">
-                  <input type="submit" class="btn btn-lg btn-primary" value="Save Changes">
-                  <input type="reset" class="btn btn-lg btn-default" value="Cancel">
-                </div>
-              </div>
-            </div>
-          </div>
+					{# footer #}
+					<div class="form-group form-footer padded">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="form-footer-buttons">
+									<input type="submit" class="btn btn-lg btn-primary" value="Save Changes">
+									<input type="reset" class="btn btn-lg btn-default" value="Cancel">
+								</div>
+							</div>
+						</div>
+					</div>
 
-        </form>
-    </div>
-  </div>
+				</form>
+		</div>
+	</div>
 
 </div>
 
@@ -139,12 +139,12 @@
 {% block metabar %}
 
 <div class="metabar-module">
-  <h5>About</h5>
-  <div class="metabar-module-title">
-    <h3>
-      Profile
-    </h3>
-  </div>
+	<h5>About</h5>
+	<div class="metabar-module-title">
+		<h3>
+			Profile
+		</h3>
+	</div>
 </div> <!-- / about -->
 
 {% endblock metabar %}
@@ -158,15 +158,15 @@
 <script type="text/javascript">
 // (function(){
 
-  var commentBox = new simpleEditor({
-    el : '.reply-box'
-  });
+	var commentBox = new simpleEditor({
+		el : '.reply-box'
+	});
 
-  if (typeof ProfilePicture !== 'undefined'){
-    var profilePicture = new ProfilePicture({
-      el : '.form-file-upload'
-    });
-  }
+	if (typeof ProfilePicture !== 'undefined'){
+		var profilePicture = new ProfilePicture({
+			el : '.form-file-upload'
+		});
+	}
 
 // })();
 </script>

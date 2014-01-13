@@ -4,85 +4,85 @@
 {% block ga %},'dimension2': '{{ content.meta.created_by.id }}','dimension3': '{{ content.microcosm_id }}'{% endblock%}
 
 {% block css %}
-    <!-- Leaflet -->
-    <link href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.css" rel="stylesheet" type="text/css" />
-    <!--[if lte IE 8]>
-      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.ie.min.css" />
-    <![endif]-->
+		<!-- Leaflet -->
+		<link href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.css" rel="stylesheet" type="text/css" />
+		<!--[if lte IE 8]>
+			<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.ie.min.css" />
+		<![endif]-->
 {% endblock %}
 
 
 {% block content %}
 <div class="content-header padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div>
 
 <div class="content-body">
-  <div class="item">
+	<div class="item">
 
-    <div class="item-header">
-      <h1>{{content.title}}</h1>
-      <div class="item-meta">
-        Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
-      </div>
-    </div>
+		<div class="item-header">
+			<h1>{{content.title}}</h1>
+			<div class="item-meta">
+				Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
+			</div>
+		</div>
 
-    {% if content.comments.page > 1 %}
-      {% include 'event_header_small.html' %}
-    {% else %}
-      {% include 'event_header_large.html' %}
-    {% endif %}
+		{% if content.comments.page > 1 %}
+			{% include 'event_header_small.html' %}
+		{% else %}
+			{% include 'event_header_large.html' %}
+		{% endif %}
 
-    {% include "forms/content-moderation.html" %}
+		{% include "forms/content-moderation.html" %}
 
-    <ul class="list-comments">
-      {% comments content.comments.items %}
-    </ul>
+		<ul class="list-comments">
+			{% comments content.comments.items %}
+		</ul>
 
-    {% include "forms/content-moderation.html" %}
+		{% include "forms/content-moderation.html" %}
 
-  </div> <!-- item -->
+	</div> <!-- item -->
 </div> <!-- / content-body -->
 
 <div class="content-footer padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div> <!-- /content-footer -->
 
 <a name="reply"></a>
 <div class="reply-container">
-  <ul class="list-comments">
-    <li class="comment-item">
-      <div class="comment-item-inner">
-        <div class="comment-item-header">
-          <div class="comment-item-author">
-            {% if user %}
-              <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
-            {% else %}
-              <img src="/static/img/avatar.gif" />
-            {% endif %}
-              <strong>Post a reply</strong>
-          </div>
-        </div>
-        <div class="comment-item-body">
-          {% include 'forms/block_comment_box.html' %}
-        </div>
-      </div>
-    </li>
-  </ul>
+	<ul class="list-comments">
+		<li class="comment-item">
+			<div class="comment-item-inner">
+				<div class="comment-item-header">
+					<div class="comment-item-author">
+						{% if user %}
+							<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
+						{% else %}
+							<img src="/static/img/avatar.gif" />
+						{% endif %}
+							<strong>Post a reply</strong>
+					</div>
+				</div>
+				<div class="comment-item-body">
+					{% include 'forms/block_comment_box.html' %}
+				</div>
+			</div>
+		</li>
+	</ul>
 </div> <!-- /reply-container -->
 
 
@@ -92,34 +92,34 @@
 
 {% block sidebar %}
 
-  <div class="metabar-module">
-    <h5>Got something to add?</h5>
-    <div class="metabar-module-primary-buttons">
-      <a id="post-a-reply-handle" href="#reply" class="btn btn-large btn-block btn-primary">
-        <span class="sprite sprite-speech-bubble-small"></span> Post a reply
-      </a>
-    </div>
-  </div> <!-- primary actions -->
+	<div class="metabar-module">
+		<h5>Got something to add?</h5>
+		<div class="metabar-module-primary-buttons">
+			<a id="post-a-reply-handle" href="#reply" class="btn btn-large btn-block btn-primary">
+				<span class="sprite sprite-speech-bubble-small"></span> Post a reply
+			</a>
+		</div>
+	</div> <!-- primary actions -->
 
-  <div class="metabar-module">
-    <h5>About</h5>
-    <div class="metabar-module-title">
-      <h3>
-        {{ content.title }}
-      </h3>
-      <p class="metabar-module-author">
-        <a href="{% url 'single-profile' content.meta.created_by.id %}">
-          <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
-          @{{ content.meta.created_by.profile_name|truncatechars:25 }}
-        </a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
-      </p>
-    </div>
-    <div class="metabar-module-body">
-      {% include 'forms/subscribe.html' %}
-    </div>
-  </div> <!-- / about -->
+	<div class="metabar-module">
+		<h5>About</h5>
+		<div class="metabar-module-title">
+			<h3>
+				{{ content.title }}
+			</h3>
+			<p class="metabar-module-author">
+				<a href="{% url 'single-profile' content.meta.created_by.id %}">
+					<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
+					@{{ content.meta.created_by.profile_name|truncatechars:25 }}
+				</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+			</p>
+		</div>
+		<div class="metabar-module-body">
+			{% include 'forms/subscribe.html' %}
+		</div>
+	</div> <!-- / about -->
 
-  {% include 'forms/metabar-moderation.html' %}
+	{% include 'forms/metabar-moderation.html' %}
 
 {% endblock %}
 
@@ -134,16 +134,16 @@
 
 <script type="text/javascript">
 var eventMap = new EventMap({
-  map : 'map-canvas'
+	map : 'map-canvas'
 });
 
 eventMap.restore(
-  {{ content.lat|default:"null" }},
-  {{ content.lon|default:"null" }},
-  [
-    [ {{ content.north|default:"null" }}, {{ content.west|default:"null" }} ],
-    [ {{ content.south|default:"null" }}, {{ content.east|default:"null" }} ]
-  ]
+	{{ content.lat|default:"null" }},
+	{{ content.lon|default:"null" }},
+	[
+		[ {{ content.north|default:"null" }}, {{ content.west|default:"null" }} ],
+		[ {{ content.south|default:"null" }}, {{ content.east|default:"null" }} ]
+	]
 );
 {% endif %}
 </script>
@@ -157,32 +157,32 @@ eventMap.restore(
 <script type="text/javascript">
 (function(){
 
-  var comments = new Comments({
-    el               : '.content-body',
-    defaultContainer : '.reply-container',
-    template         : $('.reply-container .comment-item-body').html().trim()
-  });
+	var comments = new Comments({
+		el               : '.content-body',
+		defaultContainer : '.reply-container',
+		template         : $('.reply-container .comment-item-body').html().trim()
+	});
 
-  var replyBox = new simpleEditor({
-    el : '.reply-box'
-  });
+	var replyBox = new simpleEditor({
+		el : '.reply-box'
+	});
 
-  $('#post-a-reply-handle').on('click',function(e){
-    var selectedText = Comments.prototype.getWindowSelectedText();
-    if (selectedText){
-      replyBox.textarea.value = selectedText;
-      replyBox.quote();
-    }
-  });
+	$('#post-a-reply-handle').on('click',function(e){
+		var selectedText = Comments.prototype.getWindowSelectedText();
+		if (selectedText){
+			replyBox.textarea.value = selectedText;
+			replyBox.quote();
+		}
+	});
 
-  var subscribe = new Subscribe({
-    el    : '.subscribe',
-    url   : '{% url 'single-watcher' %}',
-    id    : {{ content.id }},
-    type  : '{{ item_type }}',
-    token : '{{ csrf_token }}',
-    is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
-  });
+	var subscribe = new Subscribe({
+		el    : '.subscribe',
+		url   : '{% url 'single-watcher' %}',
+		id    : {{ content.id }},
+		type  : '{{ item_type }}',
+		token : '{{ csrf_token }}',
+		is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
+	});
 
 })();
 </script>
@@ -194,16 +194,16 @@ eventMap.restore(
 Toggle for event single page item event div for small screens
 {% endcomment %}
 <script type="text/javascript">
-  (function(){
-    // expanding item-event-div
-    $('.item-event-expand-handle').on('click',function(){
-      if ($('.item-event-compact').hasClass('item-event-expanded')){
-        $('.item-event-compact').removeClass('item-event-expanded');
-      }else{
-        $('.item-event-compact').addClass('item-event-expanded');
-      }
-    });
-  })();
+	(function(){
+		// expanding item-event-div
+		$('.item-event-expand-handle').on('click',function(){
+			if ($('.item-event-compact').hasClass('item-event-expanded')){
+				$('.item-event-compact').removeClass('item-event-expanded');
+			}else{
+				$('.item-event-compact').addClass('item-event-expanded');
+			}
+		});
+	})();
 </script>
 {% endif %} {# endif contents.comments.page > 1 #}
 

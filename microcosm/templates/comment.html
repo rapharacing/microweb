@@ -3,75 +3,75 @@
 {% block content %}
 
 <div class="content-body">
-    <div class="alert alert-warning">
-      You are reading a single comment and it's replies.
-      <a href="{{ content.meta.links.commentPage.href }}#{{ content.id }}">Click here to read the full conversation.</a>
-    </div>
+		<div class="alert alert-warning">
+			You are reading a single comment and it's replies.
+			<a href="{{ content.meta.links.commentPage.href }}#{{ content.id }}">Click here to read the full conversation.</a>
+		</div>
 
-  {% if content.meta.parents %}
-    <div class="list-comments-dull">
-      <ul class="list-comments">
-        {% comments content.meta.parents hide_permalink=True %}
-      </ul>
-    </div>
-  {% endif %}
+	{% if content.meta.parents %}
+		<div class="list-comments-dull">
+			<ul class="list-comments">
+				{% comments content.meta.parents hide_permalink=True %}
+			</ul>
+		</div>
+	{% endif %}
 
-  <ul class="list-comments list-comments-highlighted">
-    {% comments content hide_permalink=True %}
-  </ul>
+	<ul class="list-comments list-comments-highlighted">
+		{% comments content hide_permalink=True %}
+	</ul>
 
-  {% if content.meta.children %}
-    <ul class="list-comments">
-      {% comments content.meta.children hide_permalink=True %}
-    </ul>
-  {% endif %}
+	{% if content.meta.children %}
+		<ul class="list-comments">
+			{% comments content.meta.children hide_permalink=True %}
+		</ul>
+	{% endif %}
 
 </div> <!-- / content-body -->
 
 <!--
 <div class="reply-container">
-    <ul class="list-comments">
-      <li class="comment-item">
-        <div class="comment-item-inner">
-          <div class="comment-item-header">
-            <div class="comment-item-author">
-              {% if user %}
-                <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
-              {% else %}
-                <img src="/static/img/avatar.gif" />
-              {% endif %}
-                <strong>Post a reply</strong>
-            </div>
-          </div>
-          <div class="comment-item-body">
+		<ul class="list-comments">
+			<li class="comment-item">
+				<div class="comment-item-inner">
+					<div class="comment-item-header">
+						<div class="comment-item-author">
+							{% if user %}
+								<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
+							{% else %}
+								<img src="/static/img/avatar.gif" />
+							{% endif %}
+								<strong>Post a reply</strong>
+						</div>
+					</div>
+					<div class="comment-item-body">
 
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>  /reply-container -->
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>  /reply-container -->
 
 {% endblock content %}
 
 {% block sidebar %}
 
-  <div class="metabar-module">
-    <h5>About</h5>
-    <div class="metabar-module-title">
-      <h3>
-        {{ content.title }}
-      </h3>
-      <p>
-        {{ content.description }}
-      </p>
-      <p class="metabar-module-author">
-        <a href="{% url 'single-profile' content.meta.created_by.id %}">
-          <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
-          @{{ content.meta.created_by.profile_name|truncatechars:25 }}
-        </a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
-      </p>
-    </div>
-  </div> <!-- / about -->
+	<div class="metabar-module">
+		<h5>About</h5>
+		<div class="metabar-module-title">
+			<h3>
+				{{ content.title }}
+			</h3>
+			<p>
+				{{ content.description }}
+			</p>
+			<p class="metabar-module-author">
+				<a href="{% url 'single-profile' content.meta.created_by.id %}">
+					<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
+					@{{ content.meta.created_by.profile_name|truncatechars:25 }}
+				</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+			</p>
+		</div>
+	</div> <!-- / about -->
 
 
 {% endblock %}
@@ -83,19 +83,19 @@
 <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
 <script id="template-reply-box" type="text/template">
-  {% include 'forms/block_comment_box.html' %}
+	{% include 'forms/block_comment_box.html' %}
 </script>
 <script type="text/javascript">
 (function(){
 
-  var comments = new Comments({
-    el               : '.content-body',
-    defaultContainer : '.reply-container',
-    template         : $('#template-reply-box').html().trim()
-  });
+	var comments = new Comments({
+		el               : '.content-body',
+		defaultContainer : '.reply-container',
+		template         : $('#template-reply-box').html().trim()
+	});
 
 
-  $('.list-comments-highlighted').find('.insertReplyBox').click();
+	$('.list-comments-highlighted').find('.insertReplyBox').click();
 })();
 </script>
 

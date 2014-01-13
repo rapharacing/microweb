@@ -1,28 +1,26 @@
 <ol class="breadcrumb">
-  {% if not 'site' in content.meta.links %}
-  <li>
-    <a href="{% url 'index' %}">Home</a>
-  </li>
-  {% endif%}
-  {% for key,value in content.meta.links.iteritems reversed%}
-  <li>
-    {% if key == "site"%}
-    <a href="{% url 'index' %}">Home</a>
-    {% elif key == "microcosm" %}
-    <a href="{{ value.href }}">{{ value.title }}</a>
-    {% elif key == "self" %}
-    <a href="{{ value.href }}">
-      {% if content.profile_name %}
-        {{ content.profile_name }}
-      {% elif content.title %}
-        {{ content.title }}
-      {% else %}
-      {% endif %}
-    </a>
-    {% endif %}
-
-
-    </a>
-  </li>
-  {% endfor %}
+	{% if not 'site' in content.meta.links %}
+	<li>
+		<a href="{% url 'index' %}">Home</a>
+	</li>
+	{% endif%}
+	{% for key,value in content.meta.links.iteritems reversed%}
+	<li>
+		{% if key == "site"%}
+		<a href="{% url 'index' %}">Home</a>
+		{% elif key == "microcosm" %}
+		<a href="{{ value.href }}">{{ value.title }}</a>
+		{% elif key == "self" %}
+		<a href="{{ value.href }}">
+			{% if content.profile_name %}
+				{{ content.profile_name }}
+			{% elif content.title %}
+				{{ content.title }}
+			{% else %}
+			{% endif %}
+		</a>
+		{% endif %}
+		</a>
+	</li>
+	{% endfor %}
 </ol>

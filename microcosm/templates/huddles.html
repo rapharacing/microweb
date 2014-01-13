@@ -4,87 +4,87 @@
 {% block content %}
 
 <div class="content-header padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
-  <h1>Huddles</h1>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+	<h1>Huddles</h1>
 </div>
 
 <div class="content-body">
 
 {% if content.huddles.items %}
 <div class="list-huddles">
-  <ul class="list-collection bordered padded">
+	<ul class="list-collection bordered padded">
 	{% for item in content.huddles.items %}
 		<li id="{{ item.itemType }}{{ item.id }}" class="list-collection-row">
 			<div class="row">
-		    <div class="col-sm-8">
+				<div class="col-sm-8">
 
-		      <!--<div class="list-collection-row-icon">
+					<!--<div class="list-collection-row-icon">
 
-		      </div> /list-collection-row-icon -->
-		      <div class="list-collection-row-offset">
+					</div> /list-collection-row-icon -->
+					<div class="list-collection-row-offset">
 
-	          <a href="{% url 'newest-huddle' item.id %}">
-	            <h3 class="row-title">{{ item.title }}</h3>
-	          </a>
-	          <div class="row-meta">
-	          	{% if item.last_comment_created %}
+						<a href="{% url 'newest-huddle' item.id %}">
+							<h3 class="row-title">{{ item.title }}</h3>
+						</a>
+						<div class="row-meta">
+							{% if item.last_comment_created %}
 
-	          		<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
-	          			<img src="{% if 'gravatar' in item.last_comment_created_by.avatar %}{{item.last_comment_created_by.avatar}}{% elif 'files' in item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.last_comment_created_by.profile_name }}"/>
-	          			@{{ item.last_comment_created_by.profile_name|truncatechars:25 }}
-	          		</a>
-	          		&bull;
-		            <time datetime="{{ item.last_comment_created|date:"c" }}">
-                  {{ item.last_comment_created|timesince }}
-                </time>
+								<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
+									<img src="{% if 'gravatar' in item.last_comment_created_by.avatar %}{{item.last_comment_created_by.avatar}}{% elif 'files' in item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.last_comment_created_by.profile_name }}"/>
+									@{{ item.last_comment_created_by.profile_name|truncatechars:25 }}
+								</a>
+								&bull;
+								<time datetime="{{ item.last_comment_created|date:"c" }}">
+									{{ item.last_comment_created|timesince }}
+								</time>
 
-	          	{% else %}
+							{% else %}
 
-		            <a href="{% url 'single-profile' item.meta.created_by.id %}">
-		            	<img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{item.meta.created_by.avatar}}{% elif 'files' in item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.meta.created_by.profile_name }}" />
-		              @{{ item.meta.created_by.profile_name|truncatechars:25 }}
-		            </a> &bull;
-		            <time datetime="{{ item.meta.created|date:"c" }}">{{ item.meta.created|timesince }}</time>
+								<a href="{% url 'single-profile' item.meta.created_by.id %}">
+									<img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{item.meta.created_by.avatar}}{% elif 'files' in item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.meta.created_by.profile_name }}" />
+									@{{ item.meta.created_by.profile_name|truncatechars:25 }}
+								</a> &bull;
+								<time datetime="{{ item.meta.created|date:"c" }}">{{ item.meta.created|timesince }}</time>
 
-	          	{% endif %}
+							{% endif %}
 
-	          </div>
-	        </div> <!-- /list-collection-row-offset -->
+						</div>
+					</div> <!-- /list-collection-row-offset -->
 
-	      </div> <!-- /col-sm-8 -->
-	      <div class="col-sm-4">
-          <div class="row-stats">
-            <ul class="list-stats list-stats-sm">
-              <li>
-              {% if item.meta.flags.unread %}
-                <span class="label label-warning">New</span>
-              {% endif %}
-                <span>{{ item.total_comments|default:"0" }}</span>
-                comment{{ item.total_comments|pluralize:",s"}}
-              </li>
-            </ul>
-          </div>
-          <div class="row-context">
-            <ul class="list-people list-people-sm pull-right">
-              {% for participant in item.participants %}
-                <li>
-                  <a href="{% url 'single-profile' participant.id %}" data-toggle="tooltip" title="@{{ participant.profile_name }}">
-                    <img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name }}"/>
-                  </a>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div> <!-- /col-sm-4 -->
-      </div> <!--/row -->
-    </li>
+				</div> <!-- /col-sm-8 -->
+				<div class="col-sm-4">
+					<div class="row-stats">
+						<ul class="list-stats list-stats-sm">
+							<li>
+							{% if item.meta.flags.unread %}
+								<span class="label label-warning">New</span>
+							{% endif %}
+								<span>{{ item.total_comments|default:"0" }}</span>
+								comment{{ item.total_comments|pluralize:",s"}}
+							</li>
+						</ul>
+					</div>
+					<div class="row-context">
+						<ul class="list-people list-people-sm pull-right">
+							{% for participant in item.participants %}
+								<li>
+									<a href="{% url 'single-profile' participant.id %}" data-toggle="tooltip" title="@{{ participant.profile_name }}">
+										<img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name }}"/>
+									</a>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div> <!-- /col-sm-4 -->
+			</div> <!--/row -->
+		</li>
 	{% endfor %}
 	</ul>
 </div>
@@ -100,24 +100,24 @@
 
 {% block sidebar%}
 <div class="metabar-module">
-  <h5>Got something to add?</h5>
-  <div class="metabar-module-primary-buttons">
-    <a href="{% url 'create-huddle' %}" class="btn btn-large btn-block btn-primary">
-      <span class="sprite sprite-envelope-small"></span> Send a Message
-    </a>
-  </div>
+	<h5>Got something to add?</h5>
+	<div class="metabar-module-primary-buttons">
+		<a href="{% url 'create-huddle' %}" class="btn btn-large btn-block btn-primary">
+			<span class="sprite sprite-envelope-small"></span> Send a Message
+		</a>
+	</div>
 </div> <!-- primary actions -->
 
 
 <div class="metabar-module">
-  <h5>About</h5>
-  <div class="metabar-module-title">
-    <h3>
-      Huddles
-    </h3>
-    <p>
-      Start private sessions with other members of the community.
-    </p>
-  </div>
+	<h5>About</h5>
+	<div class="metabar-module-title">
+		<h3>
+			Huddles
+		</h3>
+		<p>
+			Start private sessions with other members of the community.
+		</p>
+	</div>
 </div> <!-- / about -->
 {% endblock%}

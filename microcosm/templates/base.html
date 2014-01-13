@@ -1,235 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>{{ site.title }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon" href="/static/img/favico.png" />
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<head>
+		<meta charset="utf-8" />
+		<title>{{ site.title }}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="shortcut icon" href="/static/img/favico.png" />
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 
-    <link href="{{ STATIC_URL }}themes/{{ site.theme_id|default:"1" }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		<link href="{{ STATIC_URL }}themes/{{ site.theme_id|default:"1" }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
-    <meta name="subdomain" content="https://{{ site.subdomain_key }}.microco.sm" />
+		<meta name="subdomain" content="https://{{ site.subdomain_key }}.microco.sm" />
 
-    <style type="text/css">
-    .headBand {
-      background-image: url('{% if site.header_background_url %}{{ site.header_background_url }}{% else %}{{ STATIC_URL }}themes/1/background.png{% endif %}');
-    }
-    </style>
-    {% block css %}{% endblock %}
-  </head>
-  <body>
+		<style type="text/css">
+		.headBand {
+			background-image: url('{% if site.header_background_url %}{{ site.header_background_url }}{% else %}{{ STATIC_URL }}themes/1/background.png{% endif %}');
+		}
+		</style>
+		{% block css %}{% endblock %}
+	</head>
+	<body>
 
-    <nav class="navbar navbar-default" role="navigation">
-      <div class="navbar-header-wrapper tiling-bg">
-        <div class="container">
-          <div class="row">
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="navbar-header-wrapper tiling-bg">
+				<div class="container">
+					<div class="row">
 
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header col-xs-12">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
+						<!-- Brand and toggle get grouped for better mobile display -->
+						<div class="navbar-header col-xs-12">
+							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
 
-              <button type="button" class="metabar-toggle">
-                <span class="sr-only">Toggle metabar</span>
-                <span class="sprite sprite-menu-2"></span>
-              </button>
+							<button type="button" class="metabar-toggle">
+								<span class="sr-only">Toggle metabar</span>
+								<span class="sprite sprite-menu-2"></span>
+							</button>
 
-                <div class="row">
-                  <div class="col-sm-3 col-md-3 col-lg-2 navbar-brand">
-                    <a href="/" title="Return to Homepage">
-                      <img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" />
-                    </a>
-                  </div>
-
-
-                  <div class="col-sm-8 col-md-6 col-lg-6 navbar-search">
-                    <form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
-                      <div class="input-group">
-                        <label class="input-group-addon" for="navbar-search-input">
-                          <span class="sprite sprite-search-small"></span>
-                        </label>
-                        <input type="text"
-                               id="navbar-search-input"
-                               class="form-control"
-                               name="q"
-                               placeholder="Search conversations, events and people..."
-                               {% if content.query.searched %}value="{{content.query.searched|escape}}"{% endif %} />
-                      </div>
-                    </form>
-                  </div> <!-- /navbar-search -->
-
-                  <div class="col-md-3 col-lg-2 navbar-profile">
-                    {% if user %}
-                      <div class="navbar-profile-row-1">
-                        <a href="{% url 'edit-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">
-                          <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
-                          <strong>{{ user.profile_name }}</strong>
-                        </a>
-
-                        <a class="navbar-profile-logout" href="{% url 'logout' %}">
-                          <span class="sprite sprite-logout"></span>
-                        </a>
-                        <a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">
-                          <span class="sprite sprite-envelope"></span>
-                          <span class="label label-warning">NEW</span>
-                        </a>
-                      </div>
-                      <div class="navbar-profile-row-2">
-                        <a href="{% url 'list-huddle'%}">
-                          <span class="sprite sprite-envelope-small"></span>
-                          <strong>Huddles</strong>
-                        </a>
-                        <span class="label label-warning navbar-profile-huddle-label">NEW</span>
-                      </div>
-                    {% else %}
-                      <div class="navbar-profile-row-4">
-                      Browsing as guest.
-                      </div>
-                      <div class="navbar-profile-row-5">
-                        <button class="btn btn-primary" id="login_link" onclick="login()">
-                          Sign In or Register
-                        </button>
-                      </div>
-                    {% endif %}
-                    </div><!-- /.navbar-profile -->
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div> <!-- / navbar-header-wrapper -->
-      <div class="navbar-nav-wrapper">
-        <div class="container">
-          <div class="row">
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse">
-              <ul class="nav navbar-nav">
-                <li class="active">
-                  <a href="{% url 'index' %}">Microcosms</a>
-                </li>
-                <li>
-                  <a href="#">Trending</a>
-                </li>
-                <li>
-                  <a href="{% url 'list-updates' %}">
-                    {% if user.unread_count %}
-                    <span class="badge pull-right">{{ user.unread_count }}</span>
-                    {% endif %}
-                    Updates
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'list-profiles' %}">People</a>
-                </li>
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Custom <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">Separated link</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">One more separated link</a></li>
-                  </ul>
-                </li>
-              </ul>
-
-            </div><!-- /.navbar-collapse -->
-          </div>
-        </div>
-      </div> <!-- / navbar-nav-wrapper -->
-
-    </nav> <!-- /nav -->
+								<div class="row">
+									<div class="col-sm-3 col-md-3 col-lg-2 navbar-brand">
+										<a href="/" title="Return to Homepage">
+											<img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" />
+										</a>
+									</div>
 
 
-    <div class="container main">
-      <div class="row">
-        <div class="col-md-9 content">
-          {% block content %}{% endblock content %}
-        </div> <!-- / content -->
-        <div class="col-md-3 metabar">
-          {% block sidebar %}{% endblock %}
-          <div class="metabar-footer">
-            <p class="bold">
-              Powered by <a href="#">Microcosm</a>
-            </p>
-            <p class="links">
-              <a href="#">About</a>
-              <a href="#">Help</a>
-              <a href="#">Developers</a>
-              <a href="#">Legal</a>
-            </p>
-          </div>
-        </div> <!-- / metabar -->
-      </div>
-    </div>
+									<div class="col-sm-8 col-md-6 col-lg-6 navbar-search">
+										<form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
+											<div class="input-group">
+												<label class="input-group-addon" for="navbar-search-input">
+													<span class="sprite sprite-search-small"></span>
+												</label>
+												<input type="text"
+															 id="navbar-search-input"
+															 class="form-control"
+															 name="q"
+															 placeholder="Search conversations, events and people..."
+															 {% if content.query.searched %}value="{{content.query.searched|escape}}"{% endif %} />
+											</div>
+										</form>
+									</div> <!-- /navbar-search -->
+
+									<div class="col-md-3 col-lg-2 navbar-profile">
+										{% if user %}
+											<div class="navbar-profile-row-1">
+												<a href="{% url 'edit-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">
+													<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
+													<strong>{{ user.profile_name }}</strong>
+												</a>
+
+												<a class="navbar-profile-logout" href="{% url 'logout' %}">
+													<span class="sprite sprite-logout"></span>
+												</a>
+												<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">
+													<span class="sprite sprite-envelope"></span>
+													<span class="label label-warning">NEW</span>
+												</a>
+											</div>
+											<div class="navbar-profile-row-2">
+												<a href="{% url 'list-huddle'%}">
+													<span class="sprite sprite-envelope-small"></span>
+													<strong>Huddles</strong>
+												</a>
+												<span class="label label-warning navbar-profile-huddle-label">NEW</span>
+											</div>
+										{% else %}
+											<div class="navbar-profile-row-4">
+											Browsing as guest.
+											</div>
+											<div class="navbar-profile-row-5">
+												<button class="btn btn-primary" id="login_link" onclick="login()">
+													Sign In or Register
+												</button>
+											</div>
+										{% endif %}
+										</div><!-- /.navbar-profile -->
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div> <!-- / navbar-header-wrapper -->
+			<div class="navbar-nav-wrapper">
+				<div class="container">
+					<div class="row">
+						<!-- Collect the nav links, forms, and other content for toggling -->
+						<div class="collapse navbar-collapse">
+							<ul class="nav navbar-nav">
+								<li class="active">
+									<a href="{% url 'index' %}">Microcosms</a>
+								</li>
+								<li>
+									<a href="#">Trending</a>
+								</li>
+								<li>
+									<a href="{% url 'list-updates' %}">
+										{% if user.unread_count %}
+										<span class="badge pull-right">{{ user.unread_count }}</span>
+										{% endif %}
+										Updates
+									</a>
+								</li>
+								<li>
+									<a href="{% url 'list-profiles' %}">People</a>
+								</li>
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown">Custom <b class="caret"></b></a>
+									<ul class="dropdown-menu">
+										<li><a href="#">Action</a></li>
+										<li><a href="#">Another action</a></li>
+										<li><a href="#">Something else here</a></li>
+										<li class="divider"></li>
+										<li><a href="#">Separated link</a></li>
+										<li class="divider"></li>
+										<li><a href="#">One more separated link</a></li>
+									</ul>
+								</li>
+							</ul>
+
+						</div><!-- /.navbar-collapse -->
+					</div>
+				</div>
+			</div> <!-- / navbar-nav-wrapper -->
+
+		</nav> <!-- /nav -->
 
 
-
-    {% if not user %}
-    <!-- Persona Login Form (submitted by persona login action, not directly by user) -->
-    <form id="login-form" method="POST" action="{% url 'login' %}">
-      {% csrf_token %}
-      <input id="Assertion" type="hidden" name="Assertion" value="" />
-      <input id="target_url" type="hidden" name="target_url" value="{{ request.get_full_path }}" />
-    </form>
-
-    <!-- Mozilla Persona -->
-    <script src="{{ STATIC_URL }}js/persona.js"></script>
-    <script>
-      function login() {
-        navigator.id.get(function(assertion) {
-          if (assertion) {
-            var assertion_field = document.getElementById("Assertion");
-            assertion_field.value = assertion;
-            var login_form = document.getElementById("login-form");
-            login_form.submit();
-          }
-        });
-      }
-    </script>
-  {% endif %}
-
-
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
+		<div class="container main">
+			<div class="row">
+				<div class="col-md-9 content">
+					{% block content %}{% endblock content %}
+				</div> <!-- / content -->
+				<div class="col-md-3 metabar">
+					{% block sidebar %}{% endblock %}
+					<div class="metabar-footer">
+						<p class="bold">
+							Powered by <a href="#">Microcosm</a>
+						</p>
+						<p class="links">
+							<a href="#">About</a>
+							<a href="#">Help</a>
+							<a href="#">Developers</a>
+							<a href="#">Legal</a>
+						</p>
+					</div>
+				</div> <!-- / metabar -->
+			</div>
+		</div>
 
 
 
-    <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
-    <script src="{{ STATIC_URL }}js/base.js"></script>
-    <script src="{{ STATIC_URL }}js/metabar.js"></script>
+		{% if not user %}
+		<!-- Persona Login Form (submitted by persona login action, not directly by user) -->
+		<form id="login-form" method="POST" action="{% url 'login' %}">
+			{% csrf_token %}
+			<input id="Assertion" type="hidden" name="Assertion" value="" />
+			<input id="target_url" type="hidden" name="target_url" value="{{ request.get_full_path }}" />
+		</form>
 
-    {% block js %}{% endblock js%}
+		<!-- Mozilla Persona -->
+		<script src="{{ STATIC_URL }}js/persona.js"></script>
+		<script>
+			function login() {
+				navigator.id.get(function(assertion) {
+					if (assertion) {
+						var assertion_field = document.getElementById("Assertion");
+						assertion_field.value = assertion;
+						var login_form = document.getElementById("login-form");
+						login_form.submit();
+					}
+				});
+			}
+		</script>
+	{% endif %}
 
-    <!-- Google Analytics -->
-    <script type="text/javascript">
-      {% if site.subdomain_key == 'dev1' or site.subdomain_key == 'dev2' %}window['ga-disable-UA-36931318-3'] = true;{% endif %}
 
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
 
-      var gaData = {
-        'dimension1': '{% if user %}contributor{% else %}lurker{% endif %}'
-        ,'dimension4': '{{ site.subdomain_key }}'
-        {% block ga %}{% endblock %}
-      };
 
-      ga('create', 'UA-36931318-3', 'microco.sm');
-      ga('send', 'pageview', gaData);
 
-      {% if site.ga_web_property_id %}ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
-      ga('{{ site.subdomain_key }}.send', 'pageview', gaData);{% endif %}
-    </script>
+		<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+		<script src="{{ STATIC_URL }}js/base.js"></script>
+		<script src="{{ STATIC_URL }}js/metabar.js"></script>
 
-  </body>
+		{% block js %}{% endblock js%}
+
+		<!-- Google Analytics -->
+		<script type="text/javascript">
+			{% if site.subdomain_key == 'dev1' or site.subdomain_key == 'dev2' %}window['ga-disable-UA-36931318-3'] = true;{% endif %}
+
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			var gaData = {
+				'dimension1': '{% if user %}contributor{% else %}lurker{% endif %}'
+				,'dimension4': '{{ site.subdomain_key }}'
+				{% block ga %}{% endblock %}
+			};
+
+			ga('create', 'UA-36931318-3', 'microco.sm');
+			ga('send', 'pageview', gaData);
+
+			{% if site.ga_web_property_id %}ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
+			ga('{{ site.subdomain_key }}.send', 'pageview', gaData);{% endif %}
+		</script>
+
+	</body>
 <html>

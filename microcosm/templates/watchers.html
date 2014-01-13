@@ -1,49 +1,49 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <section class="row margin-bottom-half">
-        <h1>Items you're watching</h1>
-    </section>
-    {% if not content.watchers.items %}
-        <p>When you post a comment on a conversation or event, you'll start watching it. New comments posted on
-        that item will appear on your <a href="{% url 'list-updates' %}">updates dashboard</a> or be emailed
-        to you (unless you've turned these things off).</p>
-    {% else %}
-        {% include "pagination_nav.html" %}
-        <form method="POST" action="">
-            {% csrf_token %}
-            <section class="row">
-                <div class="col col-sm-8">
-                </div>
-                <div class="col col-sm-4">
-                    Send me an email
-                </div>
-                <div class="col col-sm-4">
-                    Delete this watcher
-                </div>
-            </section>
-            <hr />
-            {% for watcher in content.watchers.items %}
-                <section class="row">
-                    <div class="col col-sm-8 text-muted" >
-                        <a href="{{ watcher.item_link }}">{{ watcher.item.title }}</a>
-                        <br>Last updated <time datetime="{{ watcher.item.last_comment_created|date:"c" }}"></time>
-                    </div>
-                    <input type="hidden" name="watcher_id" value="{{ watcher.id }}">
-                    <div class="col col-sm-4">
-                        <input name="send_email_{{ watcher.id }}" type="checkbox" {% if watcher.send_email %}checked="true"{% endif %}>
-                    </div>
-                    <div class="col col-sm-4">
-                        <input name="delete_watcher_{{ watcher.id }}" type="checkbox">
-                    </div>
-                </section>
-            {% endfor %}
+	<section class="row margin-bottom-half">
+		<h1>Items you're watching</h1>
+	</section>
+	{% if not content.watchers.items %}
+		<p>When you post a comment on a conversation or event, you'll start watching it. New comments posted on
+		that item will appear on your <a href="{% url 'list-updates' %}">updates dashboard</a> or be emailed
+		to you (unless you've turned these things off).</p>
+	{% else %}
+		{% include "pagination_nav.html" %}
+		<form method="POST" action="">
+			{% csrf_token %}
+			<section class="row">
+				<div class="col col-sm-8">
+				</div>
+				<div class="col col-sm-4">
+					Send me an email
+				</div>
+				<div class="col col-sm-4">
+					Delete this watcher
+				</div>
+			</section>
+			<hr />
+			{% for watcher in content.watchers.items %}
+				<section class="row">
+					<div class="col col-sm-8 text-muted" >
+						<a href="{{ watcher.item_link }}">{{ watcher.item.title }}</a>
+						<br>Last updated <time datetime="{{ watcher.item.last_comment_created|date:"c" }}"></time>
+					</div>
+					<input type="hidden" name="watcher_id" value="{{ watcher.id }}">
+					<div class="col col-sm-4">
+						<input name="send_email_{{ watcher.id }}" type="checkbox" {% if watcher.send_email %}checked="true"{% endif %}>
+					</div>
+					<div class="col col-sm-4">
+						<input name="delete_watcher_{{ watcher.id }}" type="checkbox">
+					</div>
+				</section>
+			{% endfor %}
 
-            <br />
-            <input type="submit" value="Save changes" class="btn btn-primary btn-small" />
-        </form>
-        {% include "pagination_nav.html" %}
-    {% endif %}
+			<br />
+			<input type="submit" value="Save changes" class="btn btn-primary btn-small" />
+		</form>
+		{% include "pagination_nav.html" %}
+	{% endif %}
 {% endblock %}
 
 {% block sidebar%}

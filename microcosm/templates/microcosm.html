@@ -5,15 +5,15 @@
 {% block content %}
 
 <div class="content-header padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
-  <h1>{{ content.title }}</h1>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+	<h1>{{ content.title }}</h1>
 </div>
 
 <div class="content-body">
@@ -22,18 +22,18 @@
 
 	<div class="list-items">
 
-	  <ul class="list-collection bordered padded">
-	  {% for item in content.items.items %}
+		<ul class="list-collection bordered padded">
+		{% for item in content.items.items %}
 
-      {% if item.item_type == "conversation" %}
-        {% conversation item %}
-      {% endif %}
+			{% if item.item_type == "conversation" %}
+				{% conversation item %}
+			{% endif %}
 
-      {% if item.item_type == "event" %}
-        {% event item %}
-      {% endif %}
+			{% if item.item_type == "event" %}
+				{% event item %}
+			{% endif %}
 
-	  {% endfor %}
+		{% endfor %}
 		</ul>
 	</div>
 
@@ -43,14 +43,14 @@
 
 
 <div class="content-footer padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div>
 
 
@@ -60,39 +60,39 @@
 
 	{# if content.meta.permissions.create #}
 		<div class="metabar-module">
-      <h5>Got something to add?</h5>
-      <div class="metabar-module-primary-buttons">
-        <a href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary">
-          <span class="sprite sprite-speech-bubble-small"></span> Start a conversation
-        </a>
-        <a href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary">
-          <span class="sprite sprite-calendar-small"></span> Start an event
-        </a>
-      </div>
-    </div> <!-- primary actions -->
+			<h5>Got something to add?</h5>
+			<div class="metabar-module-primary-buttons">
+				<a href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary">
+					<span class="sprite sprite-speech-bubble-small"></span> Start a conversation
+				</a>
+				<a href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary">
+					<span class="sprite sprite-calendar-small"></span> Start an event
+				</a>
+			</div>
+		</div> <!-- primary actions -->
 	{# endif #}
 
 
 	<div class="metabar-module">
-    <h5>About</h5>
-    <div class="metabar-module-title">
-      <h3>
-        {{ content.title }}
-      </h3>
-      <p class="metabar-module-author">
-        <a href="{% url 'single-profile' content.meta.created_by.id %}">
-          <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
-          @{{ content.meta.created_by.profile_name|truncatechars:25 }}
-        </a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
-      </p>
-    </div>
-    <div class="metabar-module-body">
-      <p>
-        {{ content.description }}
-      </p>
-      {% include 'forms/subscribe.html' %}
-    </div>
-  </div> <!-- / about -->
+		<h5>About</h5>
+		<div class="metabar-module-title">
+			<h3>
+				{{ content.title }}
+			</h3>
+			<p class="metabar-module-author">
+				<a href="{% url 'single-profile' content.meta.created_by.id %}">
+					<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
+					@{{ content.meta.created_by.profile_name|truncatechars:25 }}
+				</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+			</p>
+		</div>
+		<div class="metabar-module-body">
+			<p>
+				{{ content.description }}
+			</p>
+			{% include 'forms/subscribe.html' %}
+		</div>
+	</div> <!-- / about -->
 
 
 {% comment %}
@@ -113,13 +113,13 @@
 {% endblock %}
 {% block js %}
 <script type="text/javascript">
-  var subscribe = new Subscribe({
-    el    : '.subscribe',
-    url   : '{% url 'single-watcher' %}',
-    id    : {{ content.id }},
-    type  : '{{ item_type }}',
-    token : '{{ csrf_token }}',
-    is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
-  });
+	var subscribe = new Subscribe({
+		el    : '.subscribe',
+		url   : '{% url 'single-watcher' %}',
+		id    : {{ content.id }},
+		type  : '{{ item_type }}',
+		token : '{{ csrf_token }}',
+		is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
+	});
 </script>
 {% endblock %}

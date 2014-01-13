@@ -1,103 +1,103 @@
 <div class="item-event">
-  <div class="row">
-    <div class="col-xs-12">
+	<div class="row">
+		<div class="col-xs-12">
 
-      <ul class="item-event-inner item-event-compact">
+			<ul class="item-event-inner item-event-compact">
 
-        <li class="item-event-date-container">
-          <div class="item-event-icon">
-            <span class="glyphicon glyphicon-calendar"></span>
-          </div>
-          <div class="item-event-icon-offset">
-            <div class="item-event-date">
-              <span class="item-event-date-digit">{{ content.when|date:"j"}}</span>
-              <span class="item-event-date-day">
-                {{ content.when|date:"l" }}
-                <strong>{{ content.when|date:"F Y" }}</strong>
-              </span>
-              <span class="item-event-date-time">
-                {{ content.when|date:"g:i  A" }}
-                {% if event_dates.type == 'single' %}
-                - {{ event_dates.end|date:"g:i  A" }}
-                {% endif %}
-              </span>
-            </div>
-          </div>
-        </li>
-
-
-        <li>
-          <div class="item-event-icon">
-            <span class="glyphicon glyphicon-map-marker"></span>
-          </div>
-          <div class="item-event-icon-offset">
-            <div class="item-event-location">
-              {% if content.where %}
-                {{ content.where }}
-              {% else %}
-                TBA
-              {% endif %}
-            </div>
-          </div>
-        </li>
+				<li class="item-event-date-container">
+					<div class="item-event-icon">
+						<span class="glyphicon glyphicon-calendar"></span>
+					</div>
+					<div class="item-event-icon-offset">
+						<div class="item-event-date">
+							<span class="item-event-date-digit">{{ content.when|date:"j"}}</span>
+							<span class="item-event-date-day">
+								{{ content.when|date:"l" }}
+								<strong>{{ content.when|date:"F Y" }}</strong>
+							</span>
+							<span class="item-event-date-time">
+								{{ content.when|date:"g:i  A" }}
+								{% if event_dates.type == 'single' %}
+								- {{ event_dates.end|date:"g:i  A" }}
+								{% endif %}
+							</span>
+						</div>
+					</div>
+				</li>
 
 
-        <li class="item-event-attending-container">
+				<li>
+					<div class="item-event-icon">
+						<span class="glyphicon glyphicon-map-marker"></span>
+					</div>
+					<div class="item-event-icon-offset">
+						<div class="item-event-location">
+							{% if content.where %}
+								{{ content.where }}
+							{% else %}
+								TBA
+							{% endif %}
+						</div>
+					</div>
+				</li>
 
-          {# {%if content.rsvp_limit %} #}
-          <div class="item-event-icon">
-            <span class="glyphicon glyphicon-user"></span>
-          </div>
-          <div class="item-event-icon-offset">
-            <div class="item-event-attending">
-              <div class="progress">
-                <div class="progress-bar"
-                     role="progressbar"
-                     aria-valuenow="60"
-                     aria-valuemin="0"
-                     aria-valuemax="100"
-                     style="width: {{rsvp_percentage}}%;">
-                  <span class="sr-only">{{rsvp_percentage}}% Complete</span>
-                </div>
-              </div>
-              <strong>
-                {{ rsvp_num_attending }}/{{ content.rsvp_limit }}
-              </strong>
-            </div>
 
-          {# {% endif %} #}
+				<li class="item-event-attending-container">
 
-          {% if rsvp_num_attending > 0 %}
-          <div class="item-event-attending-people">
-            <ul class="list-people list-people-md">
-            {% for attendee in attendees.items.items %}
-              {% if attendee.rsvp == "yes" %}
-                <li>
-                  <a href="{% url 'single-profile' attendee.profile_id %}" title="{{ attendee.profile.profile_name }}">
-                    <img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name }}" />
-                  </a>
-                </li>
-              {% endif %}
-            {% endfor %}
-            </ul>
-            <span>
-              {% if rsvp_num_attending > 4 %}
-              and <a href="javascript:void 0">{{ rsvp_num_attending|add:"-4" }} others</a> are
-              {% else %}
-              is
-              {% endif %}
-              attending this event.
-            </span>
-          </div>
-          {% endif %}
-          </div>
-        </li>
-      </ul> <!-- /item-event-inner -->
+					{# {%if content.rsvp_limit %} #}
+					<div class="item-event-icon">
+						<span class="glyphicon glyphicon-user"></span>
+					</div>
+					<div class="item-event-icon-offset">
+						<div class="item-event-attending">
+							<div class="progress">
+								<div class="progress-bar"
+										 role="progressbar"
+										 aria-valuenow="60"
+										 aria-valuemin="0"
+										 aria-valuemax="100"
+										 style="width: {{rsvp_percentage}}%;">
+									<span class="sr-only">{{rsvp_percentage}}% Complete</span>
+								</div>
+							</div>
+							<strong>
+								{{ rsvp_num_attending }}/{{ content.rsvp_limit }}
+							</strong>
+						</div>
 
-      <div class="item-event-expand-handle">
-        Show Event Details
-      </div>
+					{# {% endif %} #}
 
-    </div> <!-- /col-xs-12 -->
-  </div> <!-- /row -->
+					{% if rsvp_num_attending > 0 %}
+					<div class="item-event-attending-people">
+						<ul class="list-people list-people-md">
+						{% for attendee in attendees.items.items %}
+							{% if attendee.rsvp == "yes" %}
+								<li>
+									<a href="{% url 'single-profile' attendee.profile_id %}" title="{{ attendee.profile.profile_name }}">
+										<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name }}" />
+									</a>
+								</li>
+							{% endif %}
+						{% endfor %}
+						</ul>
+						<span>
+							{% if rsvp_num_attending > 4 %}
+							and <a href="javascript:void 0">{{ rsvp_num_attending|add:"-4" }} others</a> are
+							{% else %}
+							is
+							{% endif %}
+							attending this event.
+						</span>
+					</div>
+					{% endif %}
+					</div>
+				</li>
+			</ul> <!-- /item-event-inner -->
+
+			<div class="item-event-expand-handle">
+				Show Event Details
+			</div>
+
+		</div> <!-- /col-xs-12 -->
+	</div> <!-- /row -->
 </div> <!-- /item-event -->

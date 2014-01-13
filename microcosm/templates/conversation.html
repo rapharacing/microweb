@@ -1,108 +1,108 @@
 {% extends 'base.html' %}
 {% load comments %}
 {% block ga %},'dimension2': '{{ content.meta.created_by.id }}'
-      ,'dimension3': '{{ content.microcosm_id }}'{% endblock%}
+			,'dimension3': '{{ content.microcosm_id }}'{% endblock%}
 
 {% block content %}
 <div class="content-header padded">
-  <div class="row">
-    <div class="col-sm-7">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-5">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-sm-7">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-5">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div>
 
-  <div class="content-body">
+	<div class="content-body">
 
 
-    <div class="item">
-      <div class="item-header">
-        <h1>{{ content.title }}</h1>
-        <div class="item-meta">
-          Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
-          {% include "forms/content-moderation.html" %}
-        </div>
+		<div class="item">
+			<div class="item-header">
+				<h1>{{ content.title }}</h1>
+				<div class="item-meta">
+					Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
+					{% include "forms/content-moderation.html" %}
+				</div>
 
-      </div>
+			</div>
 
-      <ul class="list-comments">
-      {% comments content.comments.items %}
-      </ul>
+			<ul class="list-comments">
+			{% comments content.comments.items %}
+			</ul>
 
-      {% include "forms/content-moderation.html" %}
-    </div> <!-- item -->
+			{% include "forms/content-moderation.html" %}
+		</div> <!-- item -->
 
 
-  </div> <!-- / content-body -->
+	</div> <!-- / content-body -->
 
 <div class="content-footer padded">
-  <div class="row">
-    <div class="col-sm-7">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-5">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-sm-7">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-5">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div>
 
 <a name="reply"></a>
-  <div class="reply-container">
-    <ul class="list-comments">
-      <li class="comment-item">
-        <div class="comment-item-inner">
-          <div class="comment-item-header">
-            <div class="comment-item-author">
-                {% if user %}
-                  <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
-                {% else %}
-                  <img src="/static/img/avatar.gif" />
-                {% endif %}
-                <strong>Post a reply</strong>
-            </div>
-          </div>
-          <div class="comment-item-body">
-            {% include 'forms/block_comment_box.html' %}
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div> <!-- /reply-container -->
+	<div class="reply-container">
+		<ul class="list-comments">
+			<li class="comment-item">
+				<div class="comment-item-inner">
+					<div class="comment-item-header">
+						<div class="comment-item-author">
+								{% if user %}
+									<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
+								{% else %}
+									<img src="/static/img/avatar.gif" />
+								{% endif %}
+								<strong>Post a reply</strong>
+						</div>
+					</div>
+					<div class="comment-item-body">
+						{% include 'forms/block_comment_box.html' %}
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div> <!-- /reply-container -->
 
 
 {% endblock content %}
 
 {% block sidebar %}
 
-  <div class="metabar-module">
-    <h5>Got something to add?</h5>
-    <div class="metabar-module-primary-buttons">
-      <a id="post-a-reply-handle" href="#reply" class="btn btn-large btn-block btn-primary">
-        <span class="sprite sprite-speech-bubble-small"></span> Post a reply
-      </a>
-    </div>
-  </div> <!-- primary actions -->
+	<div class="metabar-module">
+		<h5>Got something to add?</h5>
+		<div class="metabar-module-primary-buttons">
+			<a id="post-a-reply-handle" href="#reply" class="btn btn-large btn-block btn-primary">
+				<span class="sprite sprite-speech-bubble-small"></span> Post a reply
+			</a>
+		</div>
+	</div> <!-- primary actions -->
 
-  <div class="metabar-module">
-    <h5>About</h5>
-    <div class="metabar-module-title">
-      <h3>
-        {{ content.title }}
-      </h3>
-      <p class="metabar-module-author">
-        <a href="{% url 'single-profile' content.meta.created_by.id %}">
-          <img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
-          @{{ content.meta.created_by.profile_name|truncatechars:25 }}
-        </a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
-      </p>
-    </div>
-    <div class="metabar-module-body">
-      {% include 'forms/subscribe.html' %}
-    </div>
-  </div> <!-- / about -->
+	<div class="metabar-module">
+		<h5>About</h5>
+		<div class="metabar-module-title">
+			<h3>
+				{{ content.title }}
+			</h3>
+			<p class="metabar-module-author">
+				<a href="{% url 'single-profile' content.meta.created_by.id %}">
+					<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
+					@{{ content.meta.created_by.profile_name|truncatechars:25 }}
+				</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+			</p>
+		</div>
+		<div class="metabar-module-body">
+			{% include 'forms/subscribe.html' %}
+		</div>
+	</div> <!-- / about -->
 
 
 {% endblock %}
@@ -116,32 +116,32 @@
 <script type="text/javascript">
 (function(){
 
-  var comments = new Comments({
-    el               : '.content-body',
-    defaultContainer : '.reply-container',
-    template         : $('.reply-container .comment-item-body').html().trim()
-  });
+	var comments = new Comments({
+		el               : '.content-body',
+		defaultContainer : '.reply-container',
+		template         : $('.reply-container .comment-item-body').html().trim()
+	});
 
-  var replyBox = new simpleEditor({
-    el : '.reply-box'
-  });
+	var replyBox = new simpleEditor({
+		el : '.reply-box'
+	});
 
-  $('#post-a-reply-handle').on('click',function(e){
-    var selectedText = Comments.prototype.getWindowSelectedText();
-    if (selectedText){
-      replyBox.textarea.value = selectedText;
-      replyBox.quote();
-    }
-  });
+	$('#post-a-reply-handle').on('click',function(e){
+		var selectedText = Comments.prototype.getWindowSelectedText();
+		if (selectedText){
+			replyBox.textarea.value = selectedText;
+			replyBox.quote();
+		}
+	});
 
-  var subscribe = new Subscribe({
-    el    : '.subscribe',
-    url   : '{% url 'single-watcher' %}',
-    id    : {{ content.id }},
-    type  : '{{ item_type }}',
-    token : '{{ csrf_token }}',
-    is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
-  });
+	var subscribe = new Subscribe({
+		el    : '.subscribe',
+		url   : '{% url 'single-watcher' %}',
+		id    : {{ content.id }},
+		type  : '{{ item_type }}',
+		token : '{{ csrf_token }}',
+		is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
+	});
 
 })();
 </script>

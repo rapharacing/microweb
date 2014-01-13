@@ -2,133 +2,133 @@
 {% block content %}
 
 <div class="content-header padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
-  <h1>Search results for: {{ content.query.searched|escape }}</h1>
-  <p class="text-muted">
-    {{ content.results.total }} matches.  Search took {{ content.time_elapsed }} seconds.
-  </p>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+	<h1>Search results for: {{ content.query.searched|escape }}</h1>
+	<p class="text-muted">
+		{{ content.results.total }} matches.  Search took {{ content.time_elapsed }} seconds.
+	</p>
 </div>
 
 <div class="content-body">
 {% if content.results.items|length == 0 %}
 <div class="list-search-empty bordered padded">
-  <h2>
-    We couldn't find any items that matched your search.
-  </h2>
-  <p>
-    <h3>Suggestions:</h3>
-    <ul>
-      <li>Make sure that all words are spelled correctly.</li>
-      <li>Try different or more general keywords.</li>
-    </ul>
-  </p>
+	<h2>
+		We couldn't find any items that matched your search.
+	</h2>
+	<p>
+		<h3>Suggestions:</h3>
+		<ul>
+			<li>Make sure that all words are spelled correctly.</li>
+			<li>Try different or more general keywords.</li>
+		</ul>
+	</p>
 </div>
 {% else %}
 
-  <div class="list-search">
+	<div class="list-search">
 
-    <ul class="list-collection bordered padded">
-      {% for result in content.results.items %}
+		<ul class="list-collection bordered padded">
+			{% for result in content.results.items %}
 
-        {# MICROCOSMS #}
-        {% if result.item_type == "microcosm" %}
-        <li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="list-collection-row-icon">
-                <span class="sprite sprite-folder-open"></span>
-              </div>
-              <div class="list-collection-row-offset">
-                <div class="row-title">
-                  <a href="{{ result.item.meta.links.self.href }}">
-                    <h3 class="row-title">{{ result.item.title }}</h3>
-                  </a>
-                </div>
-                <div class="row-meta">
-                  {{ result.item.description }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        {% elif result.item_type == "profile" %}
-        <li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="list-collection-row-icon">
-                <span class="sprite sprite-user"></span>
-              </div>
-              <div class="list-collection-row-offset">
-                <div class="row-title">
-                  <a href="{% url 'single-profile' result.item.id %}">
-                    <img src="{% if 'gravatar' in result.item.avatar %}{{result.item.avatar}}{% elif 'files' in result.item.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.profile_name }}" align="left" class="img-badge"/>
-                    <h3 class="row-title">@{{ result.item.profile_name }}</h3>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        {% else %}
-        <li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="list-collection-row-icon">
-                {% if result.item_type == 'event' %}
-                <span class="sprite sprite-calendar"></span>
-                {% else %}
-                <span class="sprite sprite-speech-bubble"></span>
-                {% endif %}
-              </div>
-              <div class="list-collection-row-offset">
-                <div class="row-title">
+				{# MICROCOSMS #}
+				{% if result.item_type == "microcosm" %}
+				<li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="list-collection-row-icon">
+								<span class="sprite sprite-folder-open"></span>
+							</div>
+							<div class="list-collection-row-offset">
+								<div class="row-title">
+									<a href="{{ result.item.meta.links.self.href }}">
+										<h3 class="row-title">{{ result.item.title }}</h3>
+									</a>
+								</div>
+								<div class="row-meta">
+									{{ result.item.description }}
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+				{% elif result.item_type == "profile" %}
+				<li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="list-collection-row-icon">
+								<span class="sprite sprite-user"></span>
+							</div>
+							<div class="list-collection-row-offset">
+								<div class="row-title">
+									<a href="{% url 'single-profile' result.item.id %}">
+										<img src="{% if 'gravatar' in result.item.avatar %}{{result.item.avatar}}{% elif 'files' in result.item.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.profile_name }}" align="left" class="img-badge"/>
+										<h3 class="row-title">@{{ result.item.profile_name }}</h3>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+				{% else %}
+				<li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="list-collection-row-icon">
+								{% if result.item_type == 'event' %}
+								<span class="sprite sprite-calendar"></span>
+								{% else %}
+								<span class="sprite sprite-speech-bubble"></span>
+								{% endif %}
+							</div>
+							<div class="list-collection-row-offset">
+								<div class="row-title">
 
-                  {% if result.item_type == 'conversation' or result.item_type == 'event'%}
-                  <a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">
-                    <h3 class="row-title">{{ result.highlight|safe }}</h3>
-                  </a>
-                  {% else %}
-                  <a href="{{ result.item.meta.links.self.href }}/incontext/">
-                    <h3 class="row-title">{{ result.parent_item.title }}</h3>
-                  </a>
-                  {% endif %}
+									{% if result.item_type == 'conversation' or result.item_type == 'event'%}
+									<a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">
+										<h3 class="row-title">{{ result.highlight|safe }}</h3>
+									</a>
+									{% else %}
+									<a href="{{ result.item.meta.links.self.href }}/incontext/">
+										<h3 class="row-title">{{ result.parent_item.title }}</h3>
+									</a>
+									{% endif %}
 
-                </div>
-                <div class="row-meta">
-                  in
-                  {% if result.item_type == 'comment'%}
-                  <a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title }}</a>
-                  {% else %}
-                  <a href="{{ result.item.meta.links.microcosm.href }}">{{ result.item.meta.links.microcosm.title }}</a>
-                  {% endif %}
-                  &bull; <time datetime="{{ result.item.meta.created|date:"c" }}">{{ result.item.meta.created|timesince }}</time>
+								</div>
+								<div class="row-meta">
+									in
+									{% if result.item_type == 'comment'%}
+									<a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title }}</a>
+									{% else %}
+									<a href="{{ result.item.meta.links.microcosm.href }}">{{ result.item.meta.links.microcosm.title }}</a>
+									{% endif %}
+									&bull; <time datetime="{{ result.item.meta.created|date:"c" }}">{{ result.item.meta.created|timesince }}</time>
 
-                  {% if result.item_type == 'comment'%}
-                  <div class="row-meta-excerpt">
-                    <a href="{% url 'single-profile' result.item.meta.created_by.id %}">
-                      <img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
-                    </a>
-                    <div class="row-meta-excerpt-text">
-                      {{ result.highlight|safe }}
-                    </div>
-                  </div>
-                  {% endif %}
+									{% if result.item_type == 'comment'%}
+									<div class="row-meta-excerpt">
+										<a href="{% url 'single-profile' result.item.meta.created_by.id %}">
+											<img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
+										</a>
+										<div class="row-meta-excerpt-text">
+											{{ result.highlight|safe }}
+										</div>
+									</div>
+									{% endif %}
 
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        {% endif %}
-      {% endfor %}
-  </ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+				{% endif %}
+			{% endfor %}
+	</ul>
 
 </div>
 {% endif %}
@@ -136,12 +136,12 @@
 </div> <!-- /content-body -->
 
 <div class="content-footer padded">
-  <div class="row">
-    <div class="col-xs-12">
-      {% include 'breadcrumbs.html' %}
+	<div class="row">
+		<div class="col-xs-12">
+			{% include 'breadcrumbs.html' %}
 
-    </div>
-  </div>
+		</div>
+	</div>
 </div>
 
 
@@ -151,56 +151,56 @@
 {% block sidebar %}
 
 <div class="metabar-module metabar-filters">
-  <h5>Filters</h5>
-  <div class="metabar-module-title">
-    <h3>
-      Show me ...
-    </h3>
-  </div>
-  <div class="metabar-module-body">
-    <ul class="list-group">
-      <li class="list-group-item">
-        <div class="checkbox">
-          <input id="filter-microcosm" type="checkbox" name="type" value="microcosm" {% if "microcosm" in content.type %}checked="checked"{% endif %}/>
-          <label for="filter-microcosm">Microcosms</label>
-        </div>
-      </li>
-      <li class="list-group-item">
-        <div class="checkbox">
-          <input id="filter-conversation" type="checkbox" name="type" value="conversation" {% if "conversation" in content.type %}checked="checked"{% endif %}/>
-          <label for="filter-conversation">Conversations</label>
-        </div>
-      </li>
-      <li class="list-group-item">
-        <div class="checkbox">
-            <input id="filter-events" type="checkbox"  name="type" value="event" {% if "event" in content.type %}checked="checked"{% endif %}/>
-            <label for="filter-events">Events</label>
-        </div>
-      </li>
-      <li class="list-group-item">
-        <div class="checkbox">
-          <input id="filter-huddles" type="checkbox" name="type" value="profile" {% if "profile" in content.type %}checked="checked"{% endif %}/>
-          <label for="filter-huddles">Profile</label>
-        </div>
-      </li>
+	<h5>Filters</h5>
+	<div class="metabar-module-title">
+		<h3>
+			Show me ...
+		</h3>
+	</div>
+	<div class="metabar-module-body">
+		<ul class="list-group">
+			<li class="list-group-item">
+				<div class="checkbox">
+					<input id="filter-microcosm" type="checkbox" name="type" value="microcosm" {% if "microcosm" in content.type %}checked="checked"{% endif %}/>
+					<label for="filter-microcosm">Microcosms</label>
+				</div>
+			</li>
+			<li class="list-group-item">
+				<div class="checkbox">
+					<input id="filter-conversation" type="checkbox" name="type" value="conversation" {% if "conversation" in content.type %}checked="checked"{% endif %}/>
+					<label for="filter-conversation">Conversations</label>
+				</div>
+			</li>
+			<li class="list-group-item">
+				<div class="checkbox">
+						<input id="filter-events" type="checkbox"  name="type" value="event" {% if "event" in content.type %}checked="checked"{% endif %}/>
+						<label for="filter-events">Events</label>
+				</div>
+			</li>
+			<li class="list-group-item">
+				<div class="checkbox">
+					<input id="filter-huddles" type="checkbox" name="type" value="profile" {% if "profile" in content.type %}checked="checked"{% endif %}/>
+					<label for="filter-huddles">Profile</label>
+				</div>
+			</li>
 
-    </ul>
-  </div>
-  <div class="metabar-module-title">
-    <h3>
-      Options
-    </h3>
-  </div>
-  <div class="metabar-module-body">
-    <ul class="list-group">
-      <li class="list-group-item">
-        <div class="checkbox">
-          <input id="filter-intitle" type="checkbox" name="inTitle" value="true" {% if content.query.inTitle %}checked="checked"{% endif %}/>
-          <label for="filter-intitle">Only search titles</label>
-        </div>
-      </li>
-    </ul>
-  </div>
+		</ul>
+	</div>
+	<div class="metabar-module-title">
+		<h3>
+			Options
+		</h3>
+	</div>
+	<div class="metabar-module-body">
+		<ul class="list-group">
+			<li class="list-group-item">
+				<div class="checkbox">
+					<input id="filter-intitle" type="checkbox" name="inTitle" value="true" {% if content.query.inTitle %}checked="checked"{% endif %}/>
+					<label for="filter-intitle">Only search titles</label>
+				</div>
+			</li>
+		</ul>
+	</div>
 </div> <!-- / filters -->
 
 {% endblock %}
@@ -209,11 +209,11 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/filters.js"></script>
 <script type="text/javascript">
 (function(){
-  new Filters({
-    el     : '.metabar-filters',
-    query  : '{{ content.query.searched|escape }}',
-    url    : '?q=$1'
-  });
+	new Filters({
+		el     : '.metabar-filters',
+		query  : '{{ content.query.searched|escape }}',
+		url    : '?q=$1'
+	});
 })();
 </script>
 {% endblock %}

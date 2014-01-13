@@ -6,101 +6,101 @@
 {% block content %}
 
 <div class="content-header padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
-  <h1>{{ content.title }}</h1>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+	<h1>{{ content.title }}</h1>
 </div>
 
 
 <div class="content-meta huddle-meta">
-  <div class="row">
-    <div class="col-sm-12">
+	<div class="row">
+		<div class="col-sm-12">
 
-      <ul class="list-people list-people-md">
-    		{% for profile in content.participants %}
-    		<li>
-          <a href="{% url 'single-profile' profile.id %}">
-            <img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name }}" />
-          </a>
-        </li>
+			<ul class="list-people list-people-md">
+				{% for profile in content.participants %}
+				<li>
+					<a href="{% url 'single-profile' profile.id %}">
+						<img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name }}" />
+					</a>
+				</li>
 				{% endfor %}
 			</ul>
 
-      <a class="btn btn-default btn-group-responsive-toggle simple-toggle" data-rel=".huddle-actions">
-        <span class="glyphicon glyphicon-arrow-down"></span>
-      </a>
-      <div class="btn-group-responsive huddle-actions">
-      	{% if content.meta.permissions.owner %}
-        <button type="button" class="btn btn-primary people-widget-trigger" value="Invite People">Invite people</button>
+			<a class="btn btn-default btn-group-responsive-toggle simple-toggle" data-rel=".huddle-actions">
+				<span class="glyphicon glyphicon-arrow-down"></span>
+			</a>
+			<div class="btn-group-responsive huddle-actions">
+				{% if content.meta.permissions.owner %}
+				<button type="button" class="btn btn-primary people-widget-trigger" value="Invite People">Invite people</button>
 
-        <div class="people-widget" style="display:none">
-          <div class="people-widget-input">
-            <div class="input-group">
-              <label class="input-group-addon">?</label>
-              <input type="text" class="form-control" />
-            </div>
-          </div>
-          <div class="people-widget-list"></div>
-        </div>
+				<div class="people-widget" style="display:none">
+					<div class="people-widget-input">
+						<div class="input-group">
+							<label class="input-group-addon">?</label>
+							<input type="text" class="form-control" />
+						</div>
+					</div>
+					<div class="people-widget-list"></div>
+				</div>
 
-        {% endif %}
-        <form action="{% url 'delete-huddle' content.id %}" method="POST">
-          {% csrf_token %}
-          <input type="submit" class="btn btn-primary" value="Leave huddle" />
-        </form>
-      </div>
-    </div>
-  </div>
+				{% endif %}
+				<form action="{% url 'delete-huddle' content.id %}" method="POST">
+					{% csrf_token %}
+					<input type="submit" class="btn btn-primary" value="Leave huddle" />
+				</form>
+			</div>
+		</div>
+	</div>
 </div>
 
 
 <div class="content-body">
-  <ul class="list-comments">
-    {% comments content.comments.items %}
-  </ul>
+	<ul class="list-comments">
+		{% comments content.comments.items %}
+	</ul>
 </div> <!-- / content-body -->
 
 <div class="content-footer padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div>
 
 <a name="reply"></a>
-  <div class="reply-container">
-    <ul class="list-comments">
-      <li class="comment-item">
-        <div class="comment-item-inner">
-          <div class="comment-item-header">
-            <div class="comment-item-author">
-                <img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
-                <strong>Post a reply</strong>
-            </div>
-          </div>
-          <div class="comment-item-body">
-            {% include 'forms/block_comment_box.html' %}
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div> <!-- /reply-container -->
+	<div class="reply-container">
+		<ul class="list-comments">
+			<li class="comment-item">
+				<div class="comment-item-inner">
+					<div class="comment-item-header">
+						<div class="comment-item-author">
+								<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}"/>
+								<strong>Post a reply</strong>
+						</div>
+					</div>
+					<div class="comment-item-body">
+						{% include 'forms/block_comment_box.html' %}
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div> <!-- /reply-container -->
 
-  {% if content.meta.permissions.owner %}
-  <form id="invite-form" action="{% url 'invite-huddle' content.id %}" method="POST">
-    {% csrf_token %}
-  </form>
-  {% endif %}
+	{% if content.meta.permissions.owner %}
+	<form id="invite-form" action="{% url 'invite-huddle' content.id %}" method="POST">
+		{% csrf_token %}
+	</form>
+	{% endif %}
 
 {% endblock %}
 
@@ -108,19 +108,19 @@
 
 
 <div class="metabar-module">
-  <h5>About</h5>
-  <div class="metabar-module-title">
-    <h3>
-      {{ content.title }}
-    </h3>
+	<h5>About</h5>
+	<div class="metabar-module-title">
+		<h3>
+			{{ content.title }}
+		</h3>
 
-    <p class="metabar-module-author">
-      <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by">
-      	<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name }}" />
-      	@{{ content.meta.created_by.profile_name|truncatechars:25 }}
-      </a> Started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
-    </p>
-  </div>
+		<p class="metabar-module-author">
+			<a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by">
+				<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name }}" />
+				@{{ content.meta.created_by.profile_name|truncatechars:25 }}
+			</a> Started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
+		</p>
+	</div>
 </div> <!-- / about -->
 
 {% endblock %}
@@ -135,23 +135,23 @@
 <script type="text/javascript">
 (function(){
 
-  var comments = new Comments({
-    el               : '.content-body',
-    defaultContainer : '.reply-container',
-    template         : $('.reply-container .comment-item-body').html().trim()
-  });
+	var comments = new Comments({
+		el               : '.content-body',
+		defaultContainer : '.reply-container',
+		template         : $('.reply-container .comment-item-body').html().trim()
+	});
 
-  var replyBox = new simpleEditor({
-    el : '.reply-box'
-  });
+	var replyBox = new simpleEditor({
+		el : '.reply-box'
+	});
 
-  $('#post-a-reply-handle').on('click',function(e){
-    var selectedText = Comments.prototype.getWindowSelectedText();
-    if (selectedText){
-      replyBox.textarea.value = selectedText;
-      replyBox.quote();
-    }
-  });
+	$('#post-a-reply-handle').on('click',function(e){
+		var selectedText = Comments.prototype.getWindowSelectedText();
+		if (selectedText){
+			replyBox.textarea.value = selectedText;
+			replyBox.quote();
+		}
+	});
 
 
 })();
@@ -160,26 +160,26 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
 <script type="text/javascript">
 
-  var subdomain = $('meta[name="subdomain"]').attr('content');
+	var subdomain = $('meta[name="subdomain"]').attr('content');
 
-  var p = new PeopleWidget({
-    el         : '.people-widget-trigger',
-    static_url : subdomain,
-    dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q='
-  });
+	var p = new PeopleWidget({
+		el         : '.people-widget-trigger',
+		static_url : subdomain,
+		dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q='
+	});
 
-  p.onSelection(function(invited){
+	p.onSelection(function(invited){
 
-    var form = $('#invite-form');
+		var form = $('#invite-form');
 
-    var input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'invite_profile_id';
-    input.value = invited[0].id;
-    form.append(input);
-    form.submit();
+		var input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'invite_profile_id';
+		input.value = invited[0].id;
+		form.append(input);
+		form.submit();
 
-  });
+	});
 </script>
 
 
