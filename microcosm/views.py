@@ -856,12 +856,13 @@ class EventView(object):
 						if (attendee.profile.id == user.id):
 							user_is_attending = True
 
-				elif attendee.rsvp == "invited":
+				elif attendee.rsvp == "maybe":
 					attendees_invited.append(attendee)
 
 
 			# dates
 			import datetime as dt
+			today    = dt.datetime.now()
 			end_date = event.when + dt.timedelta(minutes=event.duration)
 
 			is_same_day = False
@@ -872,6 +873,8 @@ class EventView(object):
 				'type'  : 'multiple' if not is_same_day else 'single',
 				'end'   : end_date
 			}
+
+			is_expired = True if int(end_date.strftime('%s')) < int(today.strftime('%s')) else False
 
 			#rsvp
 			rsvp_limit    = int(responses[event_url]['rsvpLimit'])
@@ -899,7 +902,9 @@ class EventView(object):
 
 				'rsvp_num_attending': num_attending,
 				'rsvp_num_invited'  : len(attendees_invited),
-				'rsvp_percentage'   : rsvp_percentage
+				'rsvp_percentage'   : rsvp_percentage,
+
+				'is_expired'        : is_expired
 			}
 
 			return render(request, EventView.single_template, view_data)

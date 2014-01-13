@@ -31,7 +31,7 @@
 	<div class="item">
 
 		<div class="item-header">
-			<h1>{{content.title}}</h1>
+			<h1>{{content.title|safe}}</h1>
 			<div class="item-meta">
 				Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
 			</div>
@@ -40,7 +40,11 @@
 		{% if content.comments.page > 1 %}
 			{% include 'event_header_small.html' %}
 		{% else %}
-			{% include 'event_header_large.html' %}
+			{% if content.where %}
+				{% include 'event_header_large.html' %}
+			{% else %}
+				{% include 'event_header_small.html' %}
+			{% endif %}
 		{% endif %}
 
 		{% include "forms/content-moderation.html" %}

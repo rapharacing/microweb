@@ -2,7 +2,7 @@
 		class="list-collection-row {% if item.is_pinned %}row-pinned{% endif %} {% if item.is_deleted %}row-deleted{% endif %}">
 
 	<div class="row">
-		<div class="col-sm-8 col-md-7 col-lg-8">
+		<div class="col-sm-8 col-md-8 col-lg-8">
 
 			<div class="list-collection-row-icon">
 				{% if item.flags.sticky %}
@@ -38,7 +38,7 @@
 			</div>
 		</div>
 
-		<div class="col-sm-4 col-md-5 col-lg-4">
+		<div class="col-sm-4 col-md-4 col-lg-4">
 
 			{% if content.meta.permissions.moderator %}
 			<div class="list-collection-row-admin">
@@ -46,25 +46,18 @@
 			</div>
 			{% endif %}
 
-			{% if item.total_comments or item.total_views %}
 			<div class="row-stats">
-
 				<ul class="list-stats list-stats-sm">
-
 					<li>
 						<span>{{ item.total_comments }}</span>
 						comment{{ item.total_comments|pluralize:",s"}}
 					</li>
-					{% if item.total_views %}
 					<li>
 						<span>{{ item.total_views }}</span>
 						view{{ item.total_views|pluralize:",s"}}
 					</li>
-					{% endif %}
 				</ul>
-
 			</div>
-			{% endif %}
 
 			{% if not item.item.flags.sticky %}
 				<div class="row-context">

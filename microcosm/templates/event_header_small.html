@@ -6,7 +6,7 @@
 
 				<li class="item-event-date-container">
 					<div class="item-event-icon">
-						<span class="glyphicon glyphicon-calendar"></span>
+						<span class="sprite sprite-calendar"></span>
 					</div>
 					<div class="item-event-icon-offset">
 						<div class="item-event-date">
@@ -28,7 +28,7 @@
 
 				<li>
 					<div class="item-event-icon">
-						<span class="glyphicon glyphicon-map-marker"></span>
+						<span class="sprite sprite-map-marker"></span>
 					</div>
 					<div class="item-event-icon-offset">
 						<div class="item-event-location">
@@ -41,19 +41,18 @@
 					</div>
 				</li>
 
-
 				<li class="item-event-attending-container">
-
-					{# {%if content.rsvp_limit %} #}
 					<div class="item-event-icon">
-						<span class="glyphicon glyphicon-user"></span>
+						<span class="sprite sprite-attending"></span>
 					</div>
 					<div class="item-event-icon-offset">
+
+						{% if content.rsvp_limit %}
 						<div class="item-event-attending">
 							<div class="progress">
 								<div class="progress-bar"
 										 role="progressbar"
-										 aria-valuenow="60"
+										 aria-valuenow="{{rsvp_percentage}}"
 										 aria-valuemin="0"
 										 aria-valuemax="100"
 										 style="width: {{rsvp_percentage}}%;">
@@ -64,38 +63,99 @@
 								{{ rsvp_num_attending }}/{{ content.rsvp_limit }}
 							</strong>
 						</div>
+						{% endif %}
 
-					{# {% endif %} #}
+						{% if rsvp_num_attending > 0 or rsvp_num_invited > 0}
+						<div class="item-event-attending-people">
+							{% comment %}
+							<span>
+							{% if rsvp_num_attending > 0 %}
 
-					{% if rsvp_num_attending > 0 %}
-					<div class="item-event-attending-people">
-						<ul class="list-people list-people-md">
-						{% for attendee in attendees.items.items %}
-							{% if attendee.rsvp == "yes" %}
-								<li>
-									<a href="{% url 'single-profile' attendee.profile_id %}" title="{{ attendee.profile.profile_name }}">
-										<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name }}" />
-									</a>
-								</li>
+								{{ rsvp_num_attending }} {{ rsvp_num_attending|pluralize:"person,people" }}
+								{% if not is_expired %}{{ rsvp_num_attending|pluralize:"is,are" }} attending{% else %}attended{% endif %}
+								this event.
+
+							{% elif rsvp_num_invited > 0 %}
+
+								{{ rsvp_num_invited }} {{ rsvp_num_invited|pluralize:"person,people" }}
+								{% if not is_expired %}{{ rsvp_num_attending|pluralize:"is,are" }} invited{% else %}were invited{% endif %}
+								to this event.
+
 							{% endif %}
-						{% endfor %}
-						</ul>
-						<span>
-							{% if rsvp_num_attending > 4 %}
-							and <a href="javascript:void 0">{{ rsvp_num_attending|add:"-4" }} others</a> are
-							{% else %}
-							is
-							{% endif %}
-							attending this event.
-						</span>
-					</div>
+							</span>
+							{% endcomment %}
+							<ul class="list-people list-people-md">
+							{% for attendee in attendees.items.items|slice:":4" %}
+								{% if rsvp_num_attending > 0 %}
+									{% if attendee.rsvp == "yes" %}
+										<li>
+											<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name }}">
+												<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name }}" />
+											</a>
+										</li>
+									{% endif %}
+
+								{% elif rsvp_num_invited > 0%}
+									{% if attendee.rsvp == "maybe" %}
+										<li>
+											<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="{{ attendee.profile.profile_name }}">
+												<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name }}" />
+											</a>
+										</li>
+										{% endif %}
+								{% endif %}
+								{% endfor %}
+								{% if attendees.items.items|length > 4 %}
+										<li>
+											<a href="#" class="list-people-button">+{{ attendees.items.items|length|add:"-4" }}</a>
+										</li>
+								{% endif %}
+							</ul>
+						</div>
 					{% endif %}
 					</div>
 				</li>
 			</ul> <!-- /item-event-inner -->
 
-			<div class="item-event-expand-handle">
-				Show Event Details
+			<div class="item-event-actions {% if is_expired %}item-event-actions-expired{% endif %}">
+				<ul class="list-stats">
+					<li>
+						Going
+						<span>{{ rsvp_num_attending|default:"0" }}</span>
+					</li>
+					<li>
+						Invited
+						<span>{{ rsvp_num_invited|default:"0" }}</span>
+					</li>
+				</ul>
+				{% if not is_expired %}
+					{% if user %}
+						{% if user_is_attending %}
+							<h3>You are attending this event.</h3>
+							<form method="POST" action="{% url 'rsvp-event' content.id %}">
+								{% csrf_token %}
+								<input type="hidden" name="rsvp" value="no" />
+								<input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default">
+							</form>
+						{% else %}
+								<form method="POST" action="{% url 'rsvp-event' content.id %}">
+									{% csrf_token %}
+									<input type="hidden" name="rsvp" value="yes" />
+									<input type="submit" class="btn btn-lg btn-primary" value="Yes, I'm attending!" />
+								</form>
+						{% endif %}
+					{% else %}
+						<h3>Sign in to reserve your place in this event!</h3>
+						<p>
+							<button class="btn btn-primary btn-lg" id="login_link" onclick="login()">
+								Sign In or Register to attend!
+							</button>
+						</p>
+					{% endif %}
+				{% else %}
+					<h3>Sorry, this event has expired...</h3>
+					<p>..but don't miss the next one! Subscribe to this microcosm to be notified when a new event is created.</p>
+				{% endif %}
 			</div>
 
 		</div> <!-- /col-xs-12 -->
