@@ -913,23 +913,48 @@ class EventView(object):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+		user = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
 
 		if request.method == 'POST':
+
 			form = EventView.create_form(request.POST)
 			if form.is_valid():
 				event_request = Event.from_create_form(form.cleaned_data)
 				event_response = event_request.create(request.META['HTTP_HOST'], request.access_token)
 				if event_response.id > 0:
-				  if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
-					payload = {
-						'itemType': 'event',
-						'itemId': event_response.id,
-						'markdown': request.POST.get('firstcomment'),
-						'inReplyTo': 0
-					}
-					comment = Comment.from_create_form(payload)
-					comment.create(request.META['HTTP_HOST'], request.access_token)
-				  return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
+
+					# invite attendees
+					invites = request.POST.get('invite')
+					if len(invites.strip()) > 0:
+						invited_list = invites.split(",")
+						attendees = []
+						if len(invited_list) > 0:
+							for userid in invited_list:
+								if (userid != ""):
+									attendees.append({
+										'rsvp' 		: 'maybe',
+										'profileId' : int(userid)
+									})
+							if (len(attendees)>0):
+								Event.rsvp(
+									request.META['HTTP_HOST'],
+									event_response.id,
+									user.id,
+									attendees,
+									access_token=request.access_token
+								)
+
+					# create comment
+					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
+						payload = {
+							'itemType': 'event',
+							'itemId': event_response.id,
+							'markdown': request.POST.get('firstcomment'),
+							'inReplyTo': 0
+						}
+						comment = Comment.from_create_form(payload)
+						comment.create(request.META['HTTP_HOST'], request.access_token)
+					return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
 				else:
 					return HttpResponseServerError()
 			else:
