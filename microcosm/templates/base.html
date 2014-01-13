@@ -53,12 +53,15 @@
 												<label class="input-group-addon" for="navbar-search-input">
 													<span class="sprite sprite-search-small"></span>
 												</label>
-												<input type="text"
-															 id="navbar-search-input"
-															 class="form-control"
-															 name="q"
-															 placeholder="Search conversations, events and people..."
-															 {% if content.query.searched %}value="{{content.query.searched|escape}}"{% endif %} />
+												<input
+													type="text"
+													id="navbar-search-input"
+													class="form-control"
+													name="q"
+													placeholder="Search conversations, events and people..."
+													{% if content.query.searched %}value="{{content.query.searched|escape}}"{% endif %}
+													tabindex="1"
+												/>
 											</div>
 										</form>
 									</div> <!-- /navbar-search -->

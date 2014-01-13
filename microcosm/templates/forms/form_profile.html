@@ -44,6 +44,7 @@
 											value="{{ form.profileName.value }}"
 											placeholder="Enter username..."
 											maxlength="50"
+											tabindex="1"
 										/>
 									</div>
 								</div>
@@ -62,6 +63,7 @@
 													type="file"
 													accept="image/*"
 													capture="camera"
+													tabindex="1"
 												/>
 											</label>
 											<div class="form-file-upload-text">
@@ -101,6 +103,7 @@
 													name="{{ comment_form.markdown.name }}"
 													placeholder="Enter your text here..."
 													maxlength="5000"
+													tabindex="1"
 												></textarea>
 												<div class="reply-box-footer">
 													<div class="reply-box-attachments">
@@ -127,8 +130,8 @@
 						<div class="row">
 							<div class="col-sm-12">
 								<div class="form-footer-buttons">
-									<input type="submit" class="btn btn-lg btn-primary" value="Save Changes">
-									<input type="reset" class="btn btn-lg btn-default" value="Cancel">
+									<input type="submit" class="btn btn-lg btn-primary" value="Save Changes" tabindex="1" />
+									<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
 								</div>
 							</div>
 						</div>

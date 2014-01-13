@@ -3,7 +3,7 @@
 {% load conversation %}
 {% load event %}
 
-{% block title %}{{ content.title }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
+{% block title %}{{ content.title | safe }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
 
 {% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
 

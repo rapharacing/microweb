@@ -61,6 +61,7 @@
 									value="{{ form.title.value }}"
 									placeholder="Title of event"
 									maxlength="150"
+									tabindex="1"
 								/>
 							</div>
 						</div>
@@ -84,6 +85,7 @@
 									name="{{ form.editReason.name }}"
 									placeholder="Reason for editing"
 									maxlength="150"
+									tabindex="1"
 								/>
 							</div>
 						</div>
@@ -100,21 +102,21 @@
 							<div class="col-sm-3 col-lg-2">
 								<div class="radio">
 									<label>
-										<input type="radio" id="date-type" name="date-type" value="1" checked="checked" /> Single day
+										<input type="radio" id="date-type" name="date-type" value="1" checked="checked" tabindex="1" /> Single day
 									</label>
 								</div>
 							</div>
 							<div class="col-sm-3 col-lg-2">
 								<div class="radio">
 									<label>
-										<input type="radio" id="date-type" name="date-type" value="2"/> Multiple days
+										<input type="radio" id="date-type" name="date-type" value="2" tabindex="1" /> Multiple days
 									</label>
 								</div>
 							</div>
 							<div class="col-sm-3 col-lg-2">
 								<div class="radio">
 									<label>
-										<input type="radio" id="date-type" name="date-type" value="0"/>
+										<input type="radio" id="date-type" name="date-type" value="0" tabindex="1" />
 										<abbr title="To Be Announced - select this option if you have not yet set a date">TBA</abbr>
 									</label>
 								</div>
@@ -134,7 +136,7 @@
 										</div>
 									</div>
 									<div class="col-sm-12">
-											<select>
+											<select tabindex="1">
 												<option>Select a time</option>
 												{% for hour in '123456789012345678901234'%}
 													{% for minute in '1234'%}
@@ -145,7 +147,7 @@
 												{% endfor %}
 											</select>
 											<span class="form-datepicker-single">to</span>
-											<select class="form-datepicker-single">
+											<select class="form-datepicker-single" tabindex="1">
 												<option>Select a time</option>
 												{% for hour in '123456789012345678901234'%}
 													{% for minute in '1234'%}
@@ -169,7 +171,7 @@
 										</div>
 									</div>
 									<div class="col-sm-12">
-											<select>
+											<select tabindex="1">
 												<option>Select a time</option>
 												{% for hour in '123456789012345678901234'%}
 													{% for minute in '1234'%}
@@ -199,14 +201,14 @@
 								{% endif %}
 								<div class="radio">
 									<label>
-										<input type="radio" name="location-type" value="1" checked="checked" /> Enter a location
+										<input type="radio" name="location-type" value="1" checked="checked" tabindex="1" /> Enter a location
 									</label>
 								</div>
 							</div>
 							<div class="col-sm-3 col-lg-2">
 								<div class="radio">
 									<label>
-										<input type="radio" name="location-type" value="0"/>
+										<input type="radio" name="location-type" value="0" tabindex="1" />
 										<abbr title="To Be Announced - select this option if you have not yet set a location">TBA</abbr>
 									</label>
 								</div>
@@ -218,9 +220,12 @@
 					<div class="form-group form-location">
 						<div class="row">
 							<div class="col-sm-6">
-								<textarea id="location"
-													class="form-control event-location-textarea"
-													name="{{ form.where.name }}">{{ form.where.value }}</textarea>
+								<textarea
+									id="location"
+									class="form-control event-location-textarea"
+									name="{{ form.where.name }}"
+									tabindex="1"
+								>{{ form.where.value }}</textarea>
 								<div class="row">
 									<div class="col-sm-5 col-sm-offset-7">
 										<a
@@ -250,7 +255,7 @@
 									{% endif %}
 								<div class="radio">
 									<label>
-										<input type="radio" name="attendee-limit-option" value="0" checked="checked"/>
+										<input type="radio" name="attendee-limit-option" value="0" checked="checked" tabindex="1" />
 										No limit
 									</label>
 								</div>
@@ -261,7 +266,7 @@
 									<div class="col-xs-8">
 										<div class="radio">
 											<label>
-												<input type="radio" name="attendee-limit-option" value="1"/>
+												<input type="radio" name="attendee-limit-option" value="1" tabindex="1" />
 												Max number of attendees is
 											</label>
 										</div>
@@ -275,6 +280,7 @@
 											max="999"
 											value="{{ form.rsvpLimit.value }}"
 											disabled
+											tabindex="1"
 										/>
 									</div>
 							</div>
@@ -295,7 +301,7 @@
 								<div class="input-group-addon">
 									<span class="glyphicon glyphicon-search"></span>
 								</div>
-								<input id="invite" name="invite" class="form-control" placeholder="Type in a user's name"/>
+								<input id="invite" name="invite" class="form-control" placeholder="Type in a user's name" tabindex="1" />
 							</div>
 						</div>
 
@@ -319,8 +325,8 @@
 					<div class="row">
 						<div class="col-sm-12">
 							<div class="form-footer-buttons">
-								<input type="submit" class="btn btn-lg btn-primary" value="Create event">
-								<input type="reset" class="btn btn-lg btn-default" value="Cancel">
+								<input type="submit" class="btn btn-lg btn-primary" value="Create event" tabindex="1" />
+								<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
 							</div>
 						</div>
 					</div>

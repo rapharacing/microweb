@@ -189,7 +189,7 @@ class ConversationView(object):
 					payload = {
 						'itemType'  : 'conversation',
 						'itemId'    : conv_response.id,
-						'markdown'  : request.POST.get('firstcomment')
+						'markdown'  : request.POST.get('firstcomment'),
 						'inReplyTo' : 0
 					}
 					comment = Comment.from_create_form(payload)
@@ -380,15 +380,15 @@ class HuddleView(object):
 					ids = [int(x) for x in request.POST.get('invite').split(',')]
 					Huddle.invite(request.META['HTTP_HOST'], hud_response.id, ids, request.access_token)
 					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
-					  payload = {
-						  'itemType': 'huddle',
-						  'itemId': hud_response.id,
-						  'markdown': request.POST.get('firstcomment'),
-						  'inReplyTo': 0
-					  }
-					  comment = Comment.from_create_form(payload)
-					  comment.create(request.META['HTTP_HOST'], request.access_token)
-				  return HttpResponseRedirect(reverse('single-huddle', args=(hud_response.id,)))
+						payload = {
+							'itemType': 'huddle',
+							'itemId': hud_response.id,
+							'markdown': request.POST.get('firstcomment'),
+							'inReplyTo': 0
+						}
+						comment = Comment.from_create_form(payload)
+						comment.create(request.META['HTTP_HOST'], request.access_token)
+					return HttpResponseRedirect(reverse('single-huddle', args=(hud_response.id,)))
 			else:
 				view_data['form'] = form
 				return render(request, HuddleView.form_template, view_data)

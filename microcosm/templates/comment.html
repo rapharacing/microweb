@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ content.meta.links.up.title }} (Comment {{ content.id }}){% endblock title%}
+{% block title %}{{ content.meta.links.up.title | safe }} (Comment {{ content.id }}){% endblock title%}
 
 {% load comments %}
 {% block content %}

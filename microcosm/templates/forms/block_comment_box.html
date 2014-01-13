@@ -14,9 +14,13 @@
 		{{ comment_form.inReplyTo }}
 		{{ comment_form.itemId }}
 		{{ comment_form.itemType }}
-		<textarea id="reply-box-textarea"
-							name="{{ comment_form.markdown.name }}"
-							placeholder="Enter your text here..."></textarea>
+		<textarea
+			id="reply-box-textarea"
+			name="{{ comment_form.markdown.name }}"
+			placeholder="Enter your text here..."
+			maxlength="5000"
+			tabindex="1"
+		></textarea>
 		<div class="reply-box-footer">
 			<div class="reply-box-attachments">
 				<div class="reply-box-attachments-gallery"></div>
@@ -24,9 +28,9 @@
 				<label for="reply-box-attachments">
 					upload a file
 				</label>
-				<input type="file" id="reply-box-attachments" name="attachments" multiple/>
+				<input type="file" id="reply-box-attachments" name="attachments" multiple />
 			</div>
-			<input type="submit" class="btn btn-primary" value="Post reply">
+			<input type="submit" class="btn btn-primary" value="Post reply" tabindex="1" />
 			<input type="reset" class="btn btn-default" value="Cancel">
 			<a href="javascript:void 0" class="formatting-help-handle" data-toggle="modal" data-target="#formatting-help-modal">
 				<span class="sprite sprite-help-small"></span>

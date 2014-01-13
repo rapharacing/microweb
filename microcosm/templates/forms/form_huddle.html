@@ -41,6 +41,7 @@
 										name="{{ form.title.name }}"
 										placeholder="Title of huddle"
 										maxlength="150"
+										tabindex="1"
 									/>
 								</div>
 
@@ -68,6 +69,7 @@
 											class="form-control"
 											autocomplete="off"
 											placeholder="Type in a user's name"
+											tabindex="1"
 										/>
 									</div>
 								</div>
@@ -91,9 +93,13 @@
 												<li class="se-list"><span class="sprite sprite-format-list"></span> List</li>
 												<li class="se-image"><span class="sprite sprite-format-img"></span> Image</li>
 											</ul>
-											<textarea id="reply-box-textarea"
-																name="firstcomment"
-																placeholder="Enter your text here..."></textarea>
+											<textarea
+												id="reply-box-textarea"
+												name="firstcomment"
+												placeholder="Enter your text here..."
+												maxlength="5000"
+												tabindex="1"
+											></textarea>
 											<div class="reply-box-footer">
 												<div class="reply-box-attachments">
 													<div class="reply-box-attachments-gallery"></div>
@@ -123,10 +129,10 @@
 									</p>
 									<p>
 										<label>
-											<input type="radio" name="confidential" value="yes" /> Yes
+											<input type="radio" name="confidential" value="yes" tabindex="1" /> Yes
 										</label>
 										<label>
-											<input type="radio" name="confidential" value="no" /> No
+											<input type="radio" name="confidential" value="no" tabindex="1" /> No
 										</label>
 									</p>
 								</div>
@@ -141,8 +147,8 @@
 					<div class="row">
 						<div class="col-sm-12">
 							<div class="form-footer-buttons">
-								<input type="submit" class="btn btn-lg btn-primary" value="Start Huddle">
-								<input type="reset" class="btn btn-lg btn-default" value="Cancel">
+								<input type="submit" class="btn btn-lg btn-primary" value="Start Huddle" tabindex="1" />
+								<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
 							</div>
 						</div>
 					</div>

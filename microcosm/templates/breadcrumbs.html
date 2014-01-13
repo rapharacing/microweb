@@ -9,13 +9,13 @@
 		{% if key == "site"%}
 		<a href="{% url 'index' %}">Home</a>
 		{% elif key == "microcosm" %}
-		<a href="{{ value.href }}">{{ value.title }}</a>
+		<a href="{{ value.href }}">{{ value.title | safe }}</a>
 		{% elif key == "self" %}
 		<a href="{{ value.href }}">
 			{% if content.profile_name %}
-				{{ content.profile_name }}
+				{{ content.profile_name | safe }}
 			{% elif content.title %}
-				{{ content.title }}
+				{{ content.title | safe }}
 			{% else %}
 			{% endif %}
 		</a>
