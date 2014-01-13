@@ -15,7 +15,7 @@
 
 				<div class="row-title-wrapper">
 					<h3 class="row-title">
-						<a href="/{{ item.item_type }}s/{{ item.item.id }}/{% if user %}newest/{% endif %}">{{ item.item.title }}</a>
+						<a href="/{{ item.item_type }}s/{{ item.item.id }}/{% if user %}newest/{% endif %}">{{ item.item.title | safe }}</a>
 						{% if item.item.meta.flags.unread %}<span class="label label-warning">New</span>{% endif %}
 					</h3>
 				</div>

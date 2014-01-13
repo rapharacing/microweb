@@ -35,7 +35,7 @@
 {% comment %}
 						{% if description %}
 						<div class="comment-item-body profile-description">
-							{% autoescape off %} {{ description.text }} {% endautoescape %}
+							{{ description.text | safe}}
 						</div> <!-- /profile-description -->
 						{% endif %}
 
@@ -91,9 +91,7 @@
 														</a> replied {{ comment.item.last_reply.timeago }} ago
 													</div>
 													<div class="comment-item-body recent-comment-body">
-														{% autoescape off%}
-														{{ comment.text }}
-														{% endautoescape %}
+														{{ comment.text | safe}}
 													</div>
 													<div class="recent-comment-footer">
 														<span class="glyphicon glyphicon-arrow-right"></span>

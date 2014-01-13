@@ -72,7 +72,7 @@
 												</a> replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
 
 												<div class="microcosm-item-update-text">
-													{% autoescape off%}{{ update.item.html }}{% endautoescape %}
+													{{ update.item.html | safe }}
 												</div>
 
 											{# mentioned #}
@@ -90,7 +90,7 @@
 															<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
 														</a>
 														<div class="row-meta-excerpt-text">
-															{% autoescape off%}{{ update.item.html }}{% endautoescape %}
+															{{ update.item.html | safe }}
 														</div>
 													</div>
 
@@ -105,7 +105,7 @@
 													</h3>
 												</a>
 												{% if update.item_type == "comment" %}
-														{% autoescape off%}{{ update.item.html }}{% endautoescape %}
+														{{ update.item.html | safe }}
 												{% endif %}
 
 											{# new attendee #}
@@ -131,7 +131,7 @@
 													</h3>
 												</a>
 												{% if update.item_type == "comment" %}
-														{% autoescape off%}{{ update.item.html }}{% endautoescape %}
+														{{ update.item.html | safe }}
 												{% endif %}
 
 											{# new item #}

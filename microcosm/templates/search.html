@@ -10,7 +10,7 @@
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1>Search results for: {{ content.query.searched|escape }}</h1>
+	<h1>Search results for: {{ content.query.searched }}</h1>
 	<p class="text-muted">
 		{{ content.results.total }} matches.  Search took {{ content.time_elapsed }} seconds.
 	</p>
@@ -211,7 +211,7 @@
 (function(){
 	new Filters({
 		el     : '.metabar-filters',
-		query  : '{{ content.query.searched|escape }}',
+		query  : '{{ content.query.searched | urlencode }}',
 		url    : '?q=$1'
 	});
 })();
