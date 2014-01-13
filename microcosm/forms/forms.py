@@ -96,6 +96,8 @@ class EventCreate(ItemForm):
     south = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
     west = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
 
+    invite = django.forms.CharField(widget=django.forms.HiddenInput,required=False)
+    inviteObject = django.forms.CharField(widget=django.forms.HiddenInput,required=False)
 
 class EventEdit(EventCreate):
     """

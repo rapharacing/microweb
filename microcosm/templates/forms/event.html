@@ -254,7 +254,6 @@
 						<div class="row">
 							<div class="col-sm-6">
 								<div id="location-control">
-								{% spaceless %}
 									<textarea
 										id="location"
 										class="form-control event-location-textarea"
@@ -262,10 +261,7 @@
 										placeholder="Eg. Street, station, landmark, country..."
 										maxlength="150"
 										tabindex="1"
-									>
-									{{ form.where.value|default:"" }}
-									</textarea>
-								{% endspaceless %}
+									>{{ form.where.value|default:"" }}</textarea>
 									<div class="row">
 										<div class="col-sm-5 col-sm-offset-7">
 											<a
@@ -350,6 +346,7 @@
 						<label class="col-sm-12" for="invite"><span>Optional.</span> Do you wish to invite others to your event?</label>
 
 						<input type="hidden" name="invite" value="" />
+						<input type="hidden" name="inviteObject" value="" />
 
 						<div class="col-sm-12">
 							<div class="list-participants"></div>
@@ -557,6 +554,13 @@
 			}
 		}
 	);
+
+	////////////////////////
+	//    Invite object   //
+	////////////////////////
+	{% if form.inviteObject.value != "" %}
+	window.form_invitees = {{form.inviteObject.value|safe|escape}};
+	{% endif %}
 
 })();
 </script>

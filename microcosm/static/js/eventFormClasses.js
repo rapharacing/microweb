@@ -416,7 +416,7 @@
       return {
         startDateTime : startDateTime,
         endDateTime   : endDateTime,
-        duration      : duration
+        duration      : parseInt(duration,0)
       };
 
     };

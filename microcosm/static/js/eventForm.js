@@ -109,7 +109,8 @@
     el         : '#invite',
     is_textbox : true,
     static_url : subdomain,
-    dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q='
+    dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q=',
+    invited    : typeof window.form_invitees !== 'undefined' && window.form_invitees.length > 0 ? window.form_invitees : []
   });
 
   // update the hidden input box
@@ -118,8 +119,15 @@
     invite_input_field.val(peopleWidget.invitedListToDelimitedString());
   };
 
+  // update inviteObject field for form errors
+  var inviteJSON_input_field = $('input[name="inviteObject"]');
+  var updateInviteJSONField = function(obj){
+    inviteJSON_input_field.val(JSON.stringify(obj));
+  }
+
+
   // triggers when user clicks on a person in the autocomplete dropdown
-  peopleWidget.onSelection(function(invited){
+  var render_particating = function(invited){
     if (invited.length > 0){
       participating.render(invited).show();
     }else{
@@ -127,7 +135,10 @@
     }
     peopleWidget.show();
     updateInvitedField();
-  });
+    updateInviteJSONField(invited);
+  }
+
+  peopleWidget.onSelection(render_particating);
 
   // triggers when the user clicks on a person in the participants list
   participating.$el.on('click', 'li', function(e){
@@ -141,9 +152,12 @@
     updateInvitedField();
   });
 
+  // update on pageload
+  if (peopleWidget.people_invited.length > 0){
+    render_particating(peopleWidget.people_invited);
+  }
+
 })();
-
-
 
 ////////////////////
 //  comment box  //
