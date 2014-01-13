@@ -740,7 +740,6 @@ class Update(APIResource):
         update.item_type = data['itemType']
         update.meta = Meta(data['meta'])
 
-
         update.item = populate_item(update.item_type, data['item'])
 
         if data.get('parentItem'):
