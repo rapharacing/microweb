@@ -99,10 +99,11 @@
 											maxlength="5000"
 										></textarea>
 										<div class="reply-box-footer">
-											<a href="javascript:void 0">
-												<span class="glyphicon glyphicon-question-sign"></span>
+											<a href="#" class="formatting-help-handle" data-toggle="modal" data-target="#formatting-help-modal">
+												<span class="sprite sprite-help-small"></span>
 												Formatting help
 											</a>
+											{% include 'modal_formatting_help.html' %}
 										</div>
 									</div>
 								</div> <!-- /reply-box -->
@@ -126,7 +127,6 @@
 
 				</div>
 			</div>
-
 </div>
 {% endblock %}
 {% block sidebar %}
@@ -149,15 +149,40 @@
 
 
 {% block js %}
-
+<script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
 <script type="text/javascript">
-	(function(){
+(function(){
+	'use strict';
 
-		var se = new simpleEditor({
-			el : '.reply-box'
-		});
+	/////////////////
+	// comment box //
+	/////////////////
+	var editor = new simpleEditor({
+		el : '.reply-box'
+	});
 
-	})();
+
+	/////////////////////
+	// form validation //
+	/////////////////////
+
+	var form = new FormValidator(
+		document.getElementById('conversationForm'),
+		{
+			rules : {
+				'{{ form.title.name }}'      : ['not_empty','maxlength']
+			},
+			tests : {
+				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
+			},
+			error_messages : {
+				'{{ form.title.name }}:not_empty' : "* {{ form.fields.title.error_messages.required }}",
+				'{{ form.title.name }}:maxlength' : "* {{ form.fields.title.error_messages.max_length }}"
+			}
+		}
+	);
+
+})();
 </script>
 {% endblock %}
