@@ -18,179 +18,179 @@
 
 <div class="content-body">
 
-		<div class="list-updates">
-			{% if user %}
+	<div class="list-updates">
+		{% if user %}
 
-				{% if not content.updates.items %}
+			{% if not content.updates.items %}
 
-				<p>No updates yet. When your username is mentioned or a new comment is posted on an item you're watching, it'll show here.</p>
+			<p>No updates yet. When your username is mentioned or a new comment is posted on an item you're watching, it'll show here.</p>
 
-				{% else %} {# else has content.updates.items #}
+			{% else %} {# else has content.updates.items #}
 
-				<ul class="list-collection bordered padded">
-					{% for update in content.updates.items %}
-						<li class="list-collection-row">
-							<div class="row">
+			<ul class="list-collection bordered padded">
+				{% for update in content.updates.items %}
+					<li class="list-collection-row">
+						<div class="row">
 
-								<div class="col-sm-10">
+							<div class="col-sm-10">
 
-									<div class="list-collection-row-icon">
-										{% spaceless %}
+								<div class="list-collection-row-icon">
+									{% spaceless %}
 
-											{% if update.update_type == "new_comment" or update.update_type == "new_comment_in_huddle" %}
+										{% if update.update_type == "new_comment" or update.update_type == "new_comment_in_huddle" %}
 
-												{% if update.parent_item_type == "conversation" or update.item_type == "conversation" %}
+											{% if update.parent_item_type == "conversation" or update.item_type == "conversation" %}
 
-													<span class="sprite sprite-speech-bubble"></span>
+												<span class="sprite sprite-speech-bubble"></span>
 
-												{% elif update.parent_item_type == "event" or update.item_type == "event" %}
+											{% elif update.parent_item_type == "event" or update.item_type == "event" %}
 
-													<span class="sprite sprite-calendar"></span>
+												<span class="sprite sprite-calendar"></span>
 
-												{% endif %}
+											{% endif %}
+										{% endif %}
+
+									{% endspaceless %}
+								</div> <!--/list-collection-row-icon -->
+
+								<div class="list-collection-row-offset">
+
+
+									<div class="row-title-wrapper">
+										{# new comment #}
+										{% if update.update_type == "new_comment" %}
+
+											<a href="{{ update.parent_link }}/newest/">
+												<h3 class="row-title">{{ update.parent_item.title }}</h3>
+											</a>
+											<span class="label label-warning">NEW COMMENT</span>
+
+										{# reply to comment #}
+										{% elif update.update_type == "reply_to_comment" %}
+
+											<a href="{{ update.profile_link }}">
+												<h3 class="row-title">@{{ update.item.meta.created_by.profile_name }}</h3>
+											</a> replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
+
+											<div class="microcosm-item-update-text">
+												{{ update.item.html | safe }}
+											</div>
+
+										{# mentioned #}
+										{% elif update.update_type == "mentioned" %}
+
+											<a href="{{ update.profile_link }}">
+												<h3 class="row-title">@{{ update.item.meta.created_by.profile_name }}</h3>
+											</a> mentioned you in
+											<a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
+
+											<div class="row-meta">
+
+												<div class="row-meta-excerpt">
+													<a href="{% url 'single-profile' update.item.meta.created_by.id %}">
+														<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
+													</a>
+													<div class="row-meta-excerpt-text">
+														{{ update.item.html | safe }}
+													</div>
+												</div>
+
+											</div>
+
+										{# new comment in huddle #}
+										{% elif update.update_type == "new_comment_in_huddle" %}
+
+											<a href="{{ update.item_link }}">
+												<h3 class="row-title">
+													{{ update.item.title }}
+												</h3>
+											</a>
+											{% if update.item_type == "comment" %}
+													{{ update.item.html | safe }}
 											{% endif %}
 
-										{% endspaceless %}
-									</div> <!--/list-collection-row-icon -->
+										{# new attendee #}
+										{% elif update.update_type == "new_attendee" %}
 
-									<div class="list-collection-row-offset">
-
-
-										<div class="row-title-wrapper">
-											{# new comment #}
-											{% if update.update_type == "new_comment" %}
-
-												<a href="{{ update.parent_link }}/newest/">
-													<h3 class="row-title">{{ update.parent_item.title }}</h3>
-												</a>
-												<span class="label label-warning">NEW COMMENT</span>
-
-											{# reply to comment #}
-											{% elif update.update_type == "reply_to_comment" %}
-
-												<a href="{{ update.profile_link }}">
-													<h3 class="row-title">@{{ update.item.meta.created_by.profile_name }}</h3>
-												</a> replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
-
-												<div class="microcosm-item-update-text">
-													{{ update.item.html | safe }}
-												</div>
-
-											{# mentioned #}
-											{% elif update.update_type == "mentioned" %}
-
-												<a href="{{ update.profile_link }}">
-													<h3 class="row-title">@{{ update.item.meta.created_by.profile_name }}</h3>
-												</a> mentioned you in
-												<a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
-
-												<div class="row-meta">
-
-													<div class="row-meta-excerpt">
-														<a href="{% url 'single-profile' update.item.meta.created_by.id %}">
-															<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
-														</a>
-														<div class="row-meta-excerpt-text">
-															{{ update.item.html | safe }}
-														</div>
-													</div>
-
-												</div>
-
-											{# new comment in huddle #}
-											{% elif update.update_type == "new_comment_in_huddle" %}
-
-												<a href="{{ update.item_link }}">
-													<h3 class="row-title">
-														{{ update.item.title }}
-													</h3>
-												</a>
-												{% if update.item_type == "comment" %}
-														{{ update.item.html | safe }}
-												{% endif %}
-
-											{# new attendee #}
-											{% elif update.update_type == "new_attendee" %}
-
-												<a href="{{ update.item_link }}/newest/">
-													<h3 class="row-title">{{ update.item.title }}</h3>
-												</a>
-
-											{# new vote #}
-											{% elif update.update_type == "new_vote" %}
-
-												<a href="{{ update.item_link }}/newest/">
-													<h3 class="row-title">{{ update.item.title }}</h3>
-												</a>
-
-											{# new event reminder #}
-											{% elif update.update_type == "event_reminder" %}
-
-												<a href="{{ update.item_link }}">
-													<h3 class="row-title">
-														{{ update.item.title }}
-													</h3>
-												</a>
-												{% if update.item_type == "comment" %}
-														{{ update.item.html | safe }}
-												{% endif %}
-
-											{# new item #}
-											{% elif update.update_type == "new_item" %}
-												<a href="{{ update.item_link }}/newest/">
-													<h3 class="row-title">{{ update.item.title }}</h3>
-												</a> was started in
-												<a href="{{ update.parent_link }}">
-													{{ update.parent_text }}
-												</a>
-
-										{% endif %}
-										</div> <!-- /row-title-wrapper-->
-
-										<div class="row-meta">
-
-											<span class="sprite sprite-arrow-right"></span>
-
-											<a href="{{ update.parent_link }}">
-												view
-												{% if update.parent_item_type == "conversation" %}
-													conversation
-												{% elif update.parent_item_type == "event" %}
-													event
-												{% elif update.parent_item_type == "poll" %}
-													poll
-												{% elif update.item_type == "conversation" %}
-													conversation
-												{% elif update.item_type == "event" %}
-													event
-												{% elif update.item_type == "poll" %}
-													poll
-												{% endif %}
+											<a href="{{ update.item_link }}/newest/">
+												<h3 class="row-title">{{ update.item.title }}</h3>
 											</a>
-										</div> <!-- /row-meta -->
 
-									</div> <!-- /list-row-collection-offset -->
+										{# new vote #}
+										{% elif update.update_type == "new_vote" %}
+
+											<a href="{{ update.item_link }}/newest/">
+												<h3 class="row-title">{{ update.item.title }}</h3>
+											</a>
+
+										{# new event reminder #}
+										{% elif update.update_type == "event_reminder" %}
+
+											<a href="{{ update.item_link }}">
+												<h3 class="row-title">
+													{{ update.item.title }}
+												</h3>
+											</a>
+											{% if update.item_type == "comment" %}
+													{{ update.item.html | safe }}
+											{% endif %}
+
+										{# new item #}
+										{% elif update.update_type == "new_item" %}
+											<a href="{{ update.item_link }}/newest/">
+												<h3 class="row-title">{{ update.item.title }}</h3>
+											</a> was started in
+											<a href="{{ update.parent_link }}">
+												{{ update.parent_text }}
+											</a>
+
+									{% endif %}
+									</div> <!-- /row-title-wrapper-->
+
+									<div class="row-meta">
+
+										<span class="sprite sprite-arrow-right"></span>
+
+										<a href="{{ update.parent_link }}">
+											view
+											{% if update.parent_item_type == "conversation" %}
+												conversation
+											{% elif update.parent_item_type == "event" %}
+												event
+											{% elif update.parent_item_type == "poll" %}
+												poll
+											{% elif update.item_type == "conversation" %}
+												conversation
+											{% elif update.item_type == "event" %}
+												event
+											{% elif update.item_type == "poll" %}
+												poll
+											{% endif %}
+										</a>
+									</div> <!-- /row-meta -->
+
+								</div> <!-- /list-row-collection-offset -->
+							</div>
+
+							<div class="col-sm-2">
+								<div class="row-timesince">
+									<time datetime="{{ update.meta.created|date:"c" }}">{{ update.meta.created|timesince }}</time>
 								</div>
+							</div>
 
-								<div class="col-sm-2">
-									<div class="row-timesince">
-										<time datetime="{{ update.meta.created|date:"c" }}">{{ update.meta.created|timesince }}</time>
-									</div>
-								</div>
+						</div> <!-- /row -->
+					<li>
+				{% endfor %}
+			</ul>
 
-							</div> <!-- /row -->
-						<li>
-					{% endfor %}
-				</ul>
+			{% endif %} {# endif content.updates.items #}
 
-				{% endif %} {# endif content.updates.items #}
+		{% else %} {# else not user #}
 
-			{% else %} {# else not user #}
+		Please login to recieve updates
 
-			Please login to recieve updates
-
-			{% endif %}
-		</div> <!-- /list-updates -->
+		{% endif %}
+	</div> <!-- /list-updates -->
 
 </div><!-- /content-body -->
 
