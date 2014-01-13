@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Watchers{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
+{% block title %}Watchers{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
 
 
 {% block content %}
