@@ -3,15 +3,15 @@
 {% block content %}
 
 <div class="content-header padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
-  <h1>{{ site.title }}</h1>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+	<h1>{{ site.title }}</h1>
 </div>
 
 <div class="content-body">
@@ -19,86 +19,82 @@
 	{% if not content.microcosms.items %}
 		<p>This is such a new site that there are no Microcosms at the moment.</p>
 		{% if content.meta.permissions.create %}
-	    <p>Will you be the first to create one?</p>
+			<p>Will you be the first to create one?</p>
 		{% endif %}
 	{% else %}
 
 {% include "forms/content-moderation.html" %}
 
 		<div class="list-microcosms">
-		  <ul class="list-collection bordered padded">
-		  {% for item in content.microcosms.items %}
-		      <li class="list-collection-row">
-		        <div class="row">
+			<ul class="list-collection bordered padded">
+			{% for item in content.microcosms.items %}
+					<li class="list-collection-row">
+						<div class="row">
 
-		          <div class="col-sm-8 col-md-7">
-		            <!--<div class="list-collection-row-icon">
+							<div class="col-sm-8 col-md-7">
+								<!--<div class="list-collection-row-icon">
 
-		            </div> /list-collection-row-icon -->
-		            <div class="list-collection-row-offset">
-		              <a href="{% url 'single-microcosm' item.id %}">
-		                <h2 class="row-title">
-                      {{ item.title }}
-                      {% if item.meta.flags.unread %}
-                      <span class="label label-warning">NEW</span>
-                      {% endif %}
-                    </h2>
+								</div> /list-collection-row-icon -->
+								<div class="list-collection-row-offset">
+									<h2 class="row-title">
+										<a href="{% url 'single-microcosm' item.id %}">{{ item.title }}</a>
+										{% if item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
+									</h2>
 
-		              </a>
-		              <div class="row-meta">
-		                <p class="microcosm-item-description">
-		                  {{ item.description }}
-		                </p>
-		              </div>
-		            </div>
-		          </div>
+									<div class="row-meta">
+										<p class="microcosm-item-description">
+											{{ item.description }}
+										</p>
+									</div>
+								</div>
+							</div>
 
-		          <div class="col-sm-4 col-md-5">
+							<div class="col-sm-4 col-md-5">
 
-              {% if content.meta.permissions.moderator %}
-                <div class="list-collection-row-admin">
-                  <input class="row-admin-checkbox" type="checkbox" />
-                </div>
-              {% endif %}
+							{% if content.meta.permissions.moderator %}
+								<div class="list-collection-row-admin">
+									<input class="row-admin-checkbox" type="checkbox" />
+								</div>
+							{% endif %}
 
-		            <div class="row-stats">
-		              <ul class="list-stats">
-		                <li>
-		                  <span>{{ item.total_items }}</span>
-		                  conversation{{ item.total_items|pluralize:",s" }}
-		                </li>
-		                <li>
-		                  <span>{{ item.total_comments }}</span>
-		                  comment{{ item.total_comments|pluralize:",s" }}
-		                </li>
-		              </ul>
-		            </div>
-		            <div class="row-context">
-		              {#<input type="checkbox" class="row-admin-checkbox" /> #}
-		              {% if item.most_recent_update %}
+								<div class="row-stats">
+									<ul class="list-stats">
+										<li>
+											<span>{{ item.total_items }}</span>
+											conversation{{ item.total_items|pluralize:",s" }}
+										</li>
+										<li>
+											<span>{{ item.total_comments }}</span>
+											comment{{ item.total_comments|pluralize:",s" }}
+										</li>
+									</ul>
+								</div>
+								<div class="row-context">
+									{#<input type="checkbox" class="row-admin-checkbox" /> #}
+									{% if item.most_recent_update %}
 
-			              <a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">
-			              	{{ item.most_recent_update.title|truncatechars:30 }}
-			              </a>
-		              	{% if item.most_recent_update.total_comments %}
-		              		<time datetime="{{ item.most_recent_update.last_comment_created|date:"c" }}"></time>
-                      {% comment %}
-                      by <a href="{% url 'single-profile' item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a>
-                      {% endcomment %}
-                    {% else%}
-		              		<time datetime="{{ item.most_recent_update.meta.created|date:"c" }}"></time>
-                      {% comment %}
-                       by <a href="{% url 'single-profile' item.most_recent_update.meta.created_by.id %}">{{ item.most_recent_update.meta.created_by.profile_name }}</a>
-                      {% endcomment %}
-                    {% endif %}
-		              {% endif %}
-		            </div>
+										<a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">
+											{{ item.most_recent_update.title|truncatechars:30 }}
+										</a>
+										{% if item.most_recent_update.total_comments %}
+											<time datetime="{{ item.most_recent_update.last_comment_created|date:"c" }}"></time>
+											{% comment %}
+											by <a href="{% url 'single-profile' item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a>
+											{% endcomment %}
+										{% else%}
+											<time datetime="{{ item.most_recent_update.meta.created|date:"c" }}"></time>
+											{% comment %}
+											 by <a href="{% url 'single-profile' item.most_recent_update.meta.created_by.id %}">{{ item.most_recent_update.meta.created_by.profile_name }}</a>
+											{% endcomment %}
+										{% endif %}
+									{% endif %}
+								</div>
 
-		          </div>
-		        </div>
-		      </li>
-		  {% endfor %}
-		  </ul>
+							</div>
+						</div>
+					</li>
+			{% endfor %}
+			</ul>
 		</div>
 {% endif %}
 </div>
@@ -106,14 +102,14 @@
 {% include "forms/content-moderation.html" %}
 
 <div class="content-footer padded">
-  <div class="row">
-    <div class="col-sm-8">
-      {% include 'breadcrumbs.html' %}
-    </div>
-    <div class="col-sm-4">
-      {% include 'pagination.html' %}
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div>
 
 {% endblock %}
@@ -122,47 +118,47 @@
 
 	{% if content.meta.permissions.create %}
 	<div class="metabar-module">
-    <h5>Got something to add?</h5>
-    <a href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary">
-      <span class="glyphicon glyphicon-folder-open"></span> Create a microcosm
-    </a>
-  </div> <!-- primary actions -->
+		<h5>Got something to add?</h5>
+		<a href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary">
+			<span class="glyphicon glyphicon-folder-open"></span> Create a microcosm
+		</a>
+	</div> <!-- primary actions -->
 	{% endif %}
 
-  <div class="metabar-module">
-    <h5>About</h5>
-    <div class="metabar-module-title">
-      <h3>
-        {{ site.title }}
-      </h3>
-      <p>
-        {{ site.description }}
-      </p>
-    </div>
-  </div> <!-- / about -->
+	<div class="metabar-module">
+		<h5>About</h5>
+		<div class="metabar-module-title">
+			<h3>
+				{{ site.title }}
+			</h3>
+			<p>
+				{{ site.description }}
+			</p>
+		</div>
+	</div> <!-- / about -->
 
 
-  <div class="metabar-module">
-    <h5>Population</h5>
-    <ul class="list-group">
-      <li class="list-group-item">
-        <span class="badge-alt">{{ site.meta.stats.totalProfiles }}</span>
-        Members
-      </li>
-      <li class="list-group-item">
-        <span class="badge-alt">{{ site.meta.stats.totalConversations }}</span>
-        Conversations
-      </li>
-      <li class="list-group-item">
-        <span class="badge-alt">{{ site.meta.stats.totalComments }}</span>
-        Comments
-      </li>
-      <li class="list-group-item">
-        <span class="badge-alt">{{ site.meta.stats.onlineProfiles }}</span>
-        Members online now
-      </li>
-    </ul>
-  </div> <!-- / population -->
+	<div class="metabar-module">
+		<h5>Population</h5>
+		<ul class="list-group">
+			<li class="list-group-item">
+				<span class="badge-alt">{{ site.meta.stats.totalProfiles }}</span>
+				Members
+			</li>
+			<li class="list-group-item">
+				<span class="badge-alt">{{ site.meta.stats.totalConversations }}</span>
+				Conversations
+			</li>
+			<li class="list-group-item">
+				<span class="badge-alt">{{ site.meta.stats.totalComments }}</span>
+				Comments
+			</li>
+			<li class="list-group-item">
+				<span class="badge-alt">{{ site.meta.stats.onlineProfiles }}</span>
+				Members online now
+			</li>
+		</ul>
+	</div> <!-- / population -->
 
 
 {% endblock%}
