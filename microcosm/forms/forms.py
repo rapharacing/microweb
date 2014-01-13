@@ -79,6 +79,7 @@ class EventCreate(ItemForm):
 
     where = django.forms.CharField(
         max_length='150',
+        required=False,
         label='Where is the event being held?',
         widget=longTextInput,
         error_messages={
