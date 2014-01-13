@@ -13,6 +13,8 @@
 
     var filters = function(options){
 
+      options.query = decodeURIComponent(options.query)
+
       if(typeof options.el !== 'undefined'){
         this.$el = $(options.el);
       }
@@ -48,7 +50,7 @@
 
       var params          = this.parse(),
           new_query       = this.query + (params.length>0 ? '+' + params : ''),
-          formatted_query = this.url.replace(/\$1/g,new_query);
+          formatted_query = this.url.replace(/\$1/g, new_query);
 
       window.location.href = formatted_query;
     };
