@@ -1,17 +1,14 @@
 {% extends 'microweb_templates/base.html' %}
+
+{% block title %}{% if form.id > 0 %}Edit event{% else %}Start an event{% endif %}{% endblock title %}
+
 {% block content %}
 <div class="content-header padded">
 	<div class="row">
 		<div class="col-sm-12">
 		</div>
 	</div>
-	<h1>
-		{% if form.id > 0 %}
-		Edit event
-		{% else %}
-		Start an event
-		{% endif %}
-	</h1>
+	<h1>{% if form.id > 0 %}Edit event{% else %}Start an event{% endif %}</h1>
 
 </div>
 

@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
+
+{% block title %}{% if form.id > 0 %}Edit conversation{% else %}Start a conversation{% endif %}{% endblock title %}
+
 {% block content %}
 
 	<div class="content-header padded">
 		<div class="row">
 			<div class="col-sm-12"></div>
 		</div>
-		<h1>{% if form.id > 0 %}Start a conversation{% else %}Edit conversation{% endif %}</h1>
+		<h1>{% if form.id > 0 %}Edit conversation{% else %}Start a conversation{% endif %}</h1>
 	</div>
 
 	<div class="content-body">

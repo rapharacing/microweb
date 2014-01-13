@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
-{% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
+
 {% load conversation %}
 {% load event %}
+
+{% block title %}{{ content.title }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
+
+{% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
+
 {% block content %}
 
 <div class="content-header padded">

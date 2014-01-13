@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}{% if form.id > 0 %}Edit event{% else %}Start an event{% endif %}{% endblock title %}
+
 {% block css %}
 <!-- Leaflet -->
 <link href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.css" rel="stylesheet" type="text/css" />

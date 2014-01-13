@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
+
 {% load comments %}
+
+{% block title %}{{ content.title }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
+
 {% block ga %},'dimension2': '{{ content.meta.created_by.id }}'
 			,'dimension3': '{{ content.microcosm_id }}'{% endblock%}
 

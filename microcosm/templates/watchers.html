@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 
+{% block title %}Watchers{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
+
+
 {% block content %}
 	<section class="row margin-bottom-half">
 		<h1>Items you're watching</h1>
