@@ -36,25 +36,17 @@
 
 								<div class="list-collection-row-icon">
 									{% spaceless %}
-
 										{% if update.update_type == "new_comment" or update.update_type == "new_comment_in_huddle" %}
-
 											{% if update.parent_item_type == "conversation" or update.item_type == "conversation" %}
-
 												<span class="sprite sprite-speech-bubble"></span>
-
 											{% elif update.parent_item_type == "event" or update.item_type == "event" %}
-
 												<span class="sprite sprite-calendar"></span>
-
 											{% endif %}
 										{% endif %}
-
 									{% endspaceless %}
 								</div> <!--/list-collection-row-icon -->
 
 								<div class="list-collection-row-offset">
-
 
 									<div class="row-title-wrapper">
 										{# new comment #}
@@ -63,7 +55,9 @@
 											<a href="{{ update.parent_link }}/newest/">
 												<h3 class="row-title">{{ update.parent_item.title }}</h3>
 											</a>
-											<span class="label label-warning">NEW COMMENT</span>
+											{% if update.meta.flags.unread %}
+											<span class="label label-warning">NEW</span>
+											{% endif %}
 
 										{# reply to comment #}
 										{% elif update.update_type == "reply_to_comment" %}
@@ -105,8 +99,8 @@
 													{{ update.item.title }}
 												</h3>
 											</a>
-											{% if update.item_type == "comment" %}
-													{{ update.item.html | safe }}
+											{% if update.meta.flags.unread %}
+											<span class="label label-warning">NEW</span>
 											{% endif %}
 
 										{# new attendee #}
@@ -143,8 +137,7 @@
 											<a href="{{ update.parent_link }}">
 												{{ update.parent_text }}
 											</a>
-
-									{% endif %}
+										{% endif %}
 									</div> <!-- /row-title-wrapper-->
 
 									<div class="row-meta">
