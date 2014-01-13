@@ -64,7 +64,7 @@
 												 class="form-control {% if form.errors.description %}error{% endif %}"
 												 id="description"
 												 name="{{ form.description.name }}" placeholder="Description of microcosm"
-												 maxlength={{ form.description.maxlength }} />
+												 maxlength={{ form.description.max_length }} />
 								</div>
 
 							</div>
@@ -120,17 +120,19 @@ var form = new FormValidator(
 	document.getElementById('microcosmForm'),
 	{
 		rules : {
-			'{{ form.title.name }}' 		 : 'not_empty',
-			'{{ form.description.name }}': ['not_empty' ]
+			'{{ form.title.name }}' 		 : ['not_empty','maxlength'],
+			'{{ form.description.name }}': ['not_empty','maxlength']
+		},
+		tests : {
+			'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
 		},
 		error_messages : {
 			'{{ form.title.name }}:not_empty' : "* {{ form.fields.title.error_messages.required }}",
+			'{{ form.title.name }}:maxlength' : "* {{ form.fields.title.error_messages.max_length }}",
 			'{{ form.description.name }}:not_empty' : "* {{ form.fields.description.error_messages.required }}",
+			'{{ form.description.name }}:maxlength' : "* {{ form.fields.description.error_messages.max_length }}",
 		}
 	}
 );
-
-
-
 </script>
 {% endblock %}

@@ -25,7 +25,7 @@
 		<div class="col-xs-12">
 			<div class="form-container-inner padded">
 
-				<form class="form-create-event" role="form" action="" method="POST">
+				<form id="eventForm" class="form-create-event" role="form" action="" method="POST">
 
 					{% csrf_token %}
 					{{ form.microcosmId }}
@@ -391,10 +391,11 @@
 									tabindex="1"
 								></textarea>
 								<div class="reply-box-footer">
-									<a href="javascript:void 0">
+									<a href="#" class="formatting-help-handle" data-toggle="modal" data-target="#formatting-help-modal">
 										<span class="sprite sprite-help-small"></span>
 										Formatting help
 									</a>
+									{% include 'modal_formatting_help.html' %}
 								</div>
 						</div> <!-- /reply-box -->
 
@@ -453,6 +454,7 @@
 
 <script src="{{ STATIC_URL }}js/leaflet.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/eventFormClasses.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/peopleWidget.js"></script>
 <script type="text/javascript">
@@ -535,6 +537,26 @@
 		attendees : 'input[name={{ form.rsvpLimit.name }}]'
 	});
 
+
+	/////////////////////
+	// form validation //
+	/////////////////////
+
+	var form = new FormValidator(
+		document.getElementById('eventForm'),
+		{
+			rules : {
+				'{{ form.title.name }}'      : ['not_empty','maxlength']
+			},
+			tests : {
+				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
+			},
+			error_messages : {
+				'{{ form.title.name }}:not_empty' : "* {{ form.fields.title.error_messages.required }}",
+				'{{ form.title.name }}:maxlength' : "* {{ form.fields.title.error_messages.max_length }}"
+			}
+		}
+	);
 
 })();
 </script>
