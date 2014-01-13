@@ -1,83 +1,81 @@
 <li id="{{ item.item_type }}{{ item.item.id }}"
-    class="list-collection-row {% if item.is_pinned %}row-pinned{% endif %} {% if item.is_deleted %}row-deleted{% endif %}">
+		class="list-collection-row {% if item.is_pinned %}row-pinned{% endif %} {% if item.is_deleted %}row-deleted{% endif %}">
 
-  <div class="row">
-    <div class="col-sm-8 col-md-7 col-lg-8">
+	<div class="row">
+		<div class="col-sm-8 col-md-7 col-lg-8">
 
-      <div class="list-collection-row-icon">
-        {% if item.flags.sticky %}
-          <span class="sprite sprite-pushpin"></span>
-        {% endif %}
-          <span class="sprite sprite-speech-bubble"></span>
-      </div>
+			<div class="list-collection-row-icon">
+				{% if item.flags.sticky %}
+					<span class="sprite sprite-pushpin"></span>
+				{% endif %}
+					<span class="sprite sprite-speech-bubble"></span>
+			</div>
 
-      <div class="list-collection-row-offset">
+			<div class="list-collection-row-offset">
 
-        <div class="row-title-wrapper">
-          <a href="/{{ item.item_type }}s/{{ item.item.id }}/{% if user %}newest/{% endif %}">
-            <h3 class="row-title">{{ item.item.title }}</h3>
-          </a>
-        </div>
+				<div class="row-title-wrapper">
+					<h3 class="row-title">
+						<a href="/{{ item.item_type }}s/{{ item.item.id }}/{% if user %}newest/{% endif %}">{{ item.item.title }}</a>
+						{% if item.item.meta.flags.unread %}<span class="label label-warning">New</span>{% endif %}
+					</h3>
+				</div>
 
-        {% if not item.item.meta.flags.sticky %}
-        <div class="row-meta">
+				{% if not item.item.meta.flags.sticky %}
+				<div class="row-meta">
 
-        {% if item.item.meta.created_by %}
-          <a href="{% url 'single-profile' item.item.meta.created_by.id %}">
-            <img src="{% if 'gravatar' in item.item.meta.created_by.avatar %}{{ item.item.meta.created_by.avatar }}{% elif 'files' in  item.item.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ item.item.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.item.meta.created_by.profile_name }}" />
-            @{{ item.item.meta.created_by.profile_name|truncatechars:25 }}
-          </a>
+				{% if item.item.meta.created_by %}
+					<a href="{% url 'single-profile' item.item.meta.created_by.id %}">
+						<img src="{% if 'gravatar' in item.item.meta.created_by.avatar %}{{ item.item.meta.created_by.avatar }}{% elif 'files' in  item.item.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ item.item.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.item.meta.created_by.profile_name }}" />
+						@{{ item.item.meta.created_by.profile_name|truncatechars:25 }}
+					</a>
 
-            started <time datetime="{{ item.item.meta.created|date:"c" }}"></time>
+						started <time datetime="{{ item.item.meta.created|date:"c" }}"></time>
 
-        {% endif %}
+				{% endif %}
 
-        </div>
-        {% endif %}
-      </div>
-    </div>
+				</div>
+				{% endif %}
+			</div>
+		</div>
 
-    <div class="col-sm-4 col-md-5 col-lg-4">
+		<div class="col-sm-4 col-md-5 col-lg-4">
 
-      {% if content.meta.permissions.moderator %}
-      <div class="list-collection-row-admin">
-        <input class="row-admin-checkbox" type="checkbox" />
-      </div>
-      {% endif %}
+			{% if content.meta.permissions.moderator %}
+			<div class="list-collection-row-admin">
+				<input class="row-admin-checkbox" type="checkbox" />
+			</div>
+			{% endif %}
 
-      {% if item.total_comments or item.total_views %}
-      <div class="row-stats">
+			{% if item.total_comments or item.total_views %}
+			<div class="row-stats">
 
-        <ul class="list-stats list-stats-sm">
+				<ul class="list-stats list-stats-sm">
 
-          <li>
-            {% if item.item.meta.flags.unread %}
-            <span class="label label-warning">New</span>
-            {% endif %}
-            <span>{{ item.total_comments }}</span>
-            comment{{ item.total_comments|pluralize:",s"}}
-          </li>
-          {% if item.total_views %}
-          <li>
-            <span>{{ item.total_views }}</span>
-            view{{ item.total_views|pluralize:",s"}}
-          </li>
-          {% endif %}
-        </ul>
+					<li>
+						<span>{{ item.total_comments }}</span>
+						comment{{ item.total_comments|pluralize:",s"}}
+					</li>
+					{% if item.total_views %}
+					<li>
+						<span>{{ item.total_views }}</span>
+						view{{ item.total_views|pluralize:",s"}}
+					</li>
+					{% endif %}
+				</ul>
 
-      </div>
-      {% endif %}
+			</div>
+			{% endif %}
 
-      {% if not item.item.flags.sticky %}
-        <div class="row-context">
-          {% if item.last_comment_created %}
-            <a href="{% url 'single-profile' item.last_comment_created_by.id %}">
-              @{{item.last_comment_created_by.profile_name }}
-            </a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
-          {% endif %}
-        </div>
-      {% endif %}
+			{% if not item.item.flags.sticky %}
+				<div class="row-context">
+					{% if item.last_comment_created %}
+						<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
+							@{{item.last_comment_created_by.profile_name }}
+						</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
+					{% endif %}
+				</div>
+			{% endif %}
 
-    </div>
-  </div>
-  </li>
+		</div>
+	</div>
+	</li>
