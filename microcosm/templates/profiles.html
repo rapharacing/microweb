@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}People{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
+{% block title %}People{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
 
 {% block content %}
 <div class="content-header padded">

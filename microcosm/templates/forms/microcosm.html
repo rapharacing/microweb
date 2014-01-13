@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if form.id > 0 %}Edit this microcosm{% else %}Create a microcosm{% endif %}{% endblock title %}
+{% block title %}{% if form.id > 0 %}Edit this microcosm{% else %}Create a microcosm{% endif %} | {{ site.title }}{% endblock title %}
 
 {% block content %}
 

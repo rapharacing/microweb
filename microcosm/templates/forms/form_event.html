@@ -1,6 +1,6 @@
 {% extends 'microweb_templates/base.html' %}
 
-{% block title %}{% if form.id > 0 %}Edit event{% else %}Start an event{% endif %}{% endblock title %}
+{% block title %}{% if form.id > 0 %}Edit event{% else %}Start an event{% endif %} | {{ site.title }}{% endblock title %}
 
 {% block content %}
 <div class="content-header padded">
