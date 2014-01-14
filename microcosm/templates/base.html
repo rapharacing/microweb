@@ -86,7 +86,6 @@
 													<span class="sprite sprite-envelope-small"></span>
 													<strong>Huddles</strong>
 												</a>
-												<span class="label label-warning navbar-profile-huddle-label">NEW</span>
 											</div>
 										{% else %}
 											<div class="navbar-profile-row-4">
@@ -111,13 +110,13 @@
 						<!-- Collect the nav links, forms, and other content for toggling -->
 						<div class="collapse navbar-collapse">
 							<ul class="nav navbar-nav">
-								<li class="active">
+								<li {% if not site_section or site_section == "microcosm"%}class="active"{% endif %}>
 									<a href="{% url 'index' %}">Microcosms</a>
 								</li>
-								<li>
+								<li {% if site_section == "trending"%}class="active"{% endif %}>
 									<a href="#">Trending</a>
 								</li>
-								<li>
+								<li {% if site_section == "updates"%}class="active"{% endif %}>
 									<a href="{% url 'list-updates' %}">
 										{% if user.unread_count %}
 										<span class="badge pull-right">{{ user.unread_count }}</span>
@@ -125,7 +124,7 @@
 										Updates
 									</a>
 								</li>
-								<li>
+								<li {% if site_section == "people"%}class="active"{% endif %}>
 									<a href="{% url 'list-profiles' %}">People</a>
 								</li>
 								<li class="dropdown">

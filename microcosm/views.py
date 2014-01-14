@@ -486,7 +486,8 @@ class ProfileView(object):
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'item_type': 'profile',
-			'site': request.site
+			'site': request.site,
+			'site_section' : 'people'
 		}
 
 		profile = Profile.retrieve(
@@ -531,7 +532,8 @@ class ProfileView(object):
 			'q': q,
 			'top': top,
 			'following': following,
-			'alphabet': string.ascii_lowercase
+			'alphabet': string.ascii_lowercase,
+			'site_section' : 'people'
 		}
 
 		return render(request, ProfileView.list_template, view_data)
@@ -1320,6 +1322,7 @@ class UpdateView(object):
 
 		if not request.access_token:
 			pass
+			# FIXME: need a user friendly error page for unregistered users
 			# raise HttpResponseNotAllowed
 		else:
 			# pagination offset
@@ -1337,7 +1340,8 @@ class UpdateView(object):
 			view_data.update({
 				'user': Profile(responses[request.whoami_url], summary=False),
 				'content': updates_list,
-				'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates)
+				'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates),
+				'site_section' : 'updates'
 			})
 
 		return render(request, UpdateView.list_template, view_data)
