@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-
+{% load conversation %}
+{% load event %}
 {% block title %}Search for {{ content.query.searched }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
 
 {% block content %}
@@ -40,13 +41,17 @@
 		<ul class="list-collection bordered padded">
 			{% for result in content.results.items %}
 
+				{% if result.item_type == 'conversation' %}
+					{% conversation result %}
+				{% elif result.item_type == 'event' %}
+					{% event result %}
+				{% elif result.item_type == "microcosm" %}
 				{# MICROCOSMS #}
-				{% if result.item_type == "microcosm" %}
 				<li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
 					<div class="row">
 						<div class="col-sm-12">
 							<div class="list-collection-row-icon">
-								<span class="sprite sprite-folder-open"></span>
+								<a class="sprite sprite-microcosm" title="Microcosm"></a>
 							</div>
 							<div class="list-collection-row-offset">
 								<div class="row-title">
@@ -66,13 +71,13 @@
 					<div class="row">
 						<div class="col-sm-12">
 							<div class="list-collection-row-icon">
-								<span class="sprite sprite-user"></span>
+								<a class="sprite sprite-user" title="User"></a>
 							</div>
 							<div class="list-collection-row-offset">
-								<div class="row-title">
+								<div class="row-title row-title-profile">
 									<a href="{% url 'single-profile' result.item.id %}">
 										<img src="{% if 'gravatar' in result.item.avatar %}{{result.item.avatar}}{% elif 'files' in result.item.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.profile_name }}" align="left" class="img-badge"/>
-										<h3 class="row-title">@{{ result.item.profile_name }}</h3>
+										<strong>@{{ result.item.profile_name }}</strong>
 									</a>
 								</div>
 							</div>
@@ -80,57 +85,59 @@
 					</div>
 				</li>
 				{% else %}
-				<li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
-					<div class="row">
-						<div class="col-sm-12">
-							<div class="list-collection-row-icon">
-								{% if result.item_type == 'event' %}
-								<span class="sprite sprite-calendar"></span>
-								{% else %}
-								<span class="sprite sprite-speech-bubble"></span>
-								{% endif %}
-							</div>
-							<div class="list-collection-row-offset">
-								<div class="row-title">
 
-									{% if result.item_type == 'conversation' or result.item_type == 'event'%}
-									<a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">
-										<h3 class="row-title">{{ result.highlight|safe }}</h3>
-									</a>
+					<li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="list-collection-row-icon">
+									{% if result.item_type == 'event' %}
+									<a class="sprite sprite-calendar" title="Event"></a>
 									{% else %}
-									<a href="{{ result.item.meta.links.self.href }}/incontext/">
-										<h3 class="row-title">{{ result.parent_item.title }}</h3>
-									</a>
+									<a class="sprite sprite-speech-bubble-single" title="Comment"></a>
 									{% endif %}
-
 								</div>
-								<div class="row-meta">
-									in
-									{% if result.item_type == 'comment'%}
-									<a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title }}</a>
-									{% else %}
-									<a href="{{ result.item.meta.links.microcosm.href }}">{{ result.item.meta.links.microcosm.title }}</a>
-									{% endif %}
-									&bull; <time datetime="{{ result.item.meta.created|date:"c" }}">{{ result.item.meta.created|timesince }}</time>
+								<div class="list-collection-row-offset">
 
-									{% if result.item_type == 'comment'%}
-									<div class="row-meta-excerpt">
-										<a href="{% url 'single-profile' result.item.meta.created_by.id %}">
-											<img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
+									<div class="row-title">
+
+										{% if result.item_type == 'conversation' or result.item_type == 'event'%}
+										<a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">
+											<h3 class="row-title">{{ result.highlight|safe }}</h3>
 										</a>
-										<div class="row-meta-excerpt-text">
-											{{ result.highlight|safe }}
-										</div>
-									</div>
-									{% endif %}
+										{% else %}
+										<a href="{{ result.item.meta.links.self.href }}/incontext/">
+											<h3 class="row-title">{{ result.parent_item.title }}</h3>
+										</a>
+										{% endif %}
 
+									</div>
+									<div class="row-meta">
+										in
+										{% if result.item_type == 'comment'%}
+										<a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title }}</a>
+										{% else %}
+										<a href="{{ result.item.meta.links.microcosm.href }}">{{ result.item.meta.links.microcosm.title }}</a>
+										{% endif %}
+										&bull; <time datetime="{{ result.item.meta.created|date:"c" }}">{{ result.item.meta.created|timesince }}</time>
+
+										{% if result.item_type == 'comment'%}
+										<div class="row-meta-excerpt">
+											<a href="{% url 'single-profile' result.item.meta.created_by.id %}">
+												<img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
+											</a>
+											<div class="row-meta-excerpt-text">
+												{{ result.highlight|safe }}
+											</div>
+										</div>
+										{% endif %}
+
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				</li>
-				{% endif %}
-			{% endfor %}
+					</li>
+			{% endif %}
+		{% endfor %}
 	</ul>
 
 </div>
@@ -212,7 +219,7 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/filters.js"></script>
 <script type="text/javascript">
 (function(){
-	new Filters({
+	window.search_filters = new Filters({
 		el     : '.metabar-filters',
 		query  : '{{ content.query.searched | urlencode }}',
 		url    : '?q=$1'

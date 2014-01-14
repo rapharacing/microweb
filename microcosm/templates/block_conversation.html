@@ -8,7 +8,7 @@
 				{% if item.flags.sticky %}
 					<span class="sprite sprite-pushpin"></span>
 				{% endif %}
-					<span class="sprite sprite-speech-bubble"></span>
+					<a class="sprite sprite-speech-bubble" title="Conversation"></a>
 			</div>
 
 			<div class="list-collection-row-offset">
@@ -48,14 +48,18 @@
 
 			<div class="row-stats">
 				<ul class="list-stats list-stats-sm">
+					{% if item.total_comments >= 0 %}
 					<li>
 						<span>{{ item.total_comments }}</span>
 						comment{{ item.total_comments|pluralize:",s"}}
 					</li>
+					{% endif %}
+					{% if item.total_views >= 0 %}
 					<li>
 						<span>{{ item.total_views }}</span>
 						view{{ item.total_views|pluralize:",s"}}
 					</li>
+					{% endif %}
 				</ul>
 			</div>
 

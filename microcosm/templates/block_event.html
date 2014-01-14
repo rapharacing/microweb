@@ -8,7 +8,7 @@
 				{% if item.flags.sticky %}
 					<span class="sprite sprite-pushpin"></span>
 				{% endif %}
-					<span class="sprite sprite-calendar"></span>
+					<a class="sprite sprite-calendar" title="Event"></a>
 			</div>
 
 			<div class="list-collection-row-offset">
@@ -56,59 +56,30 @@
 			{% endif %}
 
 			<div class="row-stats">
-
 				<ul class="list-stats list-stats-sm">
-
+					{% if item.total_comments >= 0%}
 					<li>
 						<span>{{ item.total_comments }}</span>
 						comment{{ item.total_comments|pluralize:",s"}}
 					</li>
+					{% endif %}
+					{% if item.total_views >= 0%}
 					<li>
 						<span>{{ item.total_views }}</span>
 						view{{ item.total_views|pluralize:",s"}}
 					</li>
+					{% endif %}
 				</ul>
-
 			</div>
 
 			{% if not item.flags.sticky %}
 
 				<div class="row-context">
-
-						{% if item.item.rsvp_limit > 0 and rsvp_percentage and rsvp_percentage > 0 %}
-
-							<div class="item-event-attending"
-									 data-toggle="tooltip"
-									 title="{{ item.item.rsvp_attend }} people are attending this event">
-								<div class="progress">
-									<div class="progress-bar"
-											 role="progressbar"
-											 aria-valuenow="{{rsvp_percentage}}"
-											 aria-valuemin="0"
-											 aria-valuemax="100"
-											 style="width: {{rsvp_percentage}}%;">
-										<span class="sr-only">{{rsvp_percentage}}% Complete</span>
-									</div>
-								</div>
-									{{ item.item.rsvp_attend|default:"0" }}/{{ item.item.rsvp_limit }}
-							</div>
-
-						{% elif item.item.rsvp_attend > 0 %}
-							{{ item.item.rsvp_attend }} {{ item.item.rsvp_attend|pluralize:"person,people" }} are going
-						{% else %}
-
-							{% if item.last_comment_created %}
-								<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
-									@{{item.last_comment_created_by.profile_name }}
-								</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
-							{% endif %}
-
-						{% endif %}
-
-
-
-
-
+					{% if item.last_comment_created %}
+						<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
+							@{{item.last_comment_created_by.profile_name }}
+						</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
+					{% endif %}
 				</div>
 
 			{% endif %}

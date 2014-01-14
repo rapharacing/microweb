@@ -21,7 +21,7 @@
 
       if(typeof options.query !== 'undefined'){
         // replaces existing params
-        this.query = options.query.replace(/\s\w+:\w+/g,'');
+        this.query = options.query.replace(/\s?\w+:\w+/g,'');
       }
 
       if(typeof options.url !== 'undefined'){
