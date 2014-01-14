@@ -16,6 +16,11 @@
         }
       }
 
+      this.no_attachments = false;
+      if (typeof opts.no_attachments !== 'undefined'){
+        this.no_attachments = opts.no_attachments;
+      }
+
       this.textarea = this.$el.find('textarea')[0];
 
       this.form = this.$el.find('form');
@@ -201,7 +206,7 @@
       }
 
       // add attachments
-      if (typeof FileHandler !== 'undefined'){
+      if (typeof FileHandler !== 'undefined' && !this.no_attachments){
         this.fileHandler = new FileHandler({
           el : this.$el.find('.reply-box-attachments')[0],
           dropzone : '.reply-box-drop-zone, .reply-box-attachments-gallery'
