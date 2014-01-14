@@ -28,7 +28,7 @@
 			<ul class="list-people list-people-md">
 				{% for profile in content.participants %}
 				<li>
-					<a href="{% url 'single-profile' profile.id %}">
+					<a href="{% url 'single-profile' profile.id %}" data-toggle="tooltip" title="{{ profile.profile_name }}">
 						<img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name }}" />
 					</a>
 				</li>
@@ -36,7 +36,7 @@
 			</ul>
 
 			<a class="btn btn-default btn-group-responsive-toggle simple-toggle" data-rel=".huddle-actions">
-				<span class="glyphicon glyphicon-arrow-down"></span>
+				<span class="sprite sprite-arrow-down"></span>
 			</a>
 			<div class="btn-group-responsive huddle-actions">
 				{% if content.meta.permissions.owner %}

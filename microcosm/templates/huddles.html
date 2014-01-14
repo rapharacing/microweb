@@ -28,14 +28,16 @@
 			<div class="row">
 				<div class="col-sm-8">
 
-					<!--<div class="list-collection-row-icon">
-
-					</div> /list-collection-row-icon -->
+					<div class="list-collection-row-icon">
+						<a class="sprite sprite-speech-bubble" title="Huddle"></a>
+					</div>
 					<div class="list-collection-row-offset">
 
-						<a href="{% url 'newest-huddle' item.id %}">
-							<h3 class="row-title">{{ item.title }}</h3>
-						</a>
+						<h3 class="row-title">
+							<a href="{% url 'newest-huddle' item.id %}">
+								{{ item.title }}
+							</a>
+						</h3>
 						<div class="row-meta">
 							{% if item.last_comment_created %}
 
