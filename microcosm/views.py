@@ -1179,11 +1179,35 @@ class CommentView(object):
 
 		if request.method == 'POST':
 			form = CommentForm(request.POST)
+
 			if form.is_valid():
 				comment_request = Comment.from_create_form(form.cleaned_data)
 				comment_response = comment_request.create(request.META['HTTP_HOST'], access_token=request.access_token)
-				if comment_response.meta.links.get('commentPage'):
-					return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
+
+				if comment_response.id > 0:
+					if request.FILES.has_key('attachments'):
+
+						for f in request.FILES.getlist('attachments'):
+							file_request = FileMetadata.from_create_form(f)
+							# File must be under 30KB
+							# TODO: use Django's built-in field validators and error messaging
+							if len(file_request.file['files']) >= 30720:
+								print('file attachment error: some files too big')
+								view_data['form'] = form
+								view_data['avatar_error'] = 'Sorry, the file you upload must be under 30KB and square.'
+								return render(request, CommentView.form_template, view_data)
+							else:
+								print('file attachment: OK')
+								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+								Attachment.create(
+									request.META['HTTP_HOST'],
+									file_metadata.file_hash,
+									comment_id=comment_response.id,
+									access_token=request.access_token
+								)
+
+					if comment_response.meta.links.get('commentPage'):
+						return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
 				else:
 					return HttpResponseRedirect(reverse('single-comment', args=(comment_response.id,)))
 			else:
