@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load commentBox %}
 {% block title %}Edit profile | {{ site.title }}{% endblock title %}
 
 {% block content %}
@@ -19,8 +19,8 @@
 
 			<div class="row form-container">
 				<div class="col-lg-12">
+					<form id="profileform" role="form" action="{% url 'edit-profile' user.id %}" method="POST" enctype="multipart/form-data">
 					<div class="form-container-inner padded">
-						<form role="form" action="{% url 'edit-profile' user.id %}" method="POST" enctype="multipart/form-data">
 
 							{% csrf_token %}
 							{{ form.id }}
@@ -43,7 +43,7 @@
 											name="{{ form.profileName.name }}"
 											value="{{ form.profileName.value }}"
 											placeholder="Enter username..."
-											maxlength="50"
+											maxlength="{{ form.fields.profileName.max_length}}"
 											tabindex="1"
 										/>
 									</div>
@@ -56,7 +56,12 @@
 									<label class="col-sm-12" for="title">{{ form.avatar.label }}</label>
 									<div class="col-sm-12">
 										<div class="form-file-upload">
-											<label>
+											<label
+												{% if 'files' in user.avatar %}
+												class="active"
+												style="background-image:url('https://{{site.subdomain_key}}.microco.sm{{user.avatar}}')"
+												{% endif %}
+											>
 												<span>Click here</span>
 												<input
 													name="{{ form.avatar.name }}"
@@ -88,38 +93,9 @@
 
 									<label class="col-sm-12" for="reply-box-textarea">Tell us about yourself</label>
 									<div class="col-sm-12">
-
-										<div class="reply-box">
-												<ul>
-													<li class="se-bold"><strong>Bold</strong></li>
-													<li class="se-italics"><i>Italics</i></li>
-													<li class="se-quote">Quote</li>
-													<li class="se-link"><span class="glyphicon glyphicon-link"></span> Link</li>
-													<li class="se-list"><span class="glyphicon glyphicon-th-list"></span> List</li>
-													<li class="se-image"><span class="glyphicon glyphicon-picture"></span> Image</li>
-												</ul>
-												<textarea
-													id="reply-box-textarea"
-													name="{{ comment_form.markdown.name }}"
-													placeholder="Enter your text here..."
-													maxlength="5000"
-													tabindex="1"
-												></textarea>
-												<div class="reply-box-footer">
-													<div class="reply-box-attachments">
-														<div class="reply-box-attachments-gallery"></div>
-														<span class="reply-box-drop-zone">Drag your files into this area</span> or
-														<label for="reply-box-attachments">upload a file</label>
-														<input type="file" id="reply-box-attachments" name="attachments" multiple/>
-													</div>
-													<a href="javascript:void 0" class="formatting-help-handle">
-														<span class="glyphicon glyphicon-question-sign"></span>
-														Formatting help
-													</a>
-												</div>
-											</div>
+										<input type="hidden" name="comment_id" value="{{ comment_form.id.value }}" />
+										{% commentBox as_component=True no_attachments=True %}
 									</div>
-
 								</div>
 							</div> <!-- /form-group -->
 
@@ -136,7 +112,6 @@
 							</div>
 						</div>
 					</div>
-
 				</form>
 		</div>
 	</div>
@@ -144,18 +119,18 @@
 </div>
 
 {% endblock content %}
-{% block metabar %}
+{% block sidebar %}
 
 <div class="metabar-module">
 	<h5>About</h5>
 	<div class="metabar-module-title">
 		<h3>
-			Profile
+			Edit Profile
 		</h3>
 	</div>
 </div> <!-- / about -->
 
-{% endblock metabar %}
+{% endblock %}
 
 {% block js %}
 
@@ -164,10 +139,11 @@
 <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
 <script type="text/javascript">
-// (function(){
+(function(){
 
 	var commentBox = new simpleEditor({
-		el : '.reply-box'
+		el 					   : '.reply-box',
+		no_attachments : true
 	});
 
 	if (typeof ProfilePicture !== 'undefined'){
@@ -176,6 +152,26 @@
 		});
 	}
 
-// })();
+	/////////////////////
+	// form validation //
+	/////////////////////
+
+	var form = new FormValidator(
+		document.getElementById('profileform'),
+		{
+			rules : {
+				'{{ form.profileName.name }}'      : ['not_empty','maxlength']
+			},
+			tests : {
+				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
+			},
+			error_messages : {
+				'{{ form.profileName.name }}:not_empty' : "* {{ form.fields.profileName.error_messages.required }}",
+				'{{ form.profileName.name }}:maxlength' : "* {{ form.fields.profileName.error_messages.max_length }}"
+			}
+		}
+	);
+
+})();
 </script>
 {% endblock js %}

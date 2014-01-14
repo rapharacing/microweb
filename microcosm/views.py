@@ -570,6 +570,32 @@ class ProfileView(object):
 						)
 				profile_request = Profile(form.cleaned_data)
 				profile_response = profile_request.update(request.META['HTTP_HOST'], request.access_token)
+
+				if request.POST.get('markdown') and len(request.POST.get('markdown')) > 0:
+
+					if request.POST.get('comment_id'):
+
+						payload = {
+							'itemType'  : 'profile',
+							'itemId'    : profile_response.id,
+							'markdown'  : request.POST.get('markdown'),
+							'inReplyTo' : 0
+						}
+
+						if request.POST['comment_id'] == "None":
+
+							comment = Comment.from_create_form(payload)
+							comment.create(request.META['HTTP_HOST'], request.access_token)
+
+						elif request.POST['comment_id'].is_digit():
+
+							payload['id'] = request.POST.get('comment_id')
+							comment_request  = Comment.from_edit_form(payload)
+							comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
+
+						else:
+							pass
+
 				return HttpResponseRedirect(reverse('single-profile', args=(profile_response.id,)))
 			else:
 				view_data['form'] = form
@@ -582,6 +608,10 @@ class ProfileView(object):
 				request.access_token
 			)
 			view_data['form'] = ProfileView.edit_form(user_profile.as_dict)
+
+			comment_form = CommentForm(initial=dict(itemId=user_profile.id, itemType='profile'))
+			view_data['comment_form'] = comment_form
+
 			return render(request, ProfileView.form_template, view_data)
 
 		else:
