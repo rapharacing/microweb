@@ -22,6 +22,13 @@
         csrfmiddlewaretoken: this.token
       }
 
+      if (typeof this.data.itemId == 'function'){
+        this.data.itemId = this.data.itemId.call(this);
+      }
+      if (typeof this.data.itemType == 'function'){
+        this.data.itemType = this.data.itemType.call(this);
+      }
+
       this.is_subscribed = typeof opts.is_subscribed !== 'undefined' ? opts.is_subscribed : false;
 
       this.bind();

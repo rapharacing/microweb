@@ -1137,6 +1137,12 @@ class Event(APIResource):
         # RSVP limit is always returned, even if zero
         event.rsvp_limit = data['rsvpLimit']
 
+        # For progress bar
+        if event.rsvp_limit > 0:
+            event.rsvp_percentage = 0
+            if data.get('rsvpAttend'):
+                event.rsvp_percentage = (event.rsvp_attend/float(event.rsvp_limit))*100
+
         if data.get('when'): event.when = parse_timestamp(data['when'])
         if data.get('where'): event.where = data['where']
         if data.get('lat'): event.lat = data['lat']

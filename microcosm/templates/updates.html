@@ -28,6 +28,7 @@
 			{% else %} {# else has content.updates.items #}
 
 			<ul class="list-collection bordered padded">
+
 				{% for update in content.updates.items %}
 					<li class="list-collection-row">
 						<div class="row">
@@ -35,15 +36,19 @@
 							<div class="col-sm-10">
 
 								<div class="list-collection-row-icon">
-									{% spaceless %}
-										{% if update.update_type == "new_comment" or update.update_type == "new_comment_in_huddle" %}
-											{% if update.parent_item_type == "conversation" or update.item_type == "conversation" %}
-												<span class="sprite sprite-speech-bubble"></span>
-											{% elif update.parent_item_type == "event" or update.item_type == "event" %}
-												<span class="sprite sprite-calendar"></span>
-											{% endif %}
-										{% endif %}
-									{% endspaceless %}
+								{% if update.parent_item_type %}
+									{% if update.parent_item_type == "conversation" %}
+										<span class="sprite sprite-speech-bubble"></span>
+									{% elif update.parent_item_type == "event" %}
+										<span class="sprite sprite-calendar"></span>
+									{% endif %}
+								{% else %}
+									{% if update.item_type == "conversation" %}
+										<span class="sprite sprite-speech-bubble"></span>
+									{% elif update.item_type == "event" %}
+										<span class="sprite sprite-calendar"></span>
+									{% endif %}
+								{% endif %}
 								</div> <!--/list-collection-row-icon -->
 
 								<div class="list-collection-row-offset">
@@ -52,9 +57,13 @@
 										{# new comment #}
 										{% if update.update_type == "new_comment" %}
 
-											<a href="{{ update.parent_link }}/newest/">
-												<h3 class="row-title">{{ update.parent_item.title }}</h3>
-											</a>
+
+											<h3 class="row-title">
+												<a href="{{ update.parent_link }}/newest/">
+												{{ update.parent_item.title }}
+												</a>
+											</h3>
+
 											{% if update.meta.flags.unread %}
 											<span class="label label-warning">NEW</span>
 											{% endif %}
@@ -62,20 +71,34 @@
 										{# reply to comment #}
 										{% elif update.update_type == "reply_to_comment" %}
 
-											<a href="{{ update.profile_link }}">
-												<h3 class="row-title">@{{ update.item.meta.created_by.profile_name }}</h3>
-											</a> replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
+											<h3 class="row-title">
+												<a href="{{ update.profile_link }}">
+													@{{ update.item.meta.created_by.profile_name }}
+												</a>
+											</h3> replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
 
-											<div class="microcosm-item-update-text">
-												{{ update.item.html | safe }}
+											<div class="row-meta">
+
+												<div class="row-meta-excerpt">
+													<a href="{% url 'single-profile' update.item.meta.created_by.id %}">
+														<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
+													</a>
+													<div class="row-meta-excerpt-text">
+														{{ update.item.html | safe }}
+													</div>
+												</div>
+
 											</div>
 
 										{# mentioned #}
 										{% elif update.update_type == "mentioned" %}
 
-											<a href="{{ update.profile_link }}">
-												<h3 class="row-title">@{{ update.item.meta.created_by.profile_name }}</h3>
-											</a> mentioned you in
+											<h3 class="row-title">
+												<a href="{{ update.profile_link }}">
+													@{{ update.item.meta.created_by.profile_name }}
+												</a>
+											</h3>
+											mentioned you in
 											<a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
 
 											<div class="row-meta">
@@ -96,7 +119,7 @@
 
 											<a href="{{ update.item_link }}">
 												<h3 class="row-title">
-													{{ update.item.title }}
+													{{ update.item.title|safe }}
 												</h3>
 											</a>
 											{% if update.meta.flags.unread %}
@@ -106,15 +129,17 @@
 										{# new attendee #}
 										{% elif update.update_type == "new_attendee" %}
 
-											<a href="{{ update.item_link }}/newest/">
-												<h3 class="row-title">{{ update.item.title }}</h3>
-											</a>
+											<h3 class="row-title">
+												<a href="{{ update.item_link }}/newest/">
+													{{ update.item.title|safe }}
+												</a>
+											</h3>
 
 										{# new vote #}
 										{% elif update.update_type == "new_vote" %}
 
 											<a href="{{ update.item_link }}/newest/">
-												<h3 class="row-title">{{ update.item.title }}</h3>
+												<h3 class="row-title">{{ update.item.title|safe }}</h3>
 											</a>
 
 										{# new event reminder #}
@@ -122,7 +147,7 @@
 
 											<a href="{{ update.item_link }}">
 												<h3 class="row-title">
-													{{ update.item.title }}
+													{{ update.item.title|safe }}
 												</h3>
 											</a>
 											{% if update.item_type == "comment" %}
@@ -131,9 +156,11 @@
 
 										{# new item #}
 										{% elif update.update_type == "new_item" %}
-											<a href="{{ update.item_link }}/newest/">
-												<h3 class="row-title">{{ update.item.title }}</h3>
-											</a> was started in
+											<h3 class="row-title">
+												<a href="{{ update.item_link }}">
+													{{ update.item.title|safe }}
+												</a>
+											</h3> was started in
 											<a href="{{ update.parent_link }}">
 												{{ update.parent_text }}
 											</a>
@@ -160,6 +187,53 @@
 												poll
 											{% endif %}
 										</a>
+
+										{% if update.item_type == "event" %}
+												{% if update.item.rsvp_limit %}
+												<div class="row-meta-progress">
+													<div class="progress">
+														<div class="progress-bar"
+																 role="progressbar"
+																 aria-valuenow="{{update.item.rsvp_percentage}}"
+																 aria-valuemin="0"
+																 aria-valuemax="100"
+																 style="width: {{update.item.rsvp_percentage}}%;">
+															<span class="sr-only">{{update.item.rsvp_percentage}}% Complete</span>
+														</div>
+													</div>
+													<strong>
+														{{ update.item.rsvp_attend|default:"0" }}/{{ update.item.rsvp_limit }}
+													</strong>
+												</div>
+											{% endif %}
+										{% endif %}
+										&bull;
+
+										<div class="inline-subscribe">
+											<div class="btn-switch on active"
+												{% if update.parent_item_type %}
+													 data-content-id="{{ update.parent_item.id }}"
+													 data-content-type="{{ update.parent_item_type }}"
+												{% else %}
+													 data-content-id="{{ update.item.id }}"
+													 data-content-type="{{ update.item_type }}"
+												{% endif %}
+											>
+												<div class="btn-switch-state loading">
+													<img src="/static/img/preloader.gif" />
+												</div>
+												<div class="btn-switch-state off">
+													<span class="sprite sprite-ok-small"></span>
+														removed from updates (<a class="btn-switch-on" href="javascript:void 0">undo?</a>)
+												</div>
+												<div class="btn-switch-state on">
+													<a class="btn-switch-off" href="javascript:void 0">
+														unsubcribe
+													</a>
+												</div>
+											</div>
+										</div>
+
 									</div> <!-- /row-meta -->
 
 								</div> <!-- /list-row-collection-offset -->
@@ -186,6 +260,17 @@
 	</div> <!-- /list-updates -->
 
 </div><!-- /content-body -->
+
+<div class="content-footer">
+	<div class="row">
+		<div class="col-sm-7">
+		</div>
+		<div class="col-sm-5">
+			{% include 'pagination.html' %}
+		</div>
+
+	</div>
+</div>
 
 {% endblock %}
 
@@ -214,3 +299,20 @@
 
 
 {% endblock%}
+{% block js %}
+<script type="text/javascript">
+
+$('.inline-subscribe').each(function(index,item){
+	console.log(item);
+	var subscribe = new Subscribe({
+		el    : item,
+		url   : '{% url 'single-watcher' %}',
+		id    : function(){ return this.button.attr('data-content-id'); },
+		type  : function(){ return this.button.attr('data-content-type'); },
+		token : '{{ csrf_token }}',
+		is_subscribed : true
+	});
+});
+
+</script>
+{% endblock %}
