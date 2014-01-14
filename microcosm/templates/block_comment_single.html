@@ -33,7 +33,7 @@
 
 				{% if comment.in_reply_to %}
 				<span class="sprite sprite-arrow-forward"></span>
-				<span>
+				<span class="comment-item-in-reply-to">
 					in reply to
 					<a href="{% url 'incontext-comment' comment.in_reply_to %}">
 						@{{ comment.meta.links.inReplyToAuthor.title }}
