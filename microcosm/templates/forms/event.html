@@ -67,7 +67,7 @@
 									name="{{ form.title.name }}"
 									value="{{ form.title.value|default:"" }}"
 									placeholder="Title of event"
-									maxlength="150"
+									maxlength="{{ form.fields.title.max_length }}"
 									tabindex="1"
 								/>
 							</div>

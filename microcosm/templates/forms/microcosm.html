@@ -42,7 +42,8 @@
 									<input type="text"
 												 class="form-control {% if form.errors.title %}error{% endif %}"
 												 id="title"
-												 name="{{ form.title.name }}" placeholder="Title of microcosm" />
+												 name="{{ form.title.name }}" placeholder="Title of microcosm"
+												 maxlength="{{ form.fields.title.max_length }}" />
 								</div>
 
 							</div>
@@ -64,12 +65,12 @@
 												 class="form-control {% if form.errors.description %}error{% endif %}"
 												 id="description"
 												 name="{{ form.description.name }}" placeholder="Description of microcosm"
-												 maxlength={{ form.description.max_length }} />
+												 maxlength="{{ form.fields.description.max_length }}" />
 								</div>
 
 							</div>
 						</div> <!-- /form-group -->
-		
+
 						{{ form.visibility }}
 
 						{# reason #}
@@ -115,7 +116,7 @@
 {% block js %}
 <script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
 <script type="text/javascript">
-	
+
 var form = new FormValidator(
 	document.getElementById('microcosmForm'),
 	{

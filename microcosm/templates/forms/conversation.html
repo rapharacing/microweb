@@ -43,7 +43,7 @@
 										class="form-control {% if form.errors.title %}error{% endif %}"
 										id="title"
 										name="{{ form.title.name }}" placeholder="Title of conversation"
-										maxlength="150"
+										maxlength="{{ form.fields.title.max_length }}"
 										tabindex="1"
 									/>
 								</div>
