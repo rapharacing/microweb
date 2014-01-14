@@ -100,6 +100,7 @@ INSTALLED_APPS = (
     'microcosm.templatetags.comments',
     'microcosm.templatetags.conversation',
     'microcosm.templatetags.event',
+    'microcosm.templatetags.commentBox',
 )
 
 # The values below in must be initialised in local_settings.py
