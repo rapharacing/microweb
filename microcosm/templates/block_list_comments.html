@@ -2,7 +2,11 @@
   <div class="row">
     <div class="col-sm-12">
       <div class="list-collection-row-icon">
+      {% if result.parent_item_type == 'huddle' %}
+        <a class="sprite sprite-envelope" title="Huddle"></a>
+      {% else %}
         <a class="sprite sprite-speech-bubble-single" title="Comment"></a>
+      {% endif %}
       </div>
       <div class="list-collection-row-offset">
 
