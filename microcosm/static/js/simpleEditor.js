@@ -177,7 +177,6 @@
 
     simpleEditor.prototype.removeAttachmentFile = function(e){
       var self = $(e.currentTarget);
-      console.log(self, this.fileHandler, self.index());
       this.fileHandler.removeFile(self.index());
     };
 
@@ -194,7 +193,6 @@
     };
     simpleEditor.prototype.onKeyupHandler = function(e){
       var _this = e.currentTarget;
-      console.log(e.which);
 
       if (typeof this.peopleWidget !== 'undefined'){
         if ([32,13].indexOf(e.which)>-1){
@@ -270,7 +268,6 @@
 
               profileName = queryRefs[queryRefs.length-1];
 
-              //console.log(queryRefs, profileName,invited[0].profileName, '/\\'+profileName+'\\s?$/');
 
               re = new RegExp();
               re.compile('\\'+profileName+'\\s?$');
@@ -283,8 +280,6 @@
               this.textarea.focus();
               this.textarea.selectionStart = this.textarea.selectionEnd
             }
-          }else{
-            console.log('empty');
           }
 
         },this));
