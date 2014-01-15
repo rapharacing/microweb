@@ -130,6 +130,8 @@ def populate_item(itemtype, itemdata):
         item = Profile.from_summary(itemdata)
     elif itemtype == 'microcosm':
         item = Microcosm.from_summary(itemdata)
+    elif itemtype == 'huddle':
+        item = Huddle.from_summary(itemdata)
     else:
         item = None
     return item
