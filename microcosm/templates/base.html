@@ -39,65 +39,74 @@
 								<span class="sprite sprite-menu-2"></span>
 							</button>
 
-								<div class="row">
-									<div class="col-sm-3 col-md-3 col-lg-2 navbar-brand">
-										<a href="/" title="Return to Homepage">
-											<img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" />
-										</a>
-									</div>
+							<div class="row">
+								<div class="col-sm-3 col-md-3 col-lg-2 navbar-brand">
+									<a href="/" title="Return to Homepage">
+										<img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" />
+									</a>
+								</div>
 
 
-									<div class="col-sm-8 col-md-6 col-lg-6 navbar-search">
-										<form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
-											<div class="input-group">
-												<label class="input-group-addon" for="navbar-search-input">
-													<span class="sprite sprite-search-small"></span>
-												</label>
-												<input
-													type="text"
-													id="navbar-search-input"
-													class="form-control"
-													name="q"
-													placeholder="Search conversations, events and people..."
-													{% if content.query.searched %}value="{{content.query.searched|escape}}"{% endif %}
-													tabindex="1"
-												/>
-											</div>
-										</form>
-									</div> <!-- /navbar-search -->
+								<div class="col-sm-8 col-md-6 col-lg-6 navbar-search">
+									<form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
+										<div class="input-group">
+											<label class="input-group-addon" for="navbar-search-input">
+												<span class="sprite sprite-search-small"></span>
+											</label>
+											<input
+												type="text"
+												id="navbar-search-input"
+												class="form-control"
+												name="q"
+												placeholder="Search conversations, events and people..."
+												{% if content.query.searched %}value="{{content.query.searched|escape}}"{% endif %}
+												tabindex="1"
+											/>
+										</div>
+									</form>
+								</div> <!-- /navbar-search -->
 
-									<div class="col-md-3 col-lg-2 navbar-profile">
-										{% if user %}
-											<div class="navbar-profile-row-1">
-												<a href="{% url 'edit-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">
-													<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
-													<strong>{{ user.profile_name }}</strong>
-												</a>
+								<div class="col-md-3 col-lg-2 navbar-profile">
+									{% if user %}
+										<div class="navbar-profile-row-1">
+											<a href="{% url 'edit-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">
+												<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
+												<strong>{{ user.profile_name }}</strong>
+											</a>
 
-												<a class="navbar-profile-logout" href="{% url 'logout' %}">
-													<span class="sprite sprite-logout"></span>
-												</a>
-												<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">
+											<a class="navbar-profile-logout" href="{% url 'logout' %}">
+												<span class="sprite sprite-logout"></span>
+											</a>
+											<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">
+												{% if user and user.meta.stats.unreadHuddles > 0 %}
+													<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope"></span></span>
+												{% else %}
 													<span class="sprite sprite-envelope"></span>
-												</a>
-											</div>
-											<div class="navbar-profile-row-2">
-												<a href="{% url 'list-huddle'%}">
+												{% endif %}
+											</a>
+										</div>
+										<div class="navbar-profile-row-2">
+											<a href="{% url 'list-huddle'%}">
+												{% if user and user.meta.stats.unreadHuddles > 0 %}
+													<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope-small"></span></span>
+												{% else %}
 													<span class="sprite sprite-envelope-small"></span>
-													<strong>Huddles</strong>
-												</a>
-											</div>
-										{% else %}
-											<div class="navbar-profile-row-4">
-											Browsing as guest.
-											</div>
-											<div class="navbar-profile-row-5">
-												<button class="btn btn-primary" id="login_link" onclick="login()">
-													Sign In or Register
-												</button>
-											</div>
-										{% endif %}
-										</div><!-- /.navbar-profile -->
+												{% endif %}
+												<strong>Huddles</strong>
+												
+											</a>
+										</div>
+									{% else %}
+										<div class="navbar-profile-row-4">
+										Browsing as guest.
+										</div>
+										<div class="navbar-profile-row-5">
+											<button class="btn btn-primary" id="login_link" onclick="login()">
+												Sign In or Register
+											</button>
+										</div>
+									{% endif %}
+								</div><!-- /.navbar-profile -->
 							</div>
 						</div>
 
@@ -118,10 +127,10 @@
 								</li>
 								<li {% if site_section == "updates"%}class="active"{% endif %}>
 									<a href="{% url 'list-updates' %}">
-										{% if user.unread_count %}
-										<span class="badge pull-right">{{ user.unread_count }}</span>
-										{% endif %}
 										Updates
+										{% if user and user.meta.stats.unreadUpdates > 0 and site_section != "updates" %}
+										<span class="label label-warning">NEW</span>
+										{% endif %}
 									</a>
 								</li>
 								<li {% if site_section == "people"%}class="active"{% endif %}>
@@ -140,14 +149,11 @@
 									</ul>
 								</li>
 							</ul>
-
 						</div><!-- /.navbar-collapse -->
 					</div>
 				</div>
 			</div> <!-- / navbar-nav-wrapper -->
-
 		</nav> <!-- /nav -->
-
 
 		<div class="container main">
 			<div class="row">
@@ -170,8 +176,6 @@
 				</div> <!-- / metabar -->
 			</div>
 		</div>
-
-
 
 		{% if not user %}
 		<!-- Persona Login Form (submitted by persona login action, not directly by user) -->
