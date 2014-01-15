@@ -25,7 +25,6 @@
 
 					{% if item.item.meta.created_by %}
 					<a href="{% url 'single-profile' item.item.meta.created_by.id %}">
-						<img src="{% if 'gravatar' in item.item.meta.created_by.avatar %}{{ item.item.meta.created_by.avatar }}{% elif 'files' in  item.item.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ item.item.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.item.meta.created_by.profile_name }}" />
 						@{{ item.item.meta.created_by.profile_name|truncatechars:25 }}
 					</a>
 
