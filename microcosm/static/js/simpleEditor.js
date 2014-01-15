@@ -21,10 +21,6 @@
         this.no_attachments = opts.no_attachments;
       }
 
-      this.no_peopleWidget = false;
-      if (typeof opts.no_peopleWidget !== 'undefined'){
-        this.no_peopleWidget = opts.no_peopleWidget;
-      }
 
       this.textarea = this.$el.find('textarea')[0];
 
@@ -242,50 +238,37 @@
         },this));
       }
 
-      // add peoplepicker
-      if (typeof PeopleWidget !== 'undefined' && !this.no_peopleWidget){
+      var subdomain = $('meta[name="subdomain"]').attr('content');
+      var static_url = subdomain;
+      var dataSource = subdomain + '/api/v1/profiles?disableBoiler&top=true&q=';
 
-        var subdomain = $('meta[name="subdomain"]').attr('content');
+      $(this.textarea).textcomplete([
+        {
+          match: /\B@([\-+\w]*)$/,
+          search: function (term, callback) {
 
-        this.peopleWidget = new PeopleWidget({
-          el         : this.textarea,
-          is_textbox : true,
-          static_url : subdomain,
-          dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q=',
-          show_on_focus : false,
-          follow_caret : true
-        });
-        this.peopleWidget.on = false;
+            var _term = term,
+                _callback = callback;
 
-        this.peopleWidget.onSelection($.proxy(function(invited){
-
-          var queryRefs, profileName, re;
-
-          if (invited.length > 0){
-
-            queryRefs = this.textarea.value.match(/[+@]{1}(\w+)$/ig);
-
-            if (queryRefs !== null){
-
-              profileName = queryRefs[queryRefs.length-1];
-
-
-              re = new RegExp();
-              re.compile('\\'+profileName+'\\s?$');
-
-              this.textarea.value = this.textarea.value.replace( re,profileName[0]+invited[0].profileName);
-              this.textarea.focus();
-              this.textarea.selectionStart = this.textarea.selectionEnd
-            }
-          }
-          this.peopleWidget.hide();
-          this.peopleWidget.people_invited = [];
-          this.peopleWidget.on = false;
-
-        },this));
-
-      }
-
+            $.ajax({
+              url : dataSource + term,
+            }).success(function(data){
+              console.log(_term,data);
+              _callback($.map(data.profiles.items, function (person) {
+                  return person.profileName.toLowerCase().indexOf(_term.toLowerCase()) === 0 ? person : null;
+              }));
+            });
+          },
+          template: function (person) {
+              return '<img src="' + static_url + person.avatar + '" /> @' + person.profileName;
+          },
+          replace: function (person) {
+              return '@' + person.profileName;
+          },
+          index: 1,
+          maxCount: 5
+        }
+      ]);
     };
 
     return simpleEditor;
