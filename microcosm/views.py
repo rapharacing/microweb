@@ -503,12 +503,23 @@ class ProfileView(object):
 		Display a single profile by ID.
 		"""
 
+		# Search
+		search_url, params, headers = Search.build_request(
+			request.META['HTTP_HOST'],
+			params = dict(limit=5, q=u'type:microcosm type:conversation type:event type:comment authorId:' + profile_id, sort='date'),
+			access_token=request.access_token
+		)
+		request.view_requests.append(grequests.get(search_url, params=params, headers=headers))
+		#responses = response_list_to_dict(grequests.map(request.view_requests))
+
+		# Profile
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'item_type': 'profile',
 			'site': request.site,
-			'site_section' : 'people'
+			'search': Search.from_api_response(responses[search_url]),
+			'site_section': 'people'
 		}
 
 		profile = Profile.retrieve(
