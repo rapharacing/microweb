@@ -194,24 +194,4 @@ eventMap.restore(
 </script>
 
 {% endif %} {# endif user #}
-
-{% if content.comments.page > 1 %}
-{% comment %}
-Toggle for event single page item event div for small screens
-{% endcomment %}
-<script type="text/javascript">
-	(function(){
-		// expanding item-event-div
-		$('.item-event-expand-handle').on('click',function(){
-			if ($('.item-event-compact').hasClass('item-event-expanded')){
-				$('.item-event-compact').removeClass('item-event-expanded');
-			}else{
-				$('.item-event-compact').addClass('item-event-expanded');
-			}
-		});
-	})();
-</script>
-{% endif %} {# endif contents.comments.page > 1 #}
-
-
 {% endblock js %}
