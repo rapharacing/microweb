@@ -232,5 +232,8 @@
 			ga('{{ site.subdomain_key }}.send', 'pageview', gaData);{% endif %}
 		</script>
 
+		{% if not user %}
+			{% include 'modal_signin.html' %}
+		{% endif %}
 	</body>
 <html>
