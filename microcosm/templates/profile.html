@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load list_comment %}
 {% load conversation %}
 {% load event %}
 
@@ -14,7 +14,7 @@
 						</div>
 					</div>
 
-					<div class="content-body padded">
+					<div class="content-body">
 
 						<div class="profile-header">
 
@@ -64,112 +64,32 @@
 						<div class="profile-section">
 
 						{% if search.results.items|length == 0 %}
-							<div class="list-search-empty bordered padded">
-								<h2>Recent activity</h2>
+							<h3 class="padded">Recent activity</h3>
+							<div class="empty-state padded">
 								<p>
 									This person has not yet posted anything.
 								</p>
 							</div>
 						{% else %}
+							<h3 class="padded">Recent activity</h3>
 							<ul class="list-collection bordered padded">
-								<h2>Recent activity</h2>
+							{% for result in search.results.items %}
 
-								{% for result in search.results.items %}
+								{% if result.item_type == 'conversation' %}
 
-									{% if result.item_type == 'conversation' %}
-										{% conversation result %}
-									{% elif result.item_type == 'event' %}
-										{% event result %}
-									{% elif result.item_type == "microcosm" %}
-									{# MICROCOSMS #}
-								<li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
-									<div class="row">
-										<div class="col-sm-12">
-											<div class="list-collection-row-icon">
-												<a class="sprite sprite-microcosm" title="Microcosm"></a>
-											</div>
-											<div class="list-collection-row-offset">
-												<div class="row-title">
-													<a href="{{ result.item.meta.links.self.href }}">
-														<h3 class="row-title">{{ result.item.title }}</h3>
-													</a>
-												</div>
-												<div class="row-meta">
-													{{ result.item.description }}
-												</div>
-											</div>
-										</div>
-									</div>
-								</li>
-									{% elif result.item_type == "profile" %}
-								<li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
-									<div class="row">
-										<div class="col-sm-12">
-											<div class="list-collection-row-icon">
-												<a class="sprite sprite-user" title="User"></a>
-											</div>
-											<div class="list-collection-row-offset">
-												<div class="row-title row-title-profile">
-													<a href="{% url 'single-profile' result.item.id %}">
-														<strong>@{{ result.item.profile_name }}</strong>
-													</a>
-												</div>
-											</div>
-										</div>
-									</div>
-								</li>
-									{% else %}
+									{% conversation result %}
 
-								<li id="{{ result.itemType }}{{ result.item.id }}" class="list-collection-row">
-									<div class="row">
-										<div class="col-sm-12">
-											<div class="list-collection-row-icon">
-												{% if result.item_type == 'event' %}
-												<a class="sprite sprite-calendar" title="Event"></a>
-												{% else %}
-												<a class="sprite sprite-speech-bubble-single" title="Comment"></a>
-												{% endif %}
-											</div>
-											<div class="list-collection-row-offset">
+								{% elif result.item_type == 'event' %}
 
-												<div class="row-title">
+									{% event result %}
 
-													{% if result.item_type == 'conversation' or result.item_type == 'event'%}
-													<a href="/{{ result.item_type }}s/{{ result.item.id }}/{% if user %}newest/{% endif %}">
-														<h3 class="row-title">{{ result.highlight|safe }}</h3>
-													</a>
-													{% else %}
-													<a href="{{ result.item.meta.links.self.href }}/incontext/">
-														<h3 class="row-title">{{ result.parent_item.title }}</h3>
-													</a>
-													{% endif %}
+								{% elif result.item_type == 'comment' %}
 
-												</div>
-												<div class="row-meta">
-													in
-													{% if result.item_type == 'comment'%}
-													<a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title }}</a>
-													{% else %}
-													<a href="{{ result.item.meta.links.microcosm.href }}">{{ result.item.meta.links.microcosm.title }}</a>
-													{% endif %}
-													&bull; <time datetime="{{ result.item.meta.created|date:"c" }}">{{ result.item.meta.created|timesince }}</time>
+									{% list_comment result %}
 
-													{% if result.item_type == 'comment'%}
-													<div class="row-meta-excerpt">
-														<div class="row-meta-excerpt-text">
-															{{ result.highlight|safe }}
-														</div>
-													</div>
-													{% endif %}
-
-												</div>
-											</div>
-										</div>
-									</div>
-								</li>
 								{% endif %}
-							{% endfor %}
 
+							{% endfor %}
 							</ul>
 						{% endif %}
 						</div>
@@ -183,7 +103,7 @@
 		<h5>Got something to add?</h5>
 		<div class="metabar-module-primary-buttons">
 			<a href="#" class="btn btn-large btn-block btn-primary">
-				<span class="glyphicon glyphicon-envelope"></span> Send message
+				<span class="sprite sprite-envelope-small"></span> Send message
 			</a>
 		</div>
 	</div> <!-- primary actions -->
