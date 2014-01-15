@@ -1625,15 +1625,6 @@ class SearchView(object):
 				'pagination': build_pagination_links(responses[url]['results']['links'], search.results)
 			}
 
-			from pprint import pprint
-
-			for i in search.results.items:
-				try:
-					if (i.parent_item_type == "huddle"):
-						pprint(i.item.__dict__)
-				except AttributeError:
-					pass
-
 			return render(request, SearchView.single_template, view_data)
 		else:
 			return HttpResponseNotAllowed(['POST',])

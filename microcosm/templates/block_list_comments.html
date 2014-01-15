@@ -1,0 +1,43 @@
+<li class="list-collection-row">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="list-collection-row-icon">
+        <a class="sprite sprite-speech-bubble-single" title="Comment"></a>
+      </div>
+      <div class="list-collection-row-offset">
+
+        <div class="row-title">
+          <a href="{{ result.item.meta.links.self.href }}/incontext/">
+            <h3 class="row-title">{{ result.parent_item.title }}</h3>
+          </a>
+        </div>
+
+        <div class="row-meta">
+          <div class="row-meta-small">
+            in
+            <a href="{{ result.parent_item.meta.links.microcosm.href }}">
+              {{ result.parent_item.meta.links.microcosm.title }}
+            </a>
+            &bull;
+            <time datetime="{{ result.item.meta.created|date:"c" }}">
+              {{ result.item.meta.created|timesince }}
+            </time>
+          </div>
+          <div class="row-meta-excerpt">
+            <a href="{% url 'single-profile' result.item.meta.created_by.id %}">
+              <img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
+            </a>
+            <div class="row-meta-excerpt-text">
+              {% if result.item.highlight %}
+                {{ result.item.highlight|safe }}
+              {% else %}
+                {{ result.item.html|safe }}
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</li>
