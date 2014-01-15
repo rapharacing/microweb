@@ -24,6 +24,9 @@
 				data-max="{{ pagination.total_pages }}">
 		<input type="text" class="form-control" value="{{ pagination.page }}"/>
 		<input name="offset" type="hidden" />
+		{% if content.query and content.query.searched %}
+		<input name="q" type="hidden" value="{{ content.query.searched }}" />
+		{% endif %}
 	</form>
 	of {{ pagination.total_pages }}
 	{% else %}

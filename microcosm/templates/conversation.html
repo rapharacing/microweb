@@ -83,9 +83,15 @@
 	<div class="metabar-module">
 		<h5>Got something to add?</h5>
 		<div class="metabar-module-primary-buttons">
+			{% if user %}
 			<a id="post-a-reply-handle" href="#reply" class="btn btn-large btn-block btn-primary">
 				<span class="sprite sprite-speech-bubble-small"></span> Post a reply
 			</a>
+			{% else %}
+				<a href="#reply" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin">
+					<span class="sprite sprite-speech-bubble-small"></span> Post a reply
+				</a>
+			{% endif %}
 		</div>
 	</div> <!-- primary actions -->
 
@@ -114,6 +120,7 @@
 {% if user %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/comments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
 <script type="text/javascript">
