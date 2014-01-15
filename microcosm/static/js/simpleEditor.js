@@ -21,6 +21,11 @@
         this.no_attachments = opts.no_attachments;
       }
 
+      this.no_peopleWidget = false;
+      if (typeof opts.no_peopleWidget !== 'undefined'){
+        this.no_peopleWidget = opts.no_peopleWidget;
+      }
+
       this.textarea = this.$el.find('textarea')[0];
 
       this.form = this.$el.find('form');
@@ -146,12 +151,6 @@
       }
     };
 
-    simpleEditor.prototype.calcTextareaHeight = function(e){
-      var _this = e.currentTarget;
-      _this.style.minHeight = _this.scrollHeight + 'px';
-    };
-
-
     simpleEditor.prototype.clearAttachmentGallery = function(e){
       this.$el.find('.reply-box-attachments-gallery').html("");
       this.fileHandler.clear();
@@ -182,6 +181,28 @@
       this.fileHandler.removeFile(self.index());
     };
 
+    simpleEditor.prototype.onKeypressHandler = function(e){
+      var _this = e.currentTarget;
+
+      if (typeof this.peopleWidget !== 'undefined'){
+        if ([64,43].indexOf(e.which)>-1){
+          this.peopleWidget.on = true;
+          this.peopleWidget.show();
+        }
+      }
+
+    };
+    simpleEditor.prototype.onKeyupHandler = function(e){
+      var _this = e.currentTarget;
+      console.log(e.which);
+
+      if (typeof this.peopleWidget !== 'undefined'){
+        if ([32,13].indexOf(e.which)>-1){
+          this.peopleWidget.on = false;
+          this.peopleWidget.hide();
+        }
+      }
+    };
 
     simpleEditor.prototype.bind = function(){
 
@@ -194,7 +215,8 @@
         ['click',    '.se-link',    'link'],
         ['click',    '.se-list',    'list'],
         ['click',    '.se-image',   'image'],
-        ['keyup',    'textarea',    'calcTextareaHeight'],
+        ['keypress', 'textarea',    'onKeypressHandler'],
+        ['keyup',    'textarea',    'onKeyupHandler'],
         ['reset',    'form',        'clearAttachmentGallery'],
 
         ['click',    '.reply-box-attachments-gallery li', 'removeAttachmentFile']
@@ -219,6 +241,54 @@
         this.fileHandler.onRemove($.proxy(function(files){
           this.renderAttachmentGallery(files);
         },this));
+      }
+
+      // add peoplepicker
+      if (typeof PeopleWidget !== 'undefined' && !this.no_peopleWidget){
+
+        var subdomain = $('meta[name="subdomain"]').attr('content');
+
+        this.peopleWidget = new PeopleWidget({
+          el         : this.textarea,
+          is_textbox : true,
+          static_url : subdomain,
+          dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q=',
+          show_on_focus : false,
+          follow_caret : true
+        });
+        this.peopleWidget.on = false;
+
+        this.peopleWidget.onSelection($.proxy(function(invited){
+
+          var queryRefs, profileName, re;
+
+          if (invited.length > 0){
+
+            queryRefs = this.textarea.value.match(/[+@]{1}(\w+)$/ig);
+
+            if (queryRefs !== null){
+
+              profileName = queryRefs[queryRefs.length-1];
+
+              //console.log(queryRefs, profileName,invited[0].profileName, '/\\'+profileName+'\\s?$/');
+
+              re = new RegExp();
+              re.compile('\\'+profileName+'\\s?$');
+
+              this.textarea.value = this.textarea.value.replace( re,profileName[0]+invited[0].profileName);
+
+              this.peopleWidget.hide();
+              this.peopleWidget.people_invited = [];
+
+              this.textarea.focus();
+              this.textarea.selectionStart = this.textarea.selectionEnd
+            }
+          }else{
+            console.log('empty');
+          }
+
+        },this));
+
       }
 
     };

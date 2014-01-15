@@ -27,6 +27,14 @@
         this.static_url = options.static_url;
       }
 
+      this.show_on_focus = true;
+      if (typeof options.show_on_focus !== 'undefined'){
+        this.show_on_focus = options.show_on_focus;
+      }
+
+      this.on = true; // flag to "pause" the widget
+
+
       this.isActive = false; // flag to keep the popover from closing
 
       this.container    = this.createWidgetContainer();
@@ -280,7 +288,9 @@
 
     peopleWidget.prototype.calcPopoverPosition = function(){
 
-      var offset = this.calcTriggerOffset();
+      var offset;
+
+      offset = this.calcTriggerOffset();
       if (this.is_textbox){
         offset.left = offset.left - (this.$el.outerWidth()/2);
       }else{
@@ -338,8 +348,14 @@
     };
 
     peopleWidget.prototype.changeHandler = function(e){
-      e.preventDefault();
-      e.stopPropagation();
+
+      if (this.widget_input.type !== 'textarea'){
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      if (!this.on){
+        return;
+      }
 
       var currentList = this.excludeInvitedPeople(this.people);
 
@@ -354,6 +370,7 @@
         }
 
       }else if ( [38, 40].indexOf(e.which)!==-1 ){
+
 
         switch (e.which){
           case 38:
@@ -377,8 +394,18 @@
 
       }else{
         if ($.trim(this.widget_input.value) !== ''){
+
+          var new_query = this.widget_input.value;
+
+          if (this.widget_input.type === 'textarea'){
+            var queryRefs = this.widget_input.value.match(/[+@](\w+)\s*?/ig);
+            if (queryRefs !== null){
+              new_query = queryRefs[queryRefs.length-1].replace(/[+@]/ig,'');
+            }
+          }
+
           this.queryDataSource(
-            this.widget_input.value,
+            new_query,
             $.proxy(function(data){
               this.parseAPIResponse(data);
               this.render();
@@ -420,11 +447,21 @@
 
       $(this.widget_input)
         .on('keyup',    $.proxy(this.changeHandler,this))
-        .on('keypress', function(e){
-          if (e.which === 13){
-            e.preventDefault();
+        .on('keypress', $.proxy(function(e){
+
+          if (this.widget_input.type !== 'textarea'){
+            if (e.which === 13){
+              e.preventDefault();
+            }
           }
-        });
+
+          if (this.on){
+            if (e.which === 13){
+              e.preventDefault();
+            }
+          }
+
+        },this));
 
 
       $(this.container).on('click', 'li:not(.invited)', $.proxy(this.clickHandler,this));
@@ -432,7 +469,9 @@
 
       if (this.is_textbox){
 
-        this.$el.on('focus', $.proxy(this.show,this));
+        if (this.show_on_focus){
+          this.$el.on('focus', $.proxy(this.show,this));
+        }
 
       }else{
         this.$el.on('click', $.proxy(function(){
