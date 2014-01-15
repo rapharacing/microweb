@@ -1,17 +1,25 @@
 {% if pagination and pagination.total_pages > 1 %}
 <ul class="pagination pull-right">
 	{% if pagination.first %}
-		<li><a href="{{ pagination.first }}">First</a></li>
+		<li><a href="{{ pagination.first }}">
+			<span class="sprite sprite-arrow-jump-left"></span>
+		</a></li>
 	{% endif %}
 	<li><a href="{{ pagination.prev|default:"#" }}"><span class="sprite sprite-arrow-left"></span></a></li>
 	{% if pagination.numbers %}
 		{% for number, link in pagination.numbers %}
-		<li {% if number == pagination.page %}class="active"{% endif %}><a href="{{ link }}">{{ number }}</a></li>
+		<li {% if number == pagination.page %}class="active"{% endif %}>
+			<a href="{{ link }}{% if content.query and content.query.searched %}&q={{ content.query.searched }}{% endif %}">
+				{{ number }}
+			</a>
+		</li>
 		{% endfor %}
 	{% endif %}
 		<li><a href="{{ pagination.next|default:"#" }}"><span class="sprite sprite-arrow-right"></span></a></li>
 	{% if pagination.last %}
-		<li><a href="{{ pagination.last }}">Last</a></li>
+		<li><a href="{{ pagination.last }}">
+			<span class="sprite sprite-arrow-jump-right"></span>
+		</a></li>
 	{% endif %}
 </ul>
 <div class="pagination-alt pull-right">
