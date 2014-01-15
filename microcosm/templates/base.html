@@ -69,14 +69,14 @@
 								<div class="col-md-3 col-lg-2 navbar-profile">
 									{% if user %}
 										<div class="navbar-profile-row-1">
-											<a href="{% url 'edit-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">
-												<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
-												<strong>{{ user.profile_name }}</strong>
-											</a>
-
 											<a class="navbar-profile-logout" href="{% url 'logout' %}">
 												<span class="sprite sprite-logout"></span>
 											</a>
+											<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">
+												<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
+												<strong>{{ user.profile_name }}</strong>
+											</a>
+											<a class="navbar-profile-edit" href="{% url 'edit-profile' user.id %}">Edit Profile</a>
 											<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">
 												{% if user and user.meta.stats.unreadHuddles > 0 %}
 													<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope"></span></span>
@@ -93,7 +93,7 @@
 													<span class="sprite sprite-envelope-small"></span>
 												{% endif %}
 												<strong>Huddles</strong>
-												
+
 											</a>
 										</div>
 									{% else %}
