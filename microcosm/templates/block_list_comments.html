@@ -4,6 +4,8 @@
       <div class="list-collection-row-icon">
       {% if result.parent_item_type == 'huddle' %}
         <a class="sprite sprite-envelope" title="Huddle"></a>
+      {% elif result.parent_item_type == 'profile' %}
+        <a class="sprite sprite-user" title="Huddle"></a>
       {% else %}
         <a class="sprite sprite-speech-bubble-single" title="Comment"></a>
       {% endif %}
@@ -11,17 +13,35 @@
       <div class="list-collection-row-offset">
 
         <div class="row-title">
-          <a href="{{ result.item.meta.links.self.href }}/incontext/">
-            <h3 class="row-title">{{ result.parent_item.title }}</h3>
-          </a>
+
+            {% if result.parent_item_type == 'profile' %}
+            <a href="{% url 'single-profile' result.item.meta.created_by.id %}">
+              <h3 class="row-title">
+                @{{ result.parent_item.profile_name }}
+              </h3>
+            </a>
+
+            {% else %}
+            <a href="{{ result.item.meta.links.self.href }}/incontext/">
+              <h3 class="row-title">
+                {{ result.parent_item.title }}
+              </h3>
+            </a>
+            {% endif %}
         </div>
 
         <div class="row-meta">
           <div class="row-meta-small">
             in
+            {% if result.parent_item_type == 'huddle' %}
+            <a href="{% url 'list-huddle' %}">Huddles</a>
+            {% elif result.parent_item_type == 'profile' %}
+            <a href="{% url 'single-profile' result.item.meta.created_by.id %}">Profiles</a>
+            {% else %}
             <a href="{{ result.parent_item.meta.links.microcosm.href }}">
               {{ result.parent_item.meta.links.microcosm.title }}
             </a>
+            {% endif %}
             &bull;
             <time datetime="{{ result.item.meta.created|date:"c" }}">
               {{ result.item.meta.created|timesince }}

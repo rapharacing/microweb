@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load list_comment %}
+{% load microcosm %}
 {% load conversation %}
 {% load event %}
 
@@ -75,7 +76,11 @@
 							<ul class="list-collection bordered padded">
 							{% for result in search.results.items %}
 
-								{% if result.item_type == 'conversation' %}
+								{% if result.item_type == 'microcosm' %}
+
+									{% microcosm result %}
+
+								{% elif result.item_type == 'conversation' %}
 
 									{% conversation result %}
 
