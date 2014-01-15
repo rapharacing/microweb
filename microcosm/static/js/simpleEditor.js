@@ -197,6 +197,7 @@
       if (typeof this.peopleWidget !== 'undefined'){
         if ([32,13].indexOf(e.which)>-1){
           this.peopleWidget.on = false;
+          this.peopleWidget.people_invited = [];
           this.peopleWidget.hide();
         }
       }
@@ -273,14 +274,13 @@
               re.compile('\\'+profileName+'\\s?$');
 
               this.textarea.value = this.textarea.value.replace( re,profileName[0]+invited[0].profileName);
-
-              this.peopleWidget.hide();
-              this.peopleWidget.people_invited = [];
-
               this.textarea.focus();
               this.textarea.selectionStart = this.textarea.selectionEnd
             }
           }
+          this.peopleWidget.hide();
+          this.peopleWidget.people_invited = [];
+          this.peopleWidget.on = false;
 
         },this));
 
