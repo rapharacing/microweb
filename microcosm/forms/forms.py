@@ -259,7 +259,8 @@ class ProfileEdit(django.forms.Form):
         label='Choose a username by which you wish to be known',
         error_messages = {
             'required' : 'Please add a profile name',
-            'max_length' : 'Profile name may not be longer than 25 characters'
+            'max_length' : 'Profile name may not be longer than 25 characters',
+            'valid_chars' : "Your user name may only contain alphanumeric characters, some special characters (\".\",\"_\",\"+\",\"-\") and spaces."
         },
         validators=[validate_no_spaces]
     )
