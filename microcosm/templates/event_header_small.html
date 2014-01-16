@@ -107,7 +107,9 @@
 								{% endfor %}
 								{% if attendees.items.items|length > 4 %}
 										<li>
-											<a href="#" class="list-people-button">+{{ attendees.items.items|length|add:"-4" }}</a>
+											<a href="#" class="list-people-button" data-toggle="modal" data-target="#modal-event-attendees">
+												+{{ attendees.items.items|length|add:"-4" }}
+											</a>
 										</li>
 								{% endif %}
 							</ul>
@@ -118,7 +120,7 @@
 			</ul> <!-- /item-event-inner -->
 
 			<div class="item-event-actions {% if is_expired %}item-event-actions-expired{% endif %}">
-				<ul class="list-stats">
+				<ul class="list-stats" data-toggle="modal" data-target="#modal-event-attendees">
 					<li>
 						Going
 						<span>{{ rsvp_num_attending|default:"0" }}</span>

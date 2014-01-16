@@ -1308,7 +1308,7 @@ class Attendee(object):
         attendee.profile_id = data['profileId']
         attendee.profile = Profile.from_summary(data['profile'])
         attendee.rsvp = data['rsvp']
-        attendee.rsvpd_on = data['rsvpdOn']
+        attendee.rsvpd_on = parse_timestamp(data['rsvpdOn'])
         attendee.meta = Meta(data['meta'])
         return attendee
 

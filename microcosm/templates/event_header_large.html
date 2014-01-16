@@ -94,34 +94,41 @@
 							</span>
 							{% endcomment %}
 							<ul class="list-people list-people-md">
-							{% for attendee in attendees.items.items|slice:":6" %}
-								{% if rsvp_num_attending > 0 %}
-
-									{% if attendee.rsvp == "yes" %}
-										<li>
-											<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}">
-												<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" />
-											</a>
-										</li>
+							{% if rsvp_num_attending > 0 %}
+								{% for attendee in attendees.items.items|slice:":6" %}
+										{% if attendee.rsvp == "yes" %}
+											<li>
+												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}">
+													<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" />
+												</a>
+											</li>
+										{% endif %}
+									{% endfor %}
+									{% if rsvp_num_attending > 6 %}
+									<li>
+										<a href="#" data-toggle="modal" data-target="#modal-event-attendees"
+											 class="list-people-button">+{{ rsvp_num_attending|add:"-6" }}</a>
+									</li>
 									{% endif %}
-
 								{% elif rsvp_num_invited > 0%}
-
-									{% if attendee.rsvp == "maybe" %}
-										<li>
-											<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}">
-												<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" />
-											</a>
-										</li>
+									{% for attendee in attendees.items.items|slice:":6" %}
+										{% if attendee.rsvp == "maybe" %}
+											<li>
+												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}">
+													<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" />
+												</a>
+											</li>
+										{% endif %}
+									{% endfor %}
+									{% if rsvp_num_invited > 6 %}
+									<li>
+										<a href="#" data-toggle="modal" data-target="#modal-event-attendees"
+											 class="list-people-button">+{{ rsvp_num_invited|add:"-6" }}</a>
+									</li>
 									{% endif %}
-
 								{% endif %}
-							{% endfor %}
-							{% if attendees.items.items|length > 6 %}
-							<li>
-								<a href="#" class="list-people-button">+{{ attendees.items.items|length|add:"-6" }}</a>
-							</li>
-							{% endif %}
+
+
 							</ul>
 						</div>
 					{% endif %}
@@ -149,7 +156,7 @@
 			</ul> <!-- /item-event-inner -->
 
 			<div class="item-event-actions">
-				<ul class="list-stats">
+				<ul class="list-stats" data-toggle="modal" data-target="#modal-event-attendees">
 					<li>
 						Going
 						<span>{{ rsvp_num_attending|default:"0" }}</span>
