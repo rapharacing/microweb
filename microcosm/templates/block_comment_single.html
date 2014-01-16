@@ -26,9 +26,9 @@
 			<div class="comment-item-author">
 			{% if comment.meta.created_by %}
 				<a href="{% url 'single-profile' comment.meta.created_by.id %}">
-					<img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name }}" align="left" class="gravatar" />
+					<img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name | safe }}" align="left" class="gravatar" />
 					<strong class="comment-item-author-name">
-						{{ comment.meta.created_by.profile_name|truncatechars:25 }}
+						{{ comment.meta.created_by.profile_name | safe | truncatechars:25 }}
 					</strong>
 				</a>
 				{% endif %}
@@ -38,7 +38,7 @@
 				<span class="comment-item-in-reply-to">
 					in reply to
 					<a href="{% url 'incontext-comment' comment.in_reply_to %}">
-						@{{ comment.meta.links.inReplyToAuthor.title }}
+						@{{ comment.meta.links.inReplyToAuthor.title | safe }}
 					</a>
 				</span>
 				{% endif %}
@@ -69,7 +69,7 @@
 						<span class="sprite sprite-arrow-left"></span>
 						Reply
 						{% comment %}
-						to <strong>@{{ comment.meta.created_by.profile_name|truncatechars:25 }}</strong>
+						to <strong>@{{ comment.meta.created_by.profile_name | safe | truncatechars:25 }}</strong>
 						{% endcomment %}
 					</a>
 			{%else%}

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}People{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
+{% block title %}People{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 <div class="content-header padded">
@@ -65,8 +65,8 @@
 								{% for item in member_chunk.list %}
 								<li>
 									<a href="{% url 'single-profile' item.id %}">
-										<img src="{% if 'gravatar' in item.avatar %}{{item.avatar}}{% elif 'files' in item.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.profile_name }}"/>
-										@{{ item.profile_name }}
+										<img src="{% if 'gravatar' in item.avatar %}{{item.avatar}}{% elif 'files' in item.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ item.profile_name | safe }}"/>
+										@{{ item.profile_name | safe }}
 									</a>
 								</li>
 								{% endfor%}

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Error 500 (Internal Server Error) | {{ site.title }}{% endblock title %}
+{% block title %}Error 500 (Internal Server Error) | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 	<p>Sorry, something bad happened when we tried to process your request. The error has been logged and we'll look into it.</p>

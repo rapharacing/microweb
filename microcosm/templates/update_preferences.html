@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Updates settings | {{ site.title }}{% endblock title %}
+{% block title %}Updates settings | {{ site.title | safe }}{% endblock title %}
 
 {% block breadcrumb %}
 	<ol class="breadcrumb">
@@ -39,7 +39,7 @@
 			{% if preference.id == 1 or preference.id == 2 %}
 			<section class="row">
 				<div class="col col-sm-14">
-					<span>{{ preference.description }}</span>
+					<span>{{ preference.description | safe }}</span>
 				</div>
 					<input type="hidden" name="id_{{ preference.id }}" value="{{ preference.id }}">
 					<div class="col col-sm-2">

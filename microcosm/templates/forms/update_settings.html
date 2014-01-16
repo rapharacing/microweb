@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Update settings | {{ site.title }}{% endblock title %}
+{% block title %}Update settings | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -48,7 +48,7 @@
 
 										{% for preference in content %}
 										<tr>
-											<td><span></span><p>{{ preference.description }}</p></td>
+											<td><span></span><p>{{ preference.description | safe }}</p></td>
 											<td>
 												<input type="hidden" name="id_{{ preference.id }}" value="{{ preference.id }}">
 												<label>

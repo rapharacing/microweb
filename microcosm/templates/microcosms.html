@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ site.title }} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
+{% block title %}{{ site.title | safe }} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
 
 {% block content %}
 
@@ -13,7 +13,7 @@
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1>{{ site.title }}</h1>
+	<h1>{{ site.title | safe }}</h1>
 </div>
 
 <div class="content-body">
@@ -39,13 +39,13 @@
 								</div> /list-collection-row-icon -->
 								<div class="list-collection-row-offset">
 									<h2 class="row-title">
-										<a href="{% url 'single-microcosm' item.id %}">{{ item.title }}</a>
+										<a href="{% url 'single-microcosm' item.id %}">{{ item.title | safe }}</a>
 										{% if item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
 									</h2>
 
 									<div class="row-meta">
 										<p class="microcosm-item-description">
-											{{ item.description }}
+											{{ item.description | safe }}
 										</p>
 									</div>
 								</div>
@@ -76,17 +76,17 @@
 									{% if item.most_recent_update %}
 
 										<a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">
-											{{ item.most_recent_update.title|truncatechars:30 }}
+											{{ item.most_recent_update.title | safe | truncatechars:30 }}
 										</a>
 										{% if item.most_recent_update.total_comments %}
 											<time datetime="{{ item.most_recent_update.last_comment_created|date:"c" }}"></time>
 											{% comment %}
-											by <a href="{% url 'single-profile' item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a>
+											by <a href="{% url 'single-profile' item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name | safe }}</a>
 											{% endcomment %}
 										{% else%}
 											<time datetime="{{ item.most_recent_update.meta.created|date:"c" }}"></time>
 											{% comment %}
-											 by <a href="{% url 'single-profile' item.most_recent_update.meta.created_by.id %}">{{ item.most_recent_update.meta.created_by.profile_name }}</a>
+											 by <a href="{% url 'single-profile' item.most_recent_update.meta.created_by.id %}">{{ item.most_recent_update.meta.created_by.profile_name | safe }}</a>
 											{% endcomment %}
 										{% endif %}
 									{% endif %}
@@ -131,10 +131,10 @@
 		<h5>About</h5>
 		<div class="metabar-module-title">
 			<h3>
-				{{ site.title }}
+				{{ site.title | safe }}
 			</h3>
 			<p>
-				{{ site.description }}
+				{{ site.description | safe }}
 			</p>
 		</div>
 	</div> <!-- / about -->

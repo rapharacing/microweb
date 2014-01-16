@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+
 {% load list_comment %}
 {% load microcosm %}
 {% load conversation %}
 {% load event %}
 
-{% block title %}@{{ content.profile_name }} | {{ site.title }}{% endblock title %}
+{% block title %}@{{ content.profile_name | safe }} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 					<div class="content-header padded">
@@ -20,9 +21,9 @@
 						<div class="profile-header">
 
 							<img class="profile-header-avatar"
-									 src="{% if 'gravatar' in content.avatar %}{{content.avatar}}{% elif 'files' in content.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ content.profile_name }}" />
+									 src="{% if 'gravatar' in content.avatar %}{{content.avatar}}{% elif 'files' in content.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ content.profile_name | safe }}" />
 							<div class="profile-header-text">
-								<h1>{{content.profile_name}}</h1>
+								<h1>{{ content.profile_name | safe }}</h1>
 								Member since {{ content.created|date:"M Y" }}
 								&bull;
 								Last active {{content.last_active|date:"M Y"}}

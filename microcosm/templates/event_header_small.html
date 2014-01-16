@@ -89,8 +89,8 @@
 								{% if rsvp_num_attending > 0 %}
 									{% if attendee.rsvp == "yes" %}
 										<li>
-											<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name }}">
-												<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name }}" />
+											<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}">
+												<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" />
 											</a>
 										</li>
 									{% endif %}
@@ -98,8 +98,8 @@
 								{% elif rsvp_num_invited > 0%}
 									{% if attendee.rsvp == "maybe" %}
 										<li>
-											<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="{{ attendee.profile.profile_name }}">
-												<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name }}" />
+											<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="{{ attendee.profile.profile_name | safe }}">
+												<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" />
 											</a>
 										</li>
 										{% endif %}

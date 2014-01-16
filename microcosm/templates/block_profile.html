@@ -7,8 +7,8 @@
       <div class="list-collection-row-offset">
         <div class="row-title row-title-profile">
           <a href="{% url 'single-profile' profile.item.id %}">
-            <img src="{% if 'gravatar' in profile.item.avatar %}{{profile.item.avatar}}{% elif 'files' in profile.item.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.item.profile_name }}" align="left" class="img-badge"/>
-            <strong>@{{ profile.item.profile_name }}</strong>
+            <img src="{% if 'gravatar' in profile.item.avatar %}{{profile.item.avatar}}{% elif 'files' in profile.item.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.item.profile_name | safe }}" align="left" class="img-badge"/>
+            <strong>@{{ profile.item.profile_name | safe }}</strong>
           </a>
         </div>
       </div>
