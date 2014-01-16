@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if form.id > 0 %}Edit conversation{% else %}Start a conversation{% endif %} | {{ site.title }}{% endblock title %}
+{% block title %}{% if form.id > 0 %}Edit conversation{% else %}Start a conversation{% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 

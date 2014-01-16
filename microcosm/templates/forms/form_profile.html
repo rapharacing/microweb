@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
+
 {% load commentBox %}
-{% block title %}Edit profile | {{ site.title }}{% endblock title %}
+
+{% block title %}Edit profile | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 

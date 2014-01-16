@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Updates{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
+{% block title %}Updates{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -68,7 +68,7 @@
 
 											<h3 class="row-title">
 												<a href="{{ update.parent_link }}/newest/">
-												{{ update.parent_item.title }}
+												{{ update.parent_item.title | safe }}
 												</a>
 											</h3>
 
@@ -81,15 +81,15 @@
 
 											<h3 class="row-title">
 												<a href="{{ update.profile_link }}">
-													@{{ update.item.meta.created_by.profile_name }}
+													@{{ update.item.meta.created_by.profile_name | safe }}
 												</a>
-											</h3> replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
+											</h3> replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title | safe }}</a>
 
 											<div class="row-meta">
 
 												<div class="row-meta-excerpt">
 													<a href="{% url 'single-profile' update.item.meta.created_by.id %}">
-														<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
+														<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/>
 													</a>
 													<div class="row-meta-excerpt-text">
 														{{ update.item.html | safe }}
@@ -103,17 +103,17 @@
 
 											<h3 class="row-title">
 												<a href="{{ update.profile_link }}">
-													@{{ update.item.meta.created_by.profile_name }}
+													@{{ update.item.meta.created_by.profile_name | safe }}
 												</a>
 											</h3>
 											mentioned you in
-											<a href="{{ update.parent_link }}">{{ update.parent_item.title }}</a>
+											<a href="{{ update.parent_link }}">{{ update.parent_item.title | safe }}</a>
 
 											<div class="row-meta">
 
 												<div class="row-meta-excerpt">
 													<a href="{% url 'single-profile' update.item.meta.created_by.id %}">
-														<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name }}" align="left" class="img-badge"/>
+														<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/>
 													</a>
 													<div class="row-meta-excerpt-text">
 														{{ update.item.html | safe }}

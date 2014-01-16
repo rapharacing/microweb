@@ -1,6 +1,6 @@
 {% extends 'microweb_templates/base.html' %}
 
-{% block title %}{% if form.id > 0 %}Edit conversation{% else %}Start a conversation{% endif %} | {{ site.title }}{% endblock title %}
+{% block title %}{% if form.id > 0 %}Edit conversation{% else %}Start a conversation{% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -129,18 +129,18 @@
 		<h5>About</h5>
 		<div class="metabar-module-title">
 			<h3>
-				{{ content.title }}
+				{{ content.title | safe }}
 			</h3>
 
 			{% include 'forms/subscribe.html' %}
 
 			<p>
-				{{ content.description }}
+				{{ content.description | safe }}
 			</p>
 			<p class="metabar-module-author">
 				<a href="{% url 'single-profile' content.meta.created_by.id %}">
-					<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name }}" />
-					@{{ content.meta.created_by.profile_name|truncatechars:25 }}
+					<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name | safe }}" />
+					@{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}
 				</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
 			</p>
 		</div>

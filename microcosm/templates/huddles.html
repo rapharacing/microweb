@@ -35,7 +35,7 @@
 
 						<h3 class="row-title">
 							<a href="{% url 'newest-huddle' item.id %}">
-								{{ item.title }}
+								{{ item.title | safe }}
 							</a>
 						</h3>
 						<div class="row-meta">
@@ -43,7 +43,7 @@
 
 								<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
 
-									@{{ item.last_comment_created_by.profile_name|truncatechars:25 }}
+									@{{ item.last_comment_created_by.profile_name | safe | truncatechars:25 }}
 								</a>
 								&bull;
 								<time datetime="{{ item.last_comment_created|date:"c" }}">
@@ -54,7 +54,7 @@
 
 								<a href="{% url 'single-profile' item.meta.created_by.id %}">
 
-									@{{ item.meta.created_by.profile_name|truncatechars:25 }}
+									@{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}
 								</a> &bull;
 								<time datetime="{{ item.meta.created|date:"c" }}">{{ item.meta.created|timesince }}</time>
 
@@ -80,8 +80,8 @@
 						<ul class="list-people list-people-sm pull-right">
 							{% for participant in item.participants %}
 								<li>
-									<a href="{% url 'single-profile' participant.id %}" data-toggle="tooltip" title="@{{ participant.profile_name }}">
-										<img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name }}"/>
+									<a href="{% url 'single-profile' participant.id %}" data-toggle="tooltip" title="@{{ participant.profile_name | safe }}">
+										<img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name | safe }}"/>
 									</a>
 								</li>
 							{% endfor %}

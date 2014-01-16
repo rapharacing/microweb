@@ -42,7 +42,7 @@
 							<div class="row">
 								<div class="col-sm-3 col-md-3 col-lg-2 navbar-brand">
 									<a href="/" title="Return to Homepage">
-										<img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title }} - Powered by Microcosm" id="logo" />
+										<img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
 									</a>
 								</div>
 
@@ -72,12 +72,13 @@
 											<a class="navbar-profile-logout" href="{% url 'logout' %}">
 												<span class="sprite sprite-logout"></span>
 											</a>
+
 											<div class="navbar-profile-row-1-left">
 												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">
 													<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
 												</a>
 												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-name">
-													<strong>{{ user.profile_name }}</strong>
+													<strong>{{ user.profile_name | safe }}</strong>
 												</a>
 												<a class="navbar-profile-edit" href="{% url 'edit-profile' user.id %}">
 													<span class="sprite sprite-pencil"></span>
@@ -85,6 +86,7 @@
 												</a>
 
 												<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">
+
 												{% if user and user.meta.stats.unreadHuddles > 0 %}
 													<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope"></span></span>
 												{% else %}

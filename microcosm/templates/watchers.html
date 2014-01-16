@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Watchers{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
+{% block title %}Watchers{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
 
 {% block content %}
@@ -29,7 +29,7 @@
 			{% for watcher in content.watchers.items %}
 				<section class="row">
 					<div class="col col-sm-8 text-muted" >
-						<a href="{{ watcher.item_link }}">{{ watcher.item.title }}</a>
+						<a href="{{ watcher.item_link }}">{{ watcher.item.title | safe }}</a>
 						<br>Last updated <time datetime="{{ watcher.item.last_comment_created|date:"c" }}"></time>
 					</div>
 					<input type="hidden" name="watcher_id" value="{{ watcher.id }}">

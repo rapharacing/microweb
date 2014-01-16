@@ -13,7 +13,7 @@
 			<div class="btn-switch-state off">
 				<a class="btn-switch-on" href="javascript:void 0">
 				<strong>
-					{% if item_type == 'profile'%}Follow @{{ content.profile_name }}{%else%}Subscribe{%endif%}
+					{% if item_type == 'profile'%}Follow @{{ content.profile_name | safe }}{%else%}Subscribe{%endif%}
 				</strong>
 				</a>
 			</div>
