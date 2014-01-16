@@ -141,6 +141,8 @@
         // FIXME: not flexible, could be better
         if(_this.$.attr('data-source')){
 
+          _this.$.comment_box.find('input[type=submit]').val('Save changes');
+
           _this.$.comment_box.find('textarea').attr('placeholder','Loading... Please wait...');
 
           this.fetchCommentSource(_this.$.attr('data-source'))
