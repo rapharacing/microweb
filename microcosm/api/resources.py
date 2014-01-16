@@ -1467,6 +1467,40 @@ class Attachment(object):
     errors).
     """
 
+    api_path_fragment = 'attachments'
+
+    @classmethod
+    def from_api_response(cls, data):
+        attachments = cls()
+        attachments = PaginatedList(data.get('attachments'),Attachment)
+        attachments.meta = Meta(data.get('meta'))
+
+        return attachments
+
+    @classmethod
+    def from_summary(cls, data):
+        summary = cls()
+        summary.profile_id = data['profileId']
+        summary.meta       = data['meta']
+        summary.file_hash  = data['fileHash']
+        summary.created    = parse_timestamp(data['created'])
+
+        return summary
+
+    @staticmethod
+    def build_request(host, type, id, offset=None, access_token=None):
+        url = build_url(host, [ type, id, Attachment.api_path_fragment ])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, type, id, offset=None, access_token=None):
+        url, params, headers = Attachment.build_request(host, type, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+
+        return Attachment.from_api_response(resource)
+
     @staticmethod
     def create(host, file_hash, profile_id=None, comment_id=None, access_token=None):
         if profile_id:

@@ -178,13 +178,22 @@ class ConversationView(object):
 			conversation = Conversation.from_api_response(responses[conversation_url])
 			comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
 
+			# get attachments
+			attachments = {}
+			for comment in conversation.comments.items:
+				c = comment.as_dict
+				if 'attachments' in c:
+					c_attachments = Attachment.retrieve( request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
+					attachments[str(c['id'])] = c_attachments
+
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 				'site': request.site,
 				'content': conversation,
 				'comment_form': comment_form,
 				'pagination': build_pagination_links(responses[conversation_url]['comments']['links'], conversation.comments),
-				'item_type': 'conversation'
+				'item_type': 'conversation',
+				'attachments' : attachments
 			}
 
 			return render(request, ConversationView.single_template, view_data)
@@ -343,13 +352,22 @@ class HuddleView(object):
 			huddle = Huddle.from_api_response(responses[huddle_url])
 			comment_form = CommentForm(initial=dict(itemId=huddle_id, itemType='huddle'))
 
+			# get attachments
+			attachments = {}
+			for comment in huddle.comments.items:
+				c = comment.as_dict
+				if 'attachments' in c:
+					c_attachments = Attachment.retrieve( request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
+					attachments[str(c['id'])] = c_attachments
+
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 				'site': request.site,
 				'content': huddle,
 				'comment_form': comment_form,
 				'pagination': build_pagination_links(responses[huddle_url]['comments']['links'], huddle.comments),
-				'item_type': 'huddle'
+				'item_type': 'huddle',
+				'attachments' : attachments
 			}
 
 			return render(request, HuddleView.single_template, view_data)
@@ -941,6 +959,8 @@ class EventView(object):
 			is_expired = True if int(end_date.strftime('%s')) < int(today.strftime('%s')) else False
 
 			#rsvp
+			# FIXME: redundant. This code was written before the Event object was modified to include
+			# percentage as a default (see resources.py)
 			rsvp_limit    = int(responses[event_url]['rsvpLimit'])
 			num_attending = len(attendees_yes)
 			rsvp_percentage = (num_attending/float(rsvp_limit))*100 if rsvp_limit > 0 else 0
@@ -948,6 +968,13 @@ class EventView(object):
 			if (num_attending > 0 and rsvp_percentage < 10):
 				rsvp_percentage = 10
 
+			# get attachments
+			attachments = {}
+			for comment in event.comments.items:
+				c = comment.as_dict
+				if 'attachments' in c:
+					c_attachments = Attachment.retrieve( request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
+					attachments[str(c['id'])] = c_attachments
 
 			view_data = {
 				'user'              : user,
@@ -968,7 +995,9 @@ class EventView(object):
 				'rsvp_num_invited'  : len(attendees_invited),
 				'rsvp_percentage'   : rsvp_percentage,
 
-				'is_expired'        : is_expired
+				'is_expired'        : is_expired,
+
+				'attachments'				: attachments
 			}
 
 			return render(request, EventView.single_template, view_data)
@@ -1216,11 +1245,19 @@ class CommentView(object):
 		content = Comment.from_api_response(responses[url])
 		comment_form = CommentForm(initial=dict(itemId=content.item_id, itemType=content.item_type))
 
+		# get attachments
+		attachments = {}
+		c = content.as_dict
+		if 'attachments' in c:
+			c_attachments = Attachment.retrieve( request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
+			attachments[str(c['id'])] = c_attachments
+
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'site': request.site,
 			'content': content,
-			'comment_form' : comment_form
+			'comment_form' : comment_form,
+			'attachments'  : attachments
 		}
 
 		return render(request, CommentView.single_template, view_data)

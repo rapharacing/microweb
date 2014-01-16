@@ -1,3 +1,5 @@
+
+{% load get_attachment %}
 <li id="comment{{ comment.id }}" class="comment-item">
 	<a name="{{ comment.id }}"></a>
 	<div class="comment-item-inner">
@@ -45,11 +47,20 @@
 		</div>
 		<div class="comment-item-body">
 			{{ comment.html|safe }}
-		</div>
 
+			{% if attachments %}
+				{% get_attachment comment.id as comment_attachments %}
+				{% if comment_attachments %}
+					{% for attachment in comment_attachments.items %}
+
+						<img src="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}" />
+
+					{% endfor %}
+				{% endif %}
+			{% endif %}
+		</div>
 		<div class="comment-item-footer">
-			<div class="comment-item-attachments">
-			</div>
+
 		{% if user %}
 			{% if not comment.meta.created_by.id == user.id %}
 					<a class="insertReplyBox"
