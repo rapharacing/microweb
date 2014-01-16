@@ -34,7 +34,7 @@
 									<label class="col-sm-12" for="profileName">
 										{{ form.profileName.label }}
 									</label>
-									<div class="col-sm-6">
+									<div class="col-sm-12">
 										{% if form.errors.profileName %}
 											<div class="text-error">{{ form.errors.profileName.as_text }}</div>
 										{% endif %}
@@ -162,14 +162,22 @@
 		document.getElementById('profileform'),
 		{
 			rules : {
-				'{{ form.profileName.name }}'      : ['not_empty','maxlength']
+				'{{ form.profileName.name }}'      : ['not_empty','maxlength', 'validChars']
 			},
 			tests : {
+				'validChars': function(field){
+					var $field = $(field),
+							name   = $field.val();
+
+					return name.match(/[^a-z0-9\.\_\-\+]+/i).length == 0;
+
+				 },
 				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
 			},
 			error_messages : {
 				'{{ form.profileName.name }}:not_empty' : "* {{ form.fields.profileName.error_messages.required }}",
-				'{{ form.profileName.name }}:maxlength' : "* {{ form.fields.profileName.error_messages.max_length }}"
+				'{{ form.profileName.name }}:maxlength' : "* {{ form.fields.profileName.error_messages.max_length }}",
+				'{{ form.profileName.name }}:validChars': '* {{ form.fields.profileName.error_messages.valid_chars|safe }}'
 			}
 		}
 	);
