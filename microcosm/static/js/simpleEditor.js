@@ -244,26 +244,33 @@
 
       $(this.textarea).textcomplete([
         {
-          match: /\B@([\-+\w]*)$/,
+          match: /\B([@+][\-+\w]*)$/,
           search: function (term, callback) {
 
-            var _term = term,
+            var _term = term.substr(1,term.length-1),
+                _symbol = term[0],
                 _callback = callback;
 
             $.ajax({
-              url : dataSource + term,
+              url : dataSource + _term,
             }).success(function(data){
-              console.log(_term,data);
+
               _callback($.map(data.profiles.items, function (person) {
-                  return person.profileName.toLowerCase().indexOf(_term.toLowerCase()) === 0 ? person : null;
+                  if (person.profileName.toLowerCase().indexOf(_term.toLowerCase()) === 0){
+                    person.symbol = _symbol;
+
+                    return person;
+                  }else{
+                    return null;
+                  }
               }));
             });
           },
           template: function (person) {
-              return '<img src="' + static_url + person.avatar + '" /> @' + person.profileName;
+              return '<img src="' + static_url + person.avatar + '" /> ' + person.symbol + person.profileName;
           },
           replace: function (person) {
-              return '@' + person.profileName;
+              return person.symbol + person.profileName;
           },
           index: 1,
           maxCount: 5
