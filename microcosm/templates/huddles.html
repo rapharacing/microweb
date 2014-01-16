@@ -42,7 +42,7 @@
 							{% if item.last_comment_created %}
 
 								<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
-									<img src="{% if 'gravatar' in item.last_comment_created_by.avatar %}{{item.last_comment_created_by.avatar}}{% elif 'files' in item.last_comment_created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.last_comment_created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.last_comment_created_by.profile_name }}"/>
+
 									@{{ item.last_comment_created_by.profile_name|truncatechars:25 }}
 								</a>
 								&bull;
@@ -53,7 +53,7 @@
 							{% else %}
 
 								<a href="{% url 'single-profile' item.meta.created_by.id %}">
-									<img src="{% if 'gravatar' in item.meta.created_by.avatar %}{{item.meta.created_by.avatar}}{% elif 'files' in item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{item.meta.created_by.profile_name }}" />
+
 									@{{ item.meta.created_by.profile_name|truncatechars:25 }}
 								</a> &bull;
 								<time datetime="{{ item.meta.created|date:"c" }}">{{ item.meta.created|timesince }}</time>
