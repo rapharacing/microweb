@@ -14,9 +14,12 @@
 			{% endif %}
 
 				<time datetime="{{ comment.meta.created|date:"c" }}"></time>
-				{% if hide_permalink %}
-				{% else %}
 				<span style="color:#eee">&bull;</span>
+				{% if hide_permalink %}
+					<a href="{% url 'single-comment' comment.id %}">
+						<span class="sprite sprite-format-link"></span>
+					</a>
+				{% else %}
 				<a href="{% url 'single-comment' comment.id %}">
 					#{{ forloop.counter|add:pagination.offset }}
 				</a>
