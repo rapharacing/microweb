@@ -118,38 +118,8 @@ def build_pagination_links(request, paged_list):
 	}
 
 	for item in request:
-		page_nav[item['rel']] = str.replace(str(item['href']),'/api/v1','')
-
-	page_nav['numbers'] = [
-		( page_nav['page'], ("?offset=%s" % page_nav['offset'] if page_nav['offset'] > 0 else "") )
-	]
-
-	# check if its first page, build two links in front
-	if page_nav['page'] == 1:
-
-		if page_nav['page'] + 1 <= page_nav['total_pages']:
-				page_nav['numbers'].append( (page_nav['page']+1, page_nav['next'] ) )
-
-		if page_nav['page'] + 2 <= page_nav['total_pages']:
-			page_nav['numbers'].append( (page_nav['page']+2, "?offset=%s" % ((page_nav['page']+1) * page_nav['limit']) ) )
-
-	# check if its last page, build two links behind
-	elif page_nav['page'] == page_nav['total_pages']:
-
-		if page_nav['page'] - 1 > 0:
-			page_nav['numbers'].insert(0, (page_nav['page']-1, page_nav['prev'] ) )
-
-		if page_nav['page'] - 2 > 0:
-			page_nav['numbers'].insert(0, (page_nav['page']-2, "?offset=%s" % ((page_nav['page']-3) * page_nav['limit']) ) )
-
-	# else, build one link either side
-	else:
-
-		if page_nav['page'] - 1 > 0:
-			page_nav['numbers'].insert(0, (page_nav['page']-1, page_nav['prev'] ) )
-
-		if page_nav['page'] + 1 <= page_nav['total_pages']:
-				page_nav['numbers'].append( (page_nav['page']+1, page_nav['next'] ) )
+		item['href'] = str.replace(str(item['href']),'/api/v1','')
+		page_nav[item['rel']] = item
 
 	return page_nav
 
