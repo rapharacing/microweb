@@ -20,13 +20,14 @@
 			id="reply-box-textarea"
 			{% if not as_component %}
 			name="{{ comment_form.markdown.name }}"
+			maxlength="{{ comment_form.fields.markdown.max_length }}"
 			{%else%}
 			name="{{ name|default:"markdown" }}"
+			maxlength="{{ max_length|default:'5000' }}"
 			{% endif %}
 			placeholder="Enter your text here..."
-			maxlength="5000"
 			tabindex="1"
-		></textarea>
+		>{{ value|default:"" }}</textarea>
 
 		{% if no_attachments and as_component %}
 		{% else %}

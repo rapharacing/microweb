@@ -313,6 +313,8 @@ class Profile(object):
         if data.get('visible'): self.visible = data['visible']
         if data.get('avatar'): self.avatar = data['avatar']
         if data.get('meta'): self.meta = Meta(data['meta'])
+        if data.get('profileComment'):
+                self.profile_comment = Comment.from_summary(data['profileComment'])
 
         if not summary:
             self.style_id = data['styleId']
@@ -356,6 +358,9 @@ class Profile(object):
         if hasattr(self, 'last_active'): repr['lastActive'] = self.last_active
         if hasattr(self, 'banned'): repr['banned'] = self.banned
         if hasattr(self, 'admin'): repr['admin'] = self.admin
+
+        if hasattr(self, 'profile_comment'): repr['markdown'] = self.profile_comment.markdown
+
         return repr
 
     @staticmethod

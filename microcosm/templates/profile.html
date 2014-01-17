@@ -18,7 +18,7 @@
 
 					<div class="content-body">
 
-						<div class="profile-header">
+						<div class="profile-header padded">
 
 							<img class="profile-header-avatar"
 									 src="{% if 'gravatar' in content.avatar %}{{content.avatar}}{% elif 'files' in content.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ content.profile_name | safe }}" />
@@ -40,9 +40,9 @@
 								</ul>
 						</div> <!-- /profile-header -->
 
-						{% if description %}
-						<div class="comment-item-body profile-description">
-							{{ description.text | safe}}
+						{% if content.profile_comment %}
+						<div class="comment-item-body padded">
+							{{ content.profile_comment.html | safe }}
 						</div> <!-- /profile-description -->
 						{% endif %}
 

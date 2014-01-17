@@ -95,8 +95,7 @@
 
 									<label class="col-sm-12" for="reply-box-textarea">Tell us about yourself</label>
 									<div class="col-sm-12">
-										<input type="hidden" name="comment_id" value="{{ comment_form.id.value }}" />
-										{% commentBox as_component=True no_attachments=True %}
+									{% commentBox as_component=True no_attachments=True value=form.markdown.value %}
 									</div>
 								</div>
 							</div> <!-- /form-group -->

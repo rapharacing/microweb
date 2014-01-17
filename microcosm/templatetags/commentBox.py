@@ -15,4 +15,9 @@ def commentBox(context, **kwargs):
   if 'name' in kwargs:
     context['name'] = kwargs['name']
 
+  # value = used in <textarea>
+
+  if 'value' in kwargs:
+    context['value'] = kwargs['value']
+
   return context

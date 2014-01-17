@@ -593,8 +593,6 @@ class ProfileView(object):
 
 				if request.POST.get('markdown') and len(request.POST.get('markdown')) > 0:
 
-					if request.POST.get('comment_id'):
-
 						payload = {
 							'itemType'  : 'profile',
 							'itemId'    : profile_response.id,
@@ -602,19 +600,15 @@ class ProfileView(object):
 							'inReplyTo' : 0
 						}
 
-						if request.POST['comment_id'] == "None":
-
-							comment = Comment.from_create_form(payload)
-							comment.create(request.META['HTTP_HOST'], request.access_token)
-
-						elif request.POST['comment_id'].is_digit():
-
-							payload['id'] = request.POST.get('comment_id')
+						# try to edit comment else create a new one
+						try:
+							profile_response.profile_comment
+							payload['id'] = profile_response.profile_comment.id
 							comment_request  = Comment.from_edit_form(payload)
 							comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
-
-						else:
-							pass
+						except AttributeError:
+							comment = Comment.from_create_form(payload)
+							comment.create(request.META['HTTP_HOST'], request.access_token)
 
 				return HttpResponseRedirect(reverse('single-profile', args=(profile_response.id,)))
 			else:
@@ -627,11 +621,8 @@ class ProfileView(object):
 				profile_id,
 				request.access_token
 			)
+
 			view_data['form'] = ProfileView.edit_form(user_profile.as_dict)
-
-			comment_form = CommentForm(initial=dict(itemId=user_profile.id, itemType='profile'))
-			view_data['comment_form'] = comment_form
-
 			return render(request, ProfileView.form_template, view_data)
 
 		else:
@@ -1261,12 +1252,10 @@ class CommentView(object):
 							# File must be under 30KB
 							# TODO: use Django's built-in field validators and error messaging
 							if len(file_request.file['files']) >= 30720:
-								print('file attachment error: some files too big')
 								view_data['form'] = form
 								view_data['avatar_error'] = 'Sorry, the file you upload must be under 30KB and square.'
 								return render(request, CommentView.form_template, view_data)
 							else:
-								print('file attachment: OK')
 								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
 								Attachment.create(
 									request.META['HTTP_HOST'],
