@@ -23,9 +23,8 @@
 
 	<div class="row form-container">
 		<div class="col-xs-12">
-			<div class="form-container-inner padded">
-
-				<form id="eventForm" class="form-create-event" role="form" action="" method="POST">
+			<form id="eventForm" class="form-create-event" role="form" action="" method="POST">
+				<div class="form-container-inner padded">
 
 					{% csrf_token %}
 					{{ form.microcosmId }}
@@ -99,61 +98,59 @@
 					</div> <!-- /form-group -->
 					{% endif %}
 
-				<div class="event-form-dates">
+					<div class="event-form-dates">
 
-					{# event date options #}
-					<div class="form-group">
-						<div class="row" id="event-date-type-options">
-							<label class="col-sm-12">When does your event begin?</label>
-							{% if form.errors.when %}
-								<div class="text-error">{{ form.errors.when.as_text }}</div>
-							{% endif %}
-							<div class="col-sm-3 col-lg-2">
-								<div class="radio">
-									<label>
-										<input
-											type="radio"
-											id="date-type"
-											name="date-type"
-											value="1"
-											checked="checked"
-											tabindex="1"
-										/> Single day
-									</label>
-								</div>
-							</div>
-							<div class="col-sm-3 col-lg-2">
-								<div class="radio">
-									<label>
-										<input type="radio" id="date-type" name="date-type" value="2" tabindex="1" /> Multiple days
-									</label>
-								</div>
-							</div>
-							<div class="col-sm-3 col-lg-2">
-								<div class="radio">
-									<label>
-										<input type="radio" id="date-type" name="date-type" value="0" tabindex="1" />
-										<abbr title="To Be Announced - select this option if you have not yet set a date">TBA</abbr>
-									</label>
-								</div>
-							</div>
-						</div>
-					</div> <!-- /form-group -->
-
-
-
-					{# event date start #}
-					<div class="form-group form-datepicker">
-						<div class="row">
-							<div class="col-sm-6">
-								<div class="row">
-									<div class="col-sm-12">
-										<div id="event-start-calendar">
-											<div class="event-start-calendar-label">Start</div>
-											<div class="event-start-calendar-contents" data-date="2013-01-01"></div>
-										</div>
+						{# event date options #}
+						<div class="form-group">
+							<div class="row" id="event-date-type-options">
+								<label class="col-sm-12">When does your event begin?</label>
+								{% if form.errors.when %}
+									<div class="text-error">{{ form.errors.when.as_text }}</div>
+								{% endif %}
+								<div class="col-sm-3 col-lg-2">
+									<div class="radio">
+										<label>
+											<input
+												type="radio"
+												id="date-type"
+												name="date-type"
+												value="1"
+												checked="checked"
+												tabindex="1"
+											/> Single day
+										</label>
 									</div>
-									<div class="col-sm-12">
+								</div>
+								<div class="col-sm-3 col-lg-2">
+									<div class="radio">
+										<label>
+											<input type="radio" id="date-type" name="date-type" value="2" tabindex="1" /> Multiple days
+										</label>
+									</div>
+								</div>
+								<div class="col-sm-3 col-lg-2">
+									<div class="radio">
+										<label>
+											<input type="radio" id="date-type" name="date-type" value="0" tabindex="1" />
+											<abbr title="To Be Announced - select this option if you have not yet set a date">TBA</abbr>
+										</label>
+									</div>
+								</div>
+							</div>
+						</div> <!-- /form-group -->
+
+						{# event date start #}
+						<div class="form-group form-datepicker">
+							<div class="row">
+								<div class="col-sm-6">
+									<div class="row">
+										<div class="col-sm-12">
+											<div id="event-start-calendar">
+												<div class="event-start-calendar-label">Start</div>
+												<div class="event-start-calendar-contents" data-date="2013-01-01"></div>
+											</div>
+										</div>
+										<div class="col-sm-12">
 											<select id="event-start-calendar-start-time" class="event-time" tabindex="1">
 												{# hacky way to do it. Please improve as and when time is available. - jim #}
 												{% for hour in '123456789012345678901234'%}
@@ -185,19 +182,19 @@
 												{% endfor %}
 											</select>
 										</div>
-								</div>
-							</div>
-
-							{# event date end #}
-							<div class="col-sm-6 form-datepicker form-datepicker-multiple">
-								<div class="row">
-									<div class="col-sm-12">
-										<div id="event-end-calendar">
-											<div class="event-start-calendar-label">Finish</div>
-											<div class="event-start-calendar-contents" data-date="2013-01-01"></div>
-										</div>
 									</div>
-									<div class="col-sm-12">
+								</div>
+
+								{# event date end #}
+								<div class="col-sm-6 form-datepicker form-datepicker-multiple">
+									<div class="row">
+										<div class="col-sm-12">
+											<div id="event-end-calendar">
+												<div class="event-start-calendar-label">Finish</div>
+												<div class="event-start-calendar-contents" data-date="2013-01-01"></div>
+											</div>
+										</div>
+										<div class="col-sm-12">
 											<select id="event-end-calendar-end-time" class="event-time">
 												{% for hour in '123456789012345678901234'%}
 													{% for minute in '1234'%}
@@ -217,9 +214,9 @@
 								</div>
 							</div>
 						</div>
-					<!-- /form-group -->
+						<!-- /form-group -->
 
-				</div>
+					</div>
 
 					<div class="clearfix"></div>
 
@@ -303,7 +300,6 @@
 										/> No limit
 									</label>
 								</div>
-
 							</div>
 							<div class="col-sm-5">
 								<div class="row">
@@ -333,77 +329,72 @@
 											tabindex="1"
 										/>
 									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-
-				</div> <!-- /form-group -->
+					</div> <!-- /form-group -->
 
 
-				{# event invites #}
-				<div class="form-group">
-					<div class="row">
+					{# event invites #}
+					<div class="form-group">
+						<div class="row">
 
-						<label class="col-sm-12" for="invite"><span>Optional.</span> Do you wish to invite others to your event?</label>
+							<label class="col-sm-12" for="invite"><span>Optional.</span> Do you wish to invite others to your event?</label>
 
-						<input type="hidden" name="invite" value="" />
-						<input type="hidden" name="inviteObject" value="" />
+							<input type="hidden" name="invite" value="" />
+							<input type="hidden" name="inviteObject" value="" />
 
-						<div class="col-sm-12">
-							<div class="list-participants"></div>
-						</div>
+							<div class="col-sm-12">
+								<div class="list-participants"></div>
+							</div>
 
-						<div class="col-sm-6">
-							<div class="input-group">
-								<div class="input-group-addon">
-									<span class="sprite sprite-search-small"></span>
+							<div class="col-sm-6">
+								<div class="input-group">
+									<div class="input-group-addon">
+										<span class="sprite sprite-search-small"></span>
+									</div>
+									<input id="invite" class="form-control" placeholder="Type in a user's name" autocomplete="off" tabindex="1" />
 								</div>
-								<input id="invite" class="form-control" placeholder="Type in a user's name" autocomplete="off" tabindex="1" />
 							</div>
 						</div>
+					</div> <!-- /form-group -->
 
-					</div>
-				</div> <!-- /form-group -->
+					{# comment #}
+					<div class="form-group">
+						<div class="row">
+							<label class="col-sm-12" for="reply-box-textarea">What is it you want to say?</label>
+							<div class='col-sm-12'>
 
-				{# comment #}
-				<div class="form-group">
-					<div class="row">
-						<label class="col-sm-12" for="reply-box-textarea">What is it you want to say?</label>
-						<div class='col-sm-12'>
+								<div class="reply-box">
+									<ul>
+										<li class="se-bold"><strong>Bold</strong></li>
+										<li class="se-italics"><i>Italics</i></li>
+										<li class="se-quote">Quote</li>
+										<li class="se-link"><span class="sprite sprite-format-link"></span> Link</li>
+										<li class="se-list"><span class="sprite sprite-format-list"></span> List</li>
+										<li class="se-image"><span class="sprite sprite-format-img"></span> Image</li>
+									</ul>
 
-							<div class="reply-box">
-								<ul>
-									<li class="se-bold"><strong>Bold</strong></li>
-									<li class="se-italics"><i>Italics</i></li>
-									<li class="se-quote">Quote</li>
-									<li class="se-link"><span class="sprite sprite-format-link"></span> Link</li>
-									<li class="se-list"><span class="sprite sprite-format-list"></span> List</li>
-									<li class="se-image"><span class="sprite sprite-format-img"></span> Image</li>
-								</ul>
-
-								<textarea
-									id="reply-box-textarea"
-									name="firstcomment"
-									placeholder="Enter your text here..."
-									maxlength="5000"
-									tabindex="1"
-								></textarea>
-								<div class="reply-box-footer">
-									<a href="#" class="formatting-help-handle" data-toggle="modal" data-target="#formatting-help-modal">
-										<span class="sprite sprite-help-small"></span>
-										Formatting help
-									</a>
-									{% include 'modal_formatting_help.html' %}
-								</div>
-						</div> <!-- /reply-box -->
-
-
+									<textarea
+										id="reply-box-textarea"
+										name="firstcomment"
+										placeholder="Enter your text here..."
+										maxlength="5000"
+										tabindex="1"
+									></textarea>
+									<div class="reply-box-footer">
+										<a href="#" class="formatting-help-handle" data-toggle="modal" data-target="#formatting-help-modal">
+											<span class="sprite sprite-help-small"></span>
+											Formatting help
+										</a>
+										{% include 'modal_formatting_help.html' %}
+									</div>
+								</div> <!-- /reply-box -->
+							</div>
 						</div>
-					</div>
-				</div> <!-- /form-group -->
+					</div> <!-- /form-group -->
 
-
-			</div> <!-- /form-container-inner -->
+				</div> <!-- /form-container-inner -->
 
 				<div class="form-group form-footer padded">
 					<div class="row">
@@ -416,7 +407,6 @@
 					</div>
 				</div>
 			</form>
-
 
 		</div>
 	</div>
