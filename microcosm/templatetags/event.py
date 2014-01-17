@@ -11,6 +11,9 @@ def event(context, item, **kwargs):
 
     context['rsvp_percentage'] = rsvp_percentage
 
-  context['item'] = item
+  if hasattr(item,'item'):
+    context['item'] = item
+  else:
+    context['item'] = { 'item' : item }
 
   return context

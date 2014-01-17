@@ -53,16 +53,16 @@
 
 			<div class="row-stats">
 				<ul class="list-stats list-stats-sm">
-					{% if item.total_comments >= 0 %}
+					{% if item.item.total_comments >= 0 %}
 					<li>
-						<span>{{ item.total_comments }}</span>
-						comment{{ item.total_comments|pluralize:",s"}}
+						<span>{{ item.item.total_comments }}</span>
+						comment{{ item.item.total_comments|pluralize:",s"}}
 					</li>
 					{% endif %}
-					{% if item.total_views >= 0 %}
+					{% if item.item.total_views >= 0 %}
 					<li>
-						<span>{{ item.total_views }}</span>
-						view{{ item.total_views|pluralize:",s"}}
+						<span>{{ item.item.total_views }}</span>
+						view{{ item.item.total_views|pluralize:",s"}}
 					</li>
 					{% endif %}
 				</ul>
@@ -70,10 +70,10 @@
 
 			{% if not item.item.flags.sticky %}
 				<div class="row-context">
-					{% if item.last_comment_created %}
-						<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
-							@{{item.last_comment_created_by.profile_name | safe }}
-						</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
+					{% if item.item.last_comment_created %}
+						<a href="{% url 'single-profile' item.item.last_comment_created_by.id %}">
+							@{{item.item.last_comment_created_by.profile_name | safe }}
+						</a> replied <time datetime="{{ item.item.last_comment_created|date:"c" }}"></time>
 					{% endif %}
 				</div>
 			{% endif %}

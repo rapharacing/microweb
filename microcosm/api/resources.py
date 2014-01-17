@@ -926,14 +926,19 @@ class Conversation(APIResource):
         conversation.microcosm_id = data['microcosmId']
         conversation.title = data['title']
 
-        conversation.total_comments = data['totalComments']
-        conversation.total_views = data['totalViews']
- 
-        if data.get('lastCommentId'): conversation.last_comment_id = data['lastCommentId']
-        if data.get('lastCommentCreatedBy'):
-            conversation.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
-        if data.get('lastCommentCreated'):
-            conversation.last_comment_created = parse_timestamp(data['lastCommentCreated'])
+        conversation.total_comments = 0
+        if data.get('totalComments'):
+            conversation.total_comments = data['totalComments']
+
+        conversation.total_views = 0
+        if data.get('totalViews'):
+            conversation.total_views = data['totalViews']
+
+        if data.get('lastComment'):
+            conversation.last_comment_id = data['lastComment']['id']
+            conversation.last_comment_created_by = Profile(data['lastComment']['createdBy'])
+            conversation.last_comment_created = parse_timestamp(data['lastComment']['created'])
+
         conversation.meta = Meta(data['meta'])
         return conversation
 
@@ -1135,16 +1140,18 @@ class Event(APIResource):
         event.microcosm_id = data['microcosmId']
         event.title = data['title']
 
-        event.total_comments = data['totalComments']
-        event.total_views = data['totalViews']
+        event.total_comments = 0
+        if data.get('totalComments'):
+            event.total_comments = data['totalComments']
 
+        event.total_views = 0
+        if data.get('totalViews'):
+            event.total_views = data['totalViews']
 
-        if data.get('lastCommentId'): event.last_comment_id = data['lastCommentId']
-        if data.get('lastCommentCreatedBy'):
-            event.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
-        if data.get('lastCommentCreated'):
-            event.last_comment_created = parse_timestamp(data['lastCommentCreated'])
-        event.meta = Meta(data['meta'])
+        if data.get('lastComment'):
+            event.last_comment_id = data['lastComment']['id']
+            event.last_comment_created_by = Profile(data['lastComment']['createdBy'])
+            event.last_comment_created = parse_timestamp(data['lastComment']['created'])
 
         # RSVP attend / spaces are only returned if non-zero
         if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
@@ -1167,6 +1174,8 @@ class Event(APIResource):
         if data.get('east'): event.east = data['east']
         if data.get('south'): event.south = data['south']
         if data.get('west'): event.west = data['west']
+
+        if data.get('meta'): event.meta = Meta(data['meta'])
         return event
 
     @classmethod
