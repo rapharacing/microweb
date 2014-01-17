@@ -106,12 +106,20 @@
 {% block sidebar %}
 
 	<div class="metabar-module">
+	{% if content.id == user.id %}
+		<div class="metabar-module-primary-buttons">
+			<a href="{% url 'edit-profile' user.id %}" class="btn btn-large btn-block btn-primary">
+				<span class="sprite sprite-pencil-small"></span> Edit your Profile
+			</a>
+		</div>
+	{% else %}
 		<h5>Got something to add?</h5>
 		<div class="metabar-module-primary-buttons">
 			<a href="#" class="btn btn-large btn-block btn-primary">
 				<span class="sprite sprite-envelope-small"></span> Send message
 			</a>
 		</div>
+	{% endif %}
 	</div> <!-- primary actions -->
 
 	<div class="metabar-module">
