@@ -49,12 +49,19 @@
 <div class="pagination-alt pull-right">
 	{% if pagination.total_pages > 1 %}
 	Page
-	<form name="paginationByOffset"
-				method="GET"
-				action=""
-				data-limit="{{ pagination.limit }}"
-				data-max="{{ pagination.total_pages }}">
-		<input type="text" class="form-control" value="{{ pagination.page }}"/>
+	<form
+		name="paginationByOffset"
+		method="GET"
+		action=""
+		data-limit="{{ pagination.limit }}"
+		data-max="{{ pagination.total_pages }}"
+	>
+		<input
+			type="text"
+			class="form-control"
+			value="{{ pagination.page }}"
+			pattern="[0-9]*"
+		/>
 		<input name="offset" type="hidden" />
 		{% if content.query and content.query.searched %}
 		<input name="q" type="hidden" value="{{ content.query.searched }}" />
