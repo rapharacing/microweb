@@ -4,6 +4,7 @@
 {% load conversation %}
 {% load event %}
 {% load list_comment %}
+{% load huddle %}
 {% block title %}Search for {{ content.query.searched }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
 
 {% block content %}
@@ -63,6 +64,10 @@
 				{% elif result.item_type == "comment" %}
 
 					{% list_comment result %}
+
+				{% elif result.item_type == "huddle" %}
+
+					{% huddle result %}
 
 				{% else %}
 

@@ -300,7 +300,7 @@ class HuddleView(object):
 
 	create_form = HuddleCreate
 	edit_form = HuddleEdit
-	form_template = 'forms/form_huddle.html'
+	form_template = 'forms/huddle.html'
 	single_template = 'huddle.html'
 	list_template = 'huddles.html'
 
@@ -480,7 +480,7 @@ class HuddleView(object):
 class ProfileView(object):
 
 	edit_form = ProfileEdit
-	form_template = 'forms/form_profile.html'
+	form_template = 'forms/profile.html'
 	single_template = 'profile.html'
 	list_template = 'profiles.html'
 

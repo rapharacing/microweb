@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load huddle %}
 {% block title %}Huddles{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
 
 {% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
@@ -24,72 +24,7 @@
 <div class="list-huddles">
 	<ul class="list-collection bordered padded">
 	{% for item in content.huddles.items %}
-		<li id="{{ item.itemType }}{{ item.id }}" class="list-collection-row">
-			<div class="row">
-				<div class="col-sm-8">
-
-					<div class="list-collection-row-icon">
-						<a class="sprite sprite-speech-bubble" title="Huddle"></a>
-					</div>
-					<div class="list-collection-row-offset">
-
-						<h3 class="row-title">
-							<a href="{% url 'newest-huddle' item.id %}">
-								{{ item.title | safe }}
-							</a>
-						</h3>
-						<div class="row-meta">
-							{% if item.last_comment_created %}
-
-								<a href="{% url 'single-profile' item.last_comment_created_by.id %}">
-
-									@{{ item.last_comment_created_by.profile_name | safe | truncatechars:25 }}
-								</a>
-								&bull;
-								<time datetime="{{ item.last_comment_created|date:"c" }}">
-									{{ item.last_comment_created|timesince }}
-								</time>
-
-							{% else %}
-
-								<a href="{% url 'single-profile' item.meta.created_by.id %}">
-
-									@{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}
-								</a> &bull;
-								<time datetime="{{ item.meta.created|date:"c" }}">{{ item.meta.created|timesince }}</time>
-
-							{% endif %}
-
-						</div>
-					</div> <!-- /list-collection-row-offset -->
-
-				</div> <!-- /col-sm-8 -->
-				<div class="col-sm-4">
-					<div class="row-stats">
-						<ul class="list-stats list-stats-sm">
-							<li>
-							{% if item.meta.flags.unread %}
-								<span class="label label-warning">New</span>
-							{% endif %}
-								<span>{{ item.total_comments|default:"0" }}</span>
-								comment{{ item.total_comments|pluralize:",s"}}
-							</li>
-						</ul>
-					</div>
-					<div class="row-context">
-						<ul class="list-people list-people-sm pull-right">
-							{% for participant in item.participants %}
-								<li>
-									<a href="{% url 'single-profile' participant.id %}" data-toggle="tooltip" title="@{{ participant.profile_name | safe }}">
-										<img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name | safe }}"/>
-									</a>
-								</li>
-							{% endfor %}
-						</ul>
-					</div>
-				</div> <!-- /col-sm-4 -->
-			</div> <!--/row -->
-		</li>
+		{% huddle item %}
 	{% endfor %}
 	</ul>
 </div>

@@ -105,6 +105,7 @@ INSTALLED_APPS = (
     'microcosm.templatetags.microcosm',
     'microcosm.templatetags.list_comment',
     'microcosm.templatetags.get_attachment',
+    'microcosm.templatetags.huddle',
 )
 
 # The values below in must be initialised in local_settings.py

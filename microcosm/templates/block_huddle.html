@@ -1,0 +1,67 @@
+<li class="list-collection-row">
+  <div class="row">
+    <div class="col-sm-8">
+
+      <div class="list-collection-row-icon">
+        <a class="sprite sprite-user" title="Huddle"></a>
+      </div>
+      <div class="list-collection-row-offset">
+
+        <h3 class="row-title">
+          <a href="{% url 'newest-huddle' item.item.id %}">
+            {{ item.item.title | safe }}
+          </a>
+          {% if item.item.meta.flags.unread %}
+          <span class="label label-warning">new</span>
+          {% endif %}
+        </h3>
+        <div class="row-meta">
+          <ul class="list-people list-people-sm">
+            {% for participant in item.item.participants %}
+              <li>
+                <a href="{% url 'single-profile' participant.id %}" data-toggle="tooltip" title="@{{ participant.profile_name | safe }}">
+                  <img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name | safe }}"/>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+
+
+        </div>
+      </div> <!-- /list-collection-row-offset -->
+
+    </div> <!-- /col-sm-8 -->
+    <div class="col-sm-4">
+      <div class="row-stats">
+        <ul class="list-stats list-stats-sm">
+          <li>
+            <span>{{ item.item.total_comments|default:"0" }}</span>
+            comment{{ item.item.total_comments|pluralize:",s"}}
+          </li>
+        </ul>
+      </div>
+      <div class="row-context">
+        {% if item.item.last_comment_created %}
+
+          <a href="{% url 'single-profile' item.item.last_comment_created_by.id %}">
+
+            @{{ item.item.last_comment_created_by.profile_name | safe | truncatechars:25 }}
+          </a>
+          replied
+          <time datetime="{{ item.item.last_comment_created|date:"c" }}">
+            {{ item.item.last_comment_created|timesince }}
+          </time>
+
+        {% else %}
+
+          <a href="{% url 'single-profile' item.item.meta.created_by.id %}">
+
+            @{{ item.item.meta.created_by.profile_name | safe | truncatechars:25 }}
+          </a> replied
+          <time datetime="{{ item.item.meta.created|date:"c" }}">{{ item.item.meta.created|timesince }}</time>
+
+        {% endif %}
+      </div>
+    </div> <!-- /col-sm-4 -->
+  </div> <!--/row -->
+</li>
