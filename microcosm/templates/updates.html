@@ -47,6 +47,8 @@
 											<a class="sprite sprite-speech-bubble" title="Conversation"></a>
 										{% elif update.parent_item_type == "event" %}
 											<a class="sprite sprite-calendar" title="Event"></a>
+										{% elif update.item.item_type == "profile" %}
+											<a class="sprite sprite-user" title="Profile"></a>
 										{% endif %}
 									{% else %}
 										{% if update.item_type == "conversation" %}
@@ -66,11 +68,24 @@
 										{% if update.update_type == "new_comment" %}
 
 
-											<h3 class="row-title">
-												<a href="{{ update.parent_link }}/newest/">
-												{{ update.parent_item.title | safe }}
-												</a>
-											</h3>
+												{% if update.item.item_type == "profile" %}
+														{% if update.item.meta.created_by.id == user.id %}
+														<strong>You've successfully updated your profile</strong>
+														{% else %}
+														<h3 class="row-title">
+															<a href="{{ update.parent_link }}">
+															@{{ update.item.meta.created_by.profile_name }}
+															</a>
+														</h3>
+														updated their profile
+														{% endif %}
+												{% else %}
+												<h3 class="row-title">
+													<a href="{{ update.parent_link }}/newest/">
+													{{ update.parent_item.title | safe }}
+													</a>
+												</h3>
+												{% endif %}
 
 											{% if update.meta.flags.unread %}
 											<span class="label label-warning">NEW</span>
@@ -176,10 +191,19 @@
 									</div> <!-- /row-title-wrapper-->
 
 									<div class="row-meta">
-
 										<span class="sprite sprite-arrow-right"></span>
+										{% if update.item_type == 'comment' %}
+											<a href="{{ update.parent_link }}">
+										{% else %}
+											{% if update.item_type == "conversation" %}
+												<a href="{% url 'single-conversation' update.item.id %}">
+											{% elif update.item_type == "event" %}
+												<a href="{% url 'single-event' update.item.id %}">
+											{% else %}
+												<a href="{{ update.item_link }}"></a>
+											{% endif %}
+										{% endif %}
 
-										<a href="{{ update.parent_link }}">
 											view
 											{% if update.parent_item_type == "conversation" %}
 												conversation
@@ -193,6 +217,8 @@
 												event
 											{% elif update.item_type == "poll" %}
 												poll
+											{% elif update.item.item_type == "profile" %}
+												profile
 											{% endif %}
 										</a>
 
@@ -215,8 +241,13 @@
 												</div>
 											{% endif %}
 										{% endif %}
-										&bull;
 
+										{% if update.item.item_type == "profile" and update.item.meta.created_by.id == user.id %}
+											{% comment %}
+											Prevents you from unfollowing yourself
+											{% endcomment %}
+										{% else %}
+										&bull;
 										<div class="inline-subscribe">
 											<div class="btn-switch on active"
 												{% if update.parent_item_type %}
@@ -241,6 +272,7 @@
 												</div>
 											</div>
 										</div>
+										{% endif %}
 
 									</div> <!-- /row-meta -->
 

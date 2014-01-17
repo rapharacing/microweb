@@ -123,7 +123,10 @@
 
 {% endblock %}
 {% block js %}
+{% if user %}
 <script type="text/javascript">
+
+	{% if not content.id == user.id %}
 	var subscribe = new Subscribe({
 		el    : '.subscribe',
 		url   : '{% url 'single-watcher' %}',
@@ -132,5 +135,7 @@
 		token : '{{ csrf_token }}',
 		is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
 	});
+	{% endif %}
 </script>
+{% endif %}
 {% endblock %}
