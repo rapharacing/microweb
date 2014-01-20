@@ -110,7 +110,9 @@
     is_textbox : true,
     static_url : subdomain,
     dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q=',
-    invited    : typeof window.form_invitees !== 'undefined' && window.form_invitees.length > 0 ? window.form_invitees : []
+    invited    : typeof window.form_invitees !== 'undefined' &&
+                        window.form_invitees !== "None" &&
+                        window.form_invitees.length > 0 ? window.form_invitees : []
   });
 
   // update the hidden input box
