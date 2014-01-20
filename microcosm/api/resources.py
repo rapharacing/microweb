@@ -1368,10 +1368,12 @@ class Comment(APIResource):
     @classmethod
     def from_create_form(cls, data):
         comment = cls()
+        comment.comment_id = data['id']
         comment.item_type = data['itemType']
         comment.item_id = data['itemId']
         comment.in_reply_to = data['inReplyTo']
         comment.markdown = data['markdown']
+        comment.attachments = data['attachments'] if data.get('attachments') else 0
         return comment
 
     @classmethod
@@ -1536,6 +1538,17 @@ class Attachment(object):
         attachment = {'FileHash': file_hash}
         headers = APIResource.make_request_headers(access_token)
         return APIResource.process_response(url, requests.post(url, data=attachment, headers=headers))
+
+    @staticmethod
+    def source(host, type, id, offset=None, access_token=None):
+        url, params, headers = Attachment.build_request(host, type, id, offset, access_token)
+        response = requests.get(url=url, params=params, headers=headers)
+        return response.content
+
+    @staticmethod
+    def delete(host, type, id, fileHash, offset=None, access_token=None):
+        url = build_url(host, [ type, id, Attachment.api_path_fragment, fileHash ])
+        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
 class Search(object):
     """
