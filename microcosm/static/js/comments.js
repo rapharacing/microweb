@@ -145,7 +145,7 @@
 
         _this.$
           .addClass('active')
-          .after( _this.$.comment_box );
+          .parent().append( _this.$.comment_box );
 
         // FIXME: not flexible, could be better
         if(_this.$.attr('data-source')){
