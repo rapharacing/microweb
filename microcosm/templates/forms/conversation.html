@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load commentBox %}
 {% block title %}{% if form.id > 0 %}Edit conversation{% else %}Start a conversation{% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
@@ -83,38 +83,13 @@
 									What is it you want to say?
 								</label>
 								<div class="col-sm-12">
-
-									<div class="reply-box">
-										<ul>
-											<li class="se-bold"><strong>Bold</strong></li>
-											<li class="se-italics"><i>Italics</i></li>
-											<li class="se-quote">Quote</li>
-											<li class="se-link"><span class="glyphicon glyphicon-link"></span> Link</li>
-											<li class="se-list"><span class="glyphicon glyphicon-th-list"></span> List</li>
-											<li class="se-image"><span class="glyphicon glyphicon-picture"></span> Image</li>
-										</ul>
-
-										<textarea
-											id="reply-box-textarea"
-											name="firstcomment"
-											placeholder="Enter your text here..."
-											maxlength="5000"
-											tabindex="1"
-										></textarea>
-										<div class="reply-box-footer">
-											<a href="#" class="formatting-help-handle" data-toggle="modal" data-target="#formatting-help-modal">
-												<span class="sprite sprite-help-small"></span>
-												Formatting help
-											</a>
-											{% include 'modal_formatting_help.html' %}
-										</div>
-									</div>
-								</div> <!-- /reply-box -->
-
+									{% commentBox as_component=True %}
+								</div>
 							</div>
 						</div>
 
 						</div> <!-- /form-container-inner -->
+						</div>
 						<div class="form-group form-footer padded">
 							<div class="row">
 								<div class="col-sm-12">
@@ -154,6 +129,8 @@
 {% block js %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
 <script type="text/javascript">
 (function(){

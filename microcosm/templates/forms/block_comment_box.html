@@ -1,12 +1,17 @@
 <div class="reply-box">
 {% if user %}
-	<ul>
-		<li class="se-bold"><strong>Bold</strong></li>
-		<li class="se-italics"><i>Italics</i></li>
-		<li class="se-quote">Quote</li>
-		<li class="se-link"><span class="sprite sprite-format-link"></span> Link</li>
-		<li class="se-list"><span class="sprite sprite-format-list"></span> List</li>
-		<li class="se-image"><span class="sprite sprite-format-img"></span> Image</li>
+
+	<ul class="wmd-button-bar">
+		<li class="wmd-bold"><strong>Bold</strong></li>
+		<li class="wmd-italic"><i>Italics</i></li>
+		<li class="wmd-quote">Quote</li>
+		<li class="wmd-link"><span class="sprite sprite-format-link"></span> Link</li>
+		<li class="wmd-ol"><span class="sprite sprite-format-list"></span> List</li>
+		<li class="wmd-code">&lt;&gt; Code</li>
+		<li class="wmd-image"><span class="sprite sprite-format-img"></span> Image</li>
+		<li class="wmd-preview-button">preview</li>
+		<li class="wmd-undo">undo</li>
+		<li class="wmd-redo">redo</li>
 	</ul>
 	{% if not as_component %}
 	<form action="{% url 'create-comment' %}" method="POST" enctype="multipart/form-data">
@@ -18,6 +23,7 @@
 	{% endif %}
 		<textarea
 			id="reply-box-textarea"
+			class="wmd-input"
 			{% if not as_component %}
 			name="{{ comment_form.markdown.name }}"
 			maxlength="{{ comment_form.fields.markdown.max_length }}"
@@ -55,6 +61,12 @@
 	{% if not as_component %}
 	</form>
 	{% endif %}
+	<div class="wmd-preview-wrapper">
+		<div class="wmd-preview-title">
+			<strong>Preview</strong> &bull; click the preview button again to close
+		</div>
+		<div class="wmd-preview"></div>
+	</div>
 {% else %}
 	<ul>
 		<li><strong>Bold</strong></li>

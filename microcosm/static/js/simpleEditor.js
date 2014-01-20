@@ -176,46 +176,30 @@
       this.fileHandler.removeFile(self.index());
     };
 
-    simpleEditor.prototype.onKeypressHandler = function(e){
-      var _this = e.currentTarget;
 
-      if (typeof this.peopleWidget !== 'undefined'){
-        if ([64,43].indexOf(e.which)>-1){
-          this.peopleWidget.on = true;
-          this.peopleWidget.show();
-        }
-      }
+    simpleEditor.prototype.toggleMarkdownPreview = function(e){
+      var preview_window = this.$el.find('.wmd-preview-wrapper');
 
-    };
-    simpleEditor.prototype.onKeyupHandler = function(e){
-      var _this = e.currentTarget;
-
-      if (typeof this.peopleWidget !== 'undefined'){
-        if ([32,13].indexOf(e.which)>-1){
-          this.peopleWidget.on = false;
-          this.peopleWidget.people_invited = [];
-          this.peopleWidget.hide();
-        }
-      }
-    };
+      preview_window.css('height', window.getComputedStyle(this.textarea).height);
+      preview_window.toggle();
+    }
 
     simpleEditor.prototype.bind = function(){
 
+      // create a new instance of markdown.editor.js
+
+      var converter = new Markdown.Converter();
+      var help      = { handler : function(){ alert('help!'); } };
+      this.editor = new Markdown.Editor(converter, this.$el, help);
+      this.editor.run();
+      window.editor = this.editor;
+
       // only binds for elements inside this.$el.display
       var events = [
-        ['click',    '.se-h1',      'h1'],
-        ['click',    '.se-bold',    'bold'],
-        ['click',    '.se-italics', 'italics'],
-        ['click',    '.se-quote',   'quote'],
-        ['click',    '.se-link',    'link'],
-        ['click',    '.se-list',    'list'],
-        ['click',    '.se-image',   'image'],
-        ['keypress', 'textarea',    'onKeypressHandler'],
-        ['keyup',    'textarea',    'onKeyupHandler'],
-        ['reset',    'form',        'clearAttachmentGallery'],
+        ['reset', 'form',        'clearAttachmentGallery'],
+        ['click', '.reply-box-attachments-gallery li', 'removeAttachmentFile'],
 
-        ['click',    '.reply-box-attachments-gallery li', 'removeAttachmentFile']
-
+        ['click', '.wmd-preview-button', 'toggleMarkdownPreview']
       ];
 
       for(var i in events){
@@ -238,9 +222,11 @@
         },this));
       }
 
-      var subdomain = $('meta[name="subdomain"]').attr('content');
-      var static_url = subdomain;
-      var dataSource = subdomain + '/api/v1/profiles?disableBoiler&top=true&q=';
+
+      // textcomplete
+      var subdomain = $('meta[name="subdomain"]').attr('content'),
+          static_url = subdomain,
+          dataSource = subdomain + '/api/v1/profiles?disableBoiler&top=true&q=';
 
       if (typeof $.fn.textcomplete !== 'undefined'){
 

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load commentBox %}
 {% load comments %}
 
 {% block title %}{{ content.title | safe }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
@@ -84,7 +84,7 @@
 					</div>
 				</div>
 				<div class="comment-item-body">
-					{% include 'forms/block_comment_box.html' %}
+					{% commentBox %}
 				</div>
 			</div>
 		</li>
@@ -165,6 +165,8 @@ eventMap.restore(
 <script type="text/javascript" src="{{STATIC_URL}}js/comments.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
 
 <script type="text/javascript">

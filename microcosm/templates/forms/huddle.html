@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load commentBox %}
 {% block title %}New huddle | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
@@ -84,42 +84,12 @@
 								<label class="col-sm-12" for="reply-box-textarea">What is it you want to say?</label>
 								<div class="col-sm-12">
 
-									<div class="reply-box">
-											<ul>
-												<li class="se-bold"><strong>Bold</strong></li>
-												<li class="se-italics"><i>Italics</i></li>
-												<li class="se-quote">Quote</li>
-												<li class="se-link"><span class="sprite sprite-format-link"></span> Link</li>
-												<li class="se-list"><span class="sprite sprite-format-list"></span> List</li>
-												<li class="se-image"><span class="sprite sprite-format-img"></span> Image</li>
-											</ul>
-											<textarea
-												id="reply-box-textarea"
-												name="firstcomment"
-												placeholder="Enter your text here..."
-												maxlength="5000"
-												tabindex="1"
-											></textarea>
-											<div class="reply-box-footer">
-												<div class="reply-box-attachments">
-													<div class="reply-box-attachments-gallery"></div>
-													<span class="reply-box-drop-zone">Drag your files into this area</span> or
-													<label for="reply-box-attachments">
-														upload a file
-													</label>
-													<input type="file" id="reply-box-attachments" name="attachments" multiple/>
-												</div>
-												<a href="javascript:void 0" class="formatting-help-handle">
-													<span class="sprite sprite-help-small"></span>
-													Formatting help
-												</a>
-											</div>
-										</div>
+									{% commentBox name="firstcomment" as_component=True %}
 								</div>
 
 							</div>
 						</div> <!-- /form-group -->
-
+						</div>
 						<div class="form-group form-group-highlighted">
 							<div class="row">
 								<label class="col-sm-12">Is this huddle confidential?</label>
@@ -178,6 +148,8 @@
 {% block js %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/peopleWidget.js"></script>
 <script type="text/javascript">
