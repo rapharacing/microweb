@@ -71,15 +71,13 @@
 						 data-ref="{{ comment.id }}" href="javascript:void 0">
 						<span class="sprite sprite-arrow-left"></span>
 						Reply
-						{% comment %}
-						to <strong>@{{ comment.meta.created_by.profile_name | safe | truncatechars:25 }}</strong>
-						{% endcomment %}
 					</a>
 			{%else%}
 				<a class="insertReplyBox"
 					 data-action="{% url 'edit-comment' comment.id %}"
-					 data-source="{% url 'source-comment' comment.id %}"
+					 data-source="{% url 'single-comment' comment.id %}"
 					 data-comment-id="{{ comment.id }}"
+					 data-num-attachments="{{ comment.attachments|default:"0"}}"
 					 href="javascript:void 0">Edit</a>
 			{% endif %}
 		{% endif %}

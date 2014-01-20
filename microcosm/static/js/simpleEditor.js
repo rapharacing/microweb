@@ -3,22 +3,21 @@
 
   w.simpleEditor = (function(){
 
-    var simpleEditor = function(opts){
+    var simpleEditor = function(options){
       this.el = false;
-      if (typeof opts.el !== "undefined"){
+      if (typeof options.el !== "undefined"){
+        this.$el = typeof options.el == "string" ? $(options.el) : options.el;
+        this.el = this.$el[0];
+      }
 
-        if (typeof opts.el == "string"){
-          this.el = document.querySelector(opts.el);
-          this.$el = $(this.el);
-        }else{
-          this.$el = opts.el;
-          this.el = this.$el[0];
-        }
+      this.static_url = $('meta[name="subdomain"]').attr('content');
+      if (typeof options.static_url !== 'undefined'){
+        this.static_url = options.static_url;
       }
 
       this.no_attachments = false;
-      if (typeof opts.no_attachments !== 'undefined'){
-        this.no_attachments = opts.no_attachments;
+      if (typeof options.no_attachments !== 'undefined'){
+        this.no_attachments = options.no_attachments;
       }
 
 
@@ -147,6 +146,25 @@
       }
     };
 
+
+    simpleEditor.prototype.fetchAttachments = function(options){
+
+      var ajaxOptions = {
+        url   : "",
+        type  : 'GET'
+      };
+
+      if (typeof options !== 'undefined' &&
+          typeof options == 'object'){
+        ajaxOptions = $.extend({},ajaxOptions, options);
+      }
+
+      console.log(ajaxOptions);
+
+      return $.ajax(ajaxOptions);
+
+    };
+
     simpleEditor.prototype.clearAttachmentGallery = function(e){
       this.$el.find('.reply-box-attachments-gallery').html("");
       this.fileHandler.clear();
@@ -154,16 +172,33 @@
 
 
     simpleEditor.prototype.renderAttachmentGallery = function(files){
-      var ul,li,img;
+      var ul,li,img,span;
 
       ul = document.createElement('ul');
 
       if(files.length>0){
         for(var i=0,j=files.length;i<j;i++){
           img = document.createElement('img');
-          img.src = files[i].data;
+
+          if (typeof files[i].meta !== 'undefined'){
+            if (typeof files[i].meta.links !== 'undefined'){
+              img.src = this.static_url + files[i].meta.links[0].href;
+            }
+          }else{
+            img.src = files[i].data;
+          }
+          if (typeof files[i].fileHash !== 'undefined'){
+            img.name = files[i].fileHash;
+          }
+
           li = document.createElement('li');
           li.appendChild(img);
+
+          span = document.createElement('span');
+          span.className = 'remove';
+          span.innerHTML = "&times;";
+          li.appendChild(span);
+
           ul.appendChild(li);
         }
       }
@@ -172,8 +207,37 @@
 
 
     simpleEditor.prototype.removeAttachmentFile = function(e){
-      var self = $(e.currentTarget);
-      this.fileHandler.removeFile(self.index());
+      var self = $(e.currentTarget),
+          parent = self.parent(),
+          fileToBeRemoved = parent.find('img[name]');
+
+      var delete_confirm = window.confirm("Are you sure you want to remove this attachment?");
+
+      if (delete_confirm){
+        if (fileToBeRemoved.length > 0){
+
+          if (typeof this.attachments_delete == 'undefined'){
+            this.attachments_delete = [];
+          }
+
+          var field_attachments_delete = this.form.find('input[name="attachments-delete"]');
+
+          if (field_attachments_delete.length < 1){
+            field_attachments_delete = $('<input name="attachments-delete" type="hidden"/>');
+            this.form.append(field_attachments_delete);
+          }
+
+          if (this.attachments_delete.indexOf(fileToBeRemoved.attr('name')) === -1){
+            this.attachments_delete.push(fileToBeRemoved.attr('name'));
+            field_attachments_delete.val(this.attachments_delete.join(','));
+            parent.remove();
+          }
+
+        }else{
+          this.fileHandler.removeFile(self.index());
+        }
+      }
+
     };
 
 
@@ -194,20 +258,12 @@
       this.editor.run();
       window.editor = this.editor;
 
-      // only binds for elements inside this.$el.display
-      var events = [
-        ['reset', 'form',        'clearAttachmentGallery'],
-        ['click', '.reply-box-attachments-gallery li', 'removeAttachmentFile'],
 
-        ['click', '.wmd-preview-button', 'toggleMarkdownPreview']
-      ];
-
-      for(var i in events){
-        this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );
-      }
-
-      // add attachments
+      //////////////////////
+      //   attachments    //
+      //////////////////////
       if (typeof FileHandler !== 'undefined' && !this.no_attachments){
+
         this.fileHandler = new FileHandler({
           el : this.$el.find('.reply-box-attachments')[0],
           dropzone : '.reply-box-drop-zone, .reply-box-attachments-gallery'
@@ -220,10 +276,32 @@
         this.fileHandler.onRemove($.proxy(function(files){
           this.renderAttachmentGallery(files);
         },this));
+
+
+        // check for data-num-attachments attribute, if 1 or more
+        // fire off an ajax call for the attachments json
+        // on a response, pass the attachment items to the renderAttachmentGallery()
+        var num_attachments = parseInt(this.$el.attr('data-num-attachments'),10);
+
+        if (!isNaN(num_attachments) && num_attachments > 0){
+          this.$el.find('.reply-box-attachments-gallery').html("Loading attachments...");
+
+          this.fetchAttachments({
+            url : this.$el.attr('data-source') + "attachments"
+          }).success($.proxy(function(response){
+            if (typeof response.data.attachments !== 'undefined'){
+              this.renderAttachmentGallery(response.data.attachments.items);
+            }
+          },this));
+
+        }
       }
 
 
-      // textcomplete
+      //////////////////////
+      //   textcomplete   //
+      //////////////////////
+
       var subdomain = $('meta[name="subdomain"]').attr('content'),
           static_url = subdomain,
           dataSource = subdomain + '/api/v1/profiles?disableBoiler&top=true&q=';
@@ -264,6 +342,20 @@
             maxCount: 5
           }
         ]);
+      }
+
+      ////////////////////////
+      //     bind events    //
+      ////////////////////////
+      var events = [
+        ['reset', 'form',        'clearAttachmentGallery'],
+        ['click', '.reply-box-attachments-gallery li span.remove', 'removeAttachmentFile'],
+
+        ['click', '.wmd-preview-button', 'toggleMarkdownPreview']
+      ];
+
+      for(var i in events){
+        this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );
       }
     };
 
