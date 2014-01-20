@@ -230,12 +230,12 @@
           if (this.attachments_delete.indexOf(fileToBeRemoved.attr('name')) === -1){
             this.attachments_delete.push(fileToBeRemoved.attr('name'));
             field_attachments_delete.val(this.attachments_delete.join(','));
-            parent.remove();
           }
 
         }else{
           this.fileHandler.removeFile(self.index());
         }
+        parent.remove();
       }
 
     };
