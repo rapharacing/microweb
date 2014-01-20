@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load commentBox %}
 {% block title %}{{ content.meta.links.up.title | safe }} (Comment {{ content.id }}){% endblock title%}
 
 {% load comments %}
@@ -84,9 +84,11 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/comments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
 <script id="template-reply-box" type="text/template">
-	{% include 'forms/block_comment_box.html' %}
+	{% commentBox %}
 </script>
 <script type="text/javascript">
 (function(){
