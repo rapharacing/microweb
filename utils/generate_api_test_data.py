@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import datetime
 import json
 import sys
 import requests
@@ -87,6 +88,28 @@ def main():
         conversation = open('conversation_with_comment.json', 'w')
         conversation.write(response.content)
         conversation.close()
+
+    # events
+    ident = 'Creating event without comment'
+    print ident
+    url = unparse_api_url(site_subdomain, 'api/v1/events', access_token=access_token)
+    when = (datetime.datetime.utcnow() + datetime.timedelta(weeks=2)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    data = json.dumps({
+        'microcosmId': microcosm_id,
+        'title': 'Generated Event',
+        'when': when,
+        'duration': 180,
+        'where': 'The Park',
+        'rsvpLimit': 100,
+    })
+    response = requests.post(url, data=data, headers={'Content-Type': 'application/json'})
+    if response.status_code != 200:
+        failures[ident] = response.content
+        exit_with_error(failures)
+    else:
+        event = open('event_without_comment.json', 'w')
+        event.write(response.content)
+        event.close()
 
 
 def unparse_api_url(site_subdomain, path, query_params={}, access_token=''):
