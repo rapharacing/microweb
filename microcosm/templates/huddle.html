@@ -40,18 +40,13 @@
 			</a>
 			<div class="btn-group-responsive huddle-actions">
 				{% if content.meta.permissions.owner %}
-				<button type="button" class="btn btn-primary people-widget-trigger" value="Invite People">Invite people</button>
-
-				<div class="people-widget" style="display:none">
-					<div class="people-widget-input">
-						<div class="input-group">
-							<label class="input-group-addon">?</label>
-							<input type="text" class="form-control" />
-						</div>
-					</div>
-					<div class="people-widget-list"></div>
-				</div>
-
+				<button type="button"
+							  data-toggle="modal"
+								data-target="#modal-huddle-invite"
+								class="btn btn-primary"
+								value="Invite People">
+								Invite people
+				</button>
 				{% endif %}
 				<form action="{% url 'delete-huddle' content.id %}" method="POST">
 					{% csrf_token %}
@@ -103,6 +98,10 @@
 		{% csrf_token %}
 	</form>
 	{% endif %}
+
+{% if content.meta.permissions.owner %}
+	{% include "modal_huddle_invite.html" %}
+{% endif %}
 
 {% endblock %}
 
@@ -168,21 +167,47 @@
 	var subdomain = $('meta[name="subdomain"]').attr('content');
 
 	var p = new PeopleWidget({
-		el         : '.people-widget-trigger',
+		el         : 'input#invite',
 		static_url : subdomain,
-		dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q='
+		dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q=',
+		is_textbox : true,
+		list_target: '#modal-huddle-people-widget-list',
+		invited    : {{ participants_json|safe|default:"[]" }}
 	});
 
-	p.onSelection(function(invited){
+	p.onSelection(function(invited, added){
 
-		var form = $('#invite-form');
+		var invited_list = $('#modal-huddle-invited-list'),
+				person;
 
-		var input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'invite_profile_id';
-		input.value = invited[0].id;
-		form.append(input);
-		form.submit();
+		if (typeof added !== 'undefined'){
+			img_src = subdomain + added.avatar;
+			a_href = "{{ site.url }}/profiles/"+added.id;
+			a_profile_name = added.profileName;
+			li_id = added.id;
+
+			person = $('<li class="pending" data-id="'+li_id+'"><a href="'+a_href+'"><img src="'+img_src+'"/> @'+a_profile_name+'</a><img class="preloader" src="{{ STATIC_URL }}img/preloader.gif"/></li>');
+			invited_list.append(person);
+
+			// fire off calls to invite
+
+			$.ajax({
+				url  : '{% url 'invite-huddle' content.id %}',
+				type : 'POST',
+				data : {
+					invite_profile_id : added.id,
+					csrfmiddlewaretoken : '{{ csrf_token }}'
+				}
+			}).success(function(){
+				var li = invited_list.find('li[data-id='+added.id+']');
+				li.removeClass('pending').find('.preloader').remove();
+
+				$('.huddle-meta').find('.list-people').append(
+					'<li><a href="'+a_href+'" data-toggle="tooltip" title="'+a_profile_name+'"><img src="'+img_src+'"/></a></li>'
+				);
+			});
+
+		}
 
 	});
 </script>

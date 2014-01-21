@@ -331,6 +331,10 @@ class HuddleView(object):
 					c_attachments = Attachment.retrieve( request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
 					attachments[str(c['id'])] = c_attachments
 
+			#participants json
+			import json
+			participants_json = [ p.as_dict for p in huddle.participants ]
+
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 				'site': request.site,
@@ -338,7 +342,8 @@ class HuddleView(object):
 				'comment_form': comment_form,
 				'pagination': build_pagination_links(responses[huddle_url]['comments']['links'], huddle.comments),
 				'item_type': 'huddle',
-				'attachments' : attachments
+				'attachments' : attachments,
+				'participants_json' : json.dumps(participants_json)
 			}
 
 			return render(request, HuddleView.single_template, view_data)

@@ -9,11 +9,11 @@
 
         <div class="modal-event">
 
-          <div class="modal-event-icon">
+          <div class="modal-item-icon">
             <span class="sprite sprite-calendar"></span>
           </div>
-          <div class="modal-event-title">{{ content.title | safe }}</div>
-          <div class="modal-event-meta">
+          <div class="modal-item-title">{{ content.title | safe }}</div>
+          <div class="modal-item-meta">
             <strong>{{ content.where }}</strong>
             <p>
             {% if event_dates.type == 'multiple' %}
@@ -27,8 +27,8 @@
             </p>
           </div>
 
-          <div class="modal-event-list">
-            <div class="modal-event-list-title">Attendees / Invited</div>
+          <div class="modal-list">
+            <div class="modal-list-title">Attendees / Invited</div>
             <ul>
             {% if rsvp_num_attending > 0 %}
               {% for attendee in attendees.items.items%}
