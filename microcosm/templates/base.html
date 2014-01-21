@@ -3,9 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>{% block title %}{% endblock %}</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="shortcut icon" href="/static/img/favico.png" />
-		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 
 		<link href="{{ STATIC_URL }}themes/{{ site.theme_id|default:"1" }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
@@ -69,9 +69,10 @@
 								<div class="col-md-3 col-lg-2 navbar-profile">
 									{% if user %}
 										<div class="navbar-profile-row-1">
-											<a class="navbar-profile-logout" href="{% url 'logout' %}">
-												<span class="sprite sprite-logout"></span>
-											</a>
+											<form id="signout-form" action="{% url 'logout' %}" method="POST">
+												{% csrf_token %}
+												<span class="navbar-profile-logout"><input type="submit" class="sprite sprite-logout" value="" title="Sign out" /></span>
+											</form>
 
 											<div class="navbar-profile-row-1-left">
 												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">

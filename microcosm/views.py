@@ -3,16 +3,20 @@ import grequests
 import string
 
 from functools import wraps
+
 from microweb import settings
 from microweb.settings import PAGE_SIZE
 
 from urllib import urlencode
+
 from urlparse import parse_qs
 from urlparse import urlparse
 from urlparse import urlunparse
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
+
+
 from django.http import Http404
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
@@ -21,9 +25,14 @@ from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
+
+from django.shortcuts import redirect
 from django.shortcuts import render
+
 from django.template import RequestContext
 from django.template import loader
+
+from django.views.decorators.http import require_http_methods
 
 from django.views.generic.base import RedirectView
 from django.views.generic.base import TemplateView
@@ -1804,6 +1813,7 @@ class AuthenticationView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(["POST"])
 	def logout(request):
 		"""
 		Log a user out. Issues a DELETE request to the backend for the
@@ -1812,7 +1822,8 @@ class AuthenticationView(object):
 		"""
 
 		view_data = dict(site=request.site)
-		response = render(request, 'logout.html', view_data)
+		#response = render(request, 'logout.html', view_data)
+		response = redirect('/')
 
 		if request.COOKIES.has_key('access_token'):
 			response.delete_cookie('access_token')
@@ -1820,7 +1831,6 @@ class AuthenticationView(object):
 			requests.post(url, params={'method': 'DELETE', 'access_token': request.access_token})
 
 		return response
-
 
 class GeoView(object):
 
