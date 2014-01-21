@@ -199,12 +199,19 @@
 					csrfmiddlewaretoken : '{{ csrf_token }}'
 				}
 			}).success(function(){
-				var li = invited_list.find('li[data-id='+added.id+']');
+				var li = invited_list.find('li[data-id='+added.id+']'),
+						meta_list = $('.huddle-meta').find('.list-people');
+
 				li.removeClass('pending').find('.preloader').remove();
 
-				$('.huddle-meta').find('.list-people').append(
+				meta_list.append(
 					'<li><a href="'+a_href+'" data-toggle="tooltip" title="'+a_profile_name+'"><img src="'+img_src+'"/></a></li>'
 				);
+
+				$.each(meta_list.find('a[data-toggle="tooltip"]'),function(index,item){
+					$(item).tooltip();
+				});
+
 			});
 
 		}
