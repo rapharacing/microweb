@@ -6,7 +6,7 @@
 		{% if value.title and key != "up"%}
 	<li>
 		<a href="{{ value.href }}">
-			{{ value.title }}
+			{{ value.title | safe }}
 		</a>
 	</li>
 		{% endif %}
@@ -28,7 +28,7 @@
 			{% elif content.markdown %}
 				Comment by @{{ content.meta.created_by.profile_name }}
 			{% else %}
-				{{ content.title }}
+				{{ content.title|safe }}
 			{% endif %}
 		</a>
 	</li>
