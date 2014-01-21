@@ -1209,7 +1209,6 @@ class CommentView(object):
 			initial=dict(
 				itemId=content.item_id,
 				itemType=content.item_type,
-				attachments=content.attachments,
 				comment_id = content.id
 			))
 
