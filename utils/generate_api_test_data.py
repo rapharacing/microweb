@@ -18,7 +18,7 @@ def main():
 
     site_subdomain = sys.argv[1]
     access_token = sys.argv[2]
-    failures = []
+    failures = {}
 
     # whoami
     ident = 'Fetching whoami'
@@ -26,7 +26,8 @@ def main():
     url = unparse_api_url(site_subdomain, 'api/v1/whoami', access_token=access_token)
     response = requests.get(url, headers={'Accept-Encoding': 'application/json'})
     if response.status_code != 200:
-        exit_with_error(failures.append([ident, response.content]))
+        failures[ident] = response.content
+        exit_with_error(failures)
     else:
         whoami = open('whoami.json', 'w')
         whoami.write(response.content)
@@ -42,13 +43,50 @@ def main():
         })
     response = requests.post(url, data=data, headers={'Content-Type': 'application/json'})
     if response.status_code != 200:
-        exit_with_error(failures.append([ident, response.content]))
+        failures[ident] = response.content
+        exit_with_error(failures)
     else:
         microcosm = open('microcosm.json', 'w')
         microcosm.write(response.content)
         microcosm.close()
         microcosm_id = response.json()['data']['id']
         print 'Created microcosm with ID: %d' % microcosm_id
+
+    # conversations
+    ident = 'Creating conversation without comment'
+    print ident
+    url = unparse_api_url(site_subdomain, 'api/v1/conversations', access_token=access_token)
+    data = json.dumps({
+        'microcosmId': microcosm_id,
+        'title': 'Generated',
+        'description': 'Generated conversation',
+    })
+    response = requests.post(url, data=data, headers={'Content-Type': 'application/json'})
+    if response.status_code != 200:
+        failures[ident] = response.content
+        exit_with_error(failures)
+    else:
+        conversation = open('conversation_without_comment.json', 'w')
+        conversation.write(response.content)
+        conversation.close()
+
+    ident = 'Creating conversation with comment'
+    print ident
+    url = unparse_api_url(site_subdomain, 'api/v1/conversations', access_token=access_token)
+    data = json.dumps({
+        'microcosmId': microcosm_id,
+        'title': 'Generated',
+        'description': 'Generated conversation',
+        'firstComment': 'This is the first comment',
+    })
+    response = requests.post(url, data=data, headers={'Content-Type': 'application/json'})
+    if response.status_code != 200:
+        failures[ident] = response.content
+        exit_with_error(failures)
+    else:
+        conversation = open('conversation_with_comment.json', 'w')
+        conversation.write(response.content)
+        conversation.close()
 
 
 def unparse_api_url(site_subdomain, path, query_params={}, access_token=''):
