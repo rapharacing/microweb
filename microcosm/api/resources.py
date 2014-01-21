@@ -1030,6 +1030,9 @@ class Huddle(APIResource):
         huddle.participants = []
         for p in data['participants']:
             huddle.participants.append(Profile(p))
+        if 'isConfidential' in data:
+            huddle.is_confidential = data['isConfidential']
+
         return huddle
 
     @classmethod
