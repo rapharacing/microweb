@@ -1,7 +1,7 @@
 import pylibmc as memcache
 import logging
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponsePermanentRedirect
 
 from microweb import settings
 
@@ -56,15 +56,10 @@ class DomainRedirectMiddleware():
             if site and site.domain != '':
                 # No custom domains can be SSL, so we must be redirecting to the
                 # http version regardless of how they came into the site
-                location = 'http://' + site.domain
-
-                # Append query string to new location, if it exists
-                query_string = request.META.get('QUERY_STRING', None)
-                if query_string:
-                    location += '?' + query_string
+                location = 'http://' + site.domain + request.get_full_path()
 
                 logger.debug('Redirecting subdomain to: %s' % location)
-                # TODO: change to HttpResponsePermanentRedirect
-                return HttpResponseRedirect(location)
+                
+                return HttpResponsePermanentRedirect(location)
 
         return None
