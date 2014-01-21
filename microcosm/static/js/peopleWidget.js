@@ -154,6 +154,7 @@
           typeof this.onSelection === 'function'){
           this.onSelection(this.people_invited, invited[0]);
         }
+        this.widget_input.value = "";
       }
       this.cursor = -1;
       this.renderCursor();
