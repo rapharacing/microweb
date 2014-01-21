@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load commentBox %}
-{% block title %}{% if form.id > 0 %}Edit conversation{% else %}Start a conversation{% endif %} | {{ site.title | safe }}{% endblock title %}
+{% block title %}{% if state_edit %}Edit conversation{% else %}Start a conversation{% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -8,7 +8,7 @@
 		<div class="row">
 			<div class="col-sm-12"></div>
 		</div>
-		<h1>{% if form.id > 0 %}Edit conversation{% else %}Start a conversation{% endif %}</h1>
+		<h1>{% if state_edit %}Edit conversation{% else %}Start a conversation{% endif %}</h1>
 	</div>
 
 	<div class="content-body">
@@ -34,9 +34,9 @@
 								<label class="col-sm-12" for="title">
 									{{ form.title.label }}
 								</label>
-								<div class="col-sm-12">
+								<div class="col-sm-12 {% if form.errors.title %}has-error{% endif %}">
 									{% if form.errors.title %}
-										<div class="text-error">{{ form.errors.title.as_text }}</div>
+										<label class="control-label">{{ form.errors.title.as_text }}</label>
 									{% endif %}
 									<input
 										type="text"
@@ -45,40 +45,17 @@
 										name="{{ form.title.name }}" placeholder="Title of conversation"
 										maxlength="{{ form.fields.title.max_length }}"
 										tabindex="1"
+										value="{{ form.title.value|default:"" }}"
 									/>
 								</div>
 
 							</div>
 						</div> <!-- /form-group -->
 
-						{# reason #}
-						{% if form.id > 0 %}
+
+						{% if not state_edit %}
 						<div class="form-group">
 							<div class="row">
-								<label class="col-sm-12" for="editReason">
-									{{ form.editReason.label }}
-								</label>
-								<div class="col-sm-12">
-									{% if form.errors.editReason %}
-										<div class="text-error">{{ form.errors.editReason.as_text }}</div>
-									{% endif %}
-									<input
-										type="text"
-										class="form-control {% if form.errors.editReason %}error{% endif %}"
-										id="editReason"
-										name="{{ form.editReason.name }}"
-										placeholder="Reason for editing"
-										maxlength="150"
-										tabindex="1"
-									/>
-								</div>
-							</div>
-						</div> <!-- /form-group -->
-						{% endif %}
-
-						<div class="form-group">
-							<div class="row">
-
 								<label class="col-sm-12" for="reply-box-textarea">
 									What is it you want to say?
 								</label>
@@ -87,14 +64,46 @@
 								</div>
 							</div>
 						</div>
+						</div>
+						{% endif %}
 
 						</div> <!-- /form-container-inner -->
+
+
+						{# reason #}
+					{% if state_edit %}
+					<div class="form-group form-sticky">
+						<div class="row">
+							<label class="col-sm-12" for="editReason">
+								{{ form.editReason.label }}
+							</label>
+							<div class="col-sm-12 {% if form.errors.editReason %}has-error{% endif %}">
+								{% if form.errors.editReason %}
+									<label class="control-label">{{ form.errors.editReason.as_text }}</label>
+								{% endif %}
+								<input
+									type="text"
+									class="form-control {% if form.errors.editReason %}error{% endif %}"
+									id="editReason"
+									name="{{ form.editReason.name }}"
+									placeholder="Reason for editing"
+									maxlength="150"
+									tabindex="1"
+								/>
+							</div>
 						</div>
+					</div> <!-- /form-group -->
+					{% endif %}
+
 						<div class="form-group form-footer padded">
 							<div class="row">
 								<div class="col-sm-12">
 									<div class="form-footer-buttons">
+										{% if not state_edit %}
 										<input type="submit" class="btn btn-lg btn-primary" value="Start conversation" tabindex="1">
+										{% else %}
+										<input type="submit" class="btn btn-lg btn-primary" value="Edit conversation" tabindex="1">
+										{% endif %}
 										<input type="reset" class="btn btn-lg btn-default" value="Cancel">
 									</div>
 								</div>
@@ -109,40 +118,42 @@
 {% endblock %}
 {% block sidebar %}
 
-	{# if content.meta.permissions.create #}
+	{% if not state_edit %}
 		<div class="metabar-module">
 			<h5>Got something to add?</h5>
 			<div class="metabar-module-primary-buttons">
 				<a href="{% url 'create-conversation' microcosm_id %}" class="btn btn-large btn-block btn-primary">
-					<span class="sprite sprite-speech-bubble-small"></span> Start a conversation
+					<span class="sprite sprite-speech-bubble-small"></span>Start a conversation
 				</a>
 				<a href="{% url 'create-event' microcosm_id %}" class="btn btn-large btn-block btn-primary">
 					<span class="sprite sprite-calendar-small"></span> Start an event
 				</a>
 			</div>
 		</div> <!-- primary actions -->
-	{# endif #}
-
+	{% endif %}
 {% endblock %}
 
 
 {% block js %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
+{% if not state_edit %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+{% endif %}
 <script type="text/javascript">
 (function(){
 	'use strict';
 
+	{% if not state_edit %}
 	/////////////////
 	// comment box //
 	/////////////////
 	var editor = new simpleEditor({
 		el : '.reply-box'
 	});
-
+	{% endif %}
 
 	/////////////////////
 	// form validation //

@@ -14,7 +14,9 @@
 
 <div class="content-header padded">
 	<div class="row">
-		<div class="col-sm-12"></div>
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
 	</div>
 	<h1>{% if form.id > 0 %}Edit event{% else %}Start an event{% endif %}</h1>
 </div>
@@ -55,16 +57,16 @@
 								{{ form.title.label }}
 							</label>
 
-							<div class="col-sm-12">
+							<div class="col-sm-12 {% if form.errors.title %}has-error{% endif %}">
 								{% if form.errors.title %}
-									<div class="text-error">{{ form.errors.title.as_text }}</div>
+									<label class="control-label">{{ form.errors.title.as_text }}</label>
 								{% endif %}
 								<input
 									type="text"
 									class="form-control"
 									id="title"
 									name="{{ form.title.name }}"
-									value="{{ form.title.value|default:"" }}"
+									value="{{ form.title.value|safe|default:"" }}"
 									placeholder="Title of event"
 									maxlength="{{ form.fields.title.max_length }}"
 									tabindex="1"
@@ -73,30 +75,7 @@
 						</div>
 					</div> <!-- /form-group -->
 
-					{# reason #}
-					{% if form.id > 0 %}
-					<div class="form-group">
-						<div class="row">
-							<label class="col-sm-12" for="editReason">
-								{{ form.editReason.label }}
-							</label>
-							<div class="col-sm-12">
-								{% if form.errors.editReason %}
-									<div class="text-error">{{ form.errors.editReason.as_text }}</div>
-								{% endif %}
-								<input
-									type="text"
-									class="form-control {% if form.errors.editReason %}error{% endif %}"
-									id="editReason"
-									name="{{ form.editReason.name }}"
-									placeholder="Reason for editing"
-									maxlength="150"
-									tabindex="1"
-								/>
-							</div>
-						</div>
-					</div> <!-- /form-group -->
-					{% endif %}
+
 
 					<div class="event-form-dates">
 
@@ -258,7 +237,7 @@
 										placeholder="Eg. Street, station, landmark, country..."
 										maxlength="150"
 										tabindex="1"
-									>{{ form.where.value|default:"" }}</textarea>
+									>{{ form.where.value|safe|default:"" }}</textarea>
 									<div class="row">
 										<div class="col-sm-5 col-sm-offset-7">
 											<a
@@ -360,6 +339,7 @@
 					</div> <!-- /form-group -->
 
 					{# comment #}
+					{% if not state_edit %}
 					<div class="form-group">
 						<div class="row">
 							<label class="col-sm-12" for="reply-box-textarea">What is it you want to say?</label>
@@ -370,14 +350,47 @@
 					</div> <!-- /form-group -->
 
 					</div>
+					{% endif %}
 				</div> <!-- /form-container-inner -->
+
+				{# reason #}
+					{% if state_edit %}
+					<div class="form-group form-sticky">
+						<div class="row">
+							<label class="col-sm-12" for="editReason">
+								{{ form.editReason.label }}
+							</label>
+							<div class="col-sm-12 {% if form.errors.editReason %}has-error{% endif %}">
+								{% if form.errors.editReason %}
+									<label class="control-label">{{ form.errors.editReason.as_text }}</label>
+								{% endif %}
+								<input
+									type="text"
+									class="form-control {% if form.errors.editReason %}error{% endif %}"
+									id="editReason"
+									name="{{ form.editReason.name }}"
+									placeholder="Reason for editing"
+									maxlength="150"
+									tabindex="1"
+								/>
+							</div>
+						</div>
+					</div> <!-- /form-group -->
+					{% endif %}
+
 
 				<div class="form-group form-footer padded">
 					<div class="row">
 						<div class="col-sm-12">
 							<div class="form-footer-buttons">
+								{% if state_edit %}
+								<input type="submit" class="btn btn-lg btn-primary" value="Edit event" tabindex="1" />
+								<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
+								{% else %}
 								<input type="submit" class="btn btn-lg btn-primary" value="Create event" tabindex="1" />
 								<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
+								{% endif %}
+
 							</div>
 						</div>
 					</div>
@@ -392,7 +405,7 @@
 
 {% endblock %}
 {% block sidebar %}
-	{# if content.meta.permissions.create #}
+	{% if not state_edit %}
 		<div class="metabar-module">
 			<h5>Got something to add?</h5>
 			<div class="metabar-module-primary-buttons">
@@ -404,7 +417,7 @@
 				</a>
 			</div>
 		</div> <!-- primary actions -->
-	{# endif #}
+	{% endif %}
 
 
 {% endblock %}
@@ -419,13 +432,18 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/eventFormClasses.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
+{% if not state_edit %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+{% endif %}
 <script type="text/javascript" src="{{STATIC_URL}}js/peopleWidget.js"></script>
 <script type="text/javascript">
 (function(){
 
+	{% if state_edit %}
+	window.is_edit_form = true;
+	{% endif %}
 	////////////////////
 	//  event map   //
 	///////////////////
@@ -469,7 +487,7 @@
 		el       : '.event-form-dates',
 
 		{% if form.when.value %}
-		startDate : '{{ form.when.value }}',
+		startDate : '{{ form.when.value|date:"c" }}',
 		{% endif %}
 
 		{% if form.duration.value %}
@@ -530,7 +548,9 @@
 	{% if form.inviteObject %}
 	window.form_invitees = "{{form.inviteObject.value|safe|escape}}";
 	{% endif %}
-
+	{% if attendees_json %}
+	window.form_invitees = {{ attendees_json|safe|default:"" }}
+	{% endif %}
 })();
 </script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/eventForm.js"></script>

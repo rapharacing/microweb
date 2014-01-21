@@ -185,18 +185,18 @@ class ConversationView(object):
 				conv_request = Conversation.from_create_form(form.cleaned_data)
 				conv_response = conv_request.create(request.META['HTTP_HOST'], request.access_token)
 				if conv_response.id > 0:
-				  if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
+					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
 
-					payload = {
-						'itemType'  : 'conversation',
-						'itemId'    : conv_response.id,
-						'markdown'  : request.POST.get('firstcomment'),
-						'inReplyTo' : 0
-					}
-					comment = Comment.from_create_form(payload)
-					comment.create(request.META['HTTP_HOST'], request.access_token)
+						payload = {
+							'itemType'  : 'conversation',
+							'itemId'    : conv_response.id,
+							'markdown'  : request.POST.get('firstcomment'),
+							'inReplyTo' : 0
+						}
+						comment = Comment.from_create_form(payload)
+						comment.create(request.META['HTTP_HOST'], request.access_token)
 
-				  return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
+					return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
 				else:
 					return HttpResponseServerError()
 			else:
@@ -220,6 +220,7 @@ class ConversationView(object):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+		view_data['state_edit'] = True
 
 		if request.method == 'POST':
 			form = ConversationView.edit_form(request.POST)
@@ -239,6 +240,7 @@ class ConversationView(object):
 				access_token=request.access_token
 			)
 			view_data['form'] = ConversationView.edit_form.from_conversation_instance(conversation)
+
 			return render(request, ConversationView.form_template, view_data)
 
 		else:
@@ -1061,6 +1063,7 @@ class EventView(object):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+		view_data['state_edit'] = True
 
 		if request.method == 'POST':
 			form = EventView.edit_form(request.POST)
@@ -1070,14 +1073,32 @@ class EventView(object):
 				return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
 			else:
 				view_data['form'] = form
-				view_data['microcosm_id'] = microcosm_id
+				view_data['microcosm_id'] = form['microcosmId']
 
 				return render(request, EventView.form_template, view_data)
 
 		elif request.method == 'GET':
 			event = Event.retrieve(request.META['HTTP_HOST'], id=event_id, access_token=request.access_token)
 			view_data['form'] = EventView.edit_form.from_event_instance(event)
-			view_data['microcosm_id'] = microcosm_id
+			view_data['microcosm_id'] = event.microcosm_id
+
+			# fetch attendees
+			view_data['attendees'] = Event.get_attendees(host=request.META['HTTP_HOST'], id=event_id, access_token=request.access_token)
+
+			attendees_json = []
+			for attendee in view_data['attendees'].items.items:
+				attendees_json.append({
+					'id' 					: attendee.profile.id,
+					'profileName' : attendee.profile.profile_name,
+					'avatar' 			: attendee.profile.avatar,
+					'sticky'      : 'true'
+				})
+
+			if len(attendees_json) > 0:
+				import json
+				view_data['attendees_json'] = json.dumps(attendees_json)
+				print view_data['attendees_json']
+
 			return render(request, EventView.form_template, view_data)
 
 		else:

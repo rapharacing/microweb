@@ -614,9 +614,6 @@
         this.has_attendees_limit = true;
       }
 
-      console.log(options);
-      console.log(this);
-
       this.bind();
 
     };

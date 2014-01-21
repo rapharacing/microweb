@@ -1288,13 +1288,14 @@ class Event(APIResource):
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
-    def get_attendees(self, host, access_token=None):
+    @staticmethod
+    def get_attendees(host, id, access_token=None):
         """
         Retrieve a list of attendees for an event.
         TODO: pagination support
         """
 
-        url, params, headers = self.build_attendees_request(host, access_token)
+        url, params, headers = Event.build_attendees_request(host, id, access_token)
         resource = APIResource.retrieve(url, params, headers)
         return AttendeeList(resource)
 

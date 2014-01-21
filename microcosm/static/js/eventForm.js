@@ -144,14 +144,26 @@
 
   // triggers when the user clicks on a person in the participants list
   participating.$el.on('click', '.remove', function(e){
-    var id = e.currentTarget.rel;
-    peopleWidget.removePersonFromInvitedById(id).render();
-    if (peopleWidget.people_invited.length>0){
-      participating.render(peopleWidget.people_invited).show();
-    }else{
-      participating.hide();
+    var id = e.currentTarget.rel,
+        personToBeRemoved = {};
+
+    for (var i=0,j=peopleWidget.people_invited.length;i<j;i++){
+      if (peopleWidget.people_invited[i].id === id){
+        personToBeRemoved = peopleWidget.people_invited[i];
+        break;
+      }
     }
-    updateInvitedField();
+
+    if (typeof personToBeRemoved.sticky === 'undefined'){
+      peopleWidget.removePersonFromInvitedById(id).render();
+      if (peopleWidget.people_invited.length>0){
+        participating.render(peopleWidget.people_invited).show();
+      }else{
+        participating.hide();
+      }
+      updateInvitedField();
+    }
+
   });
 
   // update on pageload
@@ -166,9 +178,10 @@
 ///////////////////
 (function(){
   'use strict';
-
-  var replyBox = new simpleEditor({
-    el : '.reply-box'
-  });
+  if (typeof window.is_edit_form == 'undefined'){
+    var replyBox = new simpleEditor({
+      el : '.reply-box'
+    });
+  }
 
 })();

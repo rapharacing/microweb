@@ -563,11 +563,15 @@
           li = document.createElement('li');
           li.rel = peopleList[i].id;
           li.appendChild( PeopleWidget.prototype.ItemPerson.apply(this,[peopleList[i]]) );
-          span = document.createElement('span');
-          span.className = "remove";
-          span.innerHTML = "&times;";
-          span.rel       = peopleList[i].id;
-          li.children[0].appendChild(span);
+
+          if (typeof peopleList[i].sticky === 'undefined'){
+            span = document.createElement('span');
+            span.className = "remove";
+            span.innerHTML = "&times;";
+            span.rel       = peopleList[i].id;
+            li.children[0].appendChild(span);
+          }
+
           ul.appendChild(li);
         }
 
