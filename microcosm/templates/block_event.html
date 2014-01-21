@@ -40,7 +40,7 @@
 						</span>
 						{% if item.item.where %}
 						<span class="pills-event-where">
-							{{ item.item.where }}
+							{{ item.item.where | safe }}
 						</span>
 						{% endif %}
 					</div>
