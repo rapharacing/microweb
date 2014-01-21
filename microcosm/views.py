@@ -409,6 +409,23 @@ class HuddleView(object):
 				return render(request, HuddleView.form_template, view_data)
 
 		elif request.method == 'GET':
+
+			if request.GET.get('to'):
+				recipients = []
+				list_of_recipient_ids = request.GET.get('to').split(",");
+
+				for recipient_id in list_of_recipient_ids:
+					recipient_profile = Profile.retrieve(request.META['HTTP_HOST'], recipient_id)
+					if recipient_profile.id > 0:
+						recipients.append({
+							'id' 					: recipient_profile.id,
+							'profileName' : recipient_profile.profileName,
+							'avatar' 			: recipient_profile.avatar
+						})
+
+				import json
+				view_data['recipients_json'] = json.dumps(recipients)
+
 			view_data['form'] = HuddleView.create_form(initial=dict())
 			return render(request, HuddleView.form_template, view_data)
 

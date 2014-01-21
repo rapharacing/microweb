@@ -143,7 +143,7 @@
   peopleWidget.onSelection(render_particating);
 
   // triggers when the user clicks on a person in the participants list
-  participating.$el.on('click', 'li', function(e){
+  participating.$el.on('click', '.remove', function(e){
     var id = e.currentTarget.rel;
     peopleWidget.removePersonFromInvitedById(id).render();
     if (peopleWidget.people_invited.length>0){
