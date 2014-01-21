@@ -1,26 +1,35 @@
 <ol class="breadcrumb">
-	{% if not 'site' in content.meta.links %}
 	<li>
 		<a href="{% url 'index' %}">Home</a>
 	</li>
-	{% endif%}
 	{% for key,value in content.meta.links.iteritems reversed%}
+		{% if value.title and key != "up"%}
 	<li>
-		{% if key == "site"%}
-		<a href="{% url 'index' %}">Home</a>
-		{% elif key == "microcosm" %}
-		<a href="{{ value.href }}">{{ value.title | safe }}</a>
-		{% elif key == "self" %}
 		<a href="{{ value.href }}">
+			{{ value.title | safe }}
+		</a>
+	</li>
+		{% endif %}
+	{% endfor %}
+	{% if content.is_confidential == True or content.is_confidential == False %}
+	<li>
+		<a href="{% url 'list-huddle' %}">Huddles</a>
+	</li>
+	{% endif %}
+	{% if content.profiles or content.user_id %}
+	<li>
+		<a href="{% url 'list-profiles' %}">People</a>
+	</li>
+	{% endif %}
+	<li>
+		<a href="{{ content.meta.links.self.href }}">
 			{% if content.profile_name %}
-				{{ content.profile_name | safe }}
-			{% elif content.title %}
-				{{ content.title | safe }}
+				{{ content.profile_name }}
+			{% elif content.markdown %}
+				Comment by @{{ content.meta.created_by.profile_name }}
 			{% else %}
+				{{ content.title|safe }}
 			{% endif %}
 		</a>
-		{% endif %}
-		</a>
 	</li>
-	{% endfor %}
 </ol>

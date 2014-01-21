@@ -65,7 +65,8 @@
       var fragment   = $( this.template ),
           action     = "",
           replyto_id = "",
-          id         = "";
+          id         = "",
+          num_attachments = 0;
 
       if (typeof options.action !== 'undefined'){
         action = options.action;
@@ -85,6 +86,13 @@
 
       this.cleanup();
 
+      if (typeof options.data_source !== 'undefined'){
+        fragment.attr('data-source',options.data_source);
+      }
+      if (typeof options.num_attachments !== 'undefined'){
+        fragment.attr('data-num-attachments',options.num_attachments);
+      }
+
       fragment.simpleEditor = new simpleEditor({
         el : fragment
       });
@@ -103,7 +111,7 @@
       return fragment;
     };
 
-    comments.prototype.fetchCommentSource = function(url){
+    comments.prototype.fetchSource = function(url){
 
       // FIXME: possible bug with relative path, need to get absolute
       return $.ajax({
@@ -112,7 +120,6 @@
       });
 
     };
-
 
     comments.prototype.clickHandler = function(e){
 
@@ -126,7 +133,9 @@
       commentBoxOptions = {
         action : _this.$.attr('data-action') || "create",
         ref    : _this.$.attr('data-ref') || "",
-        id     : _this.$.attr('data-comment-id') || ""
+        id     : _this.$.attr('data-comment-id') || "",
+        data_source : _this.$.attr('data-source') || "",
+        num_attachments : _this.$.attr('data-num-attachments') || 0
       };
 
       if (!_this.$.hasClass('active')){
@@ -136,7 +145,7 @@
 
         _this.$
           .addClass('active')
-          .after( _this.$.comment_box );
+          .parent().append( _this.$.comment_box );
 
         // FIXME: not flexible, could be better
         if(_this.$.attr('data-source')){
@@ -145,7 +154,7 @@
 
           _this.$.comment_box.find('textarea').attr('placeholder','Loading... Please wait...');
 
-          this.fetchCommentSource(_this.$.attr('data-source'))
+          this.fetchSource(_this.$.attr('data-source')+"source")
               .success($.proxy(function(response){
                 this.$.comment_box
                       .find('textarea')

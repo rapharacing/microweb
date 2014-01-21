@@ -4,12 +4,29 @@
 
 {% load comments %}
 {% block content %}
-
+<div class="content-header padded">
+	<div class="row">
+		<div class="col-sm-7">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-5">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+</div>
 <div class="content-body">
+	<div class="item">
+		<div class="item-header">
+			<h1>{{ content.meta.links.up.title | safe }}</h1>
+			<div class="item-meta">
+				{% include "forms/content-moderation.html" %}
+			</div>
+		</div>
 		<div class="alert alert-warning">
 			You are reading a single comment and it's replies.
 			<a href="{{ content.meta.links.commentPage.href }}#{{ content.id }}">Click here to read the full conversation.</a>
 		</div>
+	</div> <!-- item -->
 
 	{% if content.meta.parents %}
 		<div class="list-comments-dull">

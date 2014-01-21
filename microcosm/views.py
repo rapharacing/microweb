@@ -146,7 +146,8 @@ class ConversationView(object):
 			request.view_requests.append(grequests.get(conversation_url, params=params, headers=headers))
 			responses = response_list_to_dict(grequests.map(request.view_requests))
 			conversation = Conversation.from_api_response(responses[conversation_url])
-			comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
+			comment_form = CommentForm(
+				initial=dict(itemId=conversation_id,itemType='conversation'))
 
 			# get attachments
 			attachments = {}
@@ -1204,7 +1205,12 @@ class CommentView(object):
 		request.view_requests.append(grequests.get(url, params=params, headers=headers))
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		content = Comment.from_api_response(responses[url])
-		comment_form = CommentForm(initial=dict(itemId=content.item_id, itemType=content.item_type))
+		comment_form = CommentForm(
+			initial=dict(
+				itemId=content.item_id,
+				itemType=content.item_type,
+				comment_id = content.id
+			))
 
 		# get attachments
 		attachments = {}
@@ -1299,6 +1305,39 @@ class CommentView(object):
 			if form.is_valid():
 				comment_request = Comment.from_edit_form(form.cleaned_data)
 				comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
+
+				# delete attachments if neccessary
+				if comment_response.id > 0:
+					if request.FILES.has_key('attachments'):
+
+						for f in request.FILES.getlist('attachments'):
+							file_request = FileMetadata.from_create_form(f)
+							# File must be under 30KB
+							# TODO: use Django's built-in field validators and error messaging
+							if len(file_request.file['files']) >= 30720:
+								view_data['form'] = form
+								view_data['avatar_error'] = 'Sorry, the file you upload must be under 30KB and square.'
+								return render(request, CommentView.form_template, view_data)
+							else:
+								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+								Attachment.create(
+									request.META['HTTP_HOST'],
+									file_metadata.file_hash,
+									comment_id=comment_response.id,
+									access_token=request.access_token
+								)
+
+					if request.POST.get('attachments-delete'):
+						attachments_delete = request.POST.get('attachments-delete').split(",")
+
+						for fileHash in attachments_delete:
+							Attachment.delete(
+								request.META['HTTP_HOST'],
+								Comment.api_path_fragment,
+								comment_response.id,
+								fileHash
+							)
+
 				if comment_response.meta.links.get('commentPage'):
 					return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
 				else:
@@ -1388,6 +1427,21 @@ class CommentView(object):
 		)
 		return HttpResponse(response, content_type='application/json')
 
+	@staticmethod
+	@exception_handler
+	def attachments(request, comment_id):
+		"""
+		Retrieve the markdown source for a comment.
+		"""
+		if request.access_token is None:
+			raise PermissionDenied
+		response = Attachment.source(
+			request.META['HTTP_HOST'],
+			type=Comment.api_path_fragment,
+			id=comment_id,
+			access_token=request.access_token
+		)
+		return HttpResponse(response, content_type='application/json')
 
 class UpdateView(object):
 

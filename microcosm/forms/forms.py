@@ -31,6 +31,7 @@ class CommentForm(django.forms.Form):
 
     # Comment ID - only required when editing.
     id = django.forms.IntegerField(required=False, widget=django.forms.HiddenInput)
+    comment_id = django.forms.IntegerField(required=False, widget=django.forms.HiddenInput)
 
     # Item ID and Item Type (e.g. 'event') to which this comment belongs.
     itemId = django.forms.IntegerField(widget=django.forms.HiddenInput)
@@ -43,6 +44,7 @@ class CommentForm(django.forms.Form):
     # TODO: why is initial=0 ?
     inReplyTo = django.forms.IntegerField(required=False, initial=0, widget=django.forms.HiddenInput)
 
+    attachments = django.forms.IntegerField(required=False, initial=0, widget=django.forms.HiddenInput)
 
 class EventCreate(ItemForm):
     """

@@ -113,7 +113,6 @@
 
     fileHandler.prototype.changeHandler = function(e){
         if (!this.event_type){
-          console.log('change event');
           this.event_type = "changed";
           this.parse(e.target.files);
         }
@@ -129,7 +128,6 @@
       e.preventDefault();
       if (!this.event_type){
         this.event_type = "dropped";
-        console.log('drop event');
         this.parse(e.originalEvent.dataTransfer.files);
       }
     };

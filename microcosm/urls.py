@@ -66,6 +66,7 @@ urlpatterns = patterns('',
 	url(r'comments/(?P<comment_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
 	url(r'comments/(?P<comment_id>\d+)/incontext/$', CommentView.incontext, name='incontext-comment'),
 	url(r'comments/(?P<comment_id>\d+)/source/$', CommentView.source, name='source-comment'),
+	url(r'comments/(?P<comment_id>\d+)/attachments/$', CommentView.attachments, name='attachment-comment'),
 
 	# Huddles
 	url(r'^huddles/$', HuddleView.list, name='list-huddle'),
