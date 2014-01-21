@@ -1,7 +1,7 @@
 import pylibmc as memcache
 import logging
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponsePermanentRedirect
 
 from microweb import settings
 
