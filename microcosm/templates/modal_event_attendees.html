@@ -14,7 +14,7 @@
           </div>
           <div class="modal-item-title">{{ content.title | safe }}</div>
           <div class="modal-item-meta">
-            <strong>{{ content.where }}</strong>
+            <strong>{{ content.where|safe }}</strong>
             <p>
             {% if event_dates.type == 'multiple' %}
               {{ content.when|date:"j F Y"}}

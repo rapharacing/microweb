@@ -33,7 +33,7 @@
 					<div class="item-event-icon-offset">
 						<div class="item-event-location">
 							{% if content.where %}
-								{{ content.where }}
+								{{ content.where|safe }}
 							{% else %}
 								TBA
 							{% endif %}
