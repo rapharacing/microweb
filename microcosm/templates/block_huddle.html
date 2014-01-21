@@ -3,7 +3,7 @@
     <div class="col-sm-8">
 
       <div class="list-collection-row-icon">
-        <a class="sprite sprite-user" title="Huddle"></a>
+        <a class="sprite sprite-envelope" title="Huddle"></a>
       </div>
       <div class="list-collection-row-offset">
 
@@ -16,14 +16,26 @@
           {% endif %}
         </h3>
         <div class="row-meta">
+
+          {% if item.item.meta.created_by %}
+          <a href="{% url 'single-profile' item.item.meta.created_by.id %}">
+            @{{ item.item.meta.created_by.profile_name | safe | truncatechars:25 }}
+          </a> started <time datetime="{{ item.item.meta.created|date:"c" }}"></time>
+          {% endif %}
+          &bull;
           <ul class="list-people list-people-sm">
-            {% for participant in item.item.participants %}
+            {% for participant in item.item.participants|slice:":6" %}
               <li>
                 <a href="{% url 'single-profile' participant.id %}" data-toggle="tooltip" title="@{{ participant.profile_name | safe }}">
                   <img src="{% if 'gravatar' in participant.avatar %}{{participant.avatar}}{% elif 'files' in participant.avatar %}https://{{site.subdomain_key}}.microco.sm{{participant.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ participant.profile_name | safe }}"/>
                 </a>
               </li>
             {% endfor %}
+            <li>
+            {% if item.item.participants|length > 6 %}
+              +{{ item.item.participants|length|add:"-6" }}
+            {% endif %}
+            </li>
           </ul>
 
 

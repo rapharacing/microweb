@@ -27,8 +27,12 @@
 				{{ content.profile_name }}
 			{% elif content.markdown %}
 				Comment by @{{ content.meta.created_by.profile_name }}
-			{% else %}
+			{% elif content.title %}
 				{{ content.title|safe }}
+			{% else %}
+				{% if 'huddles' in content.meta.links.self.href %}
+				Huddles
+				{% endif %}
 			{% endif %}
 		</a>
 	</li>
