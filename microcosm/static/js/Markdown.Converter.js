@@ -1135,6 +1135,7 @@ else
 					grafsOut.push(str);
 				}
 				else if (/\S/.test(str)) {
+					str = str.replace(/\n/g,'<br/>');
 					str = _RunSpanGamut(str);
 					str = str.replace(/^([ \t]*)/g, "<p>");
 					str += "</p>"

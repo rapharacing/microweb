@@ -1434,18 +1434,20 @@
 
 					chunk.selection = (" " + chunk.selection).replace(/([^\\](?:\\\\)*)(?=[[\]])/g, "$1\\").substr(1);
 
-					var linkDef = " [999]: " + properlyEncoded(link);
+					//var linkDef = " [999]: " + properlyEncoded(link);
 
-					var num = that.addLinkDef(chunk, linkDef);
+					//var num = that.addLinkDef(chunk, linkDef);
+
+
 					chunk.startTag = isImage ? "![" : "[";
-					chunk.endTag = "][" + num + "]";
+					chunk.endTag = "](" + link + ")";
 
 					if (!chunk.selection) {
 						if (isImage) {
-							chunk.selection = "enter image description here";
+							chunk.selection = '';
 						}
 						else {
-							chunk.selection = "enter link description here";
+							chunk.selection = link;
 						}
 					}
 				}
