@@ -61,6 +61,7 @@ from microcosm.api.resources import Search
 from microcosm.api.resources import SearchResult
 from microcosm.api.resources import Huddle
 from microcosm.api.resources import HuddleList
+from microcosm.api.resources import Trending
 
 from microcosm.api.resources import build_url
 from microcosm.api.resources import join_path_fragments
@@ -1738,6 +1739,30 @@ class SearchView(object):
 		else:
 			return HttpResponseNotAllowed(['POST',])
 
+class TrendingView(object):
+
+	list_template = 'trending.html'
+
+	@staticmethod
+	@exception_handler
+	def list(request):
+
+		url, params, headers = Trending.build_request(
+			request.META['HTTP_HOST'],
+			access_token=request.access_token
+		)
+		request.view_requests.append(grequests.get(url, params=params, headers=headers))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		trending = Trending.from_api_response(responses[url])
+
+		view_data = {
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': request.site,
+			'content': trending,
+			'pagination': build_pagination_links(responses[url]['items']['links'], trending.items)
+		}
+
+		return render(request, TrendingView.list_template, view_data)
 
 class ErrorView(object):
 

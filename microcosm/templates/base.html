@@ -111,7 +111,7 @@
 									<a href="{% url 'index' %}">Microcosms</a>
 								</li>
 								<li {% if site_section == "trending"%}class="active"{% endif %}>
-									<a href="#">Trending</a>
+									<a href="{% url 'list-trending'%}">Trending</a>
 								</li>
 								<li {% if site_section == "updates"%}class="active"{% endif %}>
 									<a href="{% url 'list-updates' %}">Updates {% if user and user.meta.stats.unreadUpdates > 0 and site_section != "updates" %}<span class="label label-warning">NEW</span>{% endif %}</a>

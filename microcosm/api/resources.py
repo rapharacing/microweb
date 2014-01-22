@@ -1606,3 +1606,30 @@ class SearchResult(object):
     @classmethod
     def from_summary(cls, data):
         return SearchResult.from_api_response(data)
+
+class Trending(APIResource):
+    """
+    Represents /trending
+    """
+
+    api_path_fragment = 'trending'
+
+    @classmethod
+    def from_api_response(cls, data):
+        trending = cls()
+        if data.get('meta'): trending.meta = Meta(data['meta'])
+        if data.get('items'): trending.items = PaginatedList(data['items'], Item)
+        return trending
+
+    @staticmethod
+    def build_request(host, offset=None, access_token=None):
+        url = build_url(host, [Trending.api_path_fragment])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = Microcosm.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return Trending.from_api_response(resource)
