@@ -267,7 +267,6 @@
 
       if (typeof opts.startDate !== "undefined"){
         this.startDate = new Date(opts.startDate);
-        this.updateStartTimesUI(getTimeStringFromDate(this.startDate));
       }
 
       // with duration, we just work out the end date
@@ -284,16 +283,12 @@
         ){
           this.event_date_type = EVENT_DATE_TYPE_MULTIPLE;
         }
-
-
-
-      }else{
-        this.endDate.setHours(this.endDate.getHours()+1);
       }
+
+      this.updateStartTimesUI(getTimeStringFromDate(this.startDate));
       this.updateEndTimesUI(getTimeStringFromDate(this.endDate));
 
-
-      this.controls.start_calendar.date   = new Date(this.startDate.getTime());
+      this.controls.start_calendar.date = new Date(this.startDate.getTime());
       this.controls.end_calendar.date = new Date(this.endDate.getTime());
 
       this.updateDatePickerUI(this.controls.start_calendar);
@@ -319,6 +314,21 @@
       var hh = d.getUTCHours();
       var mi = d.getUTCMinutes();
       var pm = (hh > 12);
+
+      // round minutes to nearest 15min block
+      if (mi > 45){
+        hh = hh+1;
+        mi = 0;
+      }else if (mi > 30){
+        mi = 45;
+      }else if (mi > 15){
+        mi = 30;
+      }else if (mi > 1){
+        mi = 15;
+      }else{
+        mi = 0;
+      }
+
       return '' + (hh <= 9 ? '0' + hh : (hh > 12 ? hh - 12: hh)) + ':' +
         (mi <= 9 ? '0' + mi : mi) + ' ' +
         (pm ? 'PM' : 'AM');
@@ -365,10 +375,6 @@
     };
 
     eventDateForm.prototype.getStartTime = function(){
-
-      if (this.controls.start_calendar_start_time[0].selectedIndex < 0){
-        this.controls.start_calendar_start_time[0].selectedIndex = 0;
-      }
       return this.controls.start_calendar_start_time.val().trim();
     };
 
@@ -382,9 +388,6 @@
         endTimeControl = this.controls.end_calendar_end_time;
       }else{
         console.log('getEndDateTime(): unrecognized event_date_type');
-      }
-      if (endTimeControl[0].selectedIndex < 0){
-        endTimeControl[0].selectedIndex = 0;
       }
       return endTimeControl.val().trim();
     };
