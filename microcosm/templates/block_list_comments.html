@@ -15,18 +15,10 @@
         <div class="row-title">
 
             {% if result.parent_item_type == 'profile' %}
-            <a href="{% url 'single-profile' result.item.meta.created_by.id %}">
-              <h3 class="row-title">
-                @{{ result.parent_item.profile_name | safe }}
-              </h3>
-            </a>
+            <a href="{% url 'single-profile' result.item.meta.created_by.id %}"><h3 class="row-title">@{{ result.parent_item.profile_name | safe }}</h3></a>
 
             {% else %}
-            <a href="{{ result.item.meta.links.self.href }}/incontext/">
-              <h3 class="row-title">
-                {{ result.parent_item.title | safe }}
-              </h3>
-            </a>
+            <a href="{{ result.item.meta.links.self.href }}/incontext/"><h3 class="row-title">{{ result.parent_item.title | safe }}</h3></a>
             {% endif %}
         </div>
 
@@ -38,19 +30,13 @@
             {% elif result.parent_item_type == 'profile' %}
             <a href="{% url 'single-profile' result.item.meta.created_by.id %}">Profiles</a>
             {% else %}
-            <a href="{{ result.parent_item.meta.links.microcosm.href }}">
-              {{ result.parent_item.meta.links.microcosm.title | safe }}
-            </a>
+            <a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title | safe }}</a>
             {% endif %}
             &bull;
-            <time datetime="{{ result.item.meta.created|date:"c" }}">
-              {{ result.item.meta.created|timesince }}
-            </time>
+            <time datetime="{{ result.item.meta.created|date:"c" }}">{{ result.item.meta.created|timesince }}</time>
           </div>
           <div class="row-meta-excerpt">
-            <a href="{% url 'single-profile' result.item.meta.created_by.id %}">
-              <img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/>
-            </a>
+            <a href="{% url 'single-profile' result.item.meta.created_by.id %}"><img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/></a>
             <div class="row-meta-excerpt-text">
               {% if result.highlight %}
                 {{ result.highlight|safe }}

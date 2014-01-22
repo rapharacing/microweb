@@ -409,12 +409,8 @@
 		<div class="metabar-module">
 			<h5>Got something to add?</h5>
 			<div class="metabar-module-primary-buttons">
-				<a href="{% url 'create-conversation' microcosm_id %}" class="btn btn-large btn-block btn-primary">
-					<span class="sprite sprite-speech-bubble-small"></span> Start a conversation
-				</a>
-				<a href="{% url 'create-event' microcosm_id %}" class="btn btn-large btn-block btn-primary">
-					<span class="sprite sprite-calendar-small"></span> Start an event
-				</a>
+				<a href="{% url 'create-conversation' microcosm_id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-speech-bubble-small"></span> Start a conversation</a>
+				<a href="{% url 'create-event' microcosm_id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-calendar-small"></span> Start an event</a>
 			</div>
 		</div> <!-- primary actions -->
 	{% endif %}

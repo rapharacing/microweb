@@ -75,9 +75,7 @@
 									{#<input type="checkbox" class="row-admin-checkbox" /> #}
 									{% if item.most_recent_update %}
 
-										<a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">
-											{{ item.most_recent_update.title | safe | truncatechars:30 }}
-										</a>
+										<a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">{{ item.most_recent_update.title | safe | truncatechars:30 }}</a>
 										{% if item.most_recent_update.total_comments %}
 											<time datetime="{{ item.most_recent_update.last_comment_created|date:"c" }}"></time>
 											{% comment %}
@@ -121,9 +119,7 @@
 	{% if content.meta.permissions.create %}
 	<div class="metabar-module">
 		<h5>Got something to add?</h5>
-		<a href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary">
-			<span class="glyphicon glyphicon-folder-open"></span> Create a microcosm
-		</a>
+		<a href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-folder-open"></span> Create a microcosm</a>
 	</div> <!-- primary actions -->
 	{% endif %}
 

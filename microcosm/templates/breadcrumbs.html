@@ -5,9 +5,7 @@
 	{% for key,value in content.meta.links.iteritems reversed%}
 		{% if value.title and key != "up"%}
 	<li>
-		<a href="{{ value.href }}">
-			{{ value.title | safe }}
-		</a>
+		<a href="{{ value.href }}">{{ value.title | safe }}</a>
 	</li>
 		{% endif %}
 	{% endfor %}
@@ -22,18 +20,6 @@
 	</li>
 	{% endif %}
 	<li>
-		<a href="{{ content.meta.links.self.href }}">
-			{% if content.profile_name %}
-				{{ content.profile_name }}
-			{% elif content.markdown %}
-				Comment by @{{ content.meta.created_by.profile_name }}
-			{% elif content.title %}
-				{{ content.title|safe }}
-			{% else %}
-				{% if 'huddles' in content.meta.links.self.href %}
-				Huddles
-				{% endif %}
-			{% endif %}
-		</a>
+		<a href="{{ content.meta.links.self.href }}">{% if content.profile_name %}{{ content.profile_name }}{% elif content.markdown %}Comment by @{{ content.meta.created_by.profile_name }}{% elif content.title %}{{ content.title|safe }}{% else %}{% if 'huddles' in content.meta.links.self.href %}Huddles{% endif %}{% endif %}</a>
 	</li>
 </ol>
