@@ -17,6 +17,7 @@ from microcosm.views import FaviconView
 from microcosm.views import RobotsView
 from microcosm.views import SearchView
 from microcosm.views import HuddleView
+from microcosm.views import TrendingView
 
 
 urlpatterns = patterns('',
@@ -89,6 +90,11 @@ urlpatterns = patterns('',
 	url(r'^profiles/(?P<profile_id>\d+)/edit/$', ProfileView.edit, name='edit-profile'),
 
 	url(r'^search/$', SearchView.single, name='single-search'),
+
+
+	# Trending
+	url(r'^trending/$', TrendingView.list, name='list-trending'),
+
 
 	# Proxy geocoding requests to the backend
 	url(r'^geocode/$', GeoView.geocode, name='geocode'),
