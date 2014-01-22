@@ -1759,7 +1759,8 @@ class TrendingView(object):
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'site': request.site,
 			'content': trending,
-			'pagination': build_pagination_links(responses[url]['items']['links'], trending.items)
+			'pagination': build_pagination_links(responses[url]['items']['links'], trending.items),
+			'site_section': 'trending'
 		}
 
 		return render(request, TrendingView.list_template, view_data)
