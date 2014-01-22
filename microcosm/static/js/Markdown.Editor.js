@@ -666,8 +666,14 @@
 			if (inputArea[0].selectionStart !== undefined && !uaSniffed.isOpera) {
 
 				inputArea[0].focus();
-				inputArea[0].selectionStart = stateObj.start;
-				inputArea[0].selectionEnd = stateObj.end;
+
+				if (stateObj.opName === "link" || stateObj.opName === 'image'){
+					inputArea[0].value = inputArea[0].value + " ";
+					inputArea[0].focus();
+				}else{
+					inputArea[0].selectionStart = stateObj.start;
+					inputArea[0].selectionEnd = stateObj.end;
+				}
 				inputArea[0].scrollTop = stateObj.scrollTop;
 			}
 			else if (doc.selection) {
@@ -1103,6 +1109,10 @@
 					return;
 				}
 
+				if (typeof button.opName !== 'undefined'){
+					state.opName = button.opName;
+				}
+
 				var chunks = state.getChunks();
 
 
@@ -1172,27 +1182,29 @@
 			}
 
       var events = [
-        [preferredUserEvent,    '.wmd-bold',   			buttons.bold],
-        [preferredUserEvent,    '.wmd-italic', 			buttons.italic],
-        [preferredUserEvent,    '.wmd-quote',			  buttons.quote],
-        [preferredUserEvent,    '.wmd-code', 				buttons.code],
-        [preferredUserEvent,    '.wmd-link', 			  buttons.link],
-				[preferredUserEvent,    '.wmd-image', 			buttons.image],
-				[preferredUserEvent, 		'.wmd-ol', 					buttons.olist],
-				[preferredUserEvent, 		'.wmd-ul', 					buttons.ulist]
+        [preferredUserEvent,    '.wmd-bold',   			buttons.bold,			'bold'],
+        [preferredUserEvent,    '.wmd-italic', 			buttons.italic,		'italic'],
+        [preferredUserEvent,    '.wmd-quote',			  buttons.quote,		'quote'],
+        [preferredUserEvent,    '.wmd-code', 				buttons.code,			'code'],
+        [preferredUserEvent,    '.wmd-link', 			  buttons.link,			'link'],
+				[preferredUserEvent,    '.wmd-image', 			buttons.image,		'image'],
+				[preferredUserEvent, 		'.wmd-ol', 					buttons.olist,		'olist'],
+				[preferredUserEvent, 		'.wmd-ul', 					buttons.ulist,		'ulist']
       ];
 
-      var returnScopedEvent = function(cmd){
-      	var _cmd = cmd;
+      var returnScopedEvent = function(cmd,cmd_name){
+      	var _cmd = cmd,
+      			_cmd_name = cmd_name;
       	return function(){
       		var fakeButton = {};
       		fakeButton.textOp = _cmd;
+      		fakeButton.opName = _cmd_name;
 					doClick(fakeButton);
 				};
       }
 
       for(var i in events){
-        panels.buttonBar.on(events[i][0],events[i][1],(returnScopedEvent)(events[i][2]));
+        panels.buttonBar.on(events[i][0],events[i][1],(returnScopedEvent)(events[i][2], events[i][3]));
       }
 
       // bind the undo and redo buttons
@@ -1385,6 +1397,7 @@
 
 		chunk.trimWhitespace();
 		chunk.findTags(/\s*!?\[/, /\][ ]?(?:\n[ ]*)?(\[.*?\])?/);
+
 		var background;
 
 
