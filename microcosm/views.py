@@ -608,14 +608,7 @@ class ProfileView(object):
 			if form.is_valid():
 				if request.FILES.has_key('avatar'):
 					file_request = FileMetadata.from_create_form(request.FILES['avatar'])
-					# File must be under 30KB
-					# TODO: use Django's built-in field validators and error messaging
-					if len(file_request.file['files']) >= 30720:
-						view_data['form'] = form
-						view_data['avatar_error'] = 'Sorry, the file you upload must be under 30KB and square.'
-						return render(request, ProfileView.form_template, view_data)
-					else:
-					file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+					file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token, 100, 100)
 					Attachment.create(
 						request.META['HTTP_HOST'],
 						file_metadata.file_hash,
