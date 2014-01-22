@@ -15,13 +15,7 @@
 
 				<div class="row-title-wrapper">
 					<h3 class="row-title {% if item.highlight %}row-title-highlight{% endif %}">
-						<a href="/{{ item.item_type }}s/{{ item.item.id }}/{% if user %}newest/{% endif %}">
-						{% if item.highlight %}
-							{{ item.highlight | safe }}
-						{% else %}
-							{{ item.item.title | safe }}
-						{% endif %}
-						</a>
+						<a href="/{{ item.item_type }}s/{{ item.item.id }}/{% if user %}newest/{% endif %}">{% if item.highlight %}{{ item.highlight | safe }}{% else %}{{ item.item.title | safe }}{% endif %}</a>
 						{% if item.item.meta.flags.unread %}<span class="label label-warning">new</span>{% endif %}
 					</h3>
 				</div>
@@ -30,12 +24,7 @@
 				<div class="row-meta">
 
 				{% if item.item.meta.created_by %}
-					<a href="{% url 'single-profile' item.item.meta.created_by.id %}">
-						@{{ item.item.meta.created_by.profile_name | safe | truncatechars:25 }}
-					</a>
-
-						started <time datetime="{{ item.item.meta.created|date:"c" }}"></time>
-
+					<a href="{% url 'single-profile' item.item.meta.created_by.id %}">@{{ item.item.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ item.item.meta.created|date:"c" }}"></time>
 				{% endif %}
 
 				</div>
@@ -71,9 +60,7 @@
 			{% if not item.item.flags.sticky %}
 				<div class="row-context">
 					{% if item.item.last_comment_created %}
-						<a href="{% url 'single-profile' item.item.last_comment_created_by.id %}">
-							@{{item.item.last_comment_created_by.profile_name | safe }}
-						</a> replied <time datetime="{{ item.item.last_comment_created|date:"c" }}"></time>
+						<a href="{% url 'single-profile' item.item.last_comment_created_by.id %}">@{{item.item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.item.last_comment_created|date:"c" }}"></time>
 					{% endif %}
 				</div>
 			{% endif %}

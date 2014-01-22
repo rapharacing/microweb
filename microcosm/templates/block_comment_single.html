@@ -16,33 +16,22 @@
 				<time datetime="{{ comment.meta.created|date:"c" }}"></time>
 				<span style="color:#eee">&bull;</span>
 				{% if hide_permalink %}
-					<a href="{% url 'single-comment' comment.id %}">
-						<span class="sprite sprite-format-link"></span>
-					</a>
+					<a href="{% url 'single-comment' comment.id %}"><span class="sprite sprite-format-link"></span></a>
 				{% else %}
-				<a href="{% url 'single-comment' comment.id %}">
-					#{{ forloop.counter|add:pagination.offset }}
-				</a>
+				<a href="{% url 'single-comment' comment.id %}">#{{ forloop.counter|add:pagination.offset }}</a>
 				{% endif %}
 			</div>
 
 			<div class="comment-item-author">
 			{% if comment.meta.created_by %}
-				<a href="{% url 'single-profile' comment.meta.created_by.id %}">
-					<img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name | safe }}" align="left" class="gravatar" />
-					<strong class="comment-item-author-name">
-						{{ comment.meta.created_by.profile_name | safe | truncatechars:25 }}
-					</strong>
-				</a>
+				<a href="{% url 'single-profile' comment.meta.created_by.id %}"><img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name | safe }}" align="left" class="gravatar" /> <strong class="comment-item-author-name">{{ comment.meta.created_by.profile_name | safe | truncatechars:25 }}</strong></a>
 				{% endif %}
 
 				{% if comment.in_reply_to %}
 				<span class="sprite sprite-arrow-forward"></span>
 				<span class="comment-item-in-reply-to">
 					in reply to
-					<a href="{% url 'incontext-comment' comment.in_reply_to %}">
-						@{{ comment.meta.links.inReplyToAuthor.title | safe }}
-					</a>
+					<a href="{% url 'incontext-comment' comment.in_reply_to %}">@{{ comment.meta.links.inReplyToAuthor.title | safe }}</a>
 				</span>
 				{% endif %}
 			</div>
@@ -67,11 +56,9 @@
 		{% if user %}
 			{% if not comment.meta.created_by.id == user.id %}
 					<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first comment-item-footer-btn-last"
-						 data-action="{% url 'create-comment' %}"
-						 data-ref="{{ comment.id }}" href="javascript:void 0">
-						<span class="sprite sprite-arrow-left"></span>
-						Reply
-					</a>
+						data-action="{% url 'create-comment' %}"
+						data-ref="{{ comment.id }}" href="javascript:void 0"
+					><span class="sprite sprite-arrow-left"></span> Reply</a>
 			{%else%}
 				{% if content.meta.permissions.update or comment.meta.permissions.update or comment.meta.created_by.id == user.id %}
 				<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first {% if not comment.meta.permissions.delete %}comment-item-footer-btn-last{% endif %}"

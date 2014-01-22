@@ -42,11 +42,8 @@
 
 							<div class="row">
 								<div class="col-sm-3 col-md-3 col-lg-2 navbar-brand">
-									<a href="/" title="Return to Homepage">
-										<img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
-									</a>
+									<a href="/" title="Return to Homepage"><img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" /></a>
 								</div>
-
 
 								<div class="col-sm-8 col-md-6 col-lg-6 navbar-search">
 									<form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
@@ -76,38 +73,16 @@
 											</form>
 
 											<div class="navbar-profile-row-1-left">
-												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar">
-													<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" />
-												</a>
-												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-name">
-													<strong>{{ user.profile_name | safe }}</strong>
-												</a>
-												<a class="navbar-profile-edit" href="{% url 'edit-profile' user.id %}">
-													<span class="sprite sprite-pencil"></span>
-													<span class="navbar-profile-edit-text">Edit Profile</span>
-												</a>
+												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar"><img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" /></a>
+												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-name"><strong>{{ user.profile_name | safe }}</strong></a>
+												<a class="navbar-profile-edit" href="{% url 'edit-profile' user.id %}"><span class="sprite sprite-pencil"></span><span class="navbar-profile-edit-text">Edit Profile</span></a>
 
-												<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">
-
-												{% if user and user.meta.stats.unreadHuddles > 0 %}
-													<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope"></span></span>
-												{% else %}
-													<span class="sprite sprite-envelope"></span>
-												{% endif %}
-												</a>
+												<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope"></span></span>{% else %}<span class="sprite sprite-envelope"></span>{% endif %}</a>
 											</div>
 
 										</div>
 										<div class="navbar-profile-row-2">
-											<a href="{% url 'list-huddle'%}">
-												{% if user and user.meta.stats.unreadHuddles > 0 %}
-													<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope-small"></span></span>
-												{% else %}
-													<span class="sprite sprite-envelope-small"></span>
-												{% endif %}
-												<strong>Huddles</strong>
-
-											</a>
+											<a href="{% url 'list-huddle'%}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope-small"></span></span>{% else %}<span class="sprite sprite-envelope-small"></span>{% endif %} <strong>Huddles</strong></a>
 										</div>
 									{% else %}
 										<div class="navbar-profile-row-4">
@@ -139,12 +114,7 @@
 									<a href="#">Trending</a>
 								</li>
 								<li {% if site_section == "updates"%}class="active"{% endif %}>
-									<a href="{% url 'list-updates' %}">
-										Updates
-										{% if user and user.meta.stats.unreadUpdates > 0 and site_section != "updates" %}
-										<span class="label label-warning">NEW</span>
-										{% endif %}
-									</a>
+									<a href="{% url 'list-updates' %}">Updates {% if user and user.meta.stats.unreadUpdates > 0 and site_section != "updates" %}<span class="label label-warning">NEW</span>{% endif %}</a>
 								</li>
 								<li {% if site_section == "people"%}class="active"{% endif %}>
 									<a href="{% url 'list-profiles' %}">People</a>
