@@ -246,6 +246,9 @@
 
       preview_window.css('height', window.getComputedStyle(this.textarea).height);
       preview_window.toggle();
+      if (typeof prettyPrint !== 'undefined'){
+        prettyPrint();
+      }
     }
 
     simpleEditor.prototype.bind = function(){
