@@ -339,7 +339,7 @@
 
                 var img_src = static_url + person.avatar;
 
-                if (person.avatar.indexOf('http://')===0){
+                if ( person.avatar.match(/http[s*]:\/\//) ){
                   img_src = person.avatar;
                 }
                 return '<img src="' + img_src + '" /> ' + person.symbol + person.profileName;
