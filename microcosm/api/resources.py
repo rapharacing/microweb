@@ -1372,12 +1372,19 @@ class Comment(APIResource):
     @classmethod
     def from_create_form(cls, data):
         comment = cls()
-        comment.comment_id = data['id']
+
         comment.item_type = data['itemType']
         comment.item_id = data['itemId']
         comment.in_reply_to = data['inReplyTo']
         comment.markdown = data['markdown']
-        comment.attachments = data['attachments'] if data.get('attachments') else 0
+
+        try:
+            comment.comment_id = data['id']
+            comment.attachments = data['attachments']
+        except KeyError:
+            comment.comment_id = 0
+            comment.attachments = 0
+
         return comment
 
     @classmethod
