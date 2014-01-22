@@ -1,28 +1,21 @@
 import json
 import datetime
 
+from django.conf import settings
+
 import requests
-from requests import RequestException
 
 from dateutil.parser import parse as parse_timestamp
 
 from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
 
-from settings import API_VERSION
-from settings import API_PATH
-from settings import API_SCHEME
-from settings import API_DOMAIN_NAME
-from settings import DEBUG
-from settings import MEMCACHE_HOST
-from settings import MEMCACHE_PORT
-
 import logging
 
 import pylibmc as memcache
 
 logger = logging.getLogger('microcosm.middleware')
-mc = memcache.Client(['%s:%d' % (MEMCACHE_HOST, MEMCACHE_PORT)])
+mc = memcache.Client(['%s:%d' % (settings.MEMCACHE_HOST, settings.MEMCACHE_PORT)])
 
 RESOURCE_PLURAL = {
     'event': 'events',
@@ -62,8 +55,8 @@ def build_url(host, path_fragments):
     """
 
     host = host.split(':')[0]
-    if host.endswith(API_DOMAIN_NAME):
-        url = API_SCHEME + host
+    if host.endswith(settings.API_DOMAIN_NAME):
+        url = settings.API_SCHEME + host
     else:
         mc_key = host + '_cname'
         resolved_name = None
@@ -75,8 +68,8 @@ def build_url(host, path_fragments):
         if resolved_name is None:
             resolved_name = Site.resolve_cname(host)
             mc.set(mc_key, resolved_name)
-        url = API_SCHEME + resolved_name
-    path_fragments = [API_PATH, API_VERSION] + path_fragments
+        url = settings.API_SCHEME + resolved_name
+    path_fragments = [settings.API_PATH, settings.API_VERSION] + path_fragments
     url += join_path_fragments(path_fragments)
     return url
 
@@ -1312,7 +1305,7 @@ class Event(APIResource):
         try:
             resource = APIResource.update(collection_url, json.dumps(attendance_data), {'access_token': access_token}, {})
             print json.dumps(attendance_data)
-        except RequestException:
+        except requests.RequestException:
             raise
         return Event.from_api_response(resource)
 

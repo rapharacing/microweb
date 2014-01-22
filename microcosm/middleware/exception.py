@@ -1,23 +1,22 @@
-import bernhard
 import traceback
-import logging
 
-import microweb.settings
+from django.conf import settings
 
+import bernhard
 
 class ExceptionMiddleware():
 
     def __init__(self):
 
-        if not hasattr(microweb.settings, 'RIEMANN_ENABLED'):
+        if not hasattr(settings, 'RIEMANN_ENABLED'):
             raise AssertionError, 'Please declare RIEMANN_ENABLED in settings.py'
 
-        if microweb.settings.RIEMANN_ENABLED:
-            self.client = bernhard.Client(host=microweb.settings.RIEMANN_HOST, transport=bernhard.UDPTransport)
+        if settings.RIEMANN_ENABLED:
+            self.client = bernhard.Client(host=settings.RIEMANN_HOST, transport=bernhard.UDPTransport)
 
     def process_exception(self, request, exception):
 
-        if microweb.settings.RIEMANN_ENABLED:
+        if settings.RIEMANN_ENABLED:
             self.client.send({
                 'host': request.META['HTTP_HOST'],
                 'service' : 'microweb',
