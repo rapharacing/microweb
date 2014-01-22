@@ -608,7 +608,6 @@ class ProfileView(object):
 			if form.is_valid():
 				if request.FILES.has_key('avatar'):
 					file_request = FileMetadata.from_create_form(request.FILES['avatar'])
-
 					file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token, 100, 100)
 					Attachment.create(
 						request.META['HTTP_HOST'],
@@ -619,24 +618,28 @@ class ProfileView(object):
 				profile_request = Profile(form.cleaned_data)
 				profile_response = profile_request.update(request.META['HTTP_HOST'], request.access_token)
 
-				if request.POST.get('markdown') and len(request.POST.get('markdown')) > 0:
+				# check for existing comment
+				if request.POST.get('markdown'):
 
-						payload = {
-							'itemType'  : 'profile',
-							'itemId'    : profile_response.id,
-							'markdown'  : request.POST.get('markdown'),
-							'inReplyTo' : 0
-						}
+					payload = {
+						'itemType'  : 'profile',
+						'itemId'    : profile_response.id,
+						'markdown'  : request.POST.get('markdown'),
+						'inReplyTo' : 0
+					}
 
-						# try to edit comment else create a new one
-						try:
-							profile_response.profile_comment
-							payload['id'] = profile_response.profile_comment.id
-							comment_request  = Comment.from_edit_form(payload)
-							comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
-						except AttributeError:
+					# try to edit comment else create a new one
+					if hasattr(profile_response,'profile_comment'):
+						payload['id'] = profile_response.profile_comment.id
+						if len(request.POST.get('markdown')) < 1:
+							payload['markdown'] = ""
+						comment_request  = Comment.from_edit_form(payload)
+						comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
+					else:
+						if len(request.POST.get('markdown')) > 0:
 							comment = Comment.from_create_form(payload)
 							comment.create(request.META['HTTP_HOST'], request.access_token)
+
 
 				return HttpResponseRedirect(reverse('single-profile', args=(profile_response.id,)))
 			else:
