@@ -4,12 +4,12 @@
 	<ul class="wmd-button-bar">
 		<li class="wmd-bold"><strong>Bold</strong></li>
 		<li class="wmd-italic"><i>Italics</i></li>
-		<li class="wmd-quote">Quote</li>
 		<li class="wmd-link"><span class="sprite sprite-format-link"></span> Link</li>
-		<li class="wmd-ol"><span class="sprite sprite-format-list"></span> List</li>
-		<li class="wmd-code">&lt;&gt; Code</li>
 		<li class="wmd-image"><span class="sprite sprite-format-img"></span> Image</li>
-		<li class="wmd-preview-button pull-right">preview</li>
+		<li class="wmd-ol"><span class="sprite sprite-format-list"></span> List</li>
+		<li class="wmd-quote">Quote</li>
+		<li class="wmd-code">&lt; code / &gt;</li>
+		<li class="wmd-preview-button pull-right">Preview</li>
 	</ul>
 	{% if not as_component %}
 	<form action="{% url 'create-comment' %}" method="POST" enctype="multipart/form-data">
