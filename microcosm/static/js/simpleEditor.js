@@ -333,7 +333,13 @@
               });
             },
             template: function (person) {
-                return '<img src="' + static_url + person.avatar + '" /> ' + person.symbol + person.profileName;
+
+                var img_src = static_url + person.avatar;
+
+                if (person.avatar.indexOf('http://')===0){
+                  img_src = person.avatar;
+                }
+                return '<img src="' + img_src + '" /> ' + person.symbol + person.profileName;
             },
             replace: function (person) {
                 return person.symbol + person.profileName;
