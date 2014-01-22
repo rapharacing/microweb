@@ -21,6 +21,19 @@ def main():
     access_token = sys.argv[2]
     failures = {}
 
+    # site
+    ident = 'Fetching site'
+    print ident
+    url = unparse_api_url(site_subdomain, 'api/v1/site', access_token=access_token)
+    response = requests.get(url, headers={'Accept-Encoding': 'application/json'})
+    if response.status_code != 200:
+        failures[ident] = response.content
+        exit_with_error(failures)
+    else:
+        site = open('site.json', 'w')
+        site.write(response.content)
+        site.close()
+
     # whoami
     ident = 'Fetching whoami'
     print ident
@@ -31,6 +44,20 @@ def main():
         exit_with_error(failures)
     else:
         whoami = open('whoami.json', 'w')
+        whoami.write(response.content)
+        whoami.close()
+        profile_id = response.json()['data']['id']
+
+    # profile
+    ident = 'Fetching profile ID %s' % profile_id
+    print ident
+    url = unparse_api_url(site_subdomain, 'api/v1/profiles/%s' % profile_id, access_token=access_token)
+    response = requests.get(url, headers={'Accept-Encoding': 'application/json'})
+    if response.status_code != 200:
+        failures[ident] = response.content
+        exit_with_error(failures)
+    else:
+        whoami = open('profile.json', 'w')
         whoami.write(response.content)
         whoami.close()
 
@@ -110,6 +137,30 @@ def main():
         event = open('event_without_comment.json', 'w')
         event.write(response.content)
         event.close()
+
+    ident = 'Creating event with comment'
+    print ident
+    url = unparse_api_url(site_subdomain, 'api/v1/events', access_token=access_token)
+    when = (datetime.datetime.utcnow() + datetime.timedelta(weeks=2)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    data = json.dumps({
+        'microcosmId': microcosm_id,
+        'title': 'Generated Event',
+        'when': when,
+        'duration': 180,
+        'where': 'The Park',
+        'rsvpLimit': 100,
+        'firstComment': 'First generated comment',
+        })
+    response = requests.post(url, data=data, headers={'Content-Type': 'application/json'})
+    if response.status_code != 200:
+        failures[ident] = response.content
+        exit_with_error(failures)
+    else:
+        event = open('event_with_comment.json', 'w')
+        event.write(response.content)
+        event.close()
+        event_id = response.json()['data']['id']
+
 
 
 def unparse_api_url(site_subdomain, path, query_params={}, access_token=''):
