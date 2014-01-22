@@ -609,7 +609,7 @@ class ProfileView(object):
 				if request.FILES.has_key('avatar'):
 					file_request = FileMetadata.from_create_form(request.FILES['avatar'])
 
-					file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+					file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token, 100, 100)
 					Attachment.create(
 						request.META['HTTP_HOST'],
 						file_metadata.file_hash,
