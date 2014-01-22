@@ -1225,12 +1225,13 @@ class Event(APIResource):
 
         # Event location
         repr['where'] = self.where
-        repr['lat'] = self.lat
-        repr['lon'] = self.lon
-        repr['north'] = self.north
-        repr['east'] = self.east
-        repr['south'] = self.south
-        repr['west'] = self.west
+        # Geo coordinates are optional
+        if hasattr(self, 'lat'): repr['lat'] = self.lat
+        if hasattr(self, 'lon'): repr['lon'] = self.lon
+        if hasattr(self, 'north'): repr['north'] = self.north
+        if hasattr(self, 'east'): repr['east'] = self.east
+        if hasattr(self, 'south'): repr['south'] = self.south
+        if hasattr(self, 'west'): repr['west'] = self.west
 
         # RSVP limit is optional
         if hasattr(self, 'rsvp_attend'): repr['rsvpAttend'] = self.rsvp_attend
