@@ -1,1 +1,110 @@
-{"context":"","status":200,"data":{"siteId":3,"title":"LFGSS","description":"London Fixed-gear and Single-speed.","subdomainKey":"lfgss","domain":"https://lfgss.microco.sm/","ownedBy":{"id":7,"siteId":3,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/7"},{"rel":"site","href":"/api/v1/sites/3"}]}},"themeId":1,"logoUrl":"https://static.lfgss.com/attachments/67698d1368451096-logo2.png","headerBackgroundUrl":"/static/themes/1/background.png","meta":{"created":"2013-05-13T12:24:53.537647Z","createdBy":{"id":7,"siteId":3,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/7"},{"rel":"site","href":"/api/v1/sites/3"}]}},"links":[{"rel":"self","href":"/api/v1/sites/3"},{"rel":"microcosm","href":"/api/v1/microcosms"},{"rel":"profile","href":"/api/v1/profiles"}],"permissions":{"create":false,"read":true,"update":false,"delete":false,"guest":true,"superUser":false}}},"error":null}
+{
+ "context": "",
+ "status": 200,
+ "data": {
+  "siteId": 5,
+  "title": "Middle Earth",
+  "description": "Middle Earth is the central continent of the world in the third age.",
+  "subdomainKey": "dev1",
+  "domain": "",
+  "ownedBy": {
+   "id": 5,
+   "siteId": 5,
+   "userId": 1,
+   "profileName": "Frodo",
+   "visible": true,
+   "avatar": "/api/v1/files/66cca61feb8001cb71a9fb7062ff94c9d2543340",
+   "meta": {
+    "flags": {},
+    "links": [
+     {
+      "rel": "self",
+      "href": "/api/v1/profiles/5"
+     },
+     {
+      "rel": "site",
+      "href": "/api/v1/sites/5"
+     }
+    ]
+   }
+  },
+  "themeId": 1,
+  "logoUrl": "https://dev1.microco.sm/api/v1/files/30ff6e4d33e1ff64deb3cc6f2be8a97e8abaa77f",
+  "headerBackgroundUrl": "/static/themes/1/background.png",
+  "meta": {
+   "created": "2014-01-22T14:53:20.636901Z",
+   "createdBy": {
+    "id": 5,
+    "siteId": 5,
+    "userId": 1,
+    "profileName": "Frodo",
+    "visible": true,
+    "avatar": "/api/v1/files/66cca61feb8001cb71a9fb7062ff94c9d2543340",
+    "meta": {
+     "flags": {},
+     "links": [
+      {
+       "rel": "self",
+       "href": "/api/v1/profiles/5"
+      },
+      {
+       "rel": "site",
+       "href": "/api/v1/sites/5"
+      }
+     ]
+    }
+   },
+   "stats": [
+    {
+     "metric": "activeProfiles",
+     "value": 2
+    },
+    {
+     "metric": "onlineProfiles",
+     "value": 1
+    },
+    {
+     "metric": "totalProfiles",
+     "value": 2
+    },
+    {
+     "metric": "totalConversations",
+     "value": 1
+    },
+    {
+     "metric": "totalComments",
+     "value": 6
+    }
+   ],
+   "links": [
+    {
+     "rel": "self",
+     "href": "/api/v1/sites/5"
+    },
+    {
+     "rel": "microcosm",
+     "href": "/api/v1/microcosms"
+    },
+    {
+     "rel": "profile",
+     "href": "/api/v1/profiles"
+    }
+   ],
+   "permissions": {
+    "create": true,
+    "read": true,
+    "update": true,
+    "delete": true,
+    "closeOwn": false,
+    "openOwn": false,
+    "readOthers": false,
+    "guest": false,
+    "banned": false,
+    "owner": true,
+    "moderator": true,
+    "siteOwner": true
+   }
+  }
+ },
+ "error": null
+}
