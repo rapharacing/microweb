@@ -366,7 +366,9 @@
 
     eventDateForm.prototype.getStartTime = function(){
 
-      var startTimeControl = "#event-start-calendar-start-time";
+      if (this.controls.start_calendar_start_time[0].selectedIndex < 0){
+        this.controls.start_calendar_start_time[0].selectedIndex = 0;
+      }
       return this.controls.start_calendar_start_time.val().trim();
     };
 
@@ -381,7 +383,9 @@
       }else{
         console.log('getEndDateTime(): unrecognized event_date_type');
       }
-
+      if (endTimeControl[0].selectedIndex < 0){
+        endTimeControl[0].selectedIndex = 0;
+      }
       return endTimeControl.val().trim();
     };
 

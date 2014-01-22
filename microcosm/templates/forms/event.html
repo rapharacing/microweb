@@ -66,7 +66,7 @@
 									class="form-control"
 									id="title"
 									name="{{ form.title.name }}"
-									value="{{ form.title.value|safe|default:"" }}"
+									value="{% if form.title.value %}{{ form.title.value|safe|default:"" }}{% endif %}"
 									placeholder="Title of event"
 									maxlength="{{ form.fields.title.max_length }}"
 									tabindex="1"
@@ -204,9 +204,9 @@
 						<div class="row" id="location-options">
 							<label class="col-sm-12">Where is your event being held?</label>
 
-							<div class="col-sm-4 col-lg-3">
+							<div class="col-sm-4 col-lg-3 {% if form.errors.where %}has-error{% endif %}">
 								{% if form.errors.where %}
-									<div class="text-error">{{ form.errors.where.as_text }}</div>
+									<label class="control-label">{{ form.errors.where.as_text }}</label>
 								{% endif %}
 								<div class="radio">
 									<label>
@@ -237,7 +237,7 @@
 										placeholder="Eg. Street, station, landmark, country..."
 										maxlength="150"
 										tabindex="1"
-									>{{ form.where.value|safe|default:"" }}</textarea>
+									>{% if form.where.value%}{{ form.where.value|safe|default:"" }}{% endif %}</textarea>
 									<div class="row">
 										<div class="col-sm-5 col-sm-offset-7">
 											<a
