@@ -35,9 +35,7 @@
 
                     <ul class="list-people list-people-sm">
                       {% for member in membership.members %}
-                      <li><a href="{% url 'profile' member.name|slugify  %}">
-                        <img src="{{ STATIC_URL }}{{ member.avatar}}" />
-                      </a></li>
+                      <li><a href="{% url 'profile' member.name|slugify  %}"><img src="{{ STATIC_URL }}{{ member.avatar}}" /></a></li>
                       {% endfor %}
                     </ul>
 

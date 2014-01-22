@@ -1365,12 +1365,19 @@ class Comment(APIResource):
     @classmethod
     def from_create_form(cls, data):
         comment = cls()
-        comment.comment_id = data['id']
+
         comment.item_type = data['itemType']
         comment.item_id = data['itemId']
         comment.in_reply_to = data['inReplyTo']
         comment.markdown = data['markdown']
-        comment.attachments = data['attachments'] if data.get('attachments') else 0
+
+        try:
+            comment.comment_id = data['id']
+            comment.attachments = data['attachments']
+        except KeyError:
+            comment.comment_id = 0
+            comment.attachments = 0
+
         return comment
 
     @classmethod
@@ -1475,8 +1482,10 @@ class FileMetadata(object):
         file_metadata.mime_type = data[0]['mimeType']
         return file_metadata
 
-    def create(self, host, access_token):
+    def create(self, host, access_token, width=0, height=0):
         url = build_url(host, [FileMetadata.api_path_fragment])
+        if height > 0 or width > 0:
+            url += "?maxWidth=" + str(width) + "&maxHeight=" + str(height)
         headers = APIResource.make_request_headers(access_token)
         response = APIResource.process_response(url, requests.post(url, files=self.file, headers=headers))
         return FileMetadata.from_api_response(response)

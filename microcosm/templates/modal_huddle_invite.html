@@ -12,10 +12,7 @@
 	      </div>
 	      <div class="modal-item-title">{{ content.title | safe }}</div>
 	      <div class="modal-item-meta">
-	        <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by">
-						<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name | safe }}" class="img-badge" />
-						@{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}
-					</a> started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
+	        <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name | safe }}" class="img-badge" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
 	      </div>
 				<div id="modal-huddle">
 					<div class="modal-list">
@@ -23,10 +20,7 @@
 						<ul id="modal-huddle-invited-list">
 							{% for profile in content.participants %}
 							<li>
-								<a href="{% url 'single-profile' profile.id %}" data-toggle="tooltip" title="{{ profile.profile_name | safe }}">
-									<img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name | safe }}" />
-									@{{profile.profile_name | safe }}
-								</a>
+								<a href="{% url 'single-profile' profile.id %}" data-toggle="tooltip" title="{{ profile.profile_name | safe }}"><img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name | safe }}" /> @{{profile.profile_name | safe }}</a>
 							</li>
 							{% endfor %}
 						</ul>

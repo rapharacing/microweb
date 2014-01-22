@@ -68,20 +68,11 @@
 			<h5>Got something to add?</h5>
 			<div class="metabar-module-primary-buttons">
 			{% if user %}
-				<a href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary">
-					<span class="sprite sprite-speech-bubble-small"></span> Start a conversation
-				</a>
-				<a href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary">
-					<span class="sprite sprite-calendar-small"></span> Start an event
-				</a>
+				<a href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-speech-bubble-small"></span> Start a conversation</a>
+				<a href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-calendar-small"></span> Start an event</a>
 			{% else %}
-				<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin">
-					<span class="sprite sprite-speech-bubble-small"></span> Start a conversation
-				</a>
-				<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin">
-					<span class="sprite sprite-calendar-small"></span> Start an event
-				</a>
-
+				<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin"><span class="sprite sprite-speech-bubble-small"></span> Start a conversation</a>
+				<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin"><span class="sprite sprite-calendar-small"></span> Start an event</a>
 			{% endif %}
 			</div>
 		</div> <!-- primary actions -->
@@ -95,10 +86,7 @@
 				{{ content.title | safe }}
 			</h3>
 			<p class="metabar-module-author">
-				<a href="{% url 'single-profile' content.meta.created_by.id %}">
-					<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name | safe }}" />
-					@{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}
-				</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+				<a href="{% url 'single-profile' content.meta.created_by.id %}"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name | safe }}" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
 			</p>
 		</div>
 		<div class="metabar-module-body">

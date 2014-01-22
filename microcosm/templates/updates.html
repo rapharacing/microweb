@@ -73,17 +73,13 @@
 														<strong>You've successfully updated your profile</strong>
 														{% else %}
 														<h3 class="row-title">
-															<a href="{{ update.parent_link }}">
-															@{{ update.item.meta.created_by.profile_name }}
-															</a>
+															<a href="{{ update.parent_link }}">@{{ update.item.meta.created_by.profile_name }}</a>
 														</h3>
 														updated their profile
 														{% endif %}
 												{% else %}
 												<h3 class="row-title">
-													<a href="{{ update.parent_link }}/newest/">
-													{{ update.parent_item.title | safe }}
-													</a>
+													<a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title | safe }}</a>
 												</h3>
 												{% endif %}
 
@@ -95,17 +91,13 @@
 										{% elif update.update_type == "reply_to_comment" %}
 
 											<h3 class="row-title">
-												<a href="{{ update.profile_link }}">
-													@{{ update.item.meta.created_by.profile_name | safe }}
-												</a>
+												<a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name | safe }}</a>
 											</h3> replied to your comment on <a href="{{ update.parent_link }}">{{ update.parent_item.title | safe }}</a>
 
 											<div class="row-meta">
 
 												<div class="row-meta-excerpt">
-													<a href="{% url 'single-profile' update.item.meta.created_by.id %}">
-														<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/>
-													</a>
+													<a href="{% url 'single-profile' update.item.meta.created_by.id %}"><img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/></a>
 													<div class="row-meta-excerpt-text">
 														{{ update.item.html | safe }}
 													</div>
@@ -117,9 +109,7 @@
 										{% elif update.update_type == "mentioned" %}
 
 											<h3 class="row-title">
-												<a href="{{ update.profile_link }}">
-													@{{ update.item.meta.created_by.profile_name | safe }}
-												</a>
+												<a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name | safe }}</a>
 											</h3>
 											mentioned you in
 											<a href="{{ update.parent_link }}">{{ update.parent_item.title | safe }}</a>
@@ -127,9 +117,7 @@
 											<div class="row-meta">
 
 												<div class="row-meta-excerpt">
-													<a href="{% url 'single-profile' update.item.meta.created_by.id %}">
-														<img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/>
-													</a>
+													<a href="{% url 'single-profile' update.item.meta.created_by.id %}"><img src="{% if 'gravatar' in update.item.meta.created_by.avatar %}{{update.item.meta.created_by.avatar}}{% elif 'files' in update.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{update.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{update.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/></a>
 													<div class="row-meta-excerpt-text">
 														{{ update.item.html | safe }}
 													</div>
@@ -140,11 +128,7 @@
 										{# new comment in huddle #}
 										{% elif update.update_type == "new_comment_in_huddle" %}
 
-											<a href="{{ update.item_link }}">
-												<h3 class="row-title">
-													{{ update.item.title|safe }}
-												</h3>
-											</a>
+											<a href="{{ update.item_link }}"><h3 class="row-title">{{ update.item.title|safe }}</h3></a>
 											{% if update.meta.flags.unread %}
 											<span class="label label-warning">NEW</span>
 											{% endif %}
@@ -153,26 +137,18 @@
 										{% elif update.update_type == "new_attendee" %}
 
 											<h3 class="row-title">
-												<a href="{{ update.item_link }}/newest/">
-													{{ update.item.title|safe }}
-												</a>
+												<a href="{{ update.item_link }}/newest/">{{ update.item.title|safe }}</a>
 											</h3>
 
 										{# new vote #}
 										{% elif update.update_type == "new_vote" %}
 
-											<a href="{{ update.item_link }}/newest/">
-												<h3 class="row-title">{{ update.item.title|safe }}</h3>
-											</a>
+											<a href="{{ update.item_link }}/newest/"><h3 class="row-title">{{ update.item.title|safe }}</h3></a>
 
 										{# new event reminder #}
 										{% elif update.update_type == "event_reminder" %}
 
-											<a href="{{ update.item_link }}">
-												<h3 class="row-title">
-													{{ update.item.title|safe }}
-												</h3>
-											</a>
+											<a href="{{ update.item_link }}"><h3 class="row-title">{{ update.item.title|safe }}</h3></a>
 											{% if update.item_type == "comment" %}
 													{{ update.item.html | safe }}
 											{% endif %}
@@ -180,13 +156,9 @@
 										{# new item #}
 										{% elif update.update_type == "new_item" %}
 											<h3 class="row-title">
-												<a href="{{ update.item_link }}">
-													{{ update.item.title|safe }}
-												</a>
+												<a href="{{ update.item_link }}">{{ update.item.title|safe }}</a>
 											</h3> was started in
-											<a href="{{ update.parent_link }}">
-												{{ update.parent_text }}
-											</a>
+											<a href="{{ update.parent_link }}">{{ update.parent_text }}</a>
 										{% endif %}
 									</div> <!-- /row-title-wrapper-->
 
@@ -200,27 +172,18 @@
 											{% elif update.item_type == "event" %}
 												<a href="{% url 'single-event' update.item.id %}">
 											{% else %}
-												<a href="{{ update.item_link }}"></a>
+												<a href="{{ update.item_link }}">
 											{% endif %}
 										{% endif %}
-
 											view
 											{% if update.parent_item_type == "conversation" %}
-												conversation
-											{% elif update.parent_item_type == "event" %}
-												event
-											{% elif update.parent_item_type == "poll" %}
-												poll
-											{% elif update.item_type == "conversation" %}
-												conversation
-											{% elif update.item_type == "event" %}
-												event
-											{% elif update.item_type == "poll" %}
-												poll
-											{% elif update.item.item_type == "profile" %}
-												profile
-											{% endif %}
-										</a>
+												conversation{% elif update.parent_item_type == "event" %}
+												event{% elif update.parent_item_type == "poll" %}
+												poll{% elif update.item_type == "conversation" %}
+												conversation{% elif update.item_type == "event" %}
+												event{% elif update.item_type == "poll" %}
+												poll{% elif update.item.item_type == "profile" %}
+												profile{% endif %}</a>
 
 										{% if update.item_type == "event" %}
 												{% if update.item.rsvp_limit %}
@@ -266,9 +229,7 @@
 														removed from updates (<a class="btn-switch-on" href="javascript:void 0">undo?</a>)
 												</div>
 												<div class="btn-switch-state on">
-													<a class="btn-switch-off" href="javascript:void 0">
-														unsubscribe
-													</a>
+													<a class="btn-switch-off" href="javascript:void 0">unsubscribe</a>
 												</div>
 											</div>
 										</div>
@@ -320,9 +281,7 @@
 	<div class="metabar-module">
 		<h5>Got something to add?</h5>
 		<div class="metabar-module-primary-buttons">
-			<a href="{% url 'updates-settings' %}" class="btn btn-large btn-block btn-primary">
-				<span class="glyphicon glyphicon-comment"></span> Update Settings
-			</a>
+			<a href="{% url 'updates-settings' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-comment"></span> Update Settings</a>
 		</div>
 	</div> <!-- primary actions -->
 	{# endif #}

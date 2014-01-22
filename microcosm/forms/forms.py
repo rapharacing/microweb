@@ -267,4 +267,4 @@ class ProfileEdit(django.forms.Form):
         validators=[validate_no_spaces]
     )
     # Comment text in markdown format.
-    markdown = django.forms.CharField(max_length='5000', widget=django.forms.Textarea)
+    markdown = django.forms.CharField(required=False, max_length='5000', widget=django.forms.Textarea)

@@ -98,9 +98,7 @@
 								{% for attendee in attendees.items.items|slice:":6" %}
 										{% if attendee.rsvp == "yes" %}
 											<li>
-												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}">
-													<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" />
-												</a>
+												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" /></a>
 											</li>
 										{% endif %}
 									{% endfor %}
@@ -114,9 +112,7 @@
 									{% for attendee in attendees.items.items|slice:":6" %}
 										{% if attendee.rsvp == "maybe" %}
 											<li>
-												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}">
-													<img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" />
-												</a>
+												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" /></a>
 											</li>
 										{% endif %}
 									{% endfor %}
