@@ -111,7 +111,7 @@ INSTALLED_APPS = (
 # The values below in must be initialised in local_settings.py
 # Example values can be found in local_settings.py.example
 
-# Details given when registering an application.
+# Credentials generated when registering an application.
 from local_settings import CLIENT_ID
 from local_settings import CLIENT_SECRET
 
