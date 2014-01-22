@@ -1,6 +1,6 @@
-from django.core.exceptions import MiddlewareNotUsed
+from django.core import exceptions
+from django.conf import settings
 
-import microweb
 import bernhard
 import time
 
@@ -8,10 +8,10 @@ import time
 class TimingMiddleware():
 
     def __init__(self):
-        if microweb.settings.RIEMANN_ENABLED:
-            self.client = bernhard.Client(host=microweb.settings.RIEMANN_HOST, transport=bernhard.UDPTransport)
+        if settings.RIEMANN_ENABLED:
+            self.client = bernhard.Client(host=settings.RIEMANN_HOST, transport=bernhard.UDPTransport)
         else:
-            raise MiddlewareNotUsed
+            raise exceptions.MiddlewareNotUsed
 
     def process_request(self, request):
         request.start_time = time.time()

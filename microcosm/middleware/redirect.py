@@ -2,8 +2,7 @@ import pylibmc as memcache
 import logging
 
 from django.http import HttpResponsePermanentRedirect
-
-from microweb import settings
+from django.conf import settings
 
 from microcosm.api.resources import Site
 from microcosm.api.exceptions import APIException

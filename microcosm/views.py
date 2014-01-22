@@ -4,8 +4,7 @@ import string
 
 from functools import wraps
 
-from microweb import settings
-from microweb.settings import PAGE_SIZE
+from django.conf import settings
 
 from urllib import urlencode
 

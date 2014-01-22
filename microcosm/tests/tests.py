@@ -2,10 +2,12 @@ import random
 import string
 import json
 import os
-from mock import patch
 
 from django.utils import unittest
+from django.conf import settings
 from django.test.client import RequestFactory
+
+from mock import patch
 
 from microcosm.views import MicrocosmView
 from microcosm.views import build_pagination_links
@@ -16,13 +18,7 @@ from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import Profile
 from microcosm.api.resources import Site
 from microcosm.api.resources import Event
-
-from microweb.helpers import build_url
-
-from microweb.settings import API_SCHEME
-from microweb.settings import API_DOMAIN_NAME
-from microweb.settings import API_PATH
-from microweb.settings import API_VERSION
+from microcosm.api.resources import build_url
 
 TEST_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -43,38 +39,38 @@ class BuildURLTests(unittest.TestCase):
     subdomain_key = 'abc.'
 
     def testWithTrailingSeparator(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['resource/', '1/', 'extra/'])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['resource/', '1/', 'extra/'])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/resource/1/extra'
 
     def testWithPrependedSeparator(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['/resource', '/1', '/extra'])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['/resource', '/1', '/extra'])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/resource/1/extra'
 
     def testWithDuplicateSeparator(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['resource/', '/1/', '/extra/'])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['resource/', '/1/', '/extra/'])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/resource/1/extra'
 
     def testWithNoSeparator(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['resource', '1', 'extra'])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['resource', '1', 'extra'])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/resource/1/extra'
 
     def testEmptyFragments(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), [])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), [])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION
 
     def testIntFragment(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), [1, 2, 3])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/1/2/3'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), [1, 2, 3])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/1/2/3'
 
     def testInvalidFragment(self):
         with self.assertRaises(AssertionError):
-            build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['resource', '1', 'ex/tra'])
+            build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['resource', '1', 'ex/tra'])
 
     def testFailCustomDomains(self):
         with self.assertRaises(AssertionError):
