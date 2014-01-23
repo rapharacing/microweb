@@ -141,19 +141,19 @@
 		<ul class="list-group">
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalProfiles }}</span>
-				Members
+				<a href="/profiles/">Members</a>
 			</li>
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalConversations }}</span>
-				Conversations
+				<a href="/search/?type=conversation">Conversations</a>
 			</li>
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalComments }}</span>
-				Comments
+				<a href="/search/?type=comment">Comments</a>
 			</li>
 			<li class="list-group-item">
 				<span class="badge-alt">{% if site.meta.stats.onlineProfiles > 1 %}{{ site.meta.stats.onlineProfiles }}{% else %}1{% endif %}</span>
-				Members online now
+				<a href="/profiles/?online=true">Members online now</a>
 			</li>
 		</ul>
 	</div> <!-- / population -->
