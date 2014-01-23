@@ -1304,11 +1304,11 @@ class CommentView(object):
 
 						for f in request.FILES.getlist('attachments'):
 							file_request = FileMetadata.from_create_form(f)
-							# File must be under 30KB
+							# File must be under 5MB
 							# TODO: use Django's built-in field validators and error messaging
-							if len(file_request.file['files']) >= 30720:
+							if len(file_request.file['files']) >= 5242880:
 								view_data['form'] = form
-								view_data['avatar_error'] = 'Sorry, the file you upload must be under 30KB and square.'
+								view_data['avatar_error'] = 'Sorry, the file you upload must be under 5MB.'
 								return render(request, CommentView.form_template, view_data)
 							else:
 								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
@@ -1361,11 +1361,11 @@ class CommentView(object):
 
 						for f in request.FILES.getlist('attachments'):
 							file_request = FileMetadata.from_create_form(f)
-							# File must be under 30KB
+							# File must be under 5MB
 							# TODO: use Django's built-in field validators and error messaging
-							if len(file_request.file['files']) >= 30720:
+							if len(file_request.file['files']) >= 5242880:
 								view_data['form'] = form
-								view_data['avatar_error'] = 'Sorry, the file you upload must be under 30KB and square.'
+								view_data['avatar_error'] = 'Sorry, the file you upload must be under 5MB and square.'
 								return render(request, CommentView.form_template, view_data)
 							else:
 								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
