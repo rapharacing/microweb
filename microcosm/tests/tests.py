@@ -143,45 +143,66 @@ class PaginationTests(unittest.TestCase):
 class ResourceTests(unittest.TestCase):
 
     """
-    Basic initialisation and serilisation tests for API resources.
+    Basic initialisation and serialisation tests for API resources.
+    TODO: in some cases, as_dict is a property, in others it is a callable.
     """
 
     def testMicrocosmInit(self):
-        Microcosm(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data']
+        Microcosm.from_api_response(data)
 
     def testMicrocosmAsDict(self):
-        microcosm = Microcosm(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data']
+        microcosm = Microcosm.from_api_response(data)
         microcosm.as_dict
 
     def testMicrocosmSummaryInit(self):
-        Microcosm(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data'], summary=True)
-
-    def testMicrocosmListInit(self):
-        MicrocosmList(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosms.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data']
+        Microcosm.from_summary(data)
 
     def testConversationInit(self):
-        Conversation.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation_with_comment.json')).read())['data']
+        Conversation.from_api_response(data)
+
+    def testCommentedConversationInit(self):
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation_without_comment.json')).read())['data']
+        Conversation.from_api_response(data)
 
     def testConversationAsDict(self):
-        conversation = Conversation.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation_without_comment.json')).read())['data']
+        conversation = Conversation.from_api_response(data)
         conversation.as_dict()
 
     def testEventInit(self):
-        Event.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'event_without_comment.json')).read())['data']
+        Event.from_api_response(data)
+
+    def testCommentedEventInit(self):
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'event_with_comment.json')).read())['data']
+        Event.from_api_response(data)
 
     def testEventAsDict(self):
-        event = Event.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'event_without_comment.json')).read())['data']
+        event = Event.from_api_response(data)
         event.as_dict()
 
+    def testWhoamiInit(self):
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'whoami.json')).read())['data']
+        Profile(data)
+
     def testProfileInit(self):
-        Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data']
+        Profile(data)
 
     def testProfileAsDict(self):
-        profile = Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data']
+        profile = Profile(data)
         profile.as_dict
 
     def testProfileSummaryInit(self):
-        Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'], summary=True)
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data']
+        Profile(data, summary=True)
 
     def testSiteInit(self):
-        Site(json.loads(open(os.path.join(TEST_ROOT, 'data', 'site.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'site.json')).read())['data']
+        Site(data)

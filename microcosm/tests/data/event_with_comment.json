@@ -3,12 +3,15 @@
  "status": 200,
  "data": {
   "id": 2,
-  "siteId": 5,
-  "visibility": "public",
-  "title": "Generated",
-  "description": "Generated microcosm",
-  "moderators": null,
-  "items": {
+  "microcosmId": 2,
+  "title": "Generated Event",
+  "when": "2014-02-05T17:23:24Z",
+  "duration": 180,
+  "where": "The Park",
+  "status": "upcoming",
+  "rsvpLimit": 100,
+  "rsvpSpaces": 100,
+  "comments": {
    "total": 0,
    "limit": 25,
    "offset": 0,
@@ -18,7 +21,7 @@
    "links": [
     {
      "rel": "self",
-     "href": "/api/v1/microcosms/2",
+     "href": "/api/v1/events/2",
      "title": "1"
     }
    ],
@@ -26,7 +29,7 @@
    "items": []
   },
   "meta": {
-   "created": "2014-01-22T17:23:21.435332Z",
+   "created": "2014-01-22T17:23:24.315078Z",
    "createdBy": {
     "id": 5,
     "siteId": 5,
@@ -53,17 +56,18 @@
     "open": true,
     "deleted": false,
     "moderated": false,
-    "visible": false,
-    "unread": false
+    "visible": true,
+    "attending": false
    },
    "links": [
     {
      "rel": "self",
-     "href": "/api/v1/microcosms/2"
+     "href": "/api/v1/events/2"
     },
     {
-     "rel": "site",
-     "href": "/api/v1/sites/5"
+     "rel": "microcosm",
+     "href": "/api/v1/microcosms/2",
+     "title": "Generated"
     }
    ],
    "permissions": {
