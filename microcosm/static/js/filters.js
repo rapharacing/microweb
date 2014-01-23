@@ -19,16 +19,27 @@
         this.$el = $(options.el);
       }
 
-      if(typeof options.query !== 'undefined'){
-        // replaces existing params
-        this.query = options.query.replace(/\s?\w+:\w+/g,'');
-      }
-
       if(typeof options.url !== 'undefined'){
         this.url = options.url;
       }
 
-      this.filters = this.$el.find('input');
+      this.concat_char = "+";
+      if(typeof options.concat_char !== 'undefined'){
+        this.concat_char = options.concat_char;
+      }
+
+      this.param_char = ":";
+      if(typeof options.param_char !== 'undefined'){
+        this.param_char = options.param_char;
+      }
+
+      if(typeof options.query !== 'undefined'){
+        // replaces existing params
+        this.query = options.query.replace(/\w+:\w+/g,'');
+      }
+
+
+      this.filters = this.$el.find('[name]');
 
       this.bind();
       return this;
@@ -37,27 +48,27 @@
     filters.prototype.parse = function(){
 
       var params  = [],
-          checked = this.filters.filter(':checked');
+          checked = this.filters.filter('select:not(:disabled), :checked');
 
       for(var i=0,j=checked.length;i<j;i++){
-        params.push( [checked[i].name,checked[i].value].join(':') );
+        params.push( [checked[i].name,checked[i].value].join(this.param_char) );
       }
 
-      return params.join('+');
+      return params.join(this.concat_char);
     };
 
     filters.prototype.changeHandler = function(){
 
       var params          = this.parse(),
-          new_query       = this.query + (params.length>0 ? '+' + params : ''),
+          new_query       = (this.query.length > 0 ? this.query + "+" : this.query) + (params.length>0 ? params : ''),
           formatted_query = this.url.replace(/\$1/g, new_query);
 
-      window.location.href = formatted_query;
+     window.location.href = formatted_query;
     };
 
     filters.prototype.bind = function(){
       var events = [
-        ['change',    'input[type=checkbox]', 'changeHandler']
+        ['change',    '[name]', 'changeHandler']
       ];
       for(var i in events){
         this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );

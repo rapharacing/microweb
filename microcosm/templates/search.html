@@ -107,26 +107,34 @@
 		<ul class="list-group">
 			<li class="list-group-item">
 				<div class="checkbox">
-					<input id="filter-microcosm" type="checkbox" name="type" value="microcosm" {% if "microcosm" in content.type %}checked="checked"{% endif %}/>
-					<label for="filter-microcosm">Microcosms</label>
+					<label for="filter-microcosm">
+						<input id="filter-microcosm" type="checkbox" name="type" value="microcosm" {% if "microcosm" in content.type %}checked="checked"{% endif %}/>
+						Microcosms
+					</label>
 				</div>
 			</li>
 			<li class="list-group-item">
 				<div class="checkbox">
-					<input id="filter-conversation" type="checkbox" name="type" value="conversation" {% if "conversation" in content.type %}checked="checked"{% endif %}/>
-					<label for="filter-conversation">Conversations</label>
+					<label for="filter-conversation">
+						<input id="filter-conversation" type="checkbox" name="type" value="conversation" {% if "conversation" in content.type %}checked="checked"{% endif %}/>
+						Conversations
+					</label>
 				</div>
 			</li>
 			<li class="list-group-item">
 				<div class="checkbox">
-						<input id="filter-events" type="checkbox"  name="type" value="event" {% if "event" in content.type %}checked="checked"{% endif %}/>
-						<label for="filter-events">Events</label>
+						<label for="filter-events">
+							<input id="filter-events" type="checkbox"  name="type" value="event" {% if "event" in content.type %}checked="checked"{% endif %}/>
+							Events
+						</label>
 				</div>
 			</li>
 			<li class="list-group-item">
 				<div class="checkbox">
-					<input id="filter-huddles" type="checkbox" name="type" value="profile" {% if "profile" in content.type %}checked="checked"{% endif %}/>
-					<label for="filter-huddles">Profile</label>
+					<label for="filter-huddles">
+						<input id="filter-huddles" type="checkbox" name="type" value="profile" {% if "profile" in content.type %}checked="checked"{% endif %}/>
+						Profile
+					</label>
 				</div>
 			</li>
 
@@ -141,8 +149,10 @@
 		<ul class="list-group">
 			<li class="list-group-item">
 				<div class="checkbox">
-					<input id="filter-intitle" type="checkbox" name="inTitle" value="true" {% if content.query.inTitle %}checked="checked"{% endif %}/>
-					<label for="filter-intitle">Only search titles</label>
+					<label for="filter-intitle">
+						<input id="filter-intitle" type="checkbox" name="inTitle" value="true" {% if content.query.inTitle %}checked="checked"{% endif %}/>
+						Only search titles
+					</label>
 				</div>
 			</li>
 		</ul>

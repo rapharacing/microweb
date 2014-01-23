@@ -563,6 +563,7 @@ class ProfileView(object):
 		top = bool(request.GET.get('top', False))
 		q = request.GET.get('q', "")
 		following = bool(request.GET.get('following', False))
+		online = bool(request.GET.get('online', False))
 
 		profiles_url, params, headers = ProfileList.build_request(
 			request.META['HTTP_HOST'],
@@ -577,7 +578,28 @@ class ProfileView(object):
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 
 		profiles = ProfileList(responses[profiles_url])
-		#print responses[profiles_url]['profiles']['links']
+
+		subtitle = "Showing everyone"
+		if q != "" and len(q)==1:
+			subtitle = "names starting with %s" % (q.upper())
+		else:
+			subtitle = False
+
+		filter_name = []
+
+		if following:
+			filter_name.append("following")
+
+		if online:
+			filter_name.append("online now")
+
+		if top:
+			filter_name.append("most comments")
+
+		if len(filter_name) < 1:
+			filter_name.append("sorted alphabetically")
+
+
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'site': request.site,
@@ -587,7 +609,10 @@ class ProfileView(object):
 			'top': top,
 			'following': following,
 			'alphabet': string.ascii_lowercase,
-			'site_section' : 'people'
+			'site_section' : 'people',
+			'filter_name' : ", ".join(filter_name),
+			'subtitle' : subtitle,
+			'online' : online
 		}
 
 		return render(request, ProfileView.list_template, view_data)
