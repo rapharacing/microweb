@@ -430,7 +430,7 @@ class HuddleView(object):
 					if recipient_profile.id > 0:
 						recipients.append({
 							'id' 					: recipient_profile.id,
-							'profileName' : recipient_profile.profileName,
+							'profileName' : recipient_profile.profile_name,
 							'avatar' 			: recipient_profile.avatar
 						})
 
