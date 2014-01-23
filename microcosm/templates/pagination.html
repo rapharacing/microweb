@@ -34,10 +34,10 @@
 
 <div class="pagination-alt">
 	{% if pagination.next %}
-		<a class="pagination-alt-btn pagination-alt-next" href="{{ pagination.next.href }}">Next</a>
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-next" href="{{ pagination.next.href }}">Next</a>
 	{% endif %}
 	{% if pagination.prev %}
-		<a class="pagination-alt-btn pagination-alt-prev" href="{{ pagination.prev.href }}">Prev</a>
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-prev" href="{{ pagination.prev.href }}">Prev</a>
 	{% endif %}
 
 	{% if pagination.total_pages > 1 %}
