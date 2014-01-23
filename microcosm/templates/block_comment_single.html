@@ -28,8 +28,8 @@
 				{% endif %}
 
 				{% if comment.in_reply_to %}
-				<span class="sprite sprite-arrow-forward"></span>
 				<span class="comment-item-in-reply-to">
+					<span class="sprite sprite-arrow-forward"></span>
 					in reply to
 					<a href="{% url 'incontext-comment' comment.in_reply_to %}">@{{ comment.meta.links.inReplyToAuthor.title | safe }}</a>
 				</span>
