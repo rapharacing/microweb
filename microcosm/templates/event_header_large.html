@@ -95,31 +95,31 @@
 							{% endcomment %}
 							<ul class="list-people list-people-md">
 							{% if rsvp_num_attending > 0 %}
-								{% for attendee in attendees.items.items|slice:":6" %}
+								{% for attendee in attendees.items.items|slice:":5" %}
 										{% if attendee.rsvp == "yes" %}
 											<li>
 												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" /></a>
 											</li>
 										{% endif %}
 									{% endfor %}
-									{% if rsvp_num_attending > 6 %}
+									{% if rsvp_num_attending > 5 %}
 									<li>
 										<a href="#" data-toggle="modal" data-target="#modal-event-attendees"
-											 class="list-people-button">+{{ rsvp_num_attending|add:"-6" }}</a>
+											 class="list-people-button">+{{ rsvp_num_attending|add:"-5" }}</a>
 									</li>
 									{% endif %}
 								{% elif rsvp_num_invited > 0%}
-									{% for attendee in attendees.items.items|slice:":6" %}
+									{% for attendee in attendees.items.items|slice:":5" %}
 										{% if attendee.rsvp == "maybe" %}
 											<li>
 												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" /></a>
 											</li>
 										{% endif %}
 									{% endfor %}
-									{% if rsvp_num_invited > 6 %}
+									{% if rsvp_num_invited > 5 %}
 									<li>
 										<a href="#" data-toggle="modal" data-target="#modal-event-attendees"
-											 class="list-people-button">+{{ rsvp_num_invited|add:"-6" }}</a>
+											 class="list-people-button">+{{ rsvp_num_invited|add:"-5" }}</a>
 									</li>
 									{% endif %}
 								{% endif %}
