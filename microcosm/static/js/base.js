@@ -45,9 +45,18 @@ $('document').ready(function() {
 
 	prettyPrint();
 
+	// toggle <time> html -> title -> html
+	$('body').on('click', 'time', function(){
+		var self = $(this),
+				title = self.attr('title'),
+				html  = self.html();
 
-	// Make tables in user generated content look pretty
-	$('.ugc table').addClass('table').addClass('table-hover');
+		self.html(title).attr('title',html);
+
+	});
+
+
+
 });
 
 
