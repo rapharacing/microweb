@@ -13,7 +13,7 @@
 		<meta name="subdomain" content="https://{{ site.subdomain_key }}.microco.sm" />
 
 		<style type="text/css">
-		.headBand {
+		#headerBackground {
 			background-image: url('{% if site.header_background_url %}{{ site.header_background_url }}{% else %}{{ STATIC_URL }}themes/1/background.png{% endif %}');
 		}
 		</style>
@@ -22,7 +22,7 @@
 	<body>
 
 		<nav class="navbar navbar-default" role="navigation">
-			<div class="navbar-header-wrapper tiling-bg">
+			<div class="navbar-header-wrapper tiling-bg" id="headerBackground">
 				<div class="container">
 					<div class="row">
 
