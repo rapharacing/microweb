@@ -2,14 +2,38 @@
 {% if user %}
 
 	<ul class="wmd-button-bar">
-		<li class="wmd-bold"><strong>Bold</strong></li>
-		<li class="wmd-italic"><i>Italics</i></li>
-		<li class="wmd-link"><span class="sprite sprite-format-link"></span> Link</li>
-		<li class="wmd-image"><span class="sprite sprite-format-img"></span> Image</li>
-		<li class="wmd-ol"><span class="sprite sprite-format-list"></span> List</li>
-		<li class="wmd-quote">Quote</li>
-		<li class="wmd-code">&lt; code / &gt;</li>
-		<li class="wmd-preview-button pull-right">Preview</li>
+		<li class="wmd-bold">
+			<span class="sprite sprite-bold-small"></span>
+			<strong class="wmd-button-bar-btn-text">Bold</strong>
+		</li>
+		<li class="wmd-italic">
+			<span class="sprite sprite-italic-small"></span>
+			<i class="wmd-button-bar-btn-text">Italics</i>
+		</li>
+		<li class="wmd-link">
+			<span class="sprite sprite-format-link"></span>
+			<span class="wmd-button-bar-btn-text">Link</span>
+		</li>
+		<li class="wmd-image">
+			<span class="sprite sprite-format-img"></span>
+			<span class="wmd-button-bar-btn-text">Image</span>
+		</li>
+		<li class="wmd-ol">
+			<span class="sprite sprite-format-list"></span>
+			<span class="wmd-button-bar-btn-text">List</span>
+		</li>
+		<li class="wmd-quote">
+			<span class="sprite sprite-quote-small"></span>
+			<span class="wmd-button-bar-btn-text">Quote</span>
+		</li>
+		<li class="wmd-code">
+			<span class="sprite sprite-code-small"></span>
+			<span class="wmd-button-bar-btn-text">code</span>
+		</li>
+		<li class="wmd-preview-button pull-right">
+			<span class="sprite sprite-preview-small"></span>
+			<span class="wmd-button-bar-btn-text">Preview</span>
+		</li>
 	</ul>
 	{% if not as_component %}
 	<form action="{% url 'create-comment' %}" method="POST" enctype="multipart/form-data">
@@ -49,7 +73,7 @@
 			{% if not as_component %}
 				<input type="submit" class="btn btn-primary" value="Post reply" tabindex="1" />
 				<input type="reset" class="btn btn-default" value="Cancel">
-				<a href="javascript:void 0" class="formatting-help-handle" data-toggle="modal" data-target="#formatting-help-modal"><span class="sprite sprite-help-small"></span> Formatting help</a>
+				<a href="javascript:void 0" class="formatting-help-handle" data-toggle="modal" data-target="#formatting-help-modal"><span class="sprite sprite-help-small"></span> <span class="wmd-button-bar-btn-text">Formatting help</span></a>
 			</div>
 			{% endif %}
 		{% endif %}

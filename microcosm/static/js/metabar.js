@@ -162,9 +162,9 @@
 (function(){
 
   var onscreen = {
-    '-webkit-transform' : 'translateX(-350px)',
-       '-moz-transform' : 'translateX(-350px)',
-            'transform' : 'translateX(-350px)'
+    '-webkit-transform' : 'translateX(-320px)',
+       '-moz-transform' : 'translateX(-320px)',
+            'transform' : 'translateX(-320px)'
   }
 
   var offscreen = {
