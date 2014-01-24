@@ -189,6 +189,8 @@
           }
           if (typeof files[i].fileHash !== 'undefined'){
             img.name = files[i].fileHash;
+          }else{
+            img.name = files[i].name;
           }
 
           li = document.createElement('li');
