@@ -115,6 +115,38 @@ def main():
         conversation = open('conversation_with_comment.json', 'w')
         conversation.write(response.content)
         conversation.close()
+        conversation_id = int(response.json()['data']['id'])
+        print 'Created conversation with ID: %d' % conversation_id
+
+    # generate comments on the conversation so pagination can be tested
+    ident = 'Creating 30 comments on conversation with ID: %d' % conversation_id
+    print ident
+    url = unparse_api_url(site_subdomain, 'api/v1/comments', access_token=access_token)
+    for comment_num in range(30):
+        data = json.dumps({
+            'itemType' : 'conversation',
+            'itemId' : conversation_id,
+            'markdown' : 'Here is comment number %d' % comment_num,
+        })
+        response = requests.post(url, data=data, headers={'Content-Type': 'application/json'})
+        if response.status_code != 200:
+            failures[ident] = response.content
+            exit_with_error(failures)
+        else:
+            print 'Comment %d done' % comment_num
+
+    # save conversation as conversation_with_comment_pages
+    ident = 'Fetching conversation %d' % conversation_id
+    print ident
+    url = unparse_api_url(site_subdomain, '/api/v1/conversations/%d' % conversation_id)
+    response = requests.get(url, headers={'Accept-Encoding': 'application/json'})
+    if response.status_code != 200:
+        failures[ident] = response.content
+        exit_with_error()
+    else:
+        paginated_comments = open('conversation_with_paginated_comments.json', 'w')
+        paginated_comments.write(response.content)
+        paginated_comments.close()
 
     # events
     ident = 'Creating event without comment'
@@ -160,7 +192,6 @@ def main():
         event.write(response.content)
         event.close()
         event_id = response.json()['data']['id']
-
 
 
 def unparse_api_url(site_subdomain, path, query_params={}, access_token=''):
