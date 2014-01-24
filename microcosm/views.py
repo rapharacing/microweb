@@ -1326,24 +1326,32 @@ class CommentView(object):
 				comment_response = comment_request.create(request.META['HTTP_HOST'], access_token=request.access_token)
 
 				if comment_response.id > 0:
+
+					attachments_delete = []
+					if request.POST.get('attachments-delete'):
+						attachments_delete = request.POST.get('attachments-delete').split(",")
+
 					if request.FILES.has_key('attachments'):
 
 						for f in request.FILES.getlist('attachments'):
-							file_request = FileMetadata.from_create_form(f)
-							# File must be under 5MB
-							# TODO: use Django's built-in field validators and error messaging
-							if len(file_request.file['files']) >= 5242880:
-								view_data['form'] = form
-								view_data['avatar_error'] = 'Sorry, the file you upload must be under 5MB.'
-								return render(request, CommentView.form_template, view_data)
-							else:
-								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
-								Attachment.create(
-									request.META['HTTP_HOST'],
-									file_metadata.file_hash,
-									comment_id=comment_response.id,
-									access_token=request.access_token
-								)
+
+							if not f.name in attachments_delete:
+								file_request = FileMetadata.from_create_form(f)
+
+								# File must be under 5MB
+								# TODO: use Django's built-in field validators and error messaging
+								if len(file_request.file['files']) >= 5242880:
+									view_data['form'] = form
+									view_data['avatar_error'] = 'Sorry, the file you upload must be under 5MB.'
+									return render(request, CommentView.form_template, view_data)
+								else:
+									file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+									Attachment.create(
+										request.META['HTTP_HOST'],
+										file_metadata.file_hash,
+										comment_id=comment_response.id,
+										access_token=request.access_token
+									)
 
 					if comment_response.meta.links.get('commentPage'):
 						return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
@@ -1383,28 +1391,35 @@ class CommentView(object):
 
 				# delete attachments if neccessary
 				if comment_response.id > 0:
-					if request.FILES.has_key('attachments'):
 
-						for f in request.FILES.getlist('attachments'):
-							file_request = FileMetadata.from_create_form(f)
-							# File must be under 5MB
-							# TODO: use Django's built-in field validators and error messaging
-							if len(file_request.file['files']) >= 5242880:
-								view_data['form'] = form
-								view_data['avatar_error'] = 'Sorry, the file you upload must be under 5MB and square.'
-								return render(request, CommentView.form_template, view_data)
-							else:
-								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
-								Attachment.create(
-									request.META['HTTP_HOST'],
-									file_metadata.file_hash,
-									comment_id=comment_response.id,
-									access_token=request.access_token
-								)
-
+					attachments_delete = []
 					if request.POST.get('attachments-delete'):
 						attachments_delete = request.POST.get('attachments-delete').split(",")
 
+					if request.FILES.has_key('attachments'):
+
+						for f in request.FILES.getlist('attachments'):
+
+							if not f.name in attachments_delete:
+								file_request = FileMetadata.from_create_form(f)
+								# File must be under 5MB
+								# TODO: use Django's built-in field validators and error messaging
+								if len(file_request.file['files']) >= 5242880:
+									view_data['form'] = form
+									view_data['avatar_error'] = 'Sorry, the file you upload must be under 5MB and square.'
+									return render(request, CommentView.form_template, view_data)
+								else:
+									file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+									Attachment.create(
+										request.META['HTTP_HOST'],
+										file_metadata.file_hash,
+										comment_id=comment_response.id,
+										access_token=request.access_token
+									)
+							else:
+								attachments_delete = [a for a in attachments_delete if not a == f.name]
+
+					if len(attachments_delete) > 0:
 						for fileHash in attachments_delete:
 							Attachment.delete(
 								request.META['HTTP_HOST'],
