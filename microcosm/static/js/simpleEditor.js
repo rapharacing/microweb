@@ -361,6 +361,31 @@
       }
 
       ////////////////////////
+      //   form validation  //
+      ////////////////////////
+      if (typeof FormValidator !== 'undefined'){
+
+        if (this.form.length > 0){
+          new FormValidator(
+            this.form[0],
+            {
+              rules : {
+                'markdown'      : ['not_empty','maxlength']
+              },
+              tests : {
+                'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
+              },
+              error_messages : {
+                'markdown:not_empty' : "* Cannot be empty",
+                'markdown:maxlength' : "* Cannot exceed max length."
+              }
+            }
+          );
+        }
+      }
+
+
+      ////////////////////////
       //     bind events    //
       ////////////////////////
       var events = [

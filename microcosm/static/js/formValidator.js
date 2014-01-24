@@ -207,7 +207,9 @@
 		validator.prototype.bind = function(){
 
 			this.$form.on('submit', $.proxy(this.validate,this));
-			this.$form.on('change', '.has-error input', $.proxy(this.onChangeHandler,this));
+			this.$form.on('change', '.has-error input, .has-error textarea', $.proxy(this.onChangeHandler,this));
+
+			this.$form.on('keyup', '.has-error textarea', $.proxy(this.onChangeHandler,this));
 
 		}
 
