@@ -288,14 +288,13 @@
 
 {% block sidebar%}
 
-	{# if content.meta.permissions.create #}
+	{% if user %}
 	<div class="metabar-module">
-		<h5>Got something to add?</h5>
 		<div class="metabar-module-primary-buttons">
 			<a href="{% url 'updates-settings' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-comment"></span> Update Settings</a>
 		</div>
 	</div> <!-- primary actions -->
-	{# endif #}
+	{% endif %}
 
 
 	<div class="metabar-module">
