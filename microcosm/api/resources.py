@@ -517,7 +517,7 @@ class Item(object):
         item.title = data['item']['title']
         item.total_comments = data['item']['totalComments']
         item.total_views = data['item']['totalViews']
- 
+
         if data['item'].get('lastComment'):
             if data['item']['lastComment'].get('id'):
                 item.last_comment_id = data['item']['lastComment']['id']
@@ -1025,7 +1025,7 @@ class Huddle(APIResource):
         for p in data['participants']:
             huddle.participants.append(Profile(p))
         if 'isConfidential' in data:
-            huddle.is_confidential = data['isConfidential']
+            huddle.isConfidential = data['isConfidential']
 
         return huddle
 
@@ -1033,6 +1033,7 @@ class Huddle(APIResource):
     def from_create_form(cls, data):
         huddle = cls()
         huddle.title = data['title']
+        huddle.is_confidential = True if data['is_confidential'] == "1" else False
         return huddle
 
     @classmethod
@@ -1077,6 +1078,7 @@ class Huddle(APIResource):
             repr['id'] = self.id
             repr['meta'] = self.meta
         repr['title'] = self.title
+        repr['isConfidential'] = self.is_confidential
         return repr
 
     @staticmethod

@@ -35,7 +35,7 @@
 
 			<a class="btn btn-default btn-group-responsive-toggle simple-toggle" data-rel=".huddle-actions"><span class="sprite sprite-arrow-down"></span></a>
 			<div class="btn-group-responsive huddle-actions">
-				{% if content.meta.permissions.owner %}
+				{% if not content.isConfidential %}
 				<button type="button"
 							  data-toggle="modal"
 								data-target="#modal-huddle-invite"

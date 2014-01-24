@@ -190,6 +190,15 @@ class HuddleCreate(django.forms.Form):
         }
     )
 
+    is_confidential = django.forms.ChoiceField(
+        label='Is this huddle confidential',
+        choices = [(1, 'yes'),(0, 'no')],
+        widget=django.forms.RadioSelect,
+        error_messages={
+            'required' : 'Please choose either yes or no.'
+        }
+    )
+
 
 class HuddleEdit(HuddleCreate):
     """

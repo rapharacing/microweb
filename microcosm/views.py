@@ -403,8 +403,11 @@ class HuddleView(object):
 				hud_request = Huddle.from_create_form(form.cleaned_data)
 				hud_response = hud_request.create(request.META['HTTP_HOST'], request.access_token)
 				if hud_response.id > 0:
-					ids = [int(x) for x in request.POST.get('invite').split(',')]
-					Huddle.invite(request.META['HTTP_HOST'], hud_response.id, ids, request.access_token)
+
+					if request.POST.get('invite'):
+						ids = [int(x) for x in request.POST.get('invite').split(',')]
+						Huddle.invite(request.META['HTTP_HOST'], hud_response.id, ids, request.access_token)
+
 					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
 						payload = {
 							'itemType': 'huddle',

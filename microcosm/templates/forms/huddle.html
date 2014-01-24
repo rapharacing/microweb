@@ -30,9 +30,9 @@
 								<label class="col-sm-12" for="title">
 									{{ form.title.label }}
 								</label>
-								<div class="col-sm-12">
+								<div class="col-sm-12 {% if form.errors.title %}has-error{% endif %}">
 									{% if form.errors.title %}
-										<div class="text-error">{{ form.errors.title.as_text }}</div>
+										<label class="control-label">{{ form.errors.title.as_text }}</label>
 									{% endif %}
 									<input
 										type="text"
@@ -90,27 +90,34 @@
 							</div>
 						</div> <!-- /form-group -->
 						</div>
-						<div class="form-group form-group-highlighted">
-							<div class="row">
-								<label class="col-sm-12">Is this huddle confidential?</label>
-								<div class="col-sm-12">
-									<p>
-										Confidential huddles disable the ability to invite more people later on.
-									</p>
-									<p>
-										<label>
-											<input type="radio" name="confidential" value="yes" tabindex="1" /> Yes
-										</label>
-										<label>
-											<input type="radio" name="confidential" value="no" tabindex="1" /> No
-										</label>
-									</p>
-								</div>
-							</div>
-						</div>
 
 				</div> <!-- /form-container-inner -->
 
+				<div class="form-group form-sticky">
+					<div class="row">
+						<label class="col-sm-12">Is this huddle confidential?</label>
+						<div class="col-sm-9 {% if form.errors.confidential %}has-error{% endif %}">
+							{% if form.errors.confidential %}
+								<label class="control-label">{{ form.errors.confidential.as_text }}</label>
+							{% endif %}
+							<ul class="list-toggles">
+							<li>
+								<span class="list-toggles-text">
+									Confidential huddles disable the ability to invite more people later on.
+								</span>
+								<div class="btn-group btn-group-xs pull-right">
+									<button type="button" class="btn btn-default">
+										<label {% if form.confidential.value == "1" %}class="active"{% endif %}>Yes <input type="radio" value="1" name="is_confidential" {% if form.confidential.value == "1" %}checked="checked"{% endif %}></label>
+									</button>
+									<button type="button" class="btn btn-default">
+										<label {% if form.confidential.value == "0" %}class="active"{% endif %}>No <input type="radio" value="0" name="is_confidential" {% if form.confidential.value == "0" %}checked="checked"{% endif %}></label>
+									</button>
+								</div>
+							</li>
+							</ul>
+						</div>
+					</div>
+				</div>
 
 				{# footer #}
 				<div class="form-group form-footer padded">
@@ -146,6 +153,7 @@
 {% endblock %}
 
 {% block js %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
