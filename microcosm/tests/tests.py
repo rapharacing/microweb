@@ -14,11 +14,11 @@ from microcosm.views import build_pagination_links
 
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Microcosm
-from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import Profile
 from microcosm.api.resources import Site
 from microcosm.api.resources import Event
 from microcosm.api.resources import build_url
+from microcosm.api.exceptions import APIException
 
 TEST_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -73,38 +73,8 @@ class BuildURLTests(unittest.TestCase):
             build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['resource', '1', 'ex/tra'])
 
     def testFailCustomDomains(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(APIException):
             build_url((BuildURLTests.subdomain_key + 'example.org'), ['resource', '1', 'ex/tra'])
-
-
-class RoutingAPITests(unittest.TestCase):
-    """
-    Verify that the Host header is used to call the appropriate
-    API endpoint.
-    """
-
-    def setUp(self):
-        self.factory = RequestFactory()
-
-
-    def testMicrocosmsView(self):
-
-        host = generate_location()
-        full_path = build_url(host, ['microcosms'])
-
-        # Create a request for a list of microcosms
-        request = self.factory.get('/microcosms', HTTP_HOST=host)
-        request.access_token = None
-        request.whoami = None
-        request.site = None
-
-        microcosms = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosms.json')).read())
-
-        # Patch requests.get and check the call args
-        with patch('requests.get') as mock:
-            mock.return_value.json.return_value = microcosms
-            MicrocosmView.list(request)
-            mock.assert_called_once_with(full_path, headers={'Host': host}, params={})
 
 
 class PaginationTests(unittest.TestCase):
