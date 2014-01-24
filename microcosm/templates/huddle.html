@@ -21,32 +21,43 @@
 </div>
 
 
-<div class="content-meta huddle-meta">
+<div class="content-meta huddle-meta padded">
 	<div class="row">
 		<div class="col-sm-12">
 
 			<ul class="list-people list-people-md">
-				{% for profile in content.participants %}
+				{% for profile in content.participants|slice:":7" %}
 				<li>
 					<a href="{% url 'single-profile' profile.id %}" data-toggle="tooltip" title="{{ profile.profile_name | safe }}"><img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name | safe }}" /></a>
 				</li>
 				{% endfor %}
+				{% if content.participants|length > 7%}
+				<li>
+					<a href="#"
+						 class="btn btn-default btn-xs"
+						 data-toggle="modal"
+						 data-target="#modal-huddle-invite">
+						+{{ content.participants|length|add:"-7" }}
+					</a>
+				</li>
+				{% endif %}
 			</ul>
 
-			<a class="btn btn-default btn-group-responsive-toggle simple-toggle" data-rel=".huddle-actions"><span class="sprite sprite-arrow-down"></span></a>
-			<div class="btn-group-responsive huddle-actions">
+			<div class="huddle-actions">
 				{% if not content.isConfidential %}
-				<button type="button"
-							  data-toggle="modal"
-								data-target="#modal-huddle-invite"
-								class="btn btn-primary"
-								value="Invite People">
-								Invite people
-				</button>
+				<a class="btn btn-primary btn-xs"
+					data-toggle="modal"
+					data-target="#modal-huddle-invite"
+					value="Invite People">
+					Invite people
+				</a>
 				{% endif %}
 				<form action="{% url 'delete-huddle' content.id %}" method="POST">
 					{% csrf_token %}
-					<input type="submit" class="btn btn-primary" value="Leave huddle" />
+					<label class="btn btn-primary btn-xs">
+					Leave huddle
+						<input type="submit"/>
+					</label>
 				</form>
 			</div>
 		</div>
@@ -114,6 +125,8 @@
 		<p class="metabar-module-author">
 			<a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name | safe }}" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> Started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
 		</p>
+
+		{% include 'forms/subscribe.html' %}
 	</div>
 </div> <!-- / about -->
 
@@ -125,19 +138,28 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/comments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
 <script type="text/javascript">
 (function(){
 
+	var subdomain = $('meta[name="subdomain"]').attr('content');
+
+	/////////////////////////
+	//       comments      //
+	/////////////////////////
 	var comments = new Comments({
 		el               : '.content-body',
 		defaultContainer : '.reply-container',
 		template         : $('.reply-container .comment-item-body').html().trim()
 	});
 
+	/////////////////////////
+	//    comment box      //
+	/////////////////////////
 	var replyBox = new simpleEditor({
 		el : '.reply-box'
 	});
@@ -150,15 +172,9 @@
 		}
 	});
 
-
-})();
-</script>
-
-<script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
-<script type="text/javascript">
-
-	var subdomain = $('meta[name="subdomain"]').attr('content');
-
+	/////////////////////////
+	//        invite       //
+	/////////////////////////
 	var p = new PeopleWidget({
 		el         : 'input#invite',
 		static_url : subdomain,
@@ -208,8 +224,20 @@
 			});
 
 		}
-
 	});
+
+	/////////////////////////
+	//     subscribe       //
+	/////////////////////////
+	var subscribe = new Subscribe({
+		el    : '.subscribe',
+		url   : '{% url 'single-watcher' %}',
+		id    : {{ content.id }},
+		type  : '{{ item_type }}',
+		token : '{{ csrf_token }}',
+		is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
+	});
+})();
 </script>
 
 
