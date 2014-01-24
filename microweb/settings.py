@@ -126,22 +126,22 @@ if API_SCHEME == '' or API_DOMAIN_NAME == '' or API_PATH == '' or API_VERSION ==
 
 # Riemann is used for exception reporting and metrics. Can be assigned empty
 # values in local_settings for local development.
-from local_settings import RIEMANN_ENABLED
-from local_settings import RIEMANN_HOST
+from microweb.local_settings import RIEMANN_ENABLED
+from microweb.local_settings import RIEMANN_HOST
 
 # Mostly used for site information cache. Compulsory.
-from local_settings import MEMCACHE_HOST
-from local_settings import MEMCACHE_PORT
+from microweb.local_settings import MEMCACHE_HOST
+from microweb.local_settings import MEMCACHE_PORT
 
 # Page size for list views: Microcosms, Huddles, etc.
-from local_settings import PAGE_SIZE
+from microweb.local_settings import PAGE_SIZE
 
 # In production, all logging goes to stdout which is redirected by gunicorn.
 # This isn't ideal (we can't route to mulitple places), but works well enough.
-from local_settings import LOGGING
+from microweb.local_settings import LOGGING
 
 # Make this unique, and don't share it with anybody.
-from local_settings import SECRET_KEY
+from microweb.local_settings import SECRET_KEY
 
 # Allows shadowing of DEBUG for development.
-from local_settings import DEBUG
+from microweb.local_settings import DEBUG
