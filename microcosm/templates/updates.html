@@ -164,26 +164,37 @@
 
 									<div class="row-meta">
 										<span class="sprite sprite-arrow-right"></span>
-										{% if update.item_type == 'comment' %}
-											<a href="{{ update.parent_link }}">
+
+										{% if update.update_type == "reply_to_comment" or update.update_type == "mentioned" %}
+											<a href="{% url 'incontext-comment' update.item.id %}">view comment</a>
 										{% else %}
-											{% if update.item_type == "conversation" %}
-												<a href="{% url 'single-conversation' update.item.id %}">
-											{% elif update.item_type == "event" %}
-												<a href="{% url 'single-event' update.item.id %}">
+											{% if update.item_type == "comment" %}
+												{% if update.parent_item_type == "conversation" %}
+													<a href="{% url 'newest-conversation' update.parent_item.id %}">
+												{% elif update.parent_item_type == "event" %}
+													<a href="{% url 'newest-event' update.parent_item.id %}">
+												{% else %}
+													<a href="{{ update.parent_link }}">
+												{% endif %}
 											{% else %}
-												<a href="{{ update.item_link }}">
+												{% if update.item_type == "conversation" %}
+													<a href="{% url 'newest-conversation' update.item.id %}">
+												{% elif update.item_type == "event" %}
+													<a href="{% url 'newest-event' update.item.id %}">
+												{% else %}
+													<a href="{{ update.item_link }}">
+												{% endif %}
 											{% endif %}
+												view
+												{% if update.parent_item_type == "conversation" %}
+													conversation{% elif update.parent_item_type == "event" %}
+													event{% elif update.parent_item_type == "poll" %}
+													poll{% elif update.item_type == "conversation" %}
+													conversation{% elif update.item_type == "event" %}
+													event{% elif update.item_type == "poll" %}
+													poll{% elif update.item.item_type == "profile" %}
+													profile{% endif %}</a>
 										{% endif %}
-											view
-											{% if update.parent_item_type == "conversation" %}
-												conversation{% elif update.parent_item_type == "event" %}
-												event{% elif update.parent_item_type == "poll" %}
-												poll{% elif update.item_type == "conversation" %}
-												conversation{% elif update.item_type == "event" %}
-												event{% elif update.item_type == "poll" %}
-												poll{% elif update.item.item_type == "profile" %}
-												profile{% endif %}</a>
 
 										{% if update.item_type == "event" %}
 												{% if update.item.rsvp_limit %}
