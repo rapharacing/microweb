@@ -129,15 +129,16 @@ class PaginationTests(unittest.TestCase):
         request.whoami = None
         request.site = None
 
-        conversation = Conversation.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation_with_paginated_comments.json')).read())['data']
+        conversation = Conversation.from_api_response(data)
         with patch('requests.get') as mock:
             mock.return_value.json.return_value = conversation
             pagination_nav = build_pagination_links(request, conversation.comments)
 
-        assert pagination_nav['first'] == path
-        assert pagination_nav['prev'] == path + '?offset=25'
-        assert pagination_nav['next'] == path + '?offset=75'
-        assert pagination_nav['last'] == path + '?offset=100'
+        assert pagination_nav['page'] == 1
+        assert pagination_nav['offset'] == 0
+        assert pagination_nav['total_pages'] == 2
+        assert pagination_nav['limit'] == 25
 
 
 class ResourceTests(unittest.TestCase):
