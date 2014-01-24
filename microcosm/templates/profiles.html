@@ -24,7 +24,7 @@
 			{% endif %}
 			Directory
 			{% if subtitle %}
-			<span>{{ subtitle }}</span>
+			<span class="text-muted"> // {{ subtitle }}</span>
 			{% endif %}
 		</h3>
 		<ul class="list-profiles">
@@ -64,6 +64,7 @@
 					<input id="filter-name" type="checkbox" {% if q %}checked="checked"{% endif %}/>
 					Starts with
 					<select {% if not q %}disabled{% endif %} name="q">
+						<option></option>
 						{% for letter in alphabet %}
 						<option value="{{ letter }}" {% if q|lower == letter|lower %}selected="selected"{% endif %}>
 							{{ letter }}
@@ -136,13 +137,14 @@
 
 	$('#filter-name').on('change',function(e){
 
-		var self = $(e.currentTarget);
+		var self = $(e.currentTarget),
+				select = $('select[name=q]');
 
 		if (self.is(':checked')){
-			$('select[name=q]').attr('disabled',false);
+			select.attr('disabled',false);
 		}else{
-			$('select[name=q]').attr('disabled',true);
-			if (!dont_jump_on_unselect){
+			select.attr('disabled',true);
+			if (!dont_jump_on_unselect && select.val().trim()!==""){
 				search_filters.changeHandler();
 			}
 		}

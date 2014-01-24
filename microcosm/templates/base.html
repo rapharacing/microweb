@@ -30,7 +30,7 @@
 						<div class="navbar-header col-xs-12">
 							<button type="button" class="navbar-toggle-btn navbar-toggle menu-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 								<span class="sr-only">Toggle navigation</span>
-								<span class="sprite sprite-search-small"></span>
+								<span class="sprite sprite-drawer"></span>
 							</button>
 
 							<button type="button" class="navbar-toggle-btn metabar-toggle">
@@ -104,8 +104,9 @@
 					<div class="row">
 						<!-- Collect the nav links, forms, and other content for toggling -->
 						<div class="collapse navbar-collapse">
-							<ul class="nav navbar-nav">
-								<li class="navbar-nav-search">
+
+							<ul class="nav navbar-nav navbar-nav-search">
+								<li>
 									<form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
 										<div class="input-group">
 											<label class="input-group-addon" for="navbar-search-input">
@@ -123,31 +124,72 @@
 										</div>
 									</form>
 								</li>
-								<li {% if not site_section or site_section == "microcosm"%}class="active"{% endif %}>
-									<a href="{% url 'index' %}">Microcosms</a>
-								</li>
-								<li {% if site_section == "trending"%}class="active"{% endif %}>
-									<a href="{% url 'list-trending'%}">Trending</a>
-								</li>
-								<li {% if site_section == "updates"%}class="active"{% endif %}>
-									<a href="{% url 'list-updates' %}">Updates {% if user and user.meta.stats.unreadUpdates > 0 and site_section != "updates" %}<span class="label label-warning">NEW</span>{% endif %}</a>
-								</li>
-								<li {% if site_section == "people"%}class="active"{% endif %}>
-									<a href="{% url 'list-profiles' %}">People</a>
-								</li>
-								<li class="dropdown">
-									<a href="#" class="dropdown-toggle" data-toggle="dropdown">Custom <b class="caret"></b></a>
-									<ul class="dropdown-menu">
-										<li><a href="#">Action</a></li>
-										<li><a href="#">Another action</a></li>
-										<li><a href="#">Something else here</a></li>
-										<li class="divider"></li>
-										<li><a href="#">Separated link</a></li>
-										<li class="divider"></li>
-										<li><a href="#">One more separated link</a></li>
-									</ul>
-								</li>
-							</ul>
+								</ul>
+								{% if not user %}
+								<ul class="nav navbar-nav navbar-nav-unregistered">
+									<li class="lh">Join our community</li>
+									<li>
+										<a href="#" onclick="login()">
+											<span class="btn btn-primary btn-block">Sign in or Register</span>
+										</a>
+									</li>
+								</ul>
+								{% else %}
+								<div class="navbar-profile">
+									<div class="navbar-profile-row-1">
+										<div class="navbar-profile-row-1-left">
+											<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar"><img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" /></a>
+											<a href="{% url 'single-profile' user.id %}" title="Edit your profile" id="profile_name" class="navbar-profile-name"><strong>{{ user.profile_name | safe }}</strong></a>
+
+											<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope"></span></span>{% else %}<span class="sprite sprite-envelope"></span>{% endif %}</a>
+										</div>
+									</div>
+									<div class="navbar-profile-row-2">
+										<a href="{% url 'list-huddle'%}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope-small"></span></span>{% else %}<span class="sprite sprite-envelope-small"></span>{% endif %} <strong>Huddles</strong></a>
+									</div>
+								</div>
+								{% endif %}
+								<ul class="nav navbar-nav">
+									<li class="lh">Pages</li>
+									<li {% if not site_section or site_section == "microcosm"%}class="active"{% endif %}>
+										<a href="{% url 'index' %}">Microcosms</a>
+									</li>
+									<li {% if site_section == "trending"%}class="active"{% endif %}>
+										<a href="{% url 'list-trending'%}">Trending</a>
+									</li>
+									<li {% if site_section == "updates"%}class="active"{% endif %}>
+										<a href="{% url 'list-updates' %}">Updates {% if user and user.meta.stats.unreadUpdates > 0 and site_section != "updates" %}<span class="label label-warning">NEW</span>{% endif %}</a>
+									</li>
+									<li {% if site_section == "people"%}class="active"{% endif %}>
+										<a href="{% url 'list-profiles' %}">People</a>
+									</li>
+									<li class="dropdown">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown">Custom <b class="caret"></b></a>
+										<ul class="dropdown-menu">
+											<li><a href="#">Action</a></li>
+											<li><a href="#">Another action</a></li>
+											<li><a href="#">Something else here</a></li>
+											<li class="divider"></li>
+											<li><a href="#">Separated link</a></li>
+											<li class="divider"></li>
+											<li><a href="#">One more separated link</a></li>
+										</ul>
+									</li>
+								</ul>
+								{% if user %}
+								<ul class="nav navbar-nav navbar-nav-registered">
+									<li class="lh">Your account</li>
+									<li>
+										<a href="{% url 'edit-profile' user.id %}">Edit profile</a>
+									</li>
+									<li>
+										<a href="{% url 'updates-settings' %}">Updates Settings</a>
+									</li>
+									<li>
+										<a href="#" onclick="logout();">Logout</a>
+									</li>
+								</ul>
+								{% endif %}
 						</div><!-- /.navbar-collapse -->
 					</div>
 				</div>
@@ -164,21 +206,15 @@
 				</div> <!-- / metabar -->
 			</div>
 		</div>
-		<div class="container">
-			<div class="row">
-				<div class="cols-sm-12">
-					<div class="footer padded">
-						<p class="bold">
-							Powered by <a href="#">Microcosm</a>
-						</p>
-						<p class="links">
-							<a href="#">About</a>
-							<a href="#">Help</a>
-							<a href="#">Developers</a>
-							<a href="#">Legal</a>
-						</p>
-					</div>
-				</div>
+		<div class="footer">
+			<div class="container">
+				<p class="links">
+					<a href="#">Help</a> &bull;
+					<a href="#">Developers</a> &bull;
+					<a href="#">Terms</a> &bull;
+					<a href="#">Privacy</a>
+				</p>
+				<p class="bold">Powered by <a href="#">Microcosm</a></p>
 			</div>
 		</div>
 
@@ -204,7 +240,13 @@
 				});
 			}
 		</script>
-	{% endif %}
+		{% else %}
+		<script type="text/javascript">
+			function logout(){
+				$('#signout-form').submit();
+			}
+		</script>
+		{% endif %}
 
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>

@@ -567,11 +567,12 @@ class ProfileView(object):
 
 		profiles_url, params, headers = ProfileList.build_request(
 			request.META['HTTP_HOST'],
-			offset=offset,
-			top=top,
-			q=q,
-			following=following,
-			access_token=request.access_token
+			offset 				= offset,
+			top 					= top,
+			q 						= q,
+			following 		= following,
+			online 				= online,
+			access_token 	= request.access_token
 		)
 
 		request.view_requests.append(grequests.get(profiles_url, params=params, headers=headers))
