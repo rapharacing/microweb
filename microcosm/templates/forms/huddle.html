@@ -21,6 +21,7 @@
 					<form role="form" action="" method="POST">
 						{% csrf_token %}
 						{{ form.id }}
+						<input type="hidden" name="{{ form.is_confidential.name }}" value="0" />
 
 						<input type="hidden" name="invite" value="" />
 						{# title #}
@@ -93,6 +94,7 @@
 
 				</div> <!-- /form-container-inner -->
 
+{% comment %}
 				<div class="form-group form-sticky">
 					<div class="row">
 						<label class="col-sm-12">Is this huddle confidential?</label>
@@ -118,6 +120,7 @@
 						</div>
 					</div>
 				</div>
+{% endcomment %}
 
 				{# footer #}
 				<div class="form-group form-footer padded">
