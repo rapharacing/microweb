@@ -87,13 +87,39 @@
 		<div class="comment-item-body wmd-preview"></div>
 	</div>
 {% else %}
-	<ul>
-		<li><strong>Bold</strong></li>
-		<li><i>Italics</i></li>
-		<li>Quote</li>
-		<li><span class="sprite sprite-format-link"></span> Link</li>
-		<li><span class="sprite sprite-format-list"></span> List</li>
-		<li><span class="sprite sprite-format-img"></span> Image</li>
+	<ul class="wmd-button-bar">
+		<li>
+			<span class="sprite sprite-bold-small"></span>
+			<strong class="wmd-button-bar-btn-text">Bold</strong>
+		</li>
+		<li>
+			<span class="sprite sprite-italic-small"></span>
+			<i class="wmd-button-bar-btn-text">Italics</i>
+		</li>
+		<li>
+			<span class="sprite sprite-format-link"></span>
+			<span class="wmd-button-bar-btn-text">Link</span>
+		</li>
+		<li>
+			<span class="sprite sprite-format-img"></span>
+			<span class="wmd-button-bar-btn-text">Image</span>
+		</li>
+		<li>
+			<span class="sprite sprite-format-list"></span>
+			<span class="wmd-button-bar-btn-text">List</span>
+		</li>
+		<li>
+			<span class="sprite sprite-quote-small"></span>
+			<span class="wmd-button-bar-btn-text">Quote</span>
+		</li>
+		<li>
+			<span class="sprite sprite-code-small"></span>
+			<span class="wmd-button-bar-btn-text">code</span>
+		</li>
+		<li class="pull-right">
+			<span class="sprite sprite-preview-small"></span>
+			<span class="wmd-button-bar-btn-text">Preview</span>
+		</li>
 	</ul>
 	<div class="dummy-textarea">
 		<button class="btn btn-primary" onclick="login()">Sign-in to post a reply</button>
