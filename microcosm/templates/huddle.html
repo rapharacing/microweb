@@ -47,18 +47,15 @@
 				{% if not content.isConfidential %}
 				<a class="btn btn-primary btn-xs"
 					data-toggle="modal"
-					data-target="#modal-huddle-invite"
-					value="Invite People">
+					data-target="#modal-huddle-invite">
 					Invite people
 				</a>
 				{% endif %}
-				<form action="{% url 'delete-huddle' content.id %}" method="POST">
-					{% csrf_token %}
-					<label class="btn btn-primary btn-xs">
+				<a class="btn btn-primary btn-xs"
+					data-toggle="modal"
+					data-target="#modal-huddle-leave">
 					Leave huddle
-						<input type="submit"/>
-					</label>
-				</form>
+				</a>
 			</div>
 		</div>
 	</div>
@@ -106,9 +103,10 @@
 	</form>
 	{% endif %}
 
-{% if content.meta.permissions.owner %}
+{% if not content.isConfidential %}
 	{% include "modal_huddle_invite.html" %}
 {% endif %}
+{% include "modal_huddle_leave.html" %}
 
 {% endblock %}
 
