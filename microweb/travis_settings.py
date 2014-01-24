@@ -10,7 +10,7 @@ TEMPLATE_DEBUG = False
 # to a microcosm site, we cannot make use of this feature. Host is verified in the API.
 ALLOWED_HOSTS = [
     '*',
-]
+    ]
 
 # Test runner requires a database. This should never be used to store anything.
 DATABASES = {
@@ -21,7 +21,7 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '',
         'PORT': '',
-    }
+        }
 }
 
 TIME_ZONE = 'Europe/London'
@@ -51,17 +51,17 @@ STATICFILES_DIRS = ()
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-)
+    )
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-)
+    )
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
-)
+    )
 TEMPLATE_DIRS = ()
 
 MIDDLEWARE_CLASSES = (
@@ -85,7 +85,7 @@ MIDDLEWARE_CLASSES = (
 
     # push exceptions to riemann
     'microcosm.middleware.exception.ExceptionMiddleware',
-)
+    )
 
 ROOT_URLCONF = 'microweb.urls'
 
@@ -106,42 +106,57 @@ INSTALLED_APPS = (
     'microcosm.templatetags.list_comment',
     'microcosm.templatetags.get_attachment',
     'microcosm.templatetags.huddle',
-)
+    )
 
-# The values below in must be initialised in local_settings.py
-# Example values can be found in local_settings.py.example
+CLIENT_ID = 1
+CLIENT_SECRET = ''
+API_SCHEME = 'https://'
+API_DOMAIN_NAME = 'microco.sm'
+API_PATH = 'api'
+API_VERSION = 'v1'
+RIEMANN_ENABLED = False
+RIEMANN_HOST = ''
+MEMCACHE_HOST = '127.0.0.1'
+MEMCACHE_PORT = 11211
+PAGE_SIZE = 25
+SECRET_KEY = 'changeme'
+DEBUG = True
 
-# Credentials generated when registering an application.
-from local_settings import CLIENT_ID
-from local_settings import CLIENT_SECRET
-
-# Microcosm API settings.
-from local_settings import API_SCHEME
-from local_settings import API_DOMAIN_NAME
-from local_settings import API_PATH
-from local_settings import API_VERSION
-
-if API_SCHEME == '' or API_DOMAIN_NAME == '' or API_PATH == '' or API_VERSION == '':
-    raise Exception('Please define API settings in local_settings.py')
-
-# Riemann is used for exception reporting and metrics. Can be assigned empty
-# values in local_settings for local development.
-from microweb.local_settings import RIEMANN_ENABLED
-from microweb.local_settings import RIEMANN_HOST
-
-# Mostly used for site information cache. Compulsory.
-from microweb.local_settings import MEMCACHE_HOST
-from microweb.local_settings import MEMCACHE_PORT
-
-# Page size for list views: Microcosms, Huddles, etc.
-from microweb.local_settings import PAGE_SIZE
-
-# In production, all logging goes to stdout which is redirected by gunicorn.
-# This isn't ideal (we can't route to mulitple places), but works well enough.
-from microweb.local_settings import LOGGING
-
-# Make this unique, and don't share it with anybody.
-from microweb.local_settings import SECRET_KEY
-
-# Allows shadowing of DEBUG for development.
-from microweb.local_settings import DEBUG
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        },
+    'handlers': {
+        'stdout':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+        },
+    'loggers': {
+        'django': {
+            'handlers': ['stdout'],
+            'level': 'DEBUG',
+            'propagate': True,
+            },
+        'django.request': {
+            'handlers': ['stdout'],
+            'level': 'DEBUG',
+            'propagate': True,
+            },
+        'microcosm.views': {
+            'handlers': ['stdout'],
+            'level': 'DEBUG',
+            'propagate' : True,
+            },
+        'microcosm.middleware': {
+            'handlers': ['stdout'],
+            'level': 'DEBUG',
+            'propagate' : True,
+            }
+    }
+}
