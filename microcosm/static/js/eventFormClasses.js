@@ -313,26 +313,26 @@
     function getTimeStringFromDate(d) {
       var hh = d.getUTCHours();
       var mi = d.getUTCMinutes();
-      var pm = (hh > 12);
+      var pm = (hh > 11);
 
       // round minutes to nearest 15min block
       if (mi > 45){
         hh = hh+1;
         mi = 0;
+        pm = (hh > 11);
       }else if (mi > 30){
         mi = 45;
       }else if (mi > 15){
         mi = 30;
-      }else if (mi > 1){
-        mi = 15;
       }else{
-        mi = 0;
+        mi = 15;
       }
 
       return '' + (hh <= 9 ? '0' + hh : (hh > 12 ? hh - 12: hh)) + ':' +
         (mi <= 9 ? '0' + mi : mi) + ' ' +
         (pm ? 'PM' : 'AM');
     }
+    eventDateForm.prototype.getTimeStringFromDate = getTimeStringFromDate;
 
     // template object for calendar display
     // @param  dateObject - a javascript Date object

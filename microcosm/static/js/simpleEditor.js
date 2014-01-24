@@ -242,9 +242,14 @@
 
 
     simpleEditor.prototype.toggleMarkdownPreview = function(e){
-      var preview_window = this.$el.find('.wmd-preview-wrapper');
+      var preview_window = this.$el.find('.wmd-preview-wrapper'),
+          button_bar = this.$el.find('.wmd-button-bar');
 
-      preview_window.css('height', window.getComputedStyle(this.textarea).height);
+      preview_window.css({
+        'height' : window.getComputedStyle(this.textarea).height,
+        'top'    : button_bar.height()
+      });
+
       preview_window.toggle();
       if (typeof prettyPrint !== 'undefined'){
         prettyPrint();
