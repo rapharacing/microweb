@@ -1,5 +1,5 @@
 CLIENT_ID = 1
-CLIENT_SECRET = 'ABCDE12345'
+CLIENT_SECRET = ''
 API_SCHEME = 'https://'
 API_DOMAIN_NAME = 'microco.sm'
 API_PATH = 'api'
@@ -9,7 +9,7 @@ RIEMANN_HOST = ''
 MEMCACHE_HOST = '127.0.0.1'
 MEMCACHE_PORT = 11211
 PAGE_SIZE = 25
-SECRET_KEY = '!ygb2(@l&amp;h1+iy6z6jwiak3e**e3ljb=1fc5#i&amp;1fk#0ve!+!&amp;'
+SECRET_KEY = 'changeme'
 DEBUG = True
 
 LOGGING = {
