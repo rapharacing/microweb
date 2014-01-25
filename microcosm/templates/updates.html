@@ -47,6 +47,8 @@
 											<a class="sprite sprite-speech-bubble" title="Conversation"></a>
 										{% elif update.parent_item_type == "event" %}
 											<a class="sprite sprite-calendar" title="Event"></a>
+										{% elif update.parent_item_type == "huddle" %}
+											<a class="sprite sprite-envelope" title="Huddle"></a>
 										{% elif update.item.item_type == "profile" %}
 											<a class="sprite sprite-user" title="Profile"></a>
 										{% endif %}
@@ -55,6 +57,8 @@
 											<a class="sprite sprite-speech-bubble" title="Conversation"></a>
 										{% elif update.item_type == "event" %}
 											<a class="sprite sprite-calendar" title="Event"></a>
+										{% elif update.item_type == "huddle" %}
+											<a class="sprite sprite-envelope" title="Huddle"></a>
 										{% endif %}
 									{% endif %}
 
@@ -67,21 +71,20 @@
 										{# new comment #}
 										{% if update.update_type == "new_comment" %}
 
-
-												{% if update.item.item_type == "profile" %}
-														{% if update.item.meta.created_by.id == user.id %}
-														<strong>You've successfully updated your profile</strong>
-														{% else %}
-														<h3 class="row-title">
-															<a href="{{ update.parent_link }}">@{{ update.item.meta.created_by.profile_name }}</a>
-														</h3>
-														updated their profile
-														{% endif %}
-												{% else %}
-												<h3 class="row-title">
-													<a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title | safe }}</a>
-												</h3>
-												{% endif %}
+											{% if update.item.item_type == "profile" %}
+													{% if update.item.meta.created_by.id == user.id %}
+													<strong>You've successfully updated your profile</strong>
+													{% else %}
+													<h3 class="row-title">
+														<a href="{{ update.parent_link }}">@{{ update.item.meta.created_by.profile_name }}</a>
+													</h3>
+													updated their profile
+													{% endif %}
+											{% else %}
+											<h3 class="row-title">
+												<a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title | safe }}</a>
+											</h3>
+											{% endif %}
 
 											{% if update.meta.flags.unread %}
 											<span class="label label-warning">NEW</span>
@@ -128,9 +131,11 @@
 										{# new comment in huddle #}
 										{% elif update.update_type == "new_comment_in_huddle" %}
 
-											<a href="{{ update.item_link }}"><h3 class="row-title">{{ update.item.title|safe }}</h3></a>
+											<h3 class="row-title">
+												<a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title | safe }}</a>
+											</h3>
 											{% if update.meta.flags.unread %}
-											<span class="label label-warning">NEW</span>
+												<span class="label label-warning">NEW</span>
 											{% endif %}
 
 										{# new attendee #}
@@ -173,6 +178,8 @@
 													<a href="{% url 'newest-conversation' update.parent_item.id %}">
 												{% elif update.parent_item_type == "event" %}
 													<a href="{% url 'newest-event' update.parent_item.id %}">
+												{% elif update.parent_item_type == "huddle" %}
+													<a href="{% url 'newest-huddle' update.parent_item.id %}">
 												{% else %}
 													<a href="{{ update.parent_link }}">
 												{% endif %}
@@ -181,6 +188,8 @@
 													<a href="{% url 'newest-conversation' update.item.id %}">
 												{% elif update.item_type == "event" %}
 													<a href="{% url 'newest-event' update.item.id %}">
+												{% elif update.item_type == "huddle" %}
+													<a href="{% url 'newest-huddle' update.item.id %}">
 												{% else %}
 													<a href="{{ update.item_link }}">
 												{% endif %}
@@ -188,7 +197,8 @@
 												view
 												{% if update.parent_item_type == "conversation" %}
 													conversation{% elif update.parent_item_type == "event" %}
-													event{% elif update.parent_item_type == "poll" %}
+													event{% elif update.parent_item_type == "huddle" %}
+													huddle{% elif update.parent_item_type == "poll" %}
 													poll{% elif update.item_type == "conversation" %}
 													conversation{% elif update.item_type == "event" %}
 													event{% elif update.item_type == "poll" %}
