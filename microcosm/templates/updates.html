@@ -131,9 +131,12 @@
 										{# new comment in huddle #}
 										{% elif update.update_type == "new_comment_in_huddle" %}
 
-											<h3 class="row-title">
-												<a href="{{ update.parent_link }}/newest/">{{ update.parent_item.title | safe }}</a>
-											</h3>
+											{% if update.parent_item_type == "huddle" %}
+												<h3 class="row-title"><a href="{% url 'newest-huddle' update.parent_item.id %}">{{ update.parent_item.title | safe }}</a></h3>
+											{% else %}
+												<h3 class="row-title"><a href="{{ update.parent_link }}">{{ update.parent_item.title | safe }}</a></h3>
+											{% endif %}
+											
 											{% if update.meta.flags.unread %}
 												<span class="label label-warning">NEW</span>
 											{% endif %}
