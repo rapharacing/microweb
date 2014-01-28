@@ -1,6 +1,7 @@
 import requests
 import grequests
 import string
+import datetime
 
 from functools import wraps
 from microweb import settings
@@ -1385,7 +1386,8 @@ class AuthenticationView(object):
         access_token = response.json()['data']
 
         response = HttpResponseRedirect(target_url if target_url != '' else '/')
-        response.set_cookie('access_token', access_token, httponly=True)
+        expires = datetime.datetime.fromtimestamp(2**31-1)
+        response.set_cookie('access_token', access_token, expires=expires, httponly=True)
         return response
 
     @staticmethod
