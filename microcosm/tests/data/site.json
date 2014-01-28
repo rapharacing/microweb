@@ -30,9 +30,12 @@
   },
   "themeId": 1,
   "logoUrl": "https://dev1.microco.sm/api/v1/files/30ff6e4d33e1ff64deb3cc6f2be8a97e8abaa77f",
-  "headerBackgroundUrl": "/static/themes/1/background.png",
+  "backgroundColor": "#FFFFFF",
+  "backgroundUrl": "/static/themes/1/background.png",
+  "backgroundPosition": "cover",
+  "linkColor": "#4082C3",
   "meta": {
-   "created": "2014-01-22T14:53:20.636901Z",
+   "created": "2014-01-28T15:29:54.56755Z",
    "createdBy": {
     "id": 5,
     "siteId": 5,
@@ -57,7 +60,7 @@
    "stats": [
     {
      "metric": "activeProfiles",
-     "value": 2
+     "value": 1
     },
     {
      "metric": "onlineProfiles",
@@ -65,15 +68,19 @@
     },
     {
      "metric": "totalProfiles",
-     "value": 2
-    },
-    {
-     "metric": "totalConversations",
      "value": 1
     },
     {
+     "metric": "totalConversations",
+     "value": 0
+    },
+    {
+     "metric": "totalEvents",
+     "value": 0
+    },
+    {
      "metric": "totalComments",
-     "value": 6
+     "value": 0
     }
    ],
    "links": [
