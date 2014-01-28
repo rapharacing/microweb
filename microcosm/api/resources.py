@@ -148,8 +148,8 @@ class Site(object):
         # Site themes are optional
         if data.get('logoUrl'): self.logo_url = data['logoUrl']
         if data.get('themeId'): self.theme_id = data['themeId']
-        if data.get('headerBackgroundUrl'):
-            self.header_background_url = data['headerBackgroundUrl']
+        if data.get('backgroundUrl'):
+            self.header_background_url = data['backgroundUrl']
 
     @staticmethod
     def retrieve(host):
