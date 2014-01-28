@@ -40,7 +40,7 @@
 								<div class="list-collection-row-offset">
 									<h2 class="row-title">
 										<a href="{% url 'single-microcosm' item.id %}">{{ item.title | safe }}</a>
-										{% if item.meta.flags.unread %}<span class="label label-warning">new</span>{% endif %}
+										{% if item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
 									</h2>
 
 									<div class="row-meta">

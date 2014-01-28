@@ -58,7 +58,7 @@
 									<a href="/" title="Return to Homepage"><img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" /></a>
 								</div>
 
-								<div class="col-sm-8 col-md-6 col-lg-6 navbar-search">
+								<div class="col-sm-offset-1 col-sm-6 col-md-5 navbar-search">
 									<form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
 										<div class="input-group">
 											<label class="input-group-addon" for="navbar-search-input">
@@ -69,7 +69,7 @@
 												id="navbar-search-input"
 												class="form-control"
 												name="q"
-												placeholder="Search conversations, events and people..."
+												placeholder="Search"
 												{% if content.query.searched %}value="{{content.query.searched|escape}}"{% endif %}
 												tabindex="1"
 											/>
