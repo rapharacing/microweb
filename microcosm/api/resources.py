@@ -223,10 +223,14 @@ class Site(object):
         if data.get('gaWebPropertyId'): self.ga_web_property_id = data['gaWebPropertyId']
 
         # Site themes are optional
-        if data.get('logoUrl'): self.logo_url = data['logoUrl']
-        if data.get('themeId'): self.theme_id = data['themeId']
-        if data.get('headerBackgroundUrl'):
-            self.header_background_url = data['headerBackgroundUrl']
+        self.logo_url = data['logoUrl']
+        self.theme_id = data['themeId']
+        self.link_color = data['linkColor']
+        self.background_color = data['backgroundColor']
+        if data.get('backgroundUrl'):
+            self.background_url = data['backgroundUrl']
+        if data.get('backgroundPosition'):
+            self.background_position = data['backgroundPosition']
 
     @staticmethod
     def retrieve(host):
