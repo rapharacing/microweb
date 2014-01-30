@@ -232,6 +232,11 @@ class Site(object):
         if data.get('backgroundPosition'):
             self.background_position = data['backgroundPosition']
 
+        self.menu = []
+        if data.get('menu'):
+            for item in data['menu']:
+                self.menu.append(item)
+
     @staticmethod
     def retrieve(host):
         url = build_url(host, [Site.api_path_fragment])

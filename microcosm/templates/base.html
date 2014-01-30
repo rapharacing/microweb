@@ -177,18 +177,17 @@
 								<li {% if site_section == "people"%}class="active"{% endif %}>
 									<a href="{% url 'list-profiles' %}">People</a>
 								</li>
+
+								{% if site.menu|length > 1 %}
 								<li class="dropdown">
-									<a href="#" class="dropdown-toggle" data-toggle="dropdown">Custom <b class="caret"></b></a>
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{site.title}} <b class="caret"></b></a>
 									<ul class="dropdown-menu">
-										<li><a href="#">Action</a></li>
-										<li><a href="#">Another action</a></li>
-										<li><a href="#">Something else here</a></li>
-										<li class="divider"></li>
-										<li><a href="#">Separated link</a></li>
-										<li class="divider"></li>
-										<li><a href="#">One more separated link</a></li>
+									{% for menu_item in site.menu %}
+										<li><a href="{{ menu_item.href }}"{% if menu_item.title %} title="{{menu_item.title}}"{% endif %}>{{menu_item.text}}</a></li>
+									{% endfor %}
 									</ul>
 								</li>
+								{% endif %}
 							</ul>
 							{% if user %}
 							<ul class="nav navbar-nav navbar-nav-registered">
