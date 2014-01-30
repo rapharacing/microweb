@@ -1295,7 +1295,7 @@ class CommentView(object):
 		attachments = {}
 		c = content.as_dict
 		if 'attachments' in c:
-			c_attachments = Attachment.retrieve( request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
+			c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
 			attachments[str(c['id'])] = c_attachments
 
 		view_data = {
