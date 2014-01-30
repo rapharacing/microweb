@@ -59,7 +59,6 @@ from microcosm.api.resources import response_list_to_dict
 from microcosm.api.resources import GlobalOptions
 from microcosm.api.resources import ProfileList
 from microcosm.api.resources import Search
-from microcosm.api.resources import SearchResult
 from microcosm.api.resources import Huddle
 from microcosm.api.resources import HuddleList
 from microcosm.api.resources import Trending
@@ -1236,12 +1235,10 @@ class CommentView(object):
 
 		if request.GET.has_key('itemId'):
 			initial['itemId'] = int(request.GET.get('itemId', None))
-
 		if request.GET.has_key('itemType'):
 			if request.GET['itemType'] not in COMMENTABLE_ITEM_TYPES:
 				raise ValueError
 			initial['itemType'] = request.GET.get('itemType', None)
-
 		if request.GET.has_key('inReplyTo'):
 			initial['inReplyTo'] = int(request.GET.get('inReplyTo', None))
 
@@ -1276,22 +1273,20 @@ class CommentView(object):
 		Display a single comment.
 		"""
 
-		url, params, headers = Comment.build_request(
-			request.META['HTTP_HOST'],
-			id=comment_id,
-			access_token=request.access_token
-		)
+		url, params, headers = Comment.build_request(request.META['HTTP_HOST'], id=comment_id,
+			access_token=request.access_token)
 		request.view_requests.append(grequests.get(url, params=params, headers=headers))
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		content = Comment.from_api_response(responses[url])
 		comment_form = CommentForm(
-			initial=dict(
-				itemId=content.item_id,
-				itemType=content.item_type,
-				comment_id = content.id
-			))
+			initial= {
+				'itemId': content.item_id,
+				'itemType': content.item_type,
+				'comment_id': content.id,
+			}
+		)
 
-		# get attachments
+		# Fetch any attachments on the comment.
 		attachments = {}
 		c = content.as_dict
 		if 'attachments' in c:
@@ -1312,73 +1307,76 @@ class CommentView(object):
 	@exception_handler
 	def create(request):
 		"""
-		Comment forms populate attributes from GET parameters, so require the create
-		method to be extended.
+		Create a comment, processing any attachments (including deletion of attachments) and
+		redirecting to the single comment form if there are any validation errors.
 		"""
-
-		if not request.access_token:
-			raise PermissionDenied
-
-		responses = response_list_to_dict(grequests.map(request.view_requests))
-		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
 		if request.method == 'POST':
 			form = CommentForm(request.POST)
 
-			if form.is_valid():
-				comment_request = Comment.from_create_form(form.cleaned_data)
-				comment_response = comment_request.create(request.META['HTTP_HOST'], access_token=request.access_token)
-
-				if comment_response.id > 0:
-
-					attachments_delete = []
-					if request.POST.get('attachments-delete'):
-						attachments_delete = request.POST.get('attachments-delete').split(",")
-
-					if request.FILES.has_key('attachments'):
-
-						for f in request.FILES.getlist('attachments'):
-
-							if not f.name in attachments_delete:
-								file_request = FileMetadata.from_create_form(f)
-
-								# File must be under 5MB
-								# TODO: use Django's built-in field validators and error messaging
-								if len(file_request.file['files']) >= 5242880:
-									view_data['form'] = form
-									view_data['avatar_error'] = 'Sorry, the file you upload must be under 5MB.'
-									return render(request, CommentView.form_template, view_data)
-								else:
-									file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
-									Attachment.create(
-										request.META['HTTP_HOST'],
-										file_metadata.file_hash,
-										comment_id=comment_response.id,
-										access_token=request.access_token
-									)
-
-					if comment_response.meta.links.get('commentPage'):
-						return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
-				else:
-					return HttpResponseRedirect(reverse('single-comment', args=(comment_response.id,)))
-			else:
-				view_data['form'] = form
+			# If invalid, load single comment view showing validation errors.
+			if not form.is_valid():
+				responses = response_list_to_dict(grequests.map(request.view_requests))
+				view_data = {
+					'user': Profile(responses[request.whoami_url], summary=False),
+					'site': request.site,
+					'form': form,
+				}
 				return render(request, CommentView.form_template, view_data)
 
-		elif request.method == 'GET':
-			initial = CommentView.fill_from_get(request, {})
-			view_data['form'] = CommentForm(initial=initial)
-			return render(request, CommentView.form_template, view_data)
+			# Create comment with API.
+			comment_request = Comment.from_create_form(form.cleaned_data)
+			comment_response = comment_request.create(request.META['HTTP_HOST'], access_token=request.access_token)
 
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
+			# If comment creation successful, handle attachment creation and deletion.
+			if comment_response.id:
+				# Check if any attachments are to be deleted.
+				attachments_delete = []
+				if request.POST.get('attachments-delete'):
+					attachments_delete = request.POST.get('attachments-delete').split(",")
+				# Check if any files have been uploaded with the comment.
+				if request.FILES.has_key('attachments'):
+					for f in request.FILES.getlist('attachments'):
+						if not f.name in attachments_delete:
+							file_request = FileMetadata.from_create_form(f)
+							# If any files are over 5MB, reload form with validation error.
+							if len(file_request.file['files']) >= 5242880:
+								responses = response_list_to_dict(grequests.map(request.view_requests))
+								comment_form = CommentForm(
+									initial= {
+										'itemId': comment_response.item_id,
+										'itemType': comment_response.item_type,
+										'comment_id': comment_response.id,
+									    'markdown': request.POST['markdown'],
+									}
+								)
+								view_data = {
+									'user': Profile(responses[request.whoami_url], summary=False),
+									'site': request.site,
+								    'content': comment_response,
+									'comment_form': comment_form,
+									'error': 'Sorry, one of your files was over 5MB. Please try again.',
+								}
+								return render(request, CommentView.form_template, view_data)
+							# Associate attachment with comment using attachments API.
+							else:
+								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+								Attachment.create(request.META['HTTP_HOST'], file_metadata.file_hash,
+									comment_id=comment_response.id, access_token=request.access_token)
+
+				# API returns which page in the thread this comments appear in, so redirect there.
+				if comment_response.meta.links.get('commentPage'):
+					return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
+
+			# Comment creation unsuccessful, show an error page. TODO: more useful error report.
+			else:
+				raise APIException("Could not create comment")
 
 	@staticmethod
 	@exception_handler
 	def edit(request, comment_id):
 		"""
-		Comment forms populate attributes from GET parameters, so require the create
-		method to be extended.
+		Edit a comment.
 		"""
 
 		if not request.access_token:
@@ -1393,7 +1391,7 @@ class CommentView(object):
 				comment_request = Comment.from_edit_form(form.cleaned_data)
 				comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
 
-				# delete attachments if neccessary
+				# delete attachments if necessary
 				if comment_response.id > 0:
 
 					attachments_delete = []
@@ -1414,23 +1412,15 @@ class CommentView(object):
 									return render(request, CommentView.form_template, view_data)
 								else:
 									file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
-									Attachment.create(
-										request.META['HTTP_HOST'],
-										file_metadata.file_hash,
-										comment_id=comment_response.id,
-										access_token=request.access_token
-									)
+									Attachment.create(request.META['HTTP_HOST'], file_metadata.file_hash,
+										comment_id=comment_response.id, access_token=request.access_token)
 							else:
 								attachments_delete = [a for a in attachments_delete if not a == f.name]
 
 					if len(attachments_delete) > 0:
 						for fileHash in attachments_delete:
-							Attachment.delete(
-								request.META['HTTP_HOST'],
-								Comment.api_path_fragment,
-								comment_response.id,
-								fileHash
-							)
+							Attachment.delete(request.META['HTTP_HOST'], Comment.api_path_fragment,
+								comment_response.id, fileHash)
 
 				if comment_response.meta.links.get('commentPage'):
 					return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
