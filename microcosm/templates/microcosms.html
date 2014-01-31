@@ -19,7 +19,7 @@
 <div class="content-body">
 
 	{% if not content.microcosms.items %}
-		<p>This is such a new site that there are no Microcosms at the moment.</p>
+		<p>This is such a new site that there are no forums at the moment.</p>
 		{% if content.meta.permissions.create %}
 			<p>Will you be the first to create one?</p>
 		{% endif %}
@@ -119,7 +119,7 @@
 	{% if content.meta.permissions.create %}
 	<div class="metabar-module">
 		<h5>Got something to add?</h5>
-		<a href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-folder-open"></span> Create a microcosm</a>
+		<a href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-folder-open"></span> Create a forum</a>
 	</div> <!-- primary actions -->
 	{% endif %}
 

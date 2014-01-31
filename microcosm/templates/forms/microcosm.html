@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if form.id > 0 %}Edit this microcosm{% else %}Create a microcosm{% endif %} | {{ site.title | safe }}{% endblock title %}
+{% block title %}{% if form.id > 0 %}Edit this forum{% else %}Create a forum{% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -11,9 +11,9 @@
 		</div>
 		<h1>
 			{% if form.id > 0 %}
-			Edit a microcosm
+			Edit a forum
 			{% else %}
-			Create a microcosm
+			Create a forum
 			{% endif %}
 		</h1>
 	</div>
@@ -42,7 +42,7 @@
 									<input type="text"
 												 class="form-control {% if form.errors.title %}error{% endif %}"
 												 id="title"
-												 name="{{ form.title.name }}" placeholder="Title of microcosm"
+												 name="{{ form.title.name }}" placeholder="Title of forum"
 												 maxlength="{{ form.fields.title.max_length }}" />
 								</div>
 
@@ -64,7 +64,7 @@
 									<input type="text"
 												 class="form-control {% if form.errors.description %}error{% endif %}"
 												 id="description"
-												 name="{{ form.description.name }}" placeholder="Description of microcosm"
+												 name="{{ form.description.name }}" placeholder="Description of forum"
 												 maxlength="{{ form.fields.description.max_length }}" />
 								</div>
 
@@ -100,7 +100,7 @@
 						<div class="row">
 							<div class="col-sm-12">
 								<div class="form-footer-buttons">
-									<input type="submit" class="btn btn-lg btn-primary" value="Save microcosm">
+									<input type="submit" class="btn btn-lg btn-primary" value="Save forum">
 									<input type="reset" class="btn btn-lg btn-default" value="Cancel">
 								</div>
 							</div>
