@@ -39,11 +39,14 @@
 									{% if form.errors.title %}
 										<label class="control-label">{{ form.errors.title.as_text }}</label>
 									{% endif %}
-									<input type="text"
-												 class="form-control {% if form.errors.title %}error{% endif %}"
-												 id="title"
-												 name="{{ form.title.name }}" placeholder="Title of forum"
-												 maxlength="{{ form.fields.title.max_length }}" />
+									<input
+										type="text"
+										class="form-control {% if form.errors.title %}error{% endif %}"
+										id="title"
+										name="{{ form.title.name }}" placeholder="Title of forum"
+										maxlength="{{ form.fields.title.max_length }}"
+										value="{{ form.title.value|default:"" }}"
+									/>
 								</div>
 
 							</div>
@@ -61,11 +64,14 @@
 									{% if form.errors.description %}
 										<label class="control-label">{{ form.errors.description.as_text }}</label>
 									{% endif %}
-									<input type="text"
-												 class="form-control {% if form.errors.description %}error{% endif %}"
-												 id="description"
-												 name="{{ form.description.name }}" placeholder="Description of forum"
-												 maxlength="{{ form.fields.description.max_length }}" />
+									<input
+										type="text"
+										class="form-control {% if form.errors.description %}error{% endif %}"
+										id="description"
+										name="{{ form.description.name }}" placeholder="Description of forum"
+										maxlength="{{ form.fields.description.max_length }}"
+										value="{{ form.description.value|default:"" }}"
+									/>
 								</div>
 
 							</div>
@@ -84,11 +90,13 @@
 									{% if form.errors.editReason %}
 										<label class="control-label">{{ form.errors.editReason.as_text }}</label>
 									{% endif %}
-									<input type="text"
-												 class="form-control {% if form.errors.editReason %}error{% endif %}"
-												 id="editReason"
-												 name="{{ form.editReason.name }}"
-												 placeholder="Reason for editing" />
+									<input
+										type="text"
+										class="form-control {% if form.errors.editReason %}error{% endif %}"
+										id="editReason"
+										name="{{ form.editReason.name }}"
+										placeholder="Reason for editing"
+									/>
 								</div>
 							</div>
 						</div> <!-- /form-group -->
@@ -106,8 +114,8 @@
 							</div>
 						</div>
 					</div> <!-- /form_footer -->
-
-			</form>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>

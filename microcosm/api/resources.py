@@ -614,6 +614,7 @@ class PermissionSet(object):
         self.guest = data['guest']
         self.super_user = data['moderator']
         self.owner = data['owner']
+        self.admin = data['siteOwner']
 
 
 class Watcher(APIResource):
