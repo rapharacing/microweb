@@ -228,7 +228,7 @@ class MicrocosmCreate(django.forms.Form):
 
     title = django.forms.CharField(
         max_length='150',
-        label='What is the name of the Microcosm?',
+        label='What is the name of the forum?',
         error_messages={
             'required' : 'The name is required',
             'max_length' : 'Name may not be longer than 150 characters'
@@ -236,9 +236,9 @@ class MicrocosmCreate(django.forms.Form):
     )
     description = django.forms.CharField(
         max_length='150',
-        label='What is the Microcosm about?',
+        label='What is the forum about?',
         error_messages={
-            'required' : 'A description is required and helps keep a Microcosm on-topic',
+            'required' : 'A description is required and helps keep a forum on-topic',
             'max_length' : 'The description may not be longer than 150 characters'
         }
     )
@@ -251,7 +251,7 @@ class MicrocosmCreate(django.forms.Form):
 
 class MicrocosmEdit(MicrocosmCreate):
     """
-    Form for editing a microcosm.
+    Form for editing a forum.
     """
 
     id = django.forms.IntegerField(widget=django.forms.HiddenInput)
