@@ -83,7 +83,7 @@
 		<h5>About</h5>
 		<div class="metabar-module-title">
 			<h3>
-				{{ content.title | safe }}
+				{{ content.title | safe }} {% if content.meta.permissions.admin or content.meta.permissions.super_user %}<a href="{% url 'edit-microcosm' content.id %}" title="Edit forum title and description"><span class="sprite sprite-pencil-small"></span></a>{% endif %}
 			</h3>
 			<p class="metabar-module-author">
 				<a href="{% url 'single-profile' content.meta.created_by.id %}"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name | safe }}" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
@@ -91,7 +91,7 @@
 		</div>
 		<div class="metabar-module-body">
 			<p>
-				{{ content.description | safe }}
+				{{ content.description | safe }} {% if content.meta.permissions.admin or content.meta.permissions.super_user %}<a href="{% url 'edit-microcosm' content.id %}" title="Edit forum title and description"><span class="sprite sprite-pencil-small"></span></a>{% endif %}
 			</p>
 			{% include 'forms/subscribe.html' %}
 		</div>
