@@ -286,7 +286,7 @@
 				{% block ga %}{% endblock %}
 			};
 
-			ga('create', 'UA-36931318-3', 'microco.sm');
+			ga('create', 'UA-36931318-3');
 			ga('send', 'pageview', gaData);
 
 			{% if site.ga_web_property_id %}ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
