@@ -123,7 +123,7 @@ class EventEdit(EventCreate):
         repr['duration'] = event.duration
 
         # Event location
-        repr['where'] = event.where
+        if hasattr(event, 'where'): repr['where'] = event.where
         if hasattr(event, 'lat'): repr['lat'] = event.lat
         if hasattr(event, 'lon'): repr['lon'] = event.lon
         if hasattr(event, 'north'): repr['north'] = event.north
