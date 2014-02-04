@@ -1235,9 +1235,10 @@ class Event(APIResource):
         repr['when'] = self.when
         repr['duration'] = self.duration
 
-        # Event location
-        repr['where'] = self.where
-        # Geo coordinates are optional
+        # Event location is optional
+        if hasattr(self, 'where'):
+            repr['where'] = self.where
+        # Geo coordinates are optional, even if 'where' is specified
         if hasattr(self, 'lat'): repr['lat'] = self.lat
         if hasattr(self, 'lon'): repr['lon'] = self.lon
         if hasattr(self, 'north'): repr['north'] = self.north
