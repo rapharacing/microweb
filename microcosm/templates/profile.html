@@ -1,21 +1,145 @@
-{% extends 'base.html' %}profile
+{% extends 'base.html' %}
 
-{% block breadcrumb %}
-	<ol class="breadcrumb">
-		<li><a href="/">Home</a></li>
-		<li><a href="/profiles/?top=true">Profiles</a></li>
-		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.profile_name }}</a></li>
-	</ol>
-{% endblock %}
+{% load list_comment %}
+{% load microcosm %}
+{% load conversation %}
+{% load event %}
+
+{% block title %}@{{ content.profile_name | safe }} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
-    <h1 id="profile-name"><img src="{% if 'gravatar' in content.avatar %}{{content.avatar}}{% elif 'files' in content.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ content.profile_name }}" /> {{content.profile_name}}</h1>
+					<div class="content-header padded">
+						<div class="row">
+							<div class="col-xs-12">
+								{% include 'breadcrumbs.html' %}
+							</div>
+						</div>
+					</div>
 
-    <h3>Statistics</h3>
-    <ul>
-        <li>Created: {{content.created}}</li>
-        <li>Last active: {{content.last_active}} </li>
-        <li>Comment count: {{content.comment_count}}</li>
-    </ul>
+					<div class="content-body">
 
+						<div class="profile-header padded">
+
+							<img class="profile-header-avatar"
+									 src="{% if 'gravatar' in content.avatar %}{{content.avatar}}{% elif 'files' in content.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ content.profile_name | safe }}" />
+							<div class="profile-header-text">
+								<h1>{{ content.profile_name | safe }}</h1>
+								Member since {{ content.created|date:"M Y" }}
+								&bull;
+								Last active {{content.last_active|date:"M Y"}}
+							</div>
+							 <ul class="list-stats profile-header-stats">
+									<li>
+										<span>{{content.item_count}}</span>
+										conversations
+									</li>
+									<li>
+										<span>{{content.comment_count}}</span>
+										comments
+									</li>
+								</ul>
+						</div> <!-- /profile-header -->
+
+						{% if content.profile_comment %}
+						<div class="comment-item-body padded">
+							{{ content.profile_comment.html | safe }}
+						</div> <!-- /profile-description -->
+						{% endif %}
+
+{% comment %}
+
+						<div class="profile-section">
+							<h2>Events attending</h2>
+							{% with events_attending as items %}
+								{% include 'microweb_templates/list_items.html' %}
+							{% endwith %}
+						</div>
+
+						<div class="profile-section">
+							<h2>Events attended</h2>
+							{% with events_attended as items %}
+								{% include 'microweb_templates/list_items.html' %}
+							{% endwith %}
+						</div>
+{% endcomment %}
+						<!-- START :: SEARCH -->
+						<div class="profile-section">
+
+						{% if search.results.items|length == 0 %}
+							<h3 class="padded">Recent activity</h3>
+							<div class="empty-state padded">
+								<p>
+									This person has not yet posted anything.
+								</p>
+							</div>
+						{% else %}
+							<h3 class="padded">Recent activity</h3>
+							<ul class="list-collection bordered padded">
+							{% for result in search.results.items %}
+
+								{% if result.item_type == 'microcosm' %}
+
+									{% microcosm result %}
+
+								{% elif result.item_type == 'conversation' %}
+
+									{% conversation result %}
+
+								{% elif result.item_type == 'event' %}
+
+									{% event result %}
+
+								{% elif result.item_type == 'comment' %}
+
+									{% list_comment result %}
+
+								{% endif %}
+
+							{% endfor %}
+							</ul>
+						{% endif %}
+						</div>
+						<!-- END :: SEARCH -->
+					</div>
+
+{% endblock content %}
+{% block sidebar %}
+
+	<div class="metabar-module">
+	{% if content.id == user.id %}
+		<div class="metabar-module-primary-buttons">
+			<a id="edit_profile" href="{% url 'edit-profile' user.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit your Profile</a>
+		</div>
+	{% else %}
+		<h5>Got something to add?</h5>
+		<div class="metabar-module-primary-buttons">
+			<a href="{% url 'create-huddle' %}?to={{ content.id }}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-envelope-small"></span> Send message</a>
+		</div>
+	{% endif %}
+	</div> <!-- primary actions -->
+
+	<div class="metabar-module">
+		<h5>Profile</h5>
+		<div class="metabar-module-body">
+			{% include 'forms/subscribe.html' %}
+		</div>
+	</div> <!-- / about -->
+
+{% endblock %}
+{% block js %}
+{% if user %}
+<script type="text/javascript">
+
+	{% if not content.id == user.id %}
+	var subscribe = new Subscribe({
+		el    : '.subscribe',
+		url   : '{% url 'single-watcher' %}',
+		id    : {{ content.id }},
+		type  : '{{ item_type }}',
+		token : '{{ csrf_token }}',
+		is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
+	});
+	{% endif %}
+</script>
+{% endif %}
 {% endblock %}

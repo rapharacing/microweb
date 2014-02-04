@@ -1,0 +1,63 @@
+<div id="modal-event-attendees" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header navbar-header-wrapper tiling-bg">
+        <img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="modal-event">
+
+          <div class="modal-item-icon">
+            <span class="sprite sprite-calendar"></span>
+          </div>
+          <div class="modal-item-title">{{ content.title | safe }}</div>
+          <div class="modal-item-meta">
+            <strong>{{ content.where|safe }}</strong>
+            <p>
+            {% if event_dates.type == 'multiple' %}
+              {{ content.when|date:"j F Y"}}
+              -
+              {{ event_dates.end|date:"j F Y" }}
+            {% else %}
+              {{ content.when|date:"j F Y"}}
+              @ {{ content.when|date:"g:i  A" }} - {{ event_dates.end|date:"g:i  A" }}
+            {% endif %}
+            </p>
+          </div>
+
+          <div class="modal-list">
+            <div class="modal-list-title">Attendees / Invited</div>
+            <ul>
+            {% if rsvp_num_attending > 0 %}
+              {% for attendee in attendees.items.items%}
+                {% if attendee.rsvp == "yes" %}
+                  <li>
+                    <a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" /> @{{ attendee.profile.profile_name }}</a>
+                    <span>{{ attendee.rsvpd_on|date:"j M" }}</span>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+
+            {% if rsvp_num_invited > 0%}
+              {% for attendee in attendees.items.items%}
+                {% if attendee.rsvp == "maybe" %}
+                  <li>
+                    <a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" /> @{{ attendee.profile.profile_name }}</a>
+                    <span><em>invited</em> {{ attendee.rsvpd_on|date:"j M" }}</span>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-small btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>

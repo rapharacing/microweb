@@ -2,27 +2,23 @@ import random
 import string
 import json
 import os
-from mock import patch
 
 from django.utils import unittest
+from django.conf import settings
 from django.test.client import RequestFactory
+
+from mock import patch
 
 from microcosm.views import MicrocosmView
 from microcosm.views import build_pagination_links
 
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Microcosm
-from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import Profile
 from microcosm.api.resources import Site
 from microcosm.api.resources import Event
-
-from microweb.helpers import build_url
-
-from microweb.settings import API_SCHEME
-from microweb.settings import API_DOMAIN_NAME
-from microweb.settings import API_PATH
-from microweb.settings import API_VERSION
+from microcosm.api.resources import build_url
+from microcosm.api.exceptions import APIException
 
 TEST_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -43,72 +39,42 @@ class BuildURLTests(unittest.TestCase):
     subdomain_key = 'abc.'
 
     def testWithTrailingSeparator(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['resource/', '1/', 'extra/'])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['resource/', '1/', 'extra/'])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/resource/1/extra'
 
     def testWithPrependedSeparator(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['/resource', '/1', '/extra'])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['/resource', '/1', '/extra'])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/resource/1/extra'
 
     def testWithDuplicateSeparator(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['resource/', '/1/', '/extra/'])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['resource/', '/1/', '/extra/'])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/resource/1/extra'
 
     def testWithNoSeparator(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['resource', '1', 'extra'])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/resource/1/extra'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['resource', '1', 'extra'])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/resource/1/extra'
 
     def testEmptyFragments(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), [])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), [])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION
 
     def testIntFragment(self):
-        url = build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), [1, 2, 3])
-        assert url == API_SCHEME + BuildURLTests.subdomain_key + \
-                      API_DOMAIN_NAME + '/' + API_PATH + '/' + API_VERSION + '/1/2/3'
+        url = build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), [1, 2, 3])
+        assert url == settings.API_SCHEME + BuildURLTests.subdomain_key +\
+                      settings.API_DOMAIN_NAME + '/' + settings.API_PATH + '/' + settings.API_VERSION + '/1/2/3'
 
     def testInvalidFragment(self):
         with self.assertRaises(AssertionError):
-            build_url((BuildURLTests.subdomain_key + API_DOMAIN_NAME), ['resource', '1', 'ex/tra'])
+            build_url((BuildURLTests.subdomain_key + settings.API_DOMAIN_NAME), ['resource', '1', 'ex/tra'])
 
     def testFailCustomDomains(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(APIException):
             build_url((BuildURLTests.subdomain_key + 'example.org'), ['resource', '1', 'ex/tra'])
-
-
-class RoutingAPITests(unittest.TestCase):
-    """
-    Verify that the Host header is used to call the appropriate
-    API endpoint.
-    """
-
-    def setUp(self):
-        self.factory = RequestFactory()
-
-
-    def testMicrocosmsView(self):
-
-        host = generate_location()
-        full_path = build_url(host, ['microcosms'])
-
-        # Create a request for a list of microcosms
-        request = self.factory.get('/microcosms', HTTP_HOST=host)
-        request.access_token = None
-        request.whoami = None
-        request.site = None
-
-        microcosms = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosms.json')).read())
-
-        # Patch requests.get and check the call args
-        with patch('requests.get') as mock:
-            mock.return_value.json.return_value = microcosms
-            MicrocosmView.list(request)
-            mock.assert_called_once_with(full_path, headers={'Host': host}, params={})
 
 
 class PaginationTests(unittest.TestCase):
@@ -133,59 +99,81 @@ class PaginationTests(unittest.TestCase):
         request.whoami = None
         request.site = None
 
-        conversation = Conversation.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation_with_paginated_comments.json')).read())['data']
+        conversation = Conversation.from_api_response(data)
         with patch('requests.get') as mock:
             mock.return_value.json.return_value = conversation
             pagination_nav = build_pagination_links(request, conversation.comments)
 
-        assert pagination_nav['first'] == path
-        assert pagination_nav['prev'] == path + '?offset=25'
-        assert pagination_nav['next'] == path + '?offset=75'
-        assert pagination_nav['last'] == path + '?offset=100'
+        assert pagination_nav['page'] == 1
+        assert pagination_nav['offset'] == 0
+        assert pagination_nav['total_pages'] == 2
+        assert pagination_nav['limit'] == 25
 
 
 class ResourceTests(unittest.TestCase):
 
     """
-    Basic initialisation and serilisation tests for API resources.
+    Basic initialisation and serialisation tests for API resources.
+    TODO: in some cases, as_dict is a property, in others it is a callable.
     """
 
     def testMicrocosmInit(self):
-        Microcosm(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data']
+        Microcosm.from_api_response(data)
 
     def testMicrocosmAsDict(self):
-        microcosm = Microcosm(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data']
+        microcosm = Microcosm.from_api_response(data)
         microcosm.as_dict
 
     def testMicrocosmSummaryInit(self):
-        Microcosm(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data'], summary=True)
-
-    def testMicrocosmListInit(self):
-        MicrocosmList(json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosms.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'microcosm.json')).read())['data']
+        Microcosm.from_summary(data)
 
     def testConversationInit(self):
-        Conversation.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation_with_comment.json')).read())['data']
+        Conversation.from_api_response(data)
+
+    def testCommentedConversationInit(self):
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation_without_comment.json')).read())['data']
+        Conversation.from_api_response(data)
 
     def testConversationAsDict(self):
-        conversation = Conversation.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'conversation_without_comment.json')).read())['data']
+        conversation = Conversation.from_api_response(data)
         conversation.as_dict()
 
     def testEventInit(self):
-        Event.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'event_without_comment.json')).read())['data']
+        Event.from_api_response(data)
+
+    def testCommentedEventInit(self):
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'event_with_comment.json')).read())['data']
+        Event.from_api_response(data)
 
     def testEventAsDict(self):
-        event = Event.from_api_response(json.loads(open(os.path.join(TEST_ROOT, 'data', 'event.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'event_without_comment.json')).read())['data']
+        event = Event.from_api_response(data)
         event.as_dict()
 
+    def testWhoamiInit(self):
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'whoami.json')).read())['data']
+        Profile(data)
+
     def testProfileInit(self):
-        Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data']
+        Profile(data)
 
     def testProfileAsDict(self):
-        profile = Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data']
+        profile = Profile(data)
         profile.as_dict
 
     def testProfileSummaryInit(self):
-        Profile(json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data'], summary=True)
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'profile.json')).read())['data']
+        Profile(data, summary=True)
 
     def testSiteInit(self):
-        Site(json.loads(open(os.path.join(TEST_ROOT, 'data', 'site.json')).read())['data'])
+        data = json.loads(open(os.path.join(TEST_ROOT, 'data', 'site.json')).read())['data']
+        Site(data)

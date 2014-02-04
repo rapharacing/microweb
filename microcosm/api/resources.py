@@ -1,15 +1,21 @@
 import json
 import datetime
 
+from django.conf import settings
+
 import requests
-from requests import RequestException
 
 from dateutil.parser import parse as parse_timestamp
 
 from microcosm.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
-from microweb.helpers import build_url
 
+import logging
+
+import pylibmc as memcache
+
+logger = logging.getLogger('microcosm.middleware')
+mc = memcache.Client(['%s:%d' % (settings.MEMCACHE_HOST, settings.MEMCACHE_PORT)])
 
 RESOURCE_PLURAL = {
     'event': 'events',
@@ -31,8 +37,60 @@ COMMENTABLE_ITEM_TYPES = [
     'huddle'
 ]
 
+
+def build_url(host, path_fragments):
+    """
+    urljoin and os.path.join don't behave exactly as we want, so
+    here's a different wheel.
+
+    As per RFC 3986, authority is composed of hostname[:port] (and optionally
+    userinfo, but the microcosm API will never accept these in the URL, so
+    we ignore their presence).
+
+    path should be a list of URL fragments. This function will strip separators and
+    insert them where needed to form a valid URL.
+
+    The use of + for string concat is deemed acceptable because it is 'fast enough'
+    on CPython and we are not going to change interpreter.
+    """
+
+    host = host.split(':')[0]
+    if host.endswith(settings.API_DOMAIN_NAME):
+        url = settings.API_SCHEME + host
+    else:
+        mc_key = host + '_cname'
+        resolved_name = None
+        try:
+            resolved_name = mc.get(mc_key)
+        except memcache.Error as e:
+            logger.error('Memcached error: %s' % str(e))
+
+        if resolved_name is None:
+            resolved_name = Site.resolve_cname(host)
+            mc.set(mc_key, resolved_name)
+        url = settings.API_SCHEME + resolved_name
+    path_fragments = [settings.API_PATH, settings.API_VERSION] + path_fragments
+    url += join_path_fragments(path_fragments)
+    return url
+
+
+def join_path_fragments(path_fragments):
+    path = ''
+
+    for fragment in path_fragments:
+        if not isinstance(fragment, str):
+            fragment = str(fragment)
+        if '/' in fragment:
+            fragment = fragment.strip('/')
+            if '/' in fragment:
+                raise AssertionError('Do not use path fragments containing slashes')
+        path += ('/' + fragment)
+    return path
+
+
 def discard_querystring(url):
     return url.split('?')[0]
+
 
 def response_list_to_dict(responses):
     """
@@ -52,6 +110,24 @@ def response_list_to_dict(responses):
         else:
             response_dict[discard_querystring(response.url)] = APIResource.process_response(response.url, response)
     return response_dict
+
+
+def populate_item(itemtype, itemdata):
+    if itemtype == 'conversation':
+        item = Conversation.from_summary(itemdata)
+    elif itemtype == 'comment':
+        item = Comment.from_summary(itemdata)
+    elif itemtype == 'event':
+        item = Event.from_summary(itemdata)
+    elif itemtype == 'profile':
+        item = Profile.from_summary(itemdata)
+    elif itemtype == 'microcosm':
+        item = Microcosm.from_summary(itemdata)
+    elif itemtype == 'huddle':
+        item = Huddle.from_summary(itemdata)
+    else:
+        item = None
+    return item
 
 
 class APIResource(object):
@@ -118,7 +194,7 @@ class APIResource(object):
         """
 
         params['method'] = 'DELETE'
-        response = requests.post(url, params=params, headers=headers)
+        response = requests.delete(url, params=params, headers=headers)
         try:
             resource = response.json()
         except ValueError:
@@ -141,21 +217,42 @@ class Site(object):
         self.subdomain_key = data['subdomainKey']
         self.domain = data['domain']
         self.owned_by = Profile(data['ownedBy'])
+        self.meta = Meta(data['meta'])
 
         # Custom tracking is optional
         if data.get('gaWebPropertyId'): self.ga_web_property_id = data['gaWebPropertyId']
 
         # Site themes are optional
-        if data.get('logoUrl'): self.logo_url = data['logoUrl']
-        if data.get('themeId'): self.theme_id = data['themeId']
+        self.logo_url = data['logoUrl']
+        self.theme_id = data['themeId']
+        self.link_color = data['linkColor']
+        self.background_color = data['backgroundColor']
         if data.get('backgroundUrl'):
-            self.header_background_url = data['backgroundUrl']
+            self.background_url = data['backgroundUrl']
+        if data.get('backgroundPosition'):
+            self.background_position = data['backgroundPosition']
+
+        self.menu = []
+        if data.get('menu'):
+            for item in data['menu']:
+                self.menu.append(item)
 
     @staticmethod
     def retrieve(host):
         url = build_url(host, [Site.api_path_fragment])
         resource = APIResource.retrieve(url, {}, {})
         return Site(resource)
+
+    @staticmethod
+    def resolve_cname(host):
+        # TODO: separation of root site API and others
+        # TODO: get rid of this string
+        url = 'https://microco.sm/api/v1/hosts/' + host
+        response = requests.get(url)
+        if response.status_code != 200:
+            raise APIException('Error resolving CNAME %s' % host, response.status_code)
+        print(response.content)
+        return response.content
 
 
 class User(object):
@@ -218,6 +315,8 @@ class Profile(object):
         if data.get('visible'): self.visible = data['visible']
         if data.get('avatar'): self.avatar = data['avatar']
         if data.get('meta'): self.meta = Meta(data['meta'])
+        if data.get('profileComment'):
+                self.profile_comment = Comment.from_summary(data['profileComment'])
 
         if not summary:
             self.style_id = data['styleId']
@@ -261,6 +360,9 @@ class Profile(object):
         if hasattr(self, 'last_active'): repr['lastActive'] = self.last_active
         if hasattr(self, 'banned'): repr['banned'] = self.banned
         if hasattr(self, 'admin'): repr['admin'] = self.admin
+
+        if hasattr(self, 'profile_comment'): repr['markdown'] = self.profile_comment.markdown
+
         return repr
 
     @staticmethod
@@ -281,12 +383,14 @@ class ProfileList(object):
         self.meta = Meta(data['meta'])
 
     @staticmethod
-    def build_request(host, offset=None, top=False, q="", access_token=None):
+    def build_request(host, offset=None, top=False, q="", following=False, online=False, access_token=None):
         url = build_url(host, [ProfileList.api_path_fragment])
         params = {}
         if offset: params['offset'] = offset
         if top: params['top'] = top
         if q: params['q'] = q
+        if following: params['following'] = following
+        if online: params['online'] = online
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
@@ -433,6 +537,8 @@ class Item(object):
 
         item.meta = Meta(data['item']['meta'])
 
+        item.item = populate_item(item.item_type, data['item'])
+
         return item
 
 
@@ -474,13 +580,12 @@ class Meta(object):
         if data.get('editedBy'): self.edited_by = Profile(data['editedBy'])
         if data.get('flags'): self.flags = data['flags']
         if data.get('permissions'): self.permissions = PermissionSet(data['permissions'])
-        if data.get('parents'):
+        if data.get('inReplyTo'):
             self.parents = []
-            for item in data['parents']:
-                self.parents.append(Comment.from_summary(item))
-        if data.get('children'):
+            self.parents.append(Comment.from_summary(data['inReplyTo']))
+        if data.get('replies'):
             self.children = []
-            for item in data['children']:
+            for item in data['replies']:
                 self.children.append(Comment.from_summary(item))
         if data.get('links'):
             self.links = {}
@@ -489,6 +594,12 @@ class Meta(object):
                     self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1',''), 'title': item['title']}
                 else:
                     self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1','')}
+        if data.get('stats'):
+            self.stats = {}
+            for stat in data['stats']:
+                if stat.get('metric'):
+                    self.stats[stat['metric']] = stat['value']
+
 
 class PermissionSet(object):
     """
@@ -552,19 +663,27 @@ class Watcher(APIResource):
         return cls(data)
 
     @staticmethod
-    def delete(host, watcher_id, access_token):
-        url = build_url(host, [Watcher.api_path_fragment, watcher_id])
-        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
+    def delete(host, data, access_token):
+        url = build_url(host, [Watcher.api_path_fragment, "delete"])
+        APIResource.delete(url, data, APIResource.make_request_headers(access_token))
 
     @staticmethod
-    def update(host, watcher_id, data, access_token):
-        url = build_url(host, [Watcher.api_path_fragment, watcher_id])
-        resource = APIResource.update(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
+    def update(host, data, access_token):
+        url = build_url(host, [Watcher.api_path_fragment, "patch"])
+        params = {}
+        params['method'] = 'PATCH'
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        response = requests.patch(url, data=json.dumps(data), params=params, headers=headers)
+        return response
 
     @staticmethod
     def create(host, data, access_token):
         url = build_url(host, [Watcher.api_path_fragment])
-        APIResource.create(url, json.dumps(data), {}, APIResource.make_request_headers(access_token))
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        response = requests.post(url, json.dumps(data), params={}, headers=headers)
+        return response.content
 
 
 class WatcherList(object):
@@ -631,32 +750,11 @@ class Update(APIResource):
         update.item_type = data['itemType']
         update.meta = Meta(data['meta'])
 
-        if update.item_type == 'conversation':
-            update.item = Conversation.from_summary(data['item'])
-        elif update.item_type == 'comment':
-            update.item = Comment.from_summary(data['item'])
-        elif update.item_type == 'event':
-            update.item = Event.from_summary(data['item'])
-        elif update.item_type == 'profile':
-            update.item = Profile.from_api_response(data['item'])
-        elif update.item_type == 'microcosm':
-            update.item = Microcosm(data['item'])
-        else:
-            update.item = None
+        update.item = populate_item(update.item_type, data['item'])
 
         if data.get('parentItem'):
             update.parent_item_type = data['parentItemType']
-
-            if update.parent_item_type == 'conversation':
-                update.parent_item = Conversation.from_summary(data['parentItem'])
-            elif update.parent_item_type == 'event':
-                update.parent_item = Event.from_summary(data['parentItem'])
-            elif update.parent_item_type == 'profile':
-                update.parent_item = Profile.from_api_response(data['parentItem'])
-            elif update.parent_item_type == 'microcosm':
-                update.parent_item = Microcosm(data['parentItem'])
-            else:
-                update.parent_item = None
+            update.parent_item = populate_item(update.parent_item_type, data['parentItem'])
         else:
             update.parent_item = update.item
 
@@ -830,11 +928,20 @@ class Conversation(APIResource):
         conversation.id = data['id']
         conversation.microcosm_id = data['microcosmId']
         conversation.title = data['title']
-        if data.get('lastCommentId'): conversation.last_comment_id = data['lastCommentId']
-        if data.get('lastCommentCreatedBy'):
-            conversation.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
-        if data.get('lastCommentCreated'):
-            conversation.last_comment_created = parse_timestamp(data['lastCommentCreated'])
+
+        conversation.total_comments = 0
+        if data.get('totalComments'):
+            conversation.total_comments = data['totalComments']
+
+        conversation.total_views = 0
+        if data.get('totalViews'):
+            conversation.total_views = data['totalViews']
+
+        if data.get('lastComment'):
+            conversation.last_comment_id = data['lastComment']['id']
+            conversation.last_comment_created_by = Profile(data['lastComment']['createdBy'])
+            conversation.last_comment_created = parse_timestamp(data['lastComment']['created'])
+
         conversation.meta = Meta(data['meta'])
         return conversation
 
@@ -926,12 +1033,16 @@ class Huddle(APIResource):
         huddle.participants = []
         for p in data['participants']:
             huddle.participants.append(Profile(p))
+        if 'isConfidential' in data:
+            huddle.isConfidential = data['isConfidential']
+
         return huddle
 
     @classmethod
     def from_create_form(cls, data):
         huddle = cls()
         huddle.title = data['title']
+        huddle.is_confidential = True if data['is_confidential'] == "1" else False
         return huddle
 
     @classmethod
@@ -976,6 +1087,7 @@ class Huddle(APIResource):
             repr['id'] = self.id
             repr['meta'] = self.meta
         repr['title'] = self.title
+        repr['isConfidential'] = self.is_confidential
         return repr
 
     @staticmethod
@@ -1027,18 +1139,6 @@ class Event(APIResource):
         event.duration = data['duration']
         event.status = data['status']
 
-        # Event location
-        event.where = data['where']
-        if data.get('lat'): event.lat = data['lat']
-        if data.get('lon'): event.lon = data['lon']
-        if data.get('north'): event.north = data['north']
-        if data.get('east'): event.east = data['east']
-        if data.get('south'): event.south = data['south']
-        if data.get('west'): event.west = data['west']
-
-        # RSVP limit is always returned, even if zero
-        event.rsvp_limit = data['rsvpLimit']
-
         return event
 
     @classmethod
@@ -1047,16 +1147,43 @@ class Event(APIResource):
         event.id = data['id']
         event.microcosm_id = data['microcosmId']
         event.title = data['title']
-        if data.get('lastCommentId'): event.last_comment_id = data['lastCommentId']
-        if data.get('lastCommentCreatedBy'):
-            event.last_comment_created_by = Profile(data['lastCommentCreatedBy'])
-        if data.get('lastCommentCreated'):
-            event.last_comment_created = parse_timestamp(data['lastCommentCreated'])
-        event.meta = Meta(data['meta'])
+
+        event.total_comments = 0
+        if data.get('totalComments'):
+            event.total_comments = data['totalComments']
+
+        event.total_views = 0
+        if data.get('totalViews'):
+            event.total_views = data['totalViews']
+
+        if data.get('lastComment'):
+            event.last_comment_id = data['lastComment']['id']
+            event.last_comment_created_by = Profile(data['lastComment']['createdBy'])
+            event.last_comment_created = parse_timestamp(data['lastComment']['created'])
 
         # RSVP attend / spaces are only returned if non-zero
         if data.get('rsvpAttend'): event.rsvp_attend = data['rsvpAttend']
         if data.get('rsvpSpaces'): event.rsvp_spaces = data['rsvpSpaces']
+
+        # RSVP limit is always returned, even if zero
+        event.rsvp_limit = data['rsvpLimit']
+
+        # For progress bar
+        if event.rsvp_limit > 0:
+            event.rsvp_percentage = 0
+            if data.get('rsvpAttend'):
+                event.rsvp_percentage = (event.rsvp_attend/float(event.rsvp_limit))*100
+
+        if data.get('when'): event.when = parse_timestamp(data['when'])
+        if data.get('where'): event.where = data['where']
+        if data.get('lat'): event.lat = data['lat']
+        if data.get('lon'): event.lon = data['lon']
+        if data.get('north'): event.north = data['north']
+        if data.get('east'): event.east = data['east']
+        if data.get('south'): event.south = data['south']
+        if data.get('west'): event.west = data['west']
+
+        if data.get('meta'): event.meta = Meta(data['meta'])
         return event
 
     @classmethod
@@ -1108,14 +1235,16 @@ class Event(APIResource):
         repr['when'] = self.when
         repr['duration'] = self.duration
 
-        # Event location
-        repr['where'] = self.where
-        repr['lat'] = self.lat
-        repr['lon'] = self.lon
-        repr['north'] = self.north
-        repr['east'] = self.east
-        repr['south'] = self.south
-        repr['west'] = self.west
+        # Event location is optional
+        if hasattr(self, 'where'):
+            repr['where'] = self.where
+        # Geo coordinates are optional, even if 'where' is specified
+        if hasattr(self, 'lat'): repr['lat'] = self.lat
+        if hasattr(self, 'lon'): repr['lon'] = self.lon
+        if hasattr(self, 'north'): repr['north'] = self.north
+        if hasattr(self, 'east'): repr['east'] = self.east
+        if hasattr(self, 'south'): repr['south'] = self.south
+        if hasattr(self, 'west'): repr['west'] = self.west
 
         # RSVP limit is optional
         if hasattr(self, 'rsvp_attend'): repr['rsvpAttend'] = self.rsvp_attend
@@ -1166,13 +1295,14 @@ class Event(APIResource):
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
-    def get_attendees(self, host, access_token=None):
+    @staticmethod
+    def get_attendees(host, id, access_token=None):
         """
         Retrieve a list of attendees for an event.
         TODO: pagination support
         """
 
-        url, params, headers = self.build_attendees_request(host, access_token)
+        url, params, headers = Event.build_attendees_request(host, id, access_token)
         resource = APIResource.retrieve(url, params, headers)
         return AttendeeList(resource)
 
@@ -1185,7 +1315,8 @@ class Event(APIResource):
         collection_url = build_url(host, [cls.api_path_fragment, event_id, 'attendees'])
         try:
             resource = APIResource.update(collection_url, json.dumps(attendance_data), {'access_token': access_token}, {})
-        except RequestException:
+            print json.dumps(attendance_data)
+        except requests.RequestException:
             raise
         return Event.from_api_response(resource)
 
@@ -1208,7 +1339,7 @@ class Attendee(object):
         attendee.profile_id = data['profileId']
         attendee.profile = Profile.from_summary(data['profile'])
         attendee.rsvp = data['rsvp']
-        attendee.rsvpd_on = data['rsvpdOn']
+        attendee.rsvpd_on = parse_timestamp(data['rsvpdOn'])
         attendee.meta = Meta(data['meta'])
         return attendee
 
@@ -1245,10 +1376,19 @@ class Comment(APIResource):
     @classmethod
     def from_create_form(cls, data):
         comment = cls()
+
         comment.item_type = data['itemType']
         comment.item_id = data['itemId']
         comment.in_reply_to = data['inReplyTo']
         comment.markdown = data['markdown']
+
+        try:
+            comment.comment_id = data['id']
+            comment.attachments = data['attachments']
+        except KeyError:
+            comment.comment_id = 0
+            comment.attachments = 0
+
         return comment
 
     @classmethod
@@ -1307,6 +1447,13 @@ class Comment(APIResource):
         response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
         return response.json()['data']
 
+    @staticmethod
+    def source(host, id, access_token=None):
+        url = build_url(host, [Comment.api_path_fragment, id])
+        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return response.content
+
+
 class GeoCode(object):
     """
     Used for proxying geocode requests to the backend.
@@ -1346,8 +1493,10 @@ class FileMetadata(object):
         file_metadata.mime_type = data[0]['mimeType']
         return file_metadata
 
-    def create(self, host, access_token):
+    def create(self, host, access_token, width=0, height=0):
         url = build_url(host, [FileMetadata.api_path_fragment])
+        if height > 0 or width > 0:
+            url += "?maxWidth=" + str(width) + "&maxHeight=" + str(height)
         headers = APIResource.make_request_headers(access_token)
         response = APIResource.process_response(url, requests.post(url, files=self.file, headers=headers))
         return FileMetadata.from_api_response(response)
@@ -1359,6 +1508,40 @@ class Attachment(object):
     TODO: parse attachment list in response (currently create only signals
     errors).
     """
+
+    api_path_fragment = 'attachments'
+
+    @classmethod
+    def from_api_response(cls, data):
+        attachments = cls()
+        attachments = PaginatedList(data.get('attachments'),Attachment)
+        attachments.meta = Meta(data.get('meta'))
+
+        return attachments
+
+    @classmethod
+    def from_summary(cls, data):
+        summary = cls()
+        summary.profile_id = data['profileId']
+        summary.meta       = data['meta']
+        summary.file_hash  = data['fileHash']
+        summary.created    = parse_timestamp(data['created'])
+
+        return summary
+
+    @staticmethod
+    def build_request(host, type, id, offset=None, access_token=None):
+        url = build_url(host, [ type, id, Attachment.api_path_fragment ])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, type, id, offset=None, access_token=None):
+        url, params, headers = Attachment.build_request(host, type, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+
+        return Attachment.from_api_response(resource)
 
     @staticmethod
     def create(host, file_hash, profile_id=None, comment_id=None, access_token=None):
@@ -1372,6 +1555,17 @@ class Attachment(object):
         attachment = {'FileHash': file_hash}
         headers = APIResource.make_request_headers(access_token)
         return APIResource.process_response(url, requests.post(url, data=attachment, headers=headers))
+
+    @staticmethod
+    def source(host, type, id, offset=None, access_token=None):
+        url, params, headers = Attachment.build_request(host, type, id, offset, access_token)
+        response = requests.get(url=url, params=params, headers=headers)
+        return response.content
+
+    @staticmethod
+    def delete(host, type, id, fileHash, offset=None, access_token=None):
+        url = build_url(host, [ type, id, Attachment.api_path_fragment, fileHash ])
+        APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
 class Search(object):
     """
@@ -1409,32 +1603,11 @@ class SearchResult(object):
         searchresult = cls()
         searchresult.item_type = data['itemType']
 
-        if searchresult.item_type == 'conversation':
-            searchresult.item = Conversation.from_summary(data['item'])
-        elif searchresult.item_type == 'comment':
-            searchresult.item = Comment.from_summary(data['item'])
-        elif searchresult.item_type == 'event':
-            searchresult.item = Event.from_summary(data['item'])
-        elif searchresult.item_type == 'profile':
-            searchresult.item = Profile.from_summary(data['item'])
-        elif searchresult.item_type == 'microcosm':
-            searchresult.item = Microcosm.from_summary(data['item'])
-        else:
-            searchresult.item = None
+        searchresult.item = populate_item(searchresult.item_type, data['item'])
 
         if data.get('parentItem'):
             searchresult.parent_item_type = data['parentItemType']
-
-            if searchresult.parent_item_type == 'conversation':
-                searchresult.parent_item = Conversation.from_summary(data['parentItem'])
-            elif searchresult.parent_item_type == 'event':
-                searchresult.parent_item = Event.from_summary(data['parentItem'])
-            elif searchresult.parent_item_type == 'profile':
-                searchresult.parent_item = Profile.from_summary(data['parentItem'])
-            elif searchresult.parent_item_type == 'microcosm':
-                searchresult.parent_item = Microcosm.from_summary(data['parentItem'])
-            else:
-                searchresult.parent_item = None
+            searchresult.parent_item = populate_item(searchresult.parent_item_type, data['parentItem'])
 
         searchresult.rank = data['rank']
         searchresult.last_modified = data['lastModified']
@@ -1444,3 +1617,30 @@ class SearchResult(object):
     @classmethod
     def from_summary(cls, data):
         return SearchResult.from_api_response(data)
+
+class Trending(APIResource):
+    """
+    Represents /trending
+    """
+
+    api_path_fragment = 'trending'
+
+    @classmethod
+    def from_api_response(cls, data):
+        trending = cls()
+        if data.get('meta'): trending.meta = Meta(data['meta'])
+        if data.get('items'): trending.items = PaginatedList(data['items'], Item)
+        return trending
+
+    @staticmethod
+    def build_request(host, offset=None, access_token=None):
+        url = build_url(host, [Trending.api_path_fragment])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = Microcosm.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return Trending.from_api_response(resource)

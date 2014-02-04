@@ -1,61 +1,190 @@
 {% extends 'base.html' %}
 
+{% load commentBox %}
+
+{% block title %}Edit profile | {{ site.title | safe }}{% endblock title %}
+
 {% block content %}
-	<h1>Edit your profile</h1>
 
-	<form action="" method="post" id="profileForm" enctype="multipart/form-data">
-		{% csrf_token %}
-		{{ form.id }}
-
-		<h4><label for="id_profileName">{{ form.profileName.label }}</label></h4>
-		<div>
-			{{ form.profileName }}
-			{% if form.errors.profileName %}
-				<div class="text-error">{{ form.errors.profileName.as_text }}</div>
-			{% endif %}
+<div class="content-header padded">
+	<div class="row">
+		<div class="col-sm-12">
+		{% include 'breadcrumbs.html' %}
 		</div>
+	</div>
+	<a href="{% url 'updates-settings' %}" class="pull-right">Update settings &rarr;</a>
+	<h1>Edit Profile</h1>
+	<div class="clearfix"></div>
+</div>
 
-		<h4><label for="id_avatar">Choose a picture to be your avatar</label></h4>
-        {{ form.avatar }}
-		{% if avatar_error %}
-			<p>{{ avatar_error }}</p>
-		{% else %}
-			<p>Your avatar should be a square image under 30KB with jpg, png or gif file extension.</p>
-		{% endif %}
+		<div class="content-body">
 
-		<input class="btn btn-primary pull-right" id="submit" type="submit" value="Save profile">
-	</form>
+			<div class="row form-container">
+				<div class="col-lg-12">
+					<form id="profileform" role="form" action="{% url 'edit-profile' user.id %}" method="POST" enctype="multipart/form-data">
+					<div class="form-container-inner padded">
+
+							{% csrf_token %}
+							{{ form.id }}
+
+							{# username #}
+							<div class="form-group">
+								<div class="row">
+
+									<label class="col-sm-12" for="profileName">
+										{{ form.profileName.label }}
+									</label>
+									<div class="col-sm-12">
+										{% if form.errors.profileName %}
+											<div class="text-error">{{ form.errors.profileName.as_text }}</div>
+										{% endif %}
+										<input
+											type="text"
+											class="form-control"
+											id="edit_profile_name"
+											name="{{ form.profileName.name }}"
+											value="{{ form.profileName.value }}"
+											placeholder="Enter username..."
+											maxlength="{{ form.fields.profileName.max_length}}"
+											tabindex="1"
+										/>
+									</div>
+								</div>
+							</div> <!-- /form-group -->
+
+							{# profile picture #}
+							<div class="form-group">
+								<div class="row">
+									<label class="col-sm-12" for="avatar">{{ form.avatar.label }}</label>
+									<div class="col-sm-12">
+										<div class="form-file-upload">
+											<label
+												{% if 'files' in user.avatar %}
+												class="active"
+												style="background-image:url('https://{{site.subdomain_key}}.microco.sm{{user.avatar}}')"
+												{% endif %}
+											>
+												<span>Click here</span>
+												<input
+													name="{{ form.avatar.name }}"
+													type="file"
+													accept="image/*"
+													capture="camera"
+													tabindex="1"
+												/>
+											</label>
+											<div class="form-file-upload-text">
+												<h3>Click on or drag a image over the box on the left to update your picture</h3>
+
+												{% if avatar_error %}
+												<div class="has-error">
+													<div class="control-label">{{ avatar_error }}</div>
+												</div>
+												{% else %}
+												<p>Your avatar should be a square image under 30KB with jpg, png or gif file extension.</p>
+												{% endif %}
+											</div>
+										</div>
+
+									</div>
+
+								</div>
+							</div> <!-- /form-group -->
+
+							{# comment #}
+							<div class="form-group">
+								<div class="row">
+
+									<label class="col-sm-12" for="reply-box-textarea">Tell us about yourself</label>
+									<div class="col-sm-12">
+									{% commentBox as_component=True no_attachments=True value=form.markdown.value %}
+									</div>
+								</div>
+							</div> <!-- /form-group -->
+
+					</div> <!-- /form-container-inner -->
+
+					{# footer #}
+					<div class="form-group form-footer padded">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="form-footer-buttons">
+									<input type="submit" class="btn btn-lg btn-primary" value="Save Changes" id="submit" tabindex="1" />
+									<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+		</div>
+	</div>
+
+</div>
+
+{% endblock content %}
+{% block sidebar %}
+
+<div class="metabar-module">
+	<h5>About</h5>
+	<div class="metabar-module-title">
+		<h3>
+			Edit Profile
+		</h3>
+	</div>
+</div> <!-- / about -->
 
 {% endblock %}
 
 {% block js %}
-	<script type="text/javascript">
-		function isEmpty(e) {
-			return (e.val().trim() == '');
-		}
-		function checkEmpty(e) {
-			if (isEmpty($(e))) {
-				addError($(e))
-			} else {
-				removeError($(e))
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/profilePicture.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+<script type="text/javascript">
+(function(){
+
+	var commentBox = new simpleEditor({
+		el 					   : '.reply-box',
+		no_attachments : true
+	});
+
+	if (typeof ProfilePicture !== 'undefined'){
+		var profilePicture = new ProfilePicture({
+			el : '.form-file-upload'
+		});
+	}
+
+	/////////////////////
+	// form validation //
+	/////////////////////
+
+	var form = new FormValidator(
+		document.getElementById('profileform'),
+		{
+			rules : {
+				'{{ form.profileName.name }}'      : ['not_empty','maxlength', 'validChars']
+			},
+			tests : {
+				'validChars': function(field){
+					var $field = $(field),
+							name   = $field.val();
+
+					return name.match(/[^a-z0-9\.\_\-\+]+/i).length == 0;
+
+				 },
+				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
+			},
+			error_messages : {
+				'{{ form.profileName.name }}:not_empty' : "* {{ form.fields.profileName.error_messages.required }}",
+				'{{ form.profileName.name }}:maxlength' : "* {{ form.fields.profileName.error_messages.max_length }}",
+				'{{ form.profileName.name }}:validChars': '* {{ form.fields.profileName.error_messages.valid_chars|safe }}'
 			}
 		}
-		function addError(e) {
-			e.parent().addClass('has-error')
-		}
-		function removeError(e) {
-			e.parent().removeClass('has-error')
-		}
+	);
 
-		$('#id_profileName').on('change', function() {
-			checkEmpty(this);
-		}).on('blur', function() {
-			checkEmpty(this);
-		});
-
-		$(document).ready(function() {
-			$('#id_profileName').addClass('form-control').parent().addClass('form-group');
-			$('#id_avatar').addClass('form-control').addClass('btn').addClass('btn-default').parent().addClass('form-group');
-		});
-	</script>
-{% endblock %}
+})();
+</script>
+{% endblock js %}

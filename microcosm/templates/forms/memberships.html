@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+
+{% block title %}Create a membership group | {{ site.title | safe }}{% endblock title %}
+
+{% block content %}
+
+<div class="content-header padded">
+	<div class="row">
+		<div class="col-sm-8">
+      {% include 'breadcrumbs.html' %}
+    </div>
+	</div>
+	<h1>Create a Membership Group</h1>
+</div>
+
+<div class="content-body">
+
+	<div class="row form-container">
+		<div class="col-lg-12">
+			<div class="form-container-inner padded">
+				<form role="form">
+
+					<div class="form-group">
+						<div class="row">
+
+							<label class="col-sm-12" for="name">What should we call this membership group?</label>
+							<div class="col-sm-12">
+								<input type="text" class="form-control" id="name" name="name" placeholder="Name of group" />
+							</div>
+
+						</div>
+					</div> <!-- /form-group -->
+
+					<div class="form-group">
+						<div class="row">
+							<label class="col-sm-12">
+								2. Complete at least one of either or a combination of 2a, 2b or 2c.
+							</label>
+						</div>
+					</div> <!-- /form-group -->
+
+					<div class="form-group">
+						<div class="row">
+							<label class="col-sm-12">
+								2a. Type of user to include
+							</label>
+							<div class="col-md-6">
+								<ul class="list-toggles">
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">Registered</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="include_registered"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="include_registered"></label>
+											</button>
+										</div><!-- /form-group -->
+									</li>
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">Unregistered users / guests</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="include_unregistered"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="include_unregistered"></label>
+											</button>
+										</div>
+									</li>
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">Banned</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="include_banned"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="include_banned"></label>
+											</button>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div> <!-- /form-group -->
+
+					<div class="form-group">
+						<div class="row">
+							<label class="col-sm-12">
+								2b. <span class="red">And/or</span> is there any criteria for joining this group?
+							</label>
+							<div class="form-widget criteria-list">
+								<div class="form-widget-empty-state">
+									No criteria is set for this group.
+									<a href="javascript:void 0">Add a criteria for users to join this group</a>
+								</div>
+								<div class="form-widget-list"></div>
+								<div class="form-widget-inlineform">
+									<label>Add a criteria</label>
+									<div class="btn-group btn-group-xs">
+										<button type="button" class="btn btn-default">
+											<label>And <input type="radio" value="add" name="switch" checked="checked"></label>
+										</button>
+										<button type="button" class="btn btn-default">
+											<label>Or <input type="radio" value="or" name="switch"></label>
+										</button>
+									</div>
+
+									<span>where</span>
+
+									<select name="condition" class="form-control btn btn-primary first">
+										<option>Post count</option>
+										<option>Member since</option>
+										<option>Comment count</option>
+										<option>Option 1</option>
+										<option>Option 2</option>
+										<option>Option 3</option>
+										<option>Option 4</option>
+									</select>
+
+									<span>is</span>
+
+									<select name="predicate" class="form-control btn btn-primary last">
+										<option>Equal</option>
+										<option>Equal or more than</option>
+										<option>Equal or less than</option>
+										<option>More than</option>
+										<option>Less than</option>
+									</select>
+
+									<input type="text" class="form-control" name="value" placeholder="Enter a value..."/>
+
+									<button type="button" class="btn btn-primary submit">Add</button>
+								</div>
+							</div><!-- /form-widget -->
+						</div>
+					</div> <!-- /form-group -->
+
+					<div class="form-group">
+						<div class="row">
+							<label class="col-sm-12">
+								2b. <span class="red">And/or</span> who do you want to join this group?
+							</label>
+							<div class="col-sm-12">
+								<div class="list-participants"></div>
+							</div>
+							<div class="col-sm-12">
+								<div class="input-group">
+									<div class="input-group-addon">
+										<span class="sprite sprite-search-small"></span>
+									</div>
+									<input id="invite" class="form-control" autocomplete="off" placeholder="Type in a user's name"/>
+									<input name="invite" type="hidden" />
+								</div>
+
+							</div>
+						</div>
+					</div> <!-- /form-group -->
+
+
+					<div class="form-group">
+						<div class="row">
+							<label class="col-sm-12">
+								3. What can members in this group do in this forum?
+							</label>
+							<div class="col-md-10">
+								<ul class="list-toggles">
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">User can access and read this forum</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="can_read"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="can_read"></label>
+											</button>
+										</div>
+									</li>
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">User can create, edit and delete their own conversations, events and comments</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="can_edit"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="can_edit"></label>
+											</button>
+										</div>
+									</li>
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">User can moderate this forum</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="can_moderate"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="can_moderate"></label>
+											</button>
+										</div>
+									</li>
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">User can edit conversations, events and comments of others</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="can_edit_others"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="can_edit_others"></label>
+											</button>
+										</div>
+									</li>
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">User can delete conversations, events and comments of others</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="can_delete_others"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="can_delete_others"></label>
+											</button>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div> <!-- /form-group -->
+
+				</div> <!-- /form-container-inner -->
+
+				<div class="form-group form-footer padded">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="form-footer-buttons">
+								<input type="submit" class="btn btn-lg btn-primary" value="Create group"/>
+								<input type="reset" class="btn btn-lg btn-default" value="Cancel"/>
+							</div>
+						</div>
+					</div>
+				</div> <!-- form-footer -->
+
+			</form>
+
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+{% block sidebar %}
+
+<div class="metabar-module">
+	<h5>About</h5>
+	<div class="metabar-module-title">
+		<h3>
+			Create a new membership group
+		</h3>
+		<p>
+			{{ membership.microcosm.name }}
+		</p>
+	</div>
+</div> <!-- / about -->
+
+
+{% endblock %}
+
+
+
+{% block js %}
+<script type="text/javascript" src="{{STATIC_URL}}js/peopleWidget.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/membership_groups_form.js"></script>
+{% endblock %}

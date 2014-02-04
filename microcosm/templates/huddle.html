@@ -1,108 +1,243 @@
 {% extends 'base.html' %}
+{% load comments %}
 
-{% block breadcrumb %}
-	<ol class="breadcrumb">
-		<li><a href="/">Home</a></li>
-		<li><a href="/huddles/">Huddles</a></li>
-		<li class="active"><a href='{{ content.meta.links.self.href }}'>{{ content.title }}</a></li>
-	</ol>
-{% endblock %}
+{% block title %}{{ content.title }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block ga %},'dimension2': '{{ content.meta.created_by.id }}'
 			,'dimension3': '{{ content.microcosm_id }}'{% endblock%}
 
 {% block content %}
-	<h1 id="huddle_title">{{ content.title }}</h1>
-	<br />
-	{% include "comments_block.html" %}
+
+<div class="content-header padded">
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+	<h1>{{ content.title | safe }}</h1>
+</div>
+
+
+<div class="content-meta huddle-meta padded">
+	<div class="row">
+		<div class="col-sm-12">
+
+			<ul class="list-people list-people-md">
+				{% for profile in content.participants|slice:":7" %}
+				<li>
+					<a href="{% url 'single-profile' profile.id %}" data-toggle="tooltip" title="{{ profile.profile_name | safe }}"><img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name | safe }}" /></a>
+				</li>
+				{% endfor %}
+				{% if content.participants|length > 7%}
+				<li>
+					<a href="#"
+						 class="btn btn-default btn-xs"
+						 data-toggle="modal"
+						 data-target="#modal-huddle-invite">
+						+{{ content.participants|length|add:"-7" }}
+					</a>
+				</li>
+				{% endif %}
+			</ul>
+
+			<div class="huddle-actions">
+				{% if not content.isConfidential %}
+				<a class="btn btn-primary btn-xs"
+					data-toggle="modal"
+					data-target="#modal-huddle-invite">
+					Invite people
+				</a>
+				{% endif %}
+				<a class="btn btn-primary btn-xs"
+					data-toggle="modal"
+					data-target="#modal-huddle-leave">
+					Leave huddle
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="content-body">
+	<ul class="list-comments">
+		{% comments content.comments.items %}
+	</ul>
+</div> <!-- / content-body -->
+
+<div class="content-footer padded">
+	<div class="row">
+		<div class="col-sm-8">
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+</div>
+
+<a name="reply"></a>
+	<div class="reply-container">
+		<ul class="list-comments">
+			<li class="comment-item">
+				<div class="comment-item-inner">
+					<div class="comment-item-header">
+						<div class="comment-item-author">
+								<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name | safe }}"/>
+								<strong>Post a reply</strong>
+						</div>
+					</div>
+					<div class="comment-item-body">
+						{% include 'forms/block_comment_box.html' %}
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div> <!-- /reply-container -->
+
+	{% if content.meta.permissions.owner %}
+	<form id="invite-form" action="{% url 'invite-huddle' content.id %}" method="POST">
+		{% csrf_token %}
+	</form>
+	{% endif %}
+
+{% if not content.isConfidential %}
+	{% include "modal_huddle_invite.html" %}
+{% endif %}
+{% include "modal_huddle_leave.html" %}
 
 {% endblock %}
 
 {% block sidebar %}
-	<p class="muted hidden-xs">
-		Created by <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by">{{ content.meta.created_by.profile_name|truncatechars:25 }}</a><br />
-		<time datetime="{{ content.meta.created|date:"c" }}"></time>
-	</p>
-	
-	{% if user %} {% if not content.meta.flags.watched %}
-	<form method="POST" action="" id="subscribe_form">
-		{% csrf_token %}
-		<input type="hidden" name="update_type_id" value="1">
-		<input class="btn btn-default btn-block" id="watch" type="submit" value="Watch this Huddle" />
-		<p/>
-	</form>
-	{% else %}
-	<p class="text-muted">You are <a href="/watchers/">watching</a> this huddle and you will receive <a href="/updates/">updates</a>.</p>
-	{% endif %}{% endif %}
 
-	<form method="POST" action="{% url 'delete-huddle' content.id %}" id="huddle_delete_form" class="hidden-xs">
-		{% csrf_token %}
-		<p class="text-muted"><a id="delete-huddle" href="#" onClick="if (confirm('Leaving a huddle is a one-way action, are you sure?')) {$('#huddle_delete_form').submit()}" class="text-danger">Leave</a> this huddle (warning: this can not be undone)</p>
-	</form>
 
-	<p class="muted">Participants:</p>
-	{% for profile in content.participants %}
-	<p><a href="{% url 'single-profile' profile.id %}"><img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name }}" align="left" class="gravatar-small" style="width: 24px;"/>{{profile.profile_name}}</a></p>
-	{% endfor %}
+<div class="metabar-module">
+	<h5>About</h5>
+	<div class="metabar-module-title">
+		<h3>
+			{{ content.title | safe }}
+		</h3>
 
-	{% if content.meta.permissions.owner %}
-	<p>Invite another participant:</p>
-	<form method="POST" action="{{ content.meta.links.self.href }}/invite/" id="invite_form">
-		{% csrf_token %}
-		<input type="text" name="invite_profile_id">
-		<input class="btn btn-default btn-block" id="invite" type="submit" value="invite user" />
-	</form>
-	{% endif %}
+		<p class="metabar-module-author">
+			<a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name | safe }}" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> Started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
+		</p>
+
+		{% include 'forms/subscribe.html' %}
+	</div>
+</div> <!-- / about -->
 
 {% endblock %}
+
 
 {% block js %}
+{% if user %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/comments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
+<script type="text/javascript">
+(function(){
 
-	{% if user %}
-	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
-	<script type="text/javascript">
-		function isEmpty(e) {
-			return (e.val().trim() == '');
+	var subdomain = $('meta[name="subdomain"]').attr('content');
+
+	/////////////////////////
+	//       comments      //
+	/////////////////////////
+	var comments = new Comments({
+		el               : '.content-body',
+		defaultContainer : '.reply-container',
+		template         : $('.reply-container .comment-item-body').html().trim()
+	});
+
+	/////////////////////////
+	//    comment box      //
+	/////////////////////////
+	var replyBox = new simpleEditor({
+		el : '.reply-box'
+	});
+
+	$('#post-a-reply-handle').on('click',function(e){
+		var selectedText = Comments.prototype.getWindowSelectedText();
+		if (selectedText){
+			replyBox.textarea.value = selectedText;
+			replyBox.quote();
 		}
-		function checkEmpty(e) {
-			if (isEmpty($(e))) {
-				addError($(e))
-			} else {
-				removeError($(e))
-			}
+	});
+
+	/////////////////////////
+	//        invite       //
+	/////////////////////////
+	var p = new PeopleWidget({
+		el         : 'input#invite',
+		static_url : subdomain,
+		dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q=',
+		is_textbox : true,
+		list_target: '#modal-huddle-people-widget-list',
+		invited    : {{ participants_json|safe|default:"[]" }}
+	});
+
+	p.onSelection(function(invited, added){
+
+		var invited_list = $('#modal-huddle-invited-list'),
+				person;
+
+		if (typeof added !== 'undefined'){
+			img_src = subdomain + added.avatar;
+			a_href = "{{ site.url }}/profiles/"+added.id;
+			a_profile_name = added.profileName;
+			li_id = added.id;
+
+			person = $('<li class="pending" data-id="'+li_id+'"><a href="'+a_href+'"><img src="'+img_src+'"/> @'+a_profile_name+'</a><img class="preloader" src="{{ STATIC_URL }}img/preloader.gif"/></li>');
+			invited_list.append(person);
+
+			// fire off calls to invite
+
+			$.ajax({
+				url  : '{% url 'invite-huddle' content.id %}',
+				type : 'POST',
+				data : {
+					invite_profile_id : added.id,
+					csrfmiddlewaretoken : '{{ csrf_token }}'
+				}
+			}).success(function(){
+				var li = invited_list.find('li[data-id='+added.id+']'),
+						meta_list = $('.huddle-meta').find('.list-people');
+
+				li.removeClass('pending').find('.preloader').remove();
+
+				meta_list.append(
+					'<li><a href="'+a_href+'" data-toggle="tooltip" title="'+a_profile_name+'"><img src="'+img_src+'"/></a></li>'
+				);
+
+				$.each(meta_list.find('a[data-toggle="tooltip"]'),function(index,item){
+					$(item).tooltip();
+				});
+
+			});
+
 		}
-		function addError(e) {
-			e.parent().addClass('has-error')
-		}
-		function removeError(e) {
-			e.parent().removeClass('has-error')
-		}
+	});
 
-		$('#id_markdown').on('change', function() {
-			checkEmpty(this);
-		}).on('blur', function() {
-			checkEmpty(this);
-		});
+	/////////////////////////
+	//     subscribe       //
+	/////////////////////////
+	var subscribe = new Subscribe({
+		el    : '.subscribe',
+		url   : '{% url 'single-watcher' %}',
+		id    : {{ content.id }},
+		type  : '{{ item_type }}',
+		token : '{{ csrf_token }}',
+		is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
+	});
+})();
+</script>
 
-		$('#commentForm').submit(function() {
-			if (isEmpty($('#id_markdown'))) {
-				addError($('#id_markdown'))
-				return false;
-			}
 
-			// Client-side dupe check
-			md5 = hex_md5($('#id_markdown').val())
-			if (this.md5 && this.md5 == md5) {
-				return false
-			}
-			this.md5 = md5;
-
-			return true;
-		});
-
-		$(document).ready(function() {
-			$('#id_markdown').addClass('form-control').parent().addClass('form-group');
-		});
-	</script>
-	{% endif %}
-{% endblock %}
+{% endif %}
+{% endblock js %}

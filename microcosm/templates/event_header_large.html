@@ -1,0 +1,197 @@
+<div class="item-event">
+	<div class="row">
+		<div class="col-xs-12">
+			<ul class="item-event-inner">
+
+				<li class="item-event-map-container">
+					<div id="map-canvas" class="item-event-map"></div>
+				</li>
+
+				<li class="item-event-date-container">
+					<div class="item-event-icon">
+						<span class="sprite sprite-calendar{% if event_dates.type == 'multiple' %}-2{%endif%}"></span>
+					</div>
+					<div class="item-event-icon-offset">
+						<div class="item-event-date">
+							<span class="item-event-date-digit">{{ content.when|date:"j"}}</span>
+							<span class="item-event-date-day">
+								{{ content.when|date:"l" }}
+								<strong>{{ content.when|date:"F Y" }}</strong>
+							</span>
+							<span class="item-event-date-time">
+
+								{{ content.when|date:"g:i  A" }}
+								{% if event_dates.type == 'single' %}
+								- {{ event_dates.end|date:"g:i  A" }}
+								{% endif %}
+							</span>
+						</div>
+					</div>
+				</li>
+
+				{% if event_dates.type == 'multiple' %}
+				<li class="item-event-date-container">
+					<div class="item-event-icon">
+						<span class="sprite sprite-calendar"></span>
+					</div>
+					<div class="item-event-icon-offset">
+						<div class="item-event-date">
+							<span class="item-event-date-digit">{{ event_dates.end|date:"j"}}</span>
+							<span class="item-event-date-day">
+								{{ event_dates.end|date:"l" }}
+								<strong>{{ event_dates.end|date:"F Y" }}</strong>
+							</span>
+							<span class="item-event-date-time">
+								{{ event_dates.end|date:"g:i  A" }}
+							</span>
+						</div>
+					</div>
+				</li>
+				{% endif %}
+
+
+				<li>
+					<div class="item-event-icon">
+						<span class="sprite sprite-map-marker"></span>
+					</div>
+					<div class="item-event-icon-offset">
+						<div class="item-event-location">
+							{% if content.where %}
+								{{ content.where | safe }}
+							{% else %}
+								TBA
+							{% endif %}
+						</div>
+					</div>
+				</li>
+
+				{% if rsvp_num_attending > 0 or rsvp_num_invited > 0 %}
+
+				<li class="item-event-attending-container">
+
+					<div class="item-event-icon">
+						<span class="sprite sprite-attending"></span>
+					</div>
+					<div class="item-event-icon-offset">
+
+						{% if rsvp_num_attending > 0 or rsvp_num_invited > 0%}
+						<div class="item-event-attending-people">
+							{% comment %}
+							<span>
+							{% if rsvp_num_attending > 0 %}
+
+								{{ rsvp_num_attending }} {{ rsvp_num_attending|pluralize:"person,people" }}
+								{% if not is_expired %}{{ rsvp_num_attending|pluralize:"is,are" }} attending{% else %}attended{% endif %}
+								this event.
+
+							{% elif rsvp_num_invited > 0 %}
+
+								{{ rsvp_num_invited }} {{ rsvp_num_invited|pluralize:"person,people" }}
+								{% if not is_expired %}{{ rsvp_num_attending|pluralize:"is,are" }} invited{% else %}were invited{% endif %}
+								to this event.
+
+							{% endif %}
+							</span>
+							{% endcomment %}
+							<ul class="list-people list-people-md">
+							{% if rsvp_num_attending > 0 %}
+								{% for attendee in attendees.items.items|slice:":5" %}
+										{% if attendee.rsvp == "yes" %}
+											<li>
+												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" /></a>
+											</li>
+										{% endif %}
+									{% endfor %}
+									{% if rsvp_num_attending > 5 %}
+									<li>
+										<a href="#" data-toggle="modal" data-target="#modal-event-attendees"
+											 class="list-people-button">+{{ rsvp_num_attending|add:"-5" }}</a>
+									</li>
+									{% endif %}
+								{% elif rsvp_num_invited > 0%}
+									{% for attendee in attendees.items.items|slice:":5" %}
+										{% if attendee.rsvp == "maybe" %}
+											<li>
+												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" /></a>
+											</li>
+										{% endif %}
+									{% endfor %}
+									{% if rsvp_num_invited > 5 %}
+									<li>
+										<a href="#" data-toggle="modal" data-target="#modal-event-attendees"
+											 class="list-people-button">+{{ rsvp_num_invited|add:"-5" }}</a>
+									</li>
+									{% endif %}
+								{% endif %}
+
+
+							</ul>
+						</div>
+					{% endif %}
+					{% if content.rsvp_limit %}
+						<div class="item-event-attending">
+							<div class="progress">
+								<div class="progress-bar"
+										 role="progressbar"
+										 aria-valuenow="{{rsvp_percentage}}"
+										 aria-valuemin="0"
+										 aria-valuemax="100"
+										 style="width: {{rsvp_percentage}}%;">
+									<span class="sr-only">{{rsvp_percentage}}% Complete</span>
+								</div>
+							</div>
+							<strong>
+								{{ rsvp_num_attending }}/{{ content.rsvp_limit }}
+							</strong>
+						</div>
+						{% endif %}
+					</div>
+
+				</li>
+				{% endif %}
+			</ul> <!-- /item-event-inner -->
+
+			<div class="item-event-actions">
+				<ul class="list-stats" data-toggle="modal" data-target="#modal-event-attendees">
+					<li>
+						Going
+						<span>{{ rsvp_num_attending|default:"0" }}</span>
+					</li>
+					<li>
+						Invited
+						<span>{{ rsvp_num_invited|default:"0" }}</span>
+					</li>
+				</ul>
+				{% if not is_expired %}
+					{% if user %}
+						{% if user_is_attending %}
+							<h3>You are attending this event.</h3>
+							<form method="POST" action="{% url 'rsvp-event' content.id %}">
+								{% csrf_token %}
+								<input type="hidden" name="rsvp" value="no" />
+								<input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default">
+							</form>
+						{% else %}
+								<form method="POST" action="{% url 'rsvp-event' content.id %}">
+									{% csrf_token %}
+									<input type="hidden" name="rsvp" value="yes" />
+									<input type="submit" class="btn btn-lg btn-primary" value="Yes, I'm attending!" />
+								</form>
+						{% endif %}
+					{% else %}
+						<h3>Sign in to reserve your place in this event!</h3>
+						<p>
+							<button class="btn btn-primary btn-lg" id="login_link" onclick="login()">
+								Sign In or Register to attend!
+							</button>
+						</p>
+					{% endif %}
+				{% else %}
+					<h3>Sorry, this event has expired...</h3>
+					<p>..but don't miss the next one! Subscribe to this forum to be notified when a new event is created.</p>
+				{% endif %}
+			</div>
+
+		</div> <!-- /col-xs-12 -->
+	</div> <!-- /row -->
+</div> <!-- /item-event -->

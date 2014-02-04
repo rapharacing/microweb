@@ -1,0 +1,17 @@
+<li id="{{ microcosm.itemType }}{{ microcosm.item.id }}" class="list-collection-row">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="list-collection-row-icon">
+        <a class="sprite sprite-microcosm" title="Microcosm"></a>
+      </div>
+      <div class="list-collection-row-offset">
+        <div class="row-title">
+          <a href="{{ microcosm.item.meta.links.self.href }}"><h3 class="row-title">{{ microcosm.item.title | safe }}</h3></a>
+        </div>
+        <div class="row-meta">
+          {{ microcosm.item.description | safe }}
+        </div>
+      </div>
+    </div>
+  </div>
+</li>

@@ -1,0 +1,80 @@
+<li id="{{ item.item_type }}{{ item.item.id }}"
+		class="list-collection-row {% if item.is_pinned %}row-pinned{% endif %} {% if item.is_deleted %}row-deleted{% endif %}">
+
+	<div class="row">
+		<div class="col-sm-8 col-md-8 col-lg-8">
+
+			<div class="list-collection-row-icon">
+				{% if item.flags.sticky %}
+					<span class="sprite sprite-pushpin"></span>
+				{% endif %}
+					<a class="sprite sprite-calendar" title="Event"></a>
+			</div>
+
+			<div class="list-collection-row-offset">
+
+				<h3 class="row-title {% if item.highlight %}row-title-highlight{% endif %}">
+					<a href="/{{ item.item_type }}s/{{ item.item.id }}/{% if user %}newest/{% endif %}">{% if item.highlight %}{{ item.highlight | safe }}{% else %}{{ item.item.title | safe }}{% endif %}</a>
+					{% if item.item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
+				</h3>
+
+				{% if not item.item.meta.flags.sticky %}
+				<div class="row-meta">
+
+					{% if item.item.meta.created_by %}
+					<a href="{% url 'single-profile' item.item.meta.created_by.id %}">@{{ item.item.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ item.item.meta.created|date:"c" }}"></time>
+					{% endif %}
+					<div class="pills-event">
+						<span>
+							{{ item.item.when|date:"N jS" }}
+						</span>
+						{% if item.item.where %}
+						<span class="pills-event-where">
+							{{ item.item.where | safe }}
+						</span>
+						{% endif %}
+					</div>
+
+				</div>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-sm-4 col-md-4 col-lg-4">
+
+			{% if content.meta.permissions.moderator %}
+			<div class="list-collection-row-admin">
+				<input class="row-admin-checkbox" type="checkbox" />
+			</div>
+			{% endif %}
+
+			<div class="row-stats">
+				<ul class="list-stats list-stats-sm">
+					{% if item.item.total_comments >= 0%}
+					<li>
+						<span>{{ item.item.total_comments }}</span>
+						comment{{ item.item.total_comments|pluralize:",s"}}
+					</li>
+					{% endif %}
+					{% if item.item.total_views >= 0%}
+					<li>
+						<span>{{ item.item.total_views }}</span>
+						view{{ item.item.total_views|pluralize:",s"}}
+					</li>
+					{% endif %}
+				</ul>
+			</div>
+
+			{% if not item.flags.sticky %}
+
+				<div class="row-context">
+					{% if item.item.last_comment_created %}
+						<a href="{% url 'single-profile' item.item.last_comment_created_by.id %}">@{{item.item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.item.last_comment_created|date:"c" }}"></time>
+					{% endif %}
+				</div>
+
+			{% endif %}
+
+		</div>
+	</div>
+	</li>

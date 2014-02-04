@@ -41,10 +41,12 @@
 # By Ole Laursen, sponsored by IOLA, November 2010.
 # - changed July 27, 2012 to add support for STATIC_ROOT
 
-import re, os
-import pylibmc as memcache
+import re
+import os
 
 from django.conf import settings
+
+import pylibmc as memcache
 
 url_attributes = ['src', 'href']
 

@@ -1,99 +1,139 @@
 {% extends 'base.html' %}
 
+{% block title %}{% if form.id > 0 %}Edit this forum{% else %}Create a forum{% endif %} | {{ site.title | safe }}{% endblock title %}
+
 {% block content %}
-	{% if form.id > 0 %}
-		<h1>Edit this microcosm</h1>
-	{% else %}
-		<h1>Create a microcosm</h1>
-	{% endif %}
 
-	<form action="" method="POST" id="microcosm-form" role="form">{% csrf_token %}
-		{{ form.siteId.value }}
-		{{ form.id }}
-		
-		<div>
-			<label for="id_title">{{ form.title.label }}</label>
-			{{ form.title }}
-			{% if form.errors.title %}
-				<div class="text-error">{{ form.errors.title.as_text }}</div>
-			{% endif %}
-		</div>
-
-		<div>
-			<label for="id_description">{{ form.description.label }}</label>
-			{{ form.description }}
-			{% if form.errors.description %}
-				<div class="text-error">{{ form.errors.description.as_text }}</div>
-			{% endif %}
-		</div>
-		
-		{{ form.visibility }}
-
-		{% if form.id > 0 %}
-			<div>
-				<label for="id_editReason">{{ form.editReason.label }}</label>
-				{{ form.editReason }}
-				{% if form.errors.editReason %}
-					<div class="text-error">{{ form.errors.editReason.as_text }}</div>
-				{% endif %}
+	<div class="content-header padded">
+		<div class="row">
+			<div class="col-sm-12">
 			</div>
-		{% endif %}
-
-		<div>
-			<input class="btn btn-primary pull-right" id="submit" type="submit" value="Save Microcosm">
 		</div>
-	</form>
+		<h1>
+			{% if form.id > 0 %}
+			Edit a forum
+			{% else %}
+			Create a forum
+			{% endif %}
+		</h1>
+	</div>
+
+	<div class="content-body">
+
+		<div class="row form-container">
+			<div class="col-lg-12">
+				<div class="form-container-inner padded">
+					<form role="form" action="" method="POST" id="microcosmForm">
+						{% csrf_token %}
+						{{ form.siteId.value }}
+						{{ form.id }}
+
+						{# title #}
+						<div class="form-group">
+							<div class="row">
+
+								<label class="col-sm-12" for="title">
+									{{ form.title.label }}
+								</label>
+								<div class="col-sm-12 {% if form.errors.title %}has-error{%endif%}">
+									{% if form.errors.title %}
+										<label class="control-label">{{ form.errors.title.as_text }}</label>
+									{% endif %}
+									<input type="text"
+												 class="form-control {% if form.errors.title %}error{% endif %}"
+												 id="title"
+												 name="{{ form.title.name }}" placeholder="Title of forum"
+												 maxlength="{{ form.fields.title.max_length }}" />
+								</div>
+
+							</div>
+						</div> <!-- /form-group -->
+
+
+						{# description #}
+						<div class="form-group">
+							<div class="row">
+
+								<label class="col-sm-12" for="title">
+									{{ form.description.label }}
+								</label>
+								<div class="col-sm-12 {% if form.errors.description %}has-error{%endif%}">
+									{% if form.errors.description %}
+										<label class="control-label">{{ form.errors.description.as_text }}</label>
+									{% endif %}
+									<input type="text"
+												 class="form-control {% if form.errors.description %}error{% endif %}"
+												 id="description"
+												 name="{{ form.description.name }}" placeholder="Description of forum"
+												 maxlength="{{ form.fields.description.max_length }}" />
+								</div>
+
+							</div>
+						</div> <!-- /form-group -->
+
+						{{ form.visibility }}
+
+						{# reason #}
+						{% if form.id > 0 %}
+						<div class="form-group">
+							<div class="row">
+								<label class="col-sm-12" for="editReason">
+									{{ form.editReason.label }}
+								</label>
+								<div class="col-sm-12">
+									{% if form.errors.editReason %}
+										<label class="control-label">{{ form.errors.editReason.as_text }}</label>
+									{% endif %}
+									<input type="text"
+												 class="form-control {% if form.errors.editReason %}error{% endif %}"
+												 id="editReason"
+												 name="{{ form.editReason.name }}"
+												 placeholder="Reason for editing" />
+								</div>
+							</div>
+						</div> <!-- /form-group -->
+						{% endif %}
+
+					</div> <!-- /form-container-inner -->
+
+					<div class="form-group form-footer padded">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="form-footer-buttons">
+									<input type="submit" class="btn btn-lg btn-primary" value="Save forum">
+									<input type="reset" class="btn btn-lg btn-default" value="Cancel">
+								</div>
+							</div>
+						</div>
+					</div> <!-- /form_footer -->
+
+			</form>
+		</div>
+	</div>
+</div>
 {% endblock %}
 
 {% block js %}
-	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
-	<script type="text/javascript">
-		function isEmpty(e) {
-			return (e.val().trim() == '');
+<script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
+<script type="text/javascript">
+
+var form = new FormValidator(
+	document.getElementById('microcosmForm'),
+	{
+		rules : {
+			'{{ form.title.name }}' 		 : ['not_empty','maxlength'],
+			'{{ form.description.name }}': ['not_empty','maxlength']
+		},
+		tests : {
+			'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
+		},
+		error_messages : {
+			'{{ form.title.name }}:not_empty' : "* {{ form.fields.title.error_messages.required }}",
+			'{{ form.title.name }}:maxlength' : "* {{ form.fields.title.error_messages.max_length }}",
+			'{{ form.description.name }}:not_empty' : "* {{ form.fields.description.error_messages.required }}",
+			'{{ form.description.name }}:maxlength' : "* {{ form.fields.description.error_messages.max_length }}",
 		}
-		function checkEmpty(e) {
-			if (isEmpty($(e))) {
-				addError($(e))
-			} else {
-				removeError($(e))
-			}
-		}
-		function addError(e) {
-			e.parent().addClass('has-error')
-		}
-		function removeError(e) {
-			e.parent().removeClass('has-error')
-		}
-
-		$('#id_title,#id_description').on('change', function() {
-			checkEmpty(this);
-		}).on('blur', function() {
-			checkEmpty(this);
-		});
-
-		$('#microcosm-form').submit(function() {
-			if (isEmpty($('#id_title'))) {
-				addError($('#id_title'))
-				return false;
-			}
-			if (isEmpty($('#id_description'))) {
-				addError($('#id_description'))
-				return false;
-			}
-
-			// Client-side dupe check
-			md5 = hex_md5($('#id_title').val() + $('#id_description').val())
-			if (this.md5 && this.md5 == md5) {
-				return false
-			}
-			this.md5 = md5;
-
-			return true;
-
-		});
-
-		$(document).ready(function() {
-			$('#id_title,#id_description,#id_visibility,#id_editReason').addClass('form-control').parent().addClass('form-group');
-		});
-	</script>
+	}
+);
+</script>
 {% endblock %}

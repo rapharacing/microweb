@@ -1,60 +1,166 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ site.title | safe }} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
+
 {% block content %}
+
+<div class="content-header padded">
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+	<h1>{{ site.title | safe }}</h1>
+</div>
+
+<div class="content-body">
+
 	{% if not content.microcosms.items %}
-		<p>This is such a new site that there are no Microcosms at the moment.</p>
+		<p>This is such a new site that there are no forums at the moment.</p>
 		{% if content.meta.permissions.create %}
-	    <p>Will you be the first to create one?</p>
+			<p>Will you be the first to create one?</p>
 		{% endif %}
 	{% else %}
 
-        {% include "pagination_nav.html" %}
+{% include "forms/content-moderation.html" %}
 
-		{% for item in content.microcosms.items %}
-			<section id="microcosm{{item.id}}" class="row">
-				<div class="row">
-					<div class="col col-sm-16">
-						<a href="{% url 'single-microcosm' item.id %}"><h1>{{ item.title }}</h1></a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col col-md-10 text-muted">
-						{{ item.description }}
-					</div>
-					<table class="col col-md-6 small text-muted">
-						<tbody>
-							<tr>
-								<td width="100"><small><i class="glyphicon glyphicon-list buffer-right"></i> {{ item.total_items }}</small></td>
-								{% if item.most_recent_update %}
-									<!-- TODO: use a template tag (or provide from the view) a mapping of item_type to path -->
-									<td><a href="/{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">{{item.most_recent_update.title}}</a></td>
-								{% endif %}
-							</tr>
-							<tr>
-								<td><small><i class="glyphicon glyphicon-comment buffer-right"></i> {{ item.total_comments }}</small></td>
-								{% if item.most_recent_update %}
-									{% if item.most_recent_update.total_comments %}
-										<td><small class="text-muted"><time datetime="{{item.most_recent_update.last_comment_created|date:"c"}}"></time> by <a href="{% url 'single-profile' item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name }}</a></small></td>
-									{% else%}
-										<td><small class="text-muted"><time datetime="{{item.most_recent_update.meta.created|date:"c"}}"></time> by <a href="{% url 'single-profile' item.most_recent_update.meta.created_by.id %}">{{ item.most_recent_update.meta.created_by.profile_name }}</a></small></td>
+		<div class="list-microcosms">
+			<ul class="list-collection bordered padded">
+			{% for item in content.microcosms.items %}
+					<li class="list-collection-row">
+						<div class="row">
+
+							<div class="col-sm-8 col-md-7">
+								<!--<div class="list-collection-row-icon">
+
+								</div> /list-collection-row-icon -->
+								<div class="list-collection-row-offset">
+									<h2 class="row-title">
+										<a href="{% url 'single-microcosm' item.id %}">{{ item.title | safe }}</a>
+										{% if item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
+									</h2>
+
+									<div class="row-meta">
+										<p class="microcosm-item-description">
+											{{ item.description | safe }}
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-sm-4 col-md-5">
+
+							{% if content.meta.permissions.moderator %}
+								<div class="list-collection-row-admin">
+									<input class="row-admin-checkbox" type="checkbox" />
+								</div>
+							{% endif %}
+
+								<div class="row-stats">
+									<ul class="list-stats">
+										<li>
+											<span>{{ item.total_items }}</span>
+											conversation{{ item.total_items|pluralize:",s" }}
+										</li>
+										<li>
+											<span>{{ item.total_comments }}</span>
+											comment{{ item.total_comments|pluralize:",s" }}
+										</li>
+									</ul>
+								</div>
+								<div class="row-context">
+									{#<input type="checkbox" class="row-admin-checkbox" /> #}
+									{% if item.most_recent_update %}
+
+										<a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">{{ item.most_recent_update.title | safe | truncatechars:30 }}</a>
+										{% if item.most_recent_update.total_comments %}
+											<time datetime="{{ item.most_recent_update.last_comment_created|date:"c" }}"></time>
+											{% comment %}
+											by <a href="{% url 'single-profile' item.most_recent_update.last_comment_created_by.id %}">{{ item.most_recent_update.last_comment_created_by.profile_name | safe }}</a>
+											{% endcomment %}
+										{% else%}
+											<time datetime="{{ item.most_recent_update.meta.created|date:"c" }}"></time>
+											{% comment %}
+											 by <a href="{% url 'single-profile' item.most_recent_update.meta.created_by.id %}">{{ item.most_recent_update.meta.created_by.profile_name | safe }}</a>
+											{% endcomment %}
+										{% endif %}
 									{% endif %}
-								{% endif %}
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</section>
-		{% endfor %}
+								</div>
 
-        {% include "pagination_nav.html" %}
+							</div>
+						</div>
+					</li>
+			{% endfor %}
+			</ul>
+		</div>
+{% endif %}
+</div>
 
-    {% endif %}
+{% include "forms/content-moderation.html" %}
+
+<div class="content-footer padded">
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+</div>
 
 {% endblock %}
 
-{% block sidebar%}
+{% block sidebar %}
+
 	{% if content.meta.permissions.create %}
-		<p><a class="btn btn-primary col col-sm-16" id="create_microcosm" href="{% url 'create-microcosm' %}">Create Microcosm</a></p>
+	<div class="metabar-module">
+		<h5>Got something to add?</h5>
+		<a href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-folder-open"></span> Create a forum</a>
+	</div> <!-- primary actions -->
 	{% endif %}
+
+	<div class="metabar-module">
+		<h5>About</h5>
+		<div class="metabar-module-title">
+			<h3>
+				{{ site.title | safe }}
+			</h3>
+			<p>
+				{{ site.description | safe }}
+			</p>
+		</div>
+	</div> <!-- / about -->
+
+
+	<div class="metabar-module">
+		<h5>Population</h5>
+		<ul class="list-group">
+			<li class="list-group-item">
+				<span class="badge-alt">{{ site.meta.stats.totalProfiles }}</span>
+				<a href="/profiles/">Members</a>
+			</li>
+			<li class="list-group-item">
+				<span class="badge-alt">{{ site.meta.stats.totalConversations }}</span>
+				<a href="/search/?type=conversation">Conversations</a>
+			</li>
+			<li class="list-group-item">
+				<span class="badge-alt">{{ site.meta.stats.totalEvents }}</span>
+				<a href="/search/?type=event">Events</a>
+			</li>
+			<li class="list-group-item">
+				<span class="badge-alt">{{ site.meta.stats.totalComments }}</span>
+				<a href="/search/?type=comment">Comments</a>
+			</li>
+			<li class="list-group-item">
+				<span class="badge-alt">{% if site.meta.stats.onlineProfiles > 1 %}{{ site.meta.stats.onlineProfiles }}{% else %}1{% endif %}</span>
+				<a href="/profiles/?online=true">Members online now</a>
+			</li>
+		</ul>
+	</div> <!-- / population -->
+
 
 {% endblock%}

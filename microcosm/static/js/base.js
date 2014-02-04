@@ -42,10 +42,80 @@ $('document').ready(function() {
 			$(this).addClass('lang-' + lang);
 		}
 	});
-	
+
 	prettyPrint();
 
+	// toggle <time> html -> title -> html
+	$('body').on('click', 'time', function(){
+		var self = $(this),
+				title = self.attr('title'),
+				html  = self.html();
 
-	// Make tables in user generated content look pretty
-	$('.ugc table').addClass('table').addClass('table-hover');
+		self.html(title).attr('title',html);
+
+	});
+
+
+
 });
+
+
+
+////////////////////
+//	pagination    //
+////////////////////
+(function(){
+	$('form[name=paginationByOffset]').submit(function(e){
+		var self   = $(e.currentTarget),
+				limit  = self.attr('data-limit'),
+				max    = self.attr('data-max'),
+				value  = self.find('input[type=text]').val(),
+				hidden = self.find('input[name=offset]');
+
+		if (isNaN(value) || value < 1 || value > max){
+			e.preventDefault();
+		}else{
+			if (limit && value){
+				hidden.val( limit * (value-1) );
+			}
+		}
+	});
+})();
+
+////////////////////
+//	   tooltip    //
+////////////////////
+(function(){
+	$('[data-toggle=tooltip]').tooltip({
+		container : 'body'
+	});
+})();
+
+
+////////////////////
+//   btn-groups   //
+////////////////////
+
+
+(function(){
+
+	var btn_groups = '.btn-group';
+
+
+	var toggleButtonParent = function(e){
+		var self 				= $(e.currentTarget),
+				siblings 		= $( 'input[name="' + self.attr('name') + '"]' ),
+				activeClass = 'active';
+
+		if (self.is(':checked')){
+			siblings.parent().removeClass( activeClass );
+			self.parent().addClass( activeClass );
+		}else{
+			self.parent().removeClass( activeClass );
+		}
+
+	}
+
+	$(btn_groups).on('change','input[type=radio]', toggleButtonParent);
+
+})();

@@ -1,0 +1,20 @@
+{% if content.meta.permissions.moderator %}
+<div class="metabar-module">
+	<h5>Moderation</h5>
+	<div class="metabar-admin">
+		<form class="metabar-admin-actions" action="" method="post">
+
+			<select id="metabar-admin-actions" class="cselect cselect-xs" name="action">
+				<option>Move {{ item_type }}</option>
+				<option>Delete {{ item_type }}</option>
+				<option>Undelete {{ item_type }}</option>
+				<option>Approve {{ item_type }}</option>
+				<option>Unapprove {{ item_type }}</option>
+				<option>Pin {{ item_type }}</option>
+				<option>Unpin {{ item_type }}</option>
+			</select>
+			<input type="submit" value="Go" class="btn btn-primary btn-xs"/>
+		</form>
+	</div> <!-- /metabar-admin -->
+</div>
+{% endif %}

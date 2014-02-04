@@ -1,0 +1,84 @@
+
+{% load get_attachment %}
+<li id="comment{{ comment.id }}" class="comment-item padded">
+	<a name="{{ comment.id }}"></a>
+	<div class="comment-item-inner">
+		<div class="comment-item-header">
+
+			<div class="comment-item-permalink">
+
+			{% if content.meta.permissions.moderator %}
+				<div class="comment-item-header-admin">
+					<input type="checkbox" />
+				</div>
+			{% endif %}
+
+				<time datetime="{{ comment.meta.created|date:"c" }}"></time>
+				<span style="color:#eee">&bull;</span>
+				{% if hide_permalink %}
+					<a href="{% url 'single-comment' comment.id %}"><span class="sprite sprite-format-link"></span></a>
+				{% else %}
+				<a href="{% url 'single-comment' comment.id %}">#{{ forloop.counter|add:pagination.offset }}</a>
+				{% endif %}
+			</div>
+
+			<div class="comment-item-author">
+			{% if comment.meta.created_by %}
+				<a href="{% url 'single-profile' comment.meta.created_by.id %}"><img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name | safe }}" align="left" class="gravatar" /> <strong class="comment-item-author-name">{{ comment.meta.created_by.profile_name | safe | truncatechars:25 }}</strong></a>
+				{% endif %}
+
+				{% if comment.in_reply_to %}
+				<span class="comment-item-in-reply-to">
+					<span class="sprite sprite-arrow-forward"></span>
+					in reply to
+					<a href="{% url 'incontext-comment' comment.in_reply_to %}">@{{ comment.meta.links.inReplyToAuthor.title | safe }}</a>
+				</span>
+				{% endif %}
+			</div>
+
+		</div>
+		<div class="comment-item-body">
+			{{ comment.html|safe }}
+
+			{% if attachments %}
+				{% get_attachment comment.id as comment_attachments %}
+				{% if comment_attachments %}
+					{% for attachment in comment_attachments.items %}
+
+						<img src="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}" />
+
+					{% endfor %}
+				{% endif %}
+			{% endif %}
+		</div>
+		<div class="comment-item-footer">
+
+		{% if user %}
+			{% if not comment.meta.created_by.id == user.id %}
+					<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first comment-item-footer-btn-last"
+						data-action="{% url 'create-comment' %}"
+						data-ref="{{ comment.id }}" href="javascript:void 0"
+					><span class="sprite sprite-arrow-left"></span> Reply</a>
+			{%else%}
+				{% if content.meta.permissions.update or comment.meta.permissions.update or comment.meta.created_by.id == user.id %}
+				<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first {% if not comment.meta.permissions.delete %}comment-item-footer-btn-last{% endif %}"
+					 data-action="{% url 'edit-comment' comment.id %}"
+					 data-source="{% url 'single-comment' comment.id %}"
+					 data-comment-id="{{ comment.id }}"
+					 data-num-attachments="{{ comment.attachments|default:"0"}}"
+					 href="javascript:void 0">Edit</a>
+				{% endif %}
+				{% if comment.meta.permissions.delete %}
+				<div class="delete-comment">
+					<form action="{% url 'delete-comment' comment.id %}" method="POST">
+						{% csrf_token %}
+						<input type="submit" value="Delete" class="comment-item-footer-btn comment-item-footer-btn-last"/>
+					</form>
+				</div>
+				{% endif %}
+			{% endif %}
+		{% endif %}
+		</div>
+
+	</div>
+</li>

@@ -1,14 +1,14 @@
+import logging
+
+from django.conf import settings
+
+import requests
+import grequests
+import pylibmc as memcache
+
 from microcosm.api.resources import Site
 from microcosm.api.resources import WhoAmI
 from microcosm.api.exceptions import APIException
-
-from requests import RequestException
-
-import grequests
-import pylibmc as memcache
-import logging
-
-from microweb import settings
 
 logger = logging.getLogger('microcosm.middleware')
 
@@ -49,12 +49,15 @@ class ContextMiddleware():
             try:
                 site = Site.retrieve(request.get_host())
                 try:
-                    self.mc.set(request.get_host(), site)
+                    # Cached for 30 seconds to spare useless requests but still
+                    # provide a useful indication in the stats of how many people
+                    # are online now
+                    self.mc.set(request.get_host(), site, time=30)
                 except memcache.Error as e:
                     logger.error('Memcached error: %s' % str(e))
             except APIException, e:
                 logger.error(e.message)
-            except RequestException, e:
+            except requests.RequestException, e:
                 logger.error(e.message)
         request.site = site
 

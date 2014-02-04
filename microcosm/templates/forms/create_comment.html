@@ -1,162 +1,121 @@
 {% extends 'base.html' %}
+{% load commentBox %}
+{% block title %}{{ content.meta.links.up.title | safe }} (Comment {{ content.id }}){% endblock title%}
 
+{% load comments %}
 {% block content %}
-	<section id="reply">
-		{% if user %}
-			<div id="comment{{ comment.id }}" class="row">
-				
-				<div class="col col-lg-4">
-					<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" align="left" class="gravatar" />
-					<div class="h4">{{ user.profile_name }}</div>
-				</div>
+    <div class="content-header padded">
+        <div class="row">
+            <div class="col-sm-7">
+                {% include 'breadcrumbs.html' %}
+            </div>
+            <div class="col-sm-5">
+                {% include 'pagination.html' %}
+            </div>
+        </div>
+    </div>
+    <div class="content-body">
+        <div class="item">
+            <div class="item-header">
+                <h1>{{ content.meta.links.up.title | safe }}</h1>
+                <div class="item-meta">
+                    {% include "forms/content-moderation.html" %}
+                </div>
+            </div>
+            <div class="alert alert-warning">
+                {{ error }}
+            </div>
+        </div> <!-- item -->
 
+        {% if content.meta.parents %}
+            <div class="list-comments-dull">
+                <ul class="list-comments">
+                    {% comments content.meta.parents hide_permalink=True %}
+                </ul>
+            </div>
+        {% endif %}
 
-				<form action="" method="POST" id="commentForm">{% csrf_token %}
-					<div class="col col-lg-12">
-						<div class="row">
-							<section class="col col-lg-16" id="comment{{ comment.id }}body">
-								{{ form.id }}
-								{{ form.inReplyTo }}
-								{{ form.itemId }}
-								{{ form.itemType }}
-								<div>{{ form.markdown }}</div>
-							</section>
+        <ul class="list-comments list-comments-highlighted">
+            {% comments content hide_permalink=True %}
+        </ul>
+
+        {% if content.meta.children %}
+            <ul class="list-comments">
+                {% comments content.meta.children hide_permalink=True %}
+            </ul>
+        {% endif %}
+
+    </div> <!-- / content-body -->
+
+    <!--
+<div class="reply-container">
+		<ul class="list-comments">
+			<li class="comment-item">
+				<div class="comment-item-inner">
+					<div class="comment-item-header">
+						<div class="comment-item-author">
+							{% if user %}
+								<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name | safe }}"/>
+							{% else %}
+								<img src="/static/img/avatar.gif" />
+							{% endif %}
+								<strong>Post a reply</strong>
 						</div>
-						<br />
-						<div class="row">
-							<div class="pull-left muted">
-								<small><a data-toggle="modal" data-target="#markdownModal">Formatting help</a></small>
-							</div>
-							<section class="pull-right" id="comment{{ comment.id }}controls">
-								<input class="btn btn-primary" type="submit" id="submit_comment" value="Save comment">
-							</section>
-						</div>
-					</div>              
-				</form>
-			</div>
-		{% else %}
-			<a class="btn btn-primary" id="prompt_login_link" href="javascript:login()">Signup or login to post a comment</a>
-		{% endif %}
-	</section>
-
-
-<!-- Markdown Modal -->
-<div id="markdownModal" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title">Markdown Cheat Sheet</h4>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col col-lg-8">
-						<strong>Links</strong>
-<pre>http://www.google.com - automatic!
-[Google](http://www.google.com)
-</pre>
-						<strong>Images</strong>
-<pre>![Microcosm Logo](/static/themes/1/logo.png)
-Format: ![Alt Text](url)
-</pre>
-						<strong>Emphasis</strong>
-<pre>*This text will be italic*
-_This will also be italic_
-**This text will be bold**
-__This will also be bold__
-
-*You **can** combine them*
-</pre>
-						<strong>Headers</strong>
-<pre># Main Header
-## Header
-### Sub Header
-</pre>
-						<strong>Mentioning people</strong>
-<pre>@user +user</pre>
 					</div>
-					<div class="col col-lg-8">
-						<strong>Unordered Lists</strong>
-<pre>* fruits
-	+ apples
-		- macintosh
-		- red delicious
-	+ pears
-	+ peaches
-* vegetables
-	+ brocolli
-</pre>
-<p>Sub-lists are indented by 4 spaces.</p>
-						<strong>Ordered Lists</strong>
-<pre>1. fruits
-	a. apples
-		- macintosh
-		- red delicious
-	b. pears
-	c. peaches
-1. vegetables
-	a. brocolli
-</pre>
-						<strong>Quotes</strong>
-<pre>As Octocat said:
+					<div class="comment-item-body">
 
-> We're living the future so
-> the present is our past.
-</pre>
 					</div>
 				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dalog -->
-</div><!-- /.modal -->
+			</li>
+		</ul>
+	</div>  /reply-container -->
+
+{% endblock content %}
+
+{% block sidebar %}
+
+    <div class="metabar-module">
+        <h5>About</h5>
+        <div class="metabar-module-title">
+            <h3>
+                {{ content.title | safe }}
+            </h3>
+            <p>
+                {{ content.description | safe }}
+            </p>
+            <p class="metabar-module-author">
+                <a href="{% url 'single-profile' content.meta.created_by.id %}"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name | safe }}" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+            </p>
+        </div>
+    </div> <!-- / about -->
+
+
 {% endblock %}
 
 {% block js %}
-	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
-	<script type="text/javascript">
-		function isEmpty(e) {
-			return (e.val().trim() == '');
-		}
-		function checkEmpty(e) {
-			if (isEmpty($(e))) {
-				addError($(e))
-			} else {
-				removeError($(e))
-			}
-		}
-		function addError(e) {
-			e.parent().addClass('has-error')
-		}
-		function removeError(e) {
-			e.parent().removeClass('has-error')
-		}
+    {% if user %}
+        <script type="text/javascript" src="{{ STATIC_URL }}js/comments.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
+        <script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
+        <script id="template-reply-box" type="text/template">
+            {% commentBox %}
+        </script>
+        <script type="text/javascript">
+            (function(){
 
-		$('#id_markdown').on('change', function() {
-			checkEmpty(this);
-		}).on('blur', function() {
-			checkEmpty(this);
-		});
+                var comments = new Comments({
+                    el               : '.content-body',
+                    defaultContainer : '.reply-container',
+                    template         : $('#template-reply-box').html().trim()
+                });
 
-		$('#commentForm').submit(function() {
-			if (isEmpty($('#id_markdown'))) {
-				addError($('#id_markdown'))
-				return false;
-			}
 
-			// Client-side dupe check
-			md5 = hex_md5($('#id_markdown').val())
-			if (this.md5 && this.md5 == md5) {
-				return false
-			}
-			this.md5 = md5;
+                $('.list-comments-highlighted').find('.insertReplyBox').click();
+            })();
+        </script>
 
-			return true;
-		});
-
-		$(document).ready(function() {
-			$('#id_markdown').addClass('input-with-feedback').parent().addClass('control-group');
-		});
-	</script>
+    {% endif %}
 {% endblock %}

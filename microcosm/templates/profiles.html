@@ -1,38 +1,156 @@
 {% extends 'base.html' %}
-
-{% block breadcrumb %}
-	<ol class="breadcrumb">
-		<li><a href="/">Home</a></li>
-		<li class="active"><a href='{{ content.meta.links.self.href }}'>Profiles</a></li>
-    </ol>
-{% endblock %}
+{% load profile %}
+{% block title %}People{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
-        <section id="alphabet">
-            <ol class="breadcrumb">
-            {% if q == "" %}
-                <li>All</li>
-            {% else %}
-                <li><a href="/profiles/{% if top %}?top=true{% endif %}">All</a></li>
-            {% endif %}
-            {% for letter in alphabet %}<li>{% if letter != q %}<a href="/profiles/?q={{ letter }}{% if top %}&top=true{% endif %}">{{ letter }}</a>{% else %}{{ letter }}{% endif %}</li>
-            {% endfor %}
-            </ol>
-        </section>
-        {% include "pagination_nav.html" %}
-        <section id="headers" class="row">
-            <div class="col col-sm-2" ></div>
-            <div class="col col-sm-14"><a href="/profiles/{% if q != "" or not top %}?{% endif %}{% if q != "" %}q={{ q }}{% endif %}{% if q != "" and not top %}&{% endif %}{% if not top %}top=true{% endif %}">Sort {% if top %}alphabetically{% else %}by post count{% endif %}</a>
-            </div>
-        {% for item in content.profiles.items %}
-            <section id="profile{{item.id}}">
-                <div class="col col-sm-2">
-                    <img src="{% if 'gravatar' in item.avatar %}{{item.avatar}}{% elif 'files' in item.avatar %}https://{{site.subdomain_key}}.microco.sm{{item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ item.profile_name }}" />
-                </div>
-                <div class="col col-sm-6">
-                    <a href="{% url 'single-profile' item.id %}"><h1>{{ item.profile_name }}</h1></a>
-                </div>
-            </section>
+<div class="content-header padded">
+	<div class="row">
+		<div class="col-sm-8">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-4">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+	<h1>People</h1>
+</div>
 
-        {% endfor %}
+<div class="content-body">
+
+	<div class="profile-section padded">
+		<h3>
+			{% if filter_name %}
+			<span class="pull-right">{{ filter_name }}</span>
+			{% endif %}
+			Directory
+			{% if subtitle %}
+			<span class="text-muted"> // {{ subtitle }}</span>
+			{% endif %}
+		</h3>
+		<ul class="list-profiles">
+		{% for item in content.profiles.items %}
+			{% profile item no_icon=True send_message=True%}
+		{% endfor %}
+		</ul>
+	</div>
+</div>
+
+<div class="content-footer padded">
+	<div class="row">
+		<div class="col-sm-7">
+		</div>
+		<div class="col-sm-5">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+</div>
+
+
+{% endblock content %}
+{% block sidebar %}
+
+<div class="metabar-module metabar-filters">
+	<h5>Filters</h5>
+	<div class="metabar-module-title">
+		<h3>
+			Show me ...
+		</h3>
+	</div>
+	<div class="metabar-module-body">
+		<ul class="list-group">
+			<li class="list-group-item">
+				<div class="checkbox">
+					<label for="filter-name">
+					<input id="filter-name" type="checkbox" {% if q %}checked="checked"{% endif %}/>
+					Starts with
+					<select {% if not q %}disabled{% endif %} name="q">
+						<option></option>
+						{% for letter in alphabet %}
+						<option value="{{ letter }}" {% if q|lower == letter|lower %}selected="selected"{% endif %}>
+							{{ letter }}
+						</option>
+						{% endfor %}
+					</select>
+					</label>
+				</div>
+			</li>
+			<li class="list-group-item">
+				<div class="checkbox">
+					<label for="filter-online">
+						<input id="filter-online" type="checkbox" name="online" value="true" {% if online %}checked="checked"{% endif %}/>
+						Online now
+					</label>
+				</div>
+			</li>
+			<li class="list-group-item">
+				<div class="checkbox">
+					<label for="filter-following">
+						<input id="filter-following" type="checkbox" name="following" value="true" {% if following %}checked="checked"{% endif %}/>
+						Following
+					</label>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class="metabar-module-title">
+		<h3>
+			Options
+		</h3>
+	</div>
+	<div class="metabar-module-body">
+		<ul class="list-group">
+			<li class="list-group-item">
+				<div class="checkbox">
+					<input id="filter-comment-count" type="checkbox" name="top" value="true" {% if top %}checked="checked"{% endif %}/>
+					<label for="filter-comment-count">Order by comment count</label>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div> <!-- / filters -->
+<div class="metabar-module">
+	<h5>About</h5>
+	<div class="metabar-module-title">
+		<h3>
+			People
+		</h3>
+		<p>
+			Find and discover other people in your community.
+		</p>
+	</div>
+</div> <!-- / about -->
+
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/filters.js"></script>
+<script type="text/javascript">
+(function(){
+	var search_filters = new Filters({
+		el     : '.metabar-filters',
+		query  : '',
+		url    : '?$1',
+		concat_char : '&',
+		param_char : '='
+	});
+
+	var dont_jump_on_unselect = {% if q %}false{%else%}true{%endif%};
+
+	$('#filter-name').on('change',function(e){
+
+		var self = $(e.currentTarget),
+				select = $('select[name=q]');
+
+		if (self.is(':checked')){
+			select.attr('disabled',false);
+		}else{
+			select.attr('disabled',true);
+			if (!dont_jump_on_unselect && select.val().trim()!==""){
+				search_filters.changeHandler();
+			}
+		}
+
+	});
+
+})();
+</script>
 {% endblock %}

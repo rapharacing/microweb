@@ -1,0 +1,48 @@
+<div id="modal-huddle-invite" class="modal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header navbar-header-wrapper tiling-bg">
+				<img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			</div>
+			<div class="modal-body">
+
+				<div class="modal-item-icon">
+	        <span class="sprite sprite-envelope"></span>
+	      </div>
+	      <div class="modal-item-title">{{ content.title | safe }}</div>
+	      <div class="modal-item-meta">
+	        <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name | safe }}" class="img-badge" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
+	      </div>
+				<div id="modal-huddle">
+					<div class="modal-list">
+	        	<div class="modal-list-title">People in this huddle</div>
+						<ul id="modal-huddle-invited-list">
+							{% for profile in content.participants %}
+							<li>
+								<a href="{% url 'single-profile' profile.id %}" data-toggle="tooltip" title="{{ profile.profile_name | safe }}"><img src="{% if 'gravatar' in profile.avatar %}{{profile.avatar}}{% elif 'files' in profile.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.profile_name | safe }}" /> @{{profile.profile_name | safe }}</a>
+							</li>
+							{% endfor %}
+						</ul>
+					</div>
+
+					<div class="modal-huddle-form">
+						<form id="invite-form" action="{% url 'invite-huddle' content.id %}" method="POST">
+							{% csrf_token %}
+							<input type="hidden" name="invite">
+							<label>Type in a user's name to invite them to this huddle</label>
+							<input type="text" id="invite" class="form-control" autocomplete="off" placeholder="Type in a user's name"/>
+						</form>
+						<div id="modal-huddle-people-widget-list"></div>
+					</div>
+
+				</div>
+
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-small btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div>

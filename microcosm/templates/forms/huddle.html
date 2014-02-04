@@ -1,71 +1,228 @@
 {% extends 'base.html' %}
+{% load commentBox %}
+{% block title %}New huddle | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
-	<h3>New huddle</h3>
-
-	<form action="" method="POST" id="huddleForm">
-		{% csrf_token %}
-		{{ form.id }}
-
-		<h4><label for="id_title">{{ form.title.label }}</label></h4>
-		<div>
-			{{ form.title }}
-			{% if form.errors.title %}
-				<div class="text-error">{{ form.errors.title.as_text }}</div>
-			{% endif %}
+	<div class="content-header padded">
+		<div class="row">
+			<div class="col-sm-12">
+			{% include 'breadcrumbs.html' %}
+			</div>
 		</div>
+		<h1>Huddles</h1>
+	</div>
 
-		<input class="btn btn-primary" id="submit" type="submit" value="Save Huddle" />
+	<div class="content-body">
+		<div class="row form-container">
+			<div class="col-lg-12">
+				<div class="form-container-inner padded">
 
-	</form>
+					<form role="form" action="" method="POST">
+						{% csrf_token %}
+						{{ form.id }}
+						<input type="hidden" name="{{ form.is_confidential.name }}" value="0" />
+
+						<input type="hidden" name="invite" value="" />
+						{# title #}
+						<div class="form-group">
+							<div class="row">
+
+								<label class="col-sm-12" for="title">
+									{{ form.title.label }}
+								</label>
+								<div class="col-sm-12 {% if form.errors.title %}has-error{% endif %}">
+									{% if form.errors.title %}
+										<label class="control-label">{{ form.errors.title.as_text }}</label>
+									{% endif %}
+									<input
+										type="text"
+										class="form-control"
+										id="title"
+										name="{{ form.title.name }}"
+										placeholder="Title of huddle"
+										maxlength="150"
+										tabindex="1"
+									/>
+								</div>
+
+							</div>
+						</div> <!-- /form-group -->
+
+
+						{# invite #}
+						<div class="form-group">
+							<div class="row">
+
+								<label class="col-sm-12" for="invite">Who will join this huddle?</label>
+
+								<div class="col-sm-12">
+									<div class="list-participants"></div>
+								</div>
+								<div class="col-sm-6">
+
+									<div class="input-group">
+										<div class="input-group-addon">
+											<span class="sprite sprite-search-small"></span>
+										</div>
+										<input
+											id="invite"
+											class="form-control"
+											autocomplete="off"
+											placeholder="Type in a user's name"
+											tabindex="1"
+										/>
+									</div>
+								</div>
+
+							</div>
+						</div> <!-- /form-group -->
+
+						{# comment #}
+						<div class="form-group">
+							<div class="row">
+
+								<label class="col-sm-12" for="reply-box-textarea">What is it you want to say?</label>
+								<div class="col-sm-12">
+
+									{% commentBox name="firstcomment" as_component=True %}
+								</div>
+
+							</div>
+						</div> <!-- /form-group -->
+						</div>
+
+				</div> <!-- /form-container-inner -->
+
+{% comment %}
+				<div class="form-group form-sticky">
+					<div class="row">
+						<label class="col-sm-12">Is this huddle confidential?</label>
+						<div class="col-sm-9 {% if form.errors.confidential %}has-error{% endif %}">
+							{% if form.errors.confidential %}
+								<label class="control-label">{{ form.errors.confidential.as_text }}</label>
+							{% endif %}
+							<ul class="list-toggles">
+							<li>
+								<span class="list-toggles-text">
+									Confidential huddles disable the ability to invite more people later on.
+								</span>
+								<div class="btn-group btn-group-xs pull-right">
+									<button type="button" class="btn btn-default">
+										<label {% if form.confidential.value == "1" %}class="active"{% endif %}>Yes <input type="radio" value="1" name="is_confidential" {% if form.confidential.value == "1" %}checked="checked"{% endif %}></label>
+									</button>
+									<button type="button" class="btn btn-default">
+										<label {% if form.confidential.value == "0" %}class="active"{% endif %}>No <input type="radio" value="0" name="is_confidential" {% if form.confidential.value == "0" %}checked="checked"{% endif %}></label>
+									</button>
+								</div>
+							</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+{% endcomment %}
+
+				{# footer #}
+				<div class="form-group form-footer padded">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="form-footer-buttons">
+								<input type="submit" class="btn btn-lg btn-primary" value="Start Huddle" tabindex="1" />
+								<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
+							</div>
+						</div>
+					</div>
+				</div> <!-- /form_footer -->
+
+			</form>
+		</div>
+	</div>
+
+</div>
+
+{% endblock %}
+
+{% block sidebar %}
+
+<div class="metabar-module">
+	<h5>About</h5>
+	<div class="metabar-module-title">
+		<h3>Huddles</h3>
+		<p>Start private sessions with other members of the community.</p>
+	</div>
+</div> <!-- / about -->
+
 
 {% endblock %}
 
 {% block js %}
-	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
-	<script type="text/javascript">
-		function isEmpty(e) {
-			return (e.val().trim() == '');
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/peopleWidget.js"></script>
+<script type="text/javascript">
+(function(){
+
+	var commentBox = new simpleEditor({
+		el : '.reply-box'
+	});
+
+	var subdomain = $('meta[name="subdomain"]').attr('content');
+
+	var participating = new Participating({
+		el         : '.list-participants',
+		className  : 'list-people list-people-sm',
+		static_url : subdomain
+	});
+
+	var peopleWidget = new PeopleWidget({
+		el         : '#invite',
+		is_textbox : true,
+		static_url : subdomain,
+		dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q=',
+		invited    : {{ recipients_json|safe|default:"[]" }}
+	});
+
+	// update the hidden input box
+	var invite_input_field = $('input[name="invite"]');
+	var updateInvitedField = function(){
+		invite_input_field.val(peopleWidget.invitedListToDelimitedString());
+	};
+
+	// triggers when user clicks on a person in the autocomplete dropdown
+	peopleWidget.onSelection(function(invited){
+		if (invited.length > 0){
+			participating.render(invited).show();
+		}else{
+			participating.hide();
 		}
-		function checkEmpty(e) {
-			if (isEmpty($(e))) {
-				addError($(e))
-			} else {
-				removeError($(e))
-			}
+		peopleWidget.show();
+		updateInvitedField();
+		peopleWidget.hide();
+	});
+
+	// triggers when the user clicks on a person in the participants list
+	participating.$el.on('click', '.remove', function(e){
+		var id = e.currentTarget.rel;
+		peopleWidget.removePersonFromInvitedById(id).render();
+		if (peopleWidget.people_invited.length>0){
+			participating.render(peopleWidget.people_invited).show();
+		}else{
+			participating.hide();
 		}
-		function addError(e) {
-			e.parent().addClass('has-error')
-		}
-		function removeError(e) {
-			e.parent().removeClass('has-error')
-		}
+		updateInvitedField();
+	});
 
-		$('#id_title').on('change', function() {
-			checkEmpty(this);
-		}).on('blur', function() {
-			checkEmpty(this);
-		});
+	// trigger on page load
 
-		$('#huddleForm').submit(function() {
-			if (isEmpty($('#id_title'))) {
-				addError($('#id_title'))
-				return false;
-			}
+	if (peopleWidget.people_invited.length > 0){
+		participating.render(peopleWidget.people_invited).show();
+		updateInvitedField();
+	}
 
-			// Client-side dupe check
-			md5 = hex_md5($('#id_title').val())
-			if (this.md5 && this.md5 == md5) {
-				return false
-			}
-			this.md5 = md5;
-
-			return true;
-		});
-
-		$(document).ready(function() {
-			$('#id_title,#id_editReason').addClass('form-control').parent().addClass('form-group');
-		});
-	</script>
-{% endblock %}
+})();
+</script>
+{% endblock%}

@@ -1,1 +1,86 @@
-{"context":"","status":200,"data":{"id":1,"visibility":"public","title":"General","description":"The first Microcosm, for everyone to get a feel for the place","moderators":null,"items":{"total":8,"limit":25,"offset":0,"maxOffset":0,"totalPages":1,"page":1,"links":[{"rel":"self","href":"/api/v1/microcosms/1"}],"type":"/api/v1/comments","items":[{"microcosmId":1,"itemType":"conversation","id":16,"title":"Adding this item should update the item count on the home page","totalComments":8,"totalViews":82,"lastCommentId":220,"lastCommentCreatedBy":{"id":13,"userId":13,"profileName":"personauser_edited","visible":false,"gravatar":"https://secure.gravatar.com/avatar/478ddedce4d1b0b9359b0e3d4e869474","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/13"},{"rel":"site","href":"/api/v1/sites/1"}]}},"lastCommentCreated":"2013-05-08T22:43:01.466846Z","meta":{"created":"2013-05-05T14:04:16.504523Z","createdBy":{"id":2,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/2"},{"rel":"site","href":"/api/v1/sites/1"}]}},"flags":{"sticky":false,"open":true,"deleted":false,"moderated":false,"visible":true},"links":[{"rel":"self","href":"/api/v1/conversations/16"}]}},{"microcosmId":1,"itemType":"conversation","id":7,"title":"This is going to be a long conversation title so I can see how it appears both in the Microcosm list page and also on the conversation list page and w","totalComments":38,"totalViews":127,"lastCommentId":214,"lastCommentCreatedBy":{"id":2,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/2"},{"rel":"site","href":"/api/v1/sites/1"}]}},"lastCommentCreated":"2013-05-08T15:40:26.617981Z","meta":{"created":"2013-05-03T08:53:40.530689Z","createdBy":{"id":7,"userId":7,"profileName":"mandsmandsmands","visible":false,"gravatar":"https://secure.gravatar.com/avatar/3c1a376d2cc83feb107859f73a0ee285","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/7"},{"rel":"site","href":"/api/v1/sites/1"}]}},"flags":{"sticky":false,"open":true,"deleted":false,"moderated":false,"visible":true},"links":[{"rel":"self","href":"/api/v1/conversations/7"}]}},{"microcosmId":1,"itemType":"event","id":12,"title":"Just drinks","totalComments":0,"totalViews":39,"meta":{"created":"2013-05-07T20:30:30.72845Z","createdBy":{"id":7,"userId":7,"profileName":"mandsmandsmands","visible":false,"gravatar":"https://secure.gravatar.com/avatar/3c1a376d2cc83feb107859f73a0ee285","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/7"},{"rel":"site","href":"/api/v1/sites/1"}]}},"flags":{"sticky":false,"open":true,"deleted":false,"moderated":false,"visible":true},"links":[{"rel":"self","href":"/api/v1/events/12"}]}},{"microcosmId":1,"itemType":"event","id":11,"title":"Birthday Drinks","totalComments":0,"totalViews":19,"meta":{"created":"2013-05-07T20:23:37.986725Z","createdBy":{"id":7,"userId":7,"profileName":"mandsmandsmands","visible":false,"gravatar":"https://secure.gravatar.com/avatar/3c1a376d2cc83feb107859f73a0ee285","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/7"},{"rel":"site","href":"/api/v1/sites/1"}]}},"flags":{"sticky":false,"open":true,"deleted":false,"moderated":false,"visible":true},"links":[{"rel":"self","href":"/api/v1/events/11"}]}},{"microcosmId":1,"itemType":"event","id":3,"title":"Love the map on the events page ride","totalComments":6,"totalViews":54,"lastCommentId":102,"lastCommentCreatedBy":{"id":2,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/2"},{"rel":"site","href":"/api/v1/sites/1"}]}},"lastCommentCreated":"2013-05-05T14:03:47.896743Z","meta":{"created":"2013-05-02T21:20:49.179782Z","createdBy":{"id":21,"userId":21,"profileName":"סקידנסר","visible":false,"gravatar":"https://secure.gravatar.com/avatar/1fb1dea1c54c0863e997e1e1d009156a","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/21"},{"rel":"site","href":"/api/v1/sites/1"}]}},"flags":{"sticky":false,"open":true,"deleted":false,"moderated":false,"visible":true},"links":[{"rel":"self","href":"/api/v1/events/3"}]}},{"microcosmId":1,"itemType":"event","id":6,"title":"Pedalo Day","totalComments":2,"totalViews":20,"lastCommentId":101,"lastCommentCreatedBy":{"id":2,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/2"},{"rel":"site","href":"/api/v1/sites/1"}]}},"lastCommentCreated":"2013-05-05T13:59:00.244353Z","meta":{"created":"2013-05-04T16:32:05.937735Z","createdBy":{"id":2,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/2"},{"rel":"site","href":"/api/v1/sites/1"}]}},"flags":{"sticky":false,"open":true,"deleted":false,"moderated":false,"visible":true},"links":[{"rel":"self","href":"/api/v1/events/6"}]}},{"microcosmId":1,"itemType":"conversation","id":4,"title":"Got a bug? Can't be bothered posting it to Github or lfgss? Put it here!","totalComments":2,"totalViews":36,"lastCommentId":100,"lastCommentCreatedBy":{"id":2,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/2"},{"rel":"site","href":"/api/v1/sites/1"}]}},"lastCommentCreated":"2013-05-05T13:57:01.045479Z","meta":{"created":"2013-05-02T17:19:58.43707Z","createdBy":{"id":7,"userId":7,"profileName":"mandsmandsmands","visible":false,"gravatar":"https://secure.gravatar.com/avatar/3c1a376d2cc83feb107859f73a0ee285","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/7"},{"rel":"site","href":"/api/v1/sites/1"}]}},"flags":{"sticky":false,"open":true,"deleted":false,"moderated":false,"visible":true},"links":[{"rel":"self","href":"/api/v1/conversations/4"}]}},{"microcosmId":1,"itemType":"event","id":7,"title":"Pedalo Day","totalComments":0,"totalViews":9,"meta":{"created":"2013-05-04T16:32:32.969752Z","createdBy":{"id":2,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/2"},{"rel":"site","href":"/api/v1/sites/1"}]}},"flags":{"sticky":false,"open":true,"deleted":false,"moderated":false,"visible":true},"links":[{"rel":"self","href":"/api/v1/events/7"}]}}]},"meta":{"created":"2013-05-02T08:50:59.124169Z","createdBy":{"id":2,"userId":2,"profileName":"Velocio","visible":true,"gravatar":"https://secure.gravatar.com/avatar/309cb01f0a25f751e7294407d983f801","meta":{"links":[{"rel":"self","href":"/api/v1/profiles/2"},{"rel":"site","href":"/api/v1/sites/1"}]}},"flags":{"sticky":true,"open":true,"deleted":false,"moderated":false,"visible":false},"links":[{"rel":"self","href":"/api/v1/microcosms/1"},{"rel":"site","href":"/api/v1/sites/1"}],"permissions":{"create":false,"read":true,"update":false,"delete":false,"guest":true,"superUser":false}}},"error":null}
+{
+ "context": "",
+ "status": 200,
+ "data": {
+  "id": 1,
+  "siteId": 5,
+  "visibility": "public",
+  "title": "Generated",
+  "description": "Generated microcosm",
+  "moderators": null,
+  "items": {
+   "total": 0,
+   "limit": 25,
+   "offset": 0,
+   "maxOffset": 0,
+   "totalPages": 0,
+   "page": 1,
+   "links": [
+    {
+     "rel": "self",
+     "href": "/api/v1/microcosms/1",
+     "title": "1"
+    }
+   ],
+   "type": "/api/v1/comments",
+   "items": []
+  },
+  "meta": {
+   "created": "2014-01-28T15:35:17.348917Z",
+   "createdBy": {
+    "id": 5,
+    "siteId": 5,
+    "userId": 1,
+    "profileName": "Frodo",
+    "visible": true,
+    "avatar": "/api/v1/files/66cca61feb8001cb71a9fb7062ff94c9d2543340",
+    "meta": {
+     "flags": {},
+     "links": [
+      {
+       "rel": "self",
+       "href": "/api/v1/profiles/5"
+      },
+      {
+       "rel": "site",
+       "href": "/api/v1/sites/5"
+      }
+     ]
+    }
+   },
+   "flags": {
+    "sticky": false,
+    "open": true,
+    "deleted": false,
+    "moderated": false,
+    "visible": false,
+    "unread": false
+   },
+   "links": [
+    {
+     "rel": "self",
+     "href": "/api/v1/microcosms/1"
+    },
+    {
+     "rel": "site",
+     "href": "/api/v1/sites/5"
+    }
+   ],
+   "permissions": {
+    "create": false,
+    "read": true,
+    "update": false,
+    "delete": false,
+    "closeOwn": false,
+    "openOwn": false,
+    "readOthers": false,
+    "guest": true,
+    "banned": false,
+    "owner": false,
+    "moderator": false,
+    "siteOwner": false
+   }
+  }
+ },
+ "error": null
+}

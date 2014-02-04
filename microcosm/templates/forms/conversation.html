@@ -1,90 +1,176 @@
 {% extends 'base.html' %}
+{% load commentBox %}
+{% block title %}{% if state_edit %}Edit conversation{% else %}Start a conversation{% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
-	{% if form.id > 0 %}
-		<h3>Edit conversation</h3>
-	{% else %}
-		<h3>New conversation</h3>
-	{% endif %}
-
-	<form action="" method="POST" id="conversationForm">
-		{% csrf_token %}
-		{{ form.microcosmId }}
-		{{ form.id }}
-		{{ form.sticky }}
-		{{ form.moderated }}
-		{{ form.visible }}
-		{{ form.deleted }}
-
-		<h4><label for="id_title">{{ form.title.label }}</label></h4>
-		<div>
-			{{ form.title }}
-			{% if form.errors.title %}
-				<div class="text-error">{{ form.errors.title.as_text }}</div>
-			{% endif %}
+	<div class="content-header padded">
+		<div class="row">
+			<div class="col-sm-12"></div>
 		</div>
+		<h1>{% if state_edit %}Edit conversation{% else %}Start a conversation{% endif %}</h1>
+	</div>
 
-		{% if form.id > 0 %}
-			<div>
-				<label for="id_editReason">{{ form.editReason.label }}</label>
-				{{ form.editReason }}
-				{% if form.errors.editReason %}
-					<div class="text-error">{{ form.errors.editReason.as_text }}</div>
-				{% endif %}
+	<div class="content-body">
+
+		<div class="row form-container">
+			<div class="col-lg-12">
+				<div class="form-container-inner padded">
+					<form role="form" action="" method="POST" id="conversationForm">
+
+						{% csrf_token %}
+						{{ form.microcosmId }}
+						{{ form.id }}
+						{{ form.sticky }}
+						{{ form.moderated }}
+						{{ form.visible }}
+						{{ form.deleted }}
+
+
+						{# title #}
+						<div class="form-group">
+							<div class="row">
+
+								<label class="col-sm-12" for="title">
+									{{ form.title.label }}
+								</label>
+								<div class="col-sm-12 {% if form.errors.title %}has-error{% endif %}">
+									{% if form.errors.title %}
+										<label class="control-label">{{ form.errors.title.as_text }}</label>
+									{% endif %}
+									<input
+										type="text"
+										class="form-control {% if form.errors.title %}error{% endif %}"
+										id="title"
+										name="{{ form.title.name }}" placeholder="Title of conversation"
+										maxlength="{{ form.fields.title.max_length }}"
+										tabindex="1"
+										value="{{ form.title.value|default:"" }}"
+									/>
+								</div>
+
+							</div>
+						</div> <!-- /form-group -->
+
+
+						{% if not state_edit %}
+						<div class="form-group">
+							<div class="row">
+								<label class="col-sm-12" for="reply-box-textarea">
+									What is it you want to say?
+								</label>
+								<div class="col-sm-12">
+									{% commentBox as_component=True name="firstcomment"%}
+								</div>
+							</div>
+						</div>
+						</div>
+						{% endif %}
+
+						</div> <!-- /form-container-inner -->
+
+
+						{# reason #}
+					{% if state_edit %}
+					<div class="form-group form-sticky">
+						<div class="row">
+							<label class="col-sm-12" for="editReason">
+								{{ form.editReason.label }}
+							</label>
+							<div class="col-sm-12 {% if form.errors.editReason %}has-error{% endif %}">
+								{% if form.errors.editReason %}
+									<label class="control-label">{{ form.errors.editReason.as_text }}</label>
+								{% endif %}
+								<input
+									type="text"
+									class="form-control {% if form.errors.editReason %}error{% endif %}"
+									id="editReason"
+									name="{{ form.editReason.name }}"
+									placeholder="Reason for editing"
+									maxlength="150"
+									tabindex="1"
+								/>
+							</div>
+						</div>
+					</div> <!-- /form-group -->
+					{% endif %}
+
+						<div class="form-group form-footer padded">
+							<div class="row">
+								<div class="col-sm-12">
+									<div class="form-footer-buttons">
+										{% if not state_edit %}
+										<input type="submit" class="btn btn-lg btn-primary" value="Start conversation" tabindex="1">
+										{% else %}
+										<input type="submit" class="btn btn-lg btn-primary" value="Edit conversation" tabindex="1">
+										{% endif %}
+										<input type="reset" class="btn btn-lg btn-default" value="Cancel">
+									</div>
+								</div>
+							</div>
+						</div> <!-- /form_footer -->
+
+					</form>
+
+				</div>
 			</div>
-		{% endif %}
+</div>
+{% endblock %}
+{% block sidebar %}
 
-		<input class="btn btn-primary" id="submit" type="submit" value="Save Conversation" />
-
-	</form>
-
+	{% if not state_edit %}
+		<div class="metabar-module">
+			<h5>Got something to add?</h5>
+			<div class="metabar-module-primary-buttons">
+				<a href="{% url 'create-conversation' microcosm_id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-speech-bubble-small"></span>Start a conversation</a>
+				<a href="{% url 'create-event' microcosm_id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-calendar-small"></span> Start an event</a>
+			</div>
+		</div> <!-- primary actions -->
+	{% endif %}
 {% endblock %}
 
+
 {% block js %}
-	<script src="{{ STATIC_URL }}js/md5.min.js"></script>
-	<script type="text/javascript">
-		function isEmpty(e) {
-			return (e.val().trim() == '');
-		}
-		function checkEmpty(e) {
-			if (isEmpty($(e))) {
-				addError($(e))
-			} else {
-				removeError($(e))
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
+{% if not state_edit %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+{% endif %}
+<script type="text/javascript">
+(function(){
+	'use strict';
+
+	{% if not state_edit %}
+	/////////////////
+	// comment box //
+	/////////////////
+	var editor = new simpleEditor({
+		el : '.reply-box'
+	});
+	{% endif %}
+
+	/////////////////////
+	// form validation //
+	/////////////////////
+
+	var form = new FormValidator(
+		document.getElementById('conversationForm'),
+		{
+			rules : {
+				'{{ form.title.name }}'      : ['not_empty','maxlength']
+			},
+			tests : {
+				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
+			},
+			error_messages : {
+				'{{ form.title.name }}:not_empty' : "* {{ form.fields.title.error_messages.required }}",
+				'{{ form.title.name }}:maxlength' : "* {{ form.fields.title.error_messages.max_length }}"
 			}
 		}
-		function addError(e) {
-			e.parent().addClass('has-error')
-		}
-		function removeError(e) {
-			e.parent().removeClass('has-error')
-		}
+	);
 
-		$('#id_title').on('change', function() {
-			checkEmpty(this);
-		}).on('blur', function() {
-			checkEmpty(this);
-		});
-
-		$('#conversationForm').submit(function() {
-			if (isEmpty($('#id_title'))) {
-				addError($('#id_title'))
-				return false;
-			}
-
-			// Client-side dupe check
-			md5 = hex_md5($('#id_title').val())
-			if (this.md5 && this.md5 == md5) {
-				return false
-			}
-			this.md5 = md5;
-
-			return true;
-		});
-
-		$(document).ready(function() {
-			$('#id_title,#id_editReason').addClass('form-control').parent().addClass('form-group');
-		});
-	</script>
+})();
+</script>
 {% endblock %}

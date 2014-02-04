@@ -31,6 +31,7 @@ class CommentForm(django.forms.Form):
 
     # Comment ID - only required when editing.
     id = django.forms.IntegerField(required=False, widget=django.forms.HiddenInput)
+    comment_id = django.forms.IntegerField(required=False, widget=django.forms.HiddenInput)
 
     # Item ID and Item Type (e.g. 'event') to which this comment belongs.
     itemId = django.forms.IntegerField(widget=django.forms.HiddenInput)
@@ -43,6 +44,7 @@ class CommentForm(django.forms.Form):
     # TODO: why is initial=0 ?
     inReplyTo = django.forms.IntegerField(required=False, initial=0, widget=django.forms.HiddenInput)
 
+    attachments = django.forms.IntegerField(required=False, initial=0, widget=django.forms.HiddenInput)
 
 class EventCreate(ItemForm):
     """
@@ -79,6 +81,7 @@ class EventCreate(ItemForm):
 
     where = django.forms.CharField(
         max_length='150',
+        required=False,
         label='Where is the event being held?',
         widget=longTextInput,
         error_messages={
@@ -95,6 +98,8 @@ class EventCreate(ItemForm):
     south = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
     west = django.forms.FloatField(widget=django.forms.HiddenInput, required=False)
 
+    invite = django.forms.CharField(widget=django.forms.HiddenInput,required=False)
+    inviteObject = django.forms.CharField(widget=django.forms.HiddenInput,required=False)
 
 class EventEdit(EventCreate):
     """
@@ -118,7 +123,7 @@ class EventEdit(EventCreate):
         repr['duration'] = event.duration
 
         # Event location
-        repr['where'] = event.where
+        if hasattr(event, 'where'): repr['where'] = event.where
         if hasattr(event, 'lat'): repr['lat'] = event.lat
         if hasattr(event, 'lon'): repr['lon'] = event.lon
         if hasattr(event, 'north'): repr['north'] = event.north
@@ -185,6 +190,15 @@ class HuddleCreate(django.forms.Form):
         }
     )
 
+    is_confidential = django.forms.ChoiceField(
+        label='Is this huddle confidential',
+        choices = [(1, 'yes'),(0, 'no')],
+        widget=django.forms.RadioSelect,
+        error_messages={
+            'required' : 'Please choose either yes or no.'
+        }
+    )
+
 
 class HuddleEdit(HuddleCreate):
     """
@@ -214,7 +228,7 @@ class MicrocosmCreate(django.forms.Form):
 
     title = django.forms.CharField(
         max_length='150',
-        label='What is the name of the Microcosm?',
+        label='What is the name of the forum?',
         error_messages={
             'required' : 'The name is required',
             'max_length' : 'Name may not be longer than 150 characters'
@@ -222,9 +236,9 @@ class MicrocosmCreate(django.forms.Form):
     )
     description = django.forms.CharField(
         max_length='150',
-        label='What is the Microcosm about?',
+        label='What is the forum about?',
         error_messages={
-            'required' : 'A description is required and helps keep a Microcosm on-topic',
+            'required' : 'A description is required and helps keep a forum on-topic',
             'max_length' : 'The description may not be longer than 150 characters'
         }
     )
@@ -237,7 +251,7 @@ class MicrocosmCreate(django.forms.Form):
 
 class MicrocosmEdit(MicrocosmCreate):
     """
-    Form for editing a microcosm.
+    Form for editing a forum.
     """
 
     id = django.forms.IntegerField(widget=django.forms.HiddenInput)
@@ -256,7 +270,10 @@ class ProfileEdit(django.forms.Form):
         label='Choose a username by which you wish to be known',
         error_messages = {
             'required' : 'Please add a profile name',
-            'max_length' : 'Profile name may not be longer than 25 characters'
+            'max_length' : 'Profile name may not be longer than 25 characters',
+            'valid_chars' : "Your user name may only contain alphanumeric characters, some special characters (\".\",\"_\",\"+\",\"-\") and spaces."
         },
         validators=[validate_no_spaces]
     )
+    # Comment text in markdown format.
+    markdown = django.forms.CharField(required=False, max_length='5000', widget=django.forms.Textarea)

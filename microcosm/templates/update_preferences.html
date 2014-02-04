@@ -1,59 +1,61 @@
 {% extends 'base.html' %}
 
+{% block title %}Updates settings | {{ site.title | safe }}{% endblock title %}
+
 {% block breadcrumb %}
-    <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
-        <li><a href='/updates'>Updates</a></li>
-        <li class="active"><a href='/updates/settings'>Settings</a></li>
-    </ol>
+	<ol class="breadcrumb">
+		<li><a href="/">Home</a></li>
+		<li><a href='/updates'>Updates</a></li>
+		<li class="active"><a href='/updates/settings'>Settings</a></li>
+	</ol>
 {% endblock %}
 
 {% block content %}
-    <section class="row margin-bottom-half">
-        <h1>Updates Settings</h1>
-        <p class="text-muted">Configure which updates you receive with the controls below.</p>
-    </section>
-    <form method="POST" action="">
-        {% csrf_token %}
-        <section class="row">
-            <div class="col col-sm-14">
-            </div>
-            <div class="col col-sm-2">
-                Email me
-            </div>
-        </section>
-        <hr />
-        <section class="row">
-            <div class="col col-sm-14">
-                <span>Profile override setting - uncheck this to turn all emails off</span>
-            </div>
-            <div class="col col-sm-2">
-                    <input name="profile_receive_email" type="checkbox" {% if globaloptions.emailNotifications %}checked="true"{% endif %}>
-            </div>
-        </section>
-        <hr />
-        <br />
-        {% for preference in content %}
-            {% if preference.id == 1 or preference.id == 2 %}
-            <section class="row">
-                <div class="col col-sm-14">
-                    <span>{{ preference.description }}</span>
-                </div>
-                    <input type="hidden" name="id_{{ preference.id }}" value="{{ preference.id }}">
-                    <div class="col col-sm-2">
-                        <input name="send_email_{{ preference.id }}" type="checkbox" {% if preference.send_email %}checked="true"{% endif %}>
-                    </div>
-            </section>
-            {% endif %}
-        {% endfor %}
-        <hr />
-        <section class="row">
-            <div class="col col-sm-14">
-            </div>
-            <div class="col col-sm-2">
-            <input type="submit" value="Save" class="btn btn-primary btn-small"/>
-            </div>
-    </form>
+	<section class="row margin-bottom-half">
+		<h1>Updates Settings</h1>
+		<p class="text-muted">Configure which updates you receive with the controls below.</p>
+	</section>
+	<form method="POST" action="">
+		{% csrf_token %}
+		<section class="row">
+			<div class="col col-sm-14">
+			</div>
+			<div class="col col-sm-2">
+				Email me
+			</div>
+		</section>
+		<hr />
+		<section class="row">
+			<div class="col col-sm-14">
+				<span>Profile override setting - uncheck this to turn all emails off</span>
+			</div>
+			<div class="col col-sm-2">
+					<input name="profile_receive_email" type="checkbox" {% if globaloptions.emailNotifications %}checked="true"{% endif %}>
+			</div>
+		</section>
+		<hr />
+		<br />
+		{% for preference in content %}
+			{% if preference.id == 1 or preference.id == 2 %}
+			<section class="row">
+				<div class="col col-sm-14">
+					<span>{{ preference.description | safe }}</span>
+				</div>
+					<input type="hidden" name="id_{{ preference.id }}" value="{{ preference.id }}">
+					<div class="col col-sm-2">
+						<input name="send_email_{{ preference.id }}" type="checkbox" {% if preference.send_email %}checked="true"{% endif %}>
+					</div>
+			</section>
+			{% endif %}
+		{% endfor %}
+		<hr />
+		<section class="row">
+			<div class="col col-sm-14">
+			</div>
+			<div class="col col-sm-2">
+			<input type="submit" value="Save" class="btn btn-primary btn-small"/>
+			</div>
+	</form>
 {% endblock %}
 
 {% block sidebar%}
