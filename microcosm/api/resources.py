@@ -311,6 +311,7 @@ class Profile(object):
         if data.get('id'): self.id = data['id']
         if data.get('siteId'): self.site_id = data['siteId']
         if data.get('userId'): self.user_id = data['userId']
+        if data.get('email'): self.email = data['email']
         if data.get('profileName'): self.profile_name = data['profileName']
         if data.get('visible'): self.visible = data['visible']
         if data.get('avatar'): self.avatar = data['avatar']

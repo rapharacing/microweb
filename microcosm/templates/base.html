@@ -230,35 +230,33 @@
 
 		<script src="{{ STATIC_URL }}js/persona.js"></script>
 		<script src="{{ STATIC_URL }}js/include.js"></script>
-		{% if not user %}
-		<!-- Persona Login Form (submitted by persona login action, not directly by user) -->
-		<form id="login-form" method="POST" action="{% url 'login' %}">
+
+		<!-- Persona signin -->
+		<form id="signin-form" method="POST" action="{% url 'login' %}">
 			{% csrf_token %}
 			<input id="Assertion" type="hidden" name="Assertion" value="" />
 			<input id="target_url" type="hidden" name="target_url" value="{{ request.get_full_path }}" />
 		</form>
 
-		<!-- Mozilla Persona -->
+		<!-- Persona signout -->
+		<form id="signout-form" action="{% url 'logout' %}" method="POST">
+			{% csrf_token %}
+			<span class="navbar-profile-logout"><input type="submit" class="sprite sprite-logout" value="" title="Sign out" /></span>
+		</form>
 
-		<script>
-			function login() {
-				navigator.id.get(function(assertion) {
-					if (assertion) {
-						var assertion_field = document.getElementById("Assertion");
-						assertion_field.value = assertion;
-						var login_form = document.getElementById("login-form");
-						login_form.submit();
-					}
-				});
-			}
-		</script>
-		{% else %}
+
 		<script type="text/javascript">
-			function logout(){
-				$('#signout-form').submit();
-			}
+			navigator.id.watch({
+				loggedInUser: {% if user.email %}"{{user.email}}"{% else %}null{% endif %},
+				onlogin: function(assertion) {
+					document.getElementById("Assertion").value = assertion;
+					document.getElementById("signin-form").submit();
+				},
+				onlogout: function() {
+					document.getElementById("signout-form").submit();
+				}
+			})
 		</script>
-		{% endif %}
 
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
