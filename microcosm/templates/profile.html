@@ -30,11 +30,11 @@
 							</div>
 							 <ul class="list-stats profile-header-stats">
 									<li>
-										<span>{{content.item_count}}</span>
+										<span>{%if content.item_count > 0 %}<a href="/search?type=conversation&amp;authorId={{content.id}}">{{content.item_count}}</a>{% else %}0{% endif %}</span>
 										conversations
 									</li>
 									<li>
-										<span>{{content.comment_count}}</span>
+										<span>{%if content.comment_count > 0 %}<a href="/search?type=comment&amp;authorId={{content.id}}">{{content.comment_count}}</a>{% else %}0{% endif %}</span>
 										comments
 									</li>
 								</ul>
