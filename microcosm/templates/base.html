@@ -81,16 +81,12 @@
 								<div class="col-md-3 col-lg-2 navbar-profile">
 									{% if user %}
 										<div class="navbar-profile-row-1">
-											<form id="signout-form" action="{% url 'logout' %}" method="POST">
-												{% csrf_token %}
-												<span class="navbar-profile-logout"><input type="submit" class="sprite sprite-logout" value="" title="Sign out" /></span>
-											</form>
+											<span class="navbar-profile-logout"><button title="Sign out" class="sprint sprite-logout" onclick="navigator.id.logout()"></button></span>
 
 											<div class="navbar-profile-row-1-left">
 												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar"><img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" /></a>
 												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" id="profile_name" class="navbar-profile-name"><strong>{{ user.profile_name | safe }}</strong></a>
 												<a class="navbar-profile-edit" href="{% url 'edit-profile' user.id %}"><span class="sprite sprite-pencil-small"></span><span class="navbar-profile-edit-text">Edit Profile</span></a>
-
 												<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope"></span></span>{% else %}<span class="sprite sprite-envelope"></span>{% endif %}</a>
 											</div>
 
@@ -103,7 +99,7 @@
 										Browsing as <strong>guest</strong>.
 										</div>
 										<div class="navbar-profile-row-5">
-											<button class="btn btn-primary" id="login_link" onclick="login()">
+											<button class="btn btn-primary" onclick="navigator.id.request()">
 												Sign In or Register
 											</button>
 										</div>
@@ -144,7 +140,7 @@
 							<ul class="nav navbar-nav navbar-nav-unregistered">
 								<li class="lh">Join our community</li>
 								<li>
-									<a href="#" onclick="login()">
+									<a href="#" onclick="navigator.id.request()">
 										<span class="btn btn-primary btn-block">Sign in or Register</span>
 									</a>
 								</li>
@@ -200,7 +196,7 @@
 									<a href="{% url 'updates-settings' %}">Updates Settings</a>
 								</li>
 								<li>
-									<a href="#" onclick="logout();">Logout</a>
+									<a href="#" onclick="navigator.id.logout()">Logout</a>
 								</li>
 							</ul>
 							{% endif %}
