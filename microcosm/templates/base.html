@@ -5,6 +5,7 @@
 		<title>{% block title %}{% endblock %}</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="shortcut icon" href="/static/img/favico.png" />
+		<!-- Ensure IE doesn't run in compatibility mode -->
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 
 		<link href="{{ STATIC_URL }}themes/{{ site.theme_id|default:"1" }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -232,6 +233,7 @@
 		</div>
 
 		{% if not user %}
+		{% include 'modal_signin.html' %}
 		<!-- Persona Login Form (submitted by persona login action, not directly by user) -->
 		<form id="login-form" method="POST" action="{% url 'login' %}">
 			{% csrf_token %}
@@ -292,9 +294,5 @@
 			{% if site.ga_web_property_id %}ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
 			ga('{{ site.subdomain_key }}.send', 'pageview', gaData);{% endif %}
 		</script>
-
-		{% if not user %}
-			{% include 'modal_signin.html' %}
-		{% endif %}
 	</body>
 <html>
