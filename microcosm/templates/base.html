@@ -232,8 +232,31 @@
 			</div>
 		</div>
 
+		<script src="{{ STATIC_URL }}js/persona.js"></script>
+		<script src="{{ STATIC_URL }}js/include.js"></script>
 		{% if not user %}
-		{% include 'modal_signin.html' %}
+		<div id="modal-signin" class="modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header navbar-header-wrapper tiling-bg">
+						<img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">
+
+						<h3>{{ site.title | safe }}</h3>
+						<p>{{ site.description | safe }}</p>
+
+						<div class="modal-buttons">
+							<button class="btn btn-lg btn-primary" onclick="login()">Sign in or Register to continue</button>
+						</div>
+					</div>
+					<div class="modal-footer">
+						Powered by <a href="#">Microcosm</a>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
 		<!-- Persona Login Form (submitted by persona login action, not directly by user) -->
 		<form id="login-form" method="POST" action="{% url 'login' %}">
 			{% csrf_token %}
@@ -242,7 +265,7 @@
 		</form>
 
 		<!-- Mozilla Persona -->
-		<script src="{{ STATIC_URL }}js/persona.js"></script>
+
 		<script>
 			function login() {
 				navigator.id.get(function(assertion) {
