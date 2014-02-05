@@ -12,7 +12,7 @@ function updateTimes() {
 			}
 			// Tooltip for precise date
 			var tt = t.attr('title');
-			var tip = m.format('LLLL');
+			var tip = m.format('llll');
 			if (!tt || tt != tip) {
 				t.attr('title', tip);
 			}
