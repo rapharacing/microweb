@@ -140,7 +140,7 @@
 							<ul class="nav navbar-nav navbar-nav-unregistered">
 								<li class="lh">Join our community</li>
 								<li>
-									<a href="#" onclick="navigator.id.request({siteLogo: '{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}'})">
+									<a href="#" onclick="navigator.id.request({siteLogo: '{{ site.logo_url }}'})">
 										<span class="btn btn-primary btn-block">Sign in or Register</span>
 									</a>
 								</li>
@@ -233,7 +233,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header navbar-header-wrapper tiling-bg">
-                        <img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
+                        <img src="{{ site.logo_url }}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -242,7 +242,7 @@
                         <p>{{ site.description | safe }}</p>
 
                         <div class="modal-buttons">
-                            <button class="btn btn-lg btn-primary" onclick="login()">Sign in or Register to continue</button>
+                            <button class="btn btn-lg btn-primary" onclick="navigator.id.request({siteLogo: '{{ site.logo_url }}'})">Sign in or Register to continue</button>
                         </div>
                     </div>
                     <div class="modal-footer">
