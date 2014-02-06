@@ -235,15 +235,14 @@
 		<form id="signin-form" method="POST" action="{% url 'login' %}">
 			{% csrf_token %}
 			<input id="Assertion" type="hidden" name="Assertion" value="" />
-			<input id="target_url" type="hidden" name="target_url" value="{{ request.get_full_path }}" />
+			<input id="target_url" type="hidden" name="target_url" value="{{request.get_full_path}}" />
 		</form>
 
 		<!-- Persona signout -->
-		<form id="signout-form" action="{% url 'logout' %}" method="POST">
+		<form id="signout-form" method="POST" action="{% url 'logout' %}">
 			{% csrf_token %}
 			<span class="navbar-profile-logout"><input type="submit" class="sprite sprite-logout" value="" title="Sign out" /></span>
 		</form>
-
 
 		<script type="text/javascript">
 			navigator.id.watch({
