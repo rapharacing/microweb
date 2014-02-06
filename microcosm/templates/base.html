@@ -139,7 +139,7 @@
 							<ul class="nav navbar-nav navbar-nav-unregistered">
 								<li class="lh">Join our community</li>
 								<li>
-									<a href="#" onclick="navigator.id.request({siteLogo: '{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}'})">
+									<a href="#" onclick="navigator.id.request({siteLogo: '{{ site.logo_url }}'})">
 										<span class="btn btn-primary btn-block">Sign in or Register</span>
 									</a>
 								</li>
@@ -227,11 +227,36 @@
 			</div>
 		</div>
 
+        {% if not user %}
+        <div id="modal-signin" class="modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header navbar-header-wrapper tiling-bg">
+                        <img src="{{ site.logo_url }}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+
+                        <h3>{{ site.title | safe }}</h3>
+                        <p>{{ site.description | safe }}</p>
+
+                        <div class="modal-buttons">
+                            <button class="btn btn-lg btn-primary" onclick="navigator.id.request({siteLogo: '{{ site.logo_url }}'})">Sign in or Register to continue</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        Powered by <a href="#">Microcosm</a>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+		{% endif %}
+
 		<script src="{{ STATIC_URL }}js/persona.js"></script>
 		<script src="{{ STATIC_URL }}js/include.js"></script>
 
-		<!-- Persona signin -->
-		<form id="signin-form" class="hidden" method="POST" action="{% url 'login' %}">
+        <!-- Persona signin -->
+        <form id="signin-form" class="hidden" method="POST" action="{% url 'login' %}">
 			{% csrf_token %}
 			<input id="Assertion" type="hidden" name="Assertion" value="" />
 			<input id="target_url" type="hidden" name="target_url" value="{{request.get_full_path}}" />

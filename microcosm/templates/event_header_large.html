@@ -181,7 +181,7 @@
 					{% else %}
 						<h3>Sign in to reserve your place in this event!</h3>
 						<p>
-							<button class="btn btn-primary btn-lg" id="login_link" onclick="login()">
+							<button class="btn btn-primary btn-lg" id="login_link" onclick="navigator.id.request({siteLogo: '{{ site.logo_url }}'})">
 								Sign In or Register to attend!
 							</button>
 						</p>
