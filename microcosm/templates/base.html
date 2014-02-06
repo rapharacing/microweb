@@ -81,7 +81,7 @@
 								<div class="col-md-3 col-lg-2 navbar-profile">
 									{% if user %}
 										<div class="navbar-profile-row-1">
-											<span class="navbar-profile-logout"><button title="Sign out" class="sprint sprite-logout" onclick="navigator.id.logout()"></button></span>
+											<span class="navbar-profile-logout"><a href="#" title="Sign out" class="sprite sprite-logout" onclick="navigator.id.logout()"></a></span>
 
 											<div class="navbar-profile-row-1-left">
 												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar"><img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" /></a>
