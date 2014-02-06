@@ -5,6 +5,7 @@
 		<title>{% block title %}{% endblock %}</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="shortcut icon" href="/static/img/favico.png" />
+		<!-- Ensure IE doesn't run in compatibility mode -->
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 
 		<link href="{{ STATIC_URL }}themes/{{ site.theme_id|default:"1" }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -80,16 +81,12 @@
 								<div class="col-md-3 col-lg-2 navbar-profile">
 									{% if user %}
 										<div class="navbar-profile-row-1">
-											<form id="signout-form" action="{% url 'logout' %}" method="POST">
-												{% csrf_token %}
-												<span class="navbar-profile-logout"><input type="submit" class="sprite sprite-logout" value="" title="Sign out" /></span>
-											</form>
+											<span class="navbar-profile-logout"><a href="#" title="Sign out" class="sprite sprite-logout" onclick="navigator.id.logout()"></a></span>
 
 											<div class="navbar-profile-row-1-left">
 												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" class="navbar-profile-avatar"><img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" /></a>
 												<a href="{% url 'single-profile' user.id %}" title="Edit your profile" id="profile_name" class="navbar-profile-name"><strong>{{ user.profile_name | safe }}</strong></a>
 												<a class="navbar-profile-edit" href="{% url 'edit-profile' user.id %}"><span class="sprite sprite-pencil-small"></span><span class="navbar-profile-edit-text">Edit Profile</span></a>
-
 												<a class="navbar-profile-row-1-huddles" href="{% url 'list-huddle' %}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope"></span></span>{% else %}<span class="sprite sprite-envelope"></span>{% endif %}</a>
 											</div>
 
@@ -102,7 +99,7 @@
 										Browsing as <strong>guest</strong>.
 										</div>
 										<div class="navbar-profile-row-5">
-											<button class="btn btn-primary" id="login_link" onclick="login()">
+											<button class="btn btn-primary" onclick="navigator.id.request({siteLogo: '{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}'})">
 												Sign In or Register
 											</button>
 										</div>
@@ -143,7 +140,7 @@
 							<ul class="nav navbar-nav navbar-nav-unregistered">
 								<li class="lh">Join our community</li>
 								<li>
-									<a href="#" onclick="login()">
+									<a href="#" onclick="navigator.id.request({siteLogo: '{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}'})">
 										<span class="btn btn-primary btn-block">Sign in or Register</span>
 									</a>
 								</li>
@@ -199,7 +196,7 @@
 									<a href="{% url 'updates-settings' %}">Updates Settings</a>
 								</li>
 								<li>
-									<a href="#" onclick="logout();">Logout</a>
+									<a href="#" onclick="navigator.id.logout()">Logout</a>
 								</li>
 							</ul>
 							{% endif %}
@@ -231,35 +228,33 @@
 			</div>
 		</div>
 
-		{% if not user %}
-		<!-- Persona Login Form (submitted by persona login action, not directly by user) -->
-		<form id="login-form" method="POST" action="{% url 'login' %}">
+		<script src="{{ STATIC_URL }}js/persona.js"></script>
+		<script src="{{ STATIC_URL }}js/include.js"></script>
+
+		<!-- Persona signin -->
+		<form id="signin-form" class="hidden" method="POST" action="{% url 'login' %}">
 			{% csrf_token %}
 			<input id="Assertion" type="hidden" name="Assertion" value="" />
-			<input id="target_url" type="hidden" name="target_url" value="{{ request.get_full_path }}" />
+			<input id="target_url" type="hidden" name="target_url" value="{{request.get_full_path}}" />
 		</form>
 
-		<!-- Mozilla Persona -->
-		<script src="{{ STATIC_URL }}js/persona.js"></script>
-		<script>
-			function login() {
-				navigator.id.get(function(assertion) {
-					if (assertion) {
-						var assertion_field = document.getElementById("Assertion");
-						assertion_field.value = assertion;
-						var login_form = document.getElementById("login-form");
-						login_form.submit();
-					}
-				});
-			}
-		</script>
-		{% else %}
+		<!-- Persona signout -->
+		<form id="signout-form" class="hidden" method="POST" action="{% url 'logout' %}">
+			{% csrf_token %}
+		</form>
+
 		<script type="text/javascript">
-			function logout(){
-				$('#signout-form').submit();
-			}
+			navigator.id.watch({
+				loggedInUser: {% if user.email %}"{{user.email}}"{% else %}null{% endif %},
+				onlogin: function(assertion) {
+					document.getElementById("Assertion").value = assertion;
+					document.getElementById("signin-form").submit();
+				},
+				onlogout: function() {
+					document.getElementById("signout-form").submit();
+				}
+			})
 		</script>
-		{% endif %}
 
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
@@ -292,9 +287,5 @@
 			{% if site.ga_web_property_id %}ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
 			ga('{{ site.subdomain_key }}.send', 'pageview', gaData);{% endif %}
 		</script>
-
-		{% if not user %}
-			{% include 'modal_signin.html' %}
-		{% endif %}
 	</body>
 <html>
