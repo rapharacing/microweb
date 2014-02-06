@@ -99,7 +99,7 @@
 										Browsing as <strong>guest</strong>.
 										</div>
 										<div class="navbar-profile-row-5">
-											<button class="btn btn-primary" onclick="navigator.id.request()">
+											<button class="btn btn-primary" onclick="navigator.id.request({siteLogo: '{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}'})">
 												Sign In or Register
 											</button>
 										</div>
@@ -140,7 +140,7 @@
 							<ul class="nav navbar-nav navbar-nav-unregistered">
 								<li class="lh">Join our community</li>
 								<li>
-									<a href="#" onclick="navigator.id.request()">
+									<a href="#" onclick="navigator.id.request({siteLogo: '{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}'})">
 										<span class="btn btn-primary btn-block">Sign in or Register</span>
 									</a>
 								</li>
