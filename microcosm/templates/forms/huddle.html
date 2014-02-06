@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load commentBox %}
-{% block title %}New huddle | {{ site.title | safe }}{% endblock title %}
+{% block title %}New message | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -10,7 +10,7 @@
 			{% include 'breadcrumbs.html' %}
 			</div>
 		</div>
-		<h1>Huddles</h1>
+		<h1>Messages</h1>
 	</div>
 
 	<div class="content-body">
@@ -40,7 +40,7 @@
 										class="form-control"
 										id="title"
 										name="{{ form.title.name }}"
-										placeholder="Title of huddle"
+										placeholder="Title of message"
 										maxlength="150"
 										tabindex="1"
 									/>
@@ -54,7 +54,7 @@
 						<div class="form-group">
 							<div class="row">
 
-								<label class="col-sm-12" for="invite">Who will join this huddle?</label>
+								<label class="col-sm-12" for="invite">Who will be able to see and reply to this message?</label>
 
 								<div class="col-sm-12">
 									<div class="list-participants"></div>
@@ -94,40 +94,12 @@
 
 				</div> <!-- /form-container-inner -->
 
-{% comment %}
-				<div class="form-group form-sticky">
-					<div class="row">
-						<label class="col-sm-12">Is this huddle confidential?</label>
-						<div class="col-sm-9 {% if form.errors.confidential %}has-error{% endif %}">
-							{% if form.errors.confidential %}
-								<label class="control-label">{{ form.errors.confidential.as_text }}</label>
-							{% endif %}
-							<ul class="list-toggles">
-							<li>
-								<span class="list-toggles-text">
-									Confidential huddles disable the ability to invite more people later on.
-								</span>
-								<div class="btn-group btn-group-xs pull-right">
-									<button type="button" class="btn btn-default">
-										<label {% if form.confidential.value == "1" %}class="active"{% endif %}>Yes <input type="radio" value="1" name="is_confidential" {% if form.confidential.value == "1" %}checked="checked"{% endif %}></label>
-									</button>
-									<button type="button" class="btn btn-default">
-										<label {% if form.confidential.value == "0" %}class="active"{% endif %}>No <input type="radio" value="0" name="is_confidential" {% if form.confidential.value == "0" %}checked="checked"{% endif %}></label>
-									</button>
-								</div>
-							</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-{% endcomment %}
-
 				{# footer #}
 				<div class="form-group form-footer padded">
 					<div class="row">
 						<div class="col-sm-12">
 							<div class="form-footer-buttons">
-								<input type="submit" class="btn btn-lg btn-primary" value="Start Huddle" tabindex="1" />
+								<input type="submit" class="btn btn-lg btn-primary" value="Send Message" tabindex="1" />
 								<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
 							</div>
 						</div>
@@ -147,8 +119,9 @@
 <div class="metabar-module">
 	<h5>About</h5>
 	<div class="metabar-module-title">
-		<h3>Huddles</h3>
-		<p>Start private sessions with other members of the community.</p>
+		<h3>Messages</h3>
+		<p>Messages are discreet conversations shared with a small group of people.</p>
+		<p>When every person with access to a message has deleted it, the shared conversation and all comments will be physically deleted.</p>
 	</div>
 </div> <!-- / about -->
 
@@ -158,11 +131,11 @@
 {% block js %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}js/attachments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}js/peopleWidget.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
 <script type="text/javascript">
 (function(){
 

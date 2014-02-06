@@ -48,7 +48,7 @@
 										{% elif update.parent_item_type == "event" %}
 											<a class="sprite sprite-calendar" title="Event"></a>
 										{% elif update.parent_item_type == "huddle" %}
-											<a class="sprite sprite-envelope" title="Huddle"></a>
+											<a class="sprite sprite-envelope" title="Message"></a>
 										{% elif update.item.item_type == "profile" %}
 											<a class="sprite sprite-user" title="Profile"></a>
 										{% endif %}
@@ -201,7 +201,7 @@
 												{% if update.parent_item_type == "conversation" %}
 													conversation{% elif update.parent_item_type == "event" %}
 													event{% elif update.parent_item_type == "huddle" %}
-													huddle{% elif update.parent_item_type == "poll" %}
+													message{% elif update.parent_item_type == "poll" %}
 													poll{% elif update.item_type == "conversation" %}
 													conversation{% elif update.item_type == "event" %}
 													event{% elif update.item_type == "poll" %}

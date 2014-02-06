@@ -16,7 +16,7 @@
 	      </div>
 				<div id="modal-huddle">
 					<div class="modal-list">
-	        	<div class="modal-list-title">People in this huddle</div>
+	        	<div class="modal-list-title">People who can see this message</div>
 						<ul id="modal-huddle-invited-list">
 							{% for profile in content.participants %}
 							<li>
@@ -30,7 +30,7 @@
 						<form id="invite-form" action="{% url 'invite-huddle' content.id %}" method="POST">
 							{% csrf_token %}
 							<input type="hidden" name="invite">
-							<label>Type in a user's name to invite them to this huddle</label>
+							<label>Type in a user's name to share this message with them</label>
 							<input type="text" id="invite" class="form-control" autocomplete="off" placeholder="Type in a user's name"/>
 						</form>
 						<div id="modal-huddle-people-widget-list"></div>

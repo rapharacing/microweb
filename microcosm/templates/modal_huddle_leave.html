@@ -16,15 +16,15 @@
         </div>
         <div id="modal-huddle">
 
-          <h2>Leaving so soon?</h2>
+          <h2>Delete Message</h2>
           <p>
             <strong>Warning!</strong>
-            You will no longer be able to view any past or<br/>future messages in this huddle.
+            You will no longer be able to view any past or<br/>future messages in this shared conversation.
           </p>
           <p>
             <form action="{% url 'delete-huddle' content.id %}" method="POST">
               {% csrf_token %}
-              <input type="submit" class="btn btn-danger" value="Leave huddle"/>
+              <input type="submit" class="btn btn-danger" value="Delete Message"/>
             </form>
           </p>
         </div>

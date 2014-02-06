@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load huddle %}
-{% block title %}Huddles{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
+{% block title %}Messages{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
 
 {% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
 
@@ -15,7 +15,7 @@
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1>Huddles</h1>
+	<h1>Messages</h1>
 </div>
 
 <div class="content-body">
@@ -50,12 +50,9 @@
 <div class="metabar-module">
 	<h5>About</h5>
 	<div class="metabar-module-title">
-		<h3>
-			Huddles
-		</h3>
-		<p>
-			Start private sessions with other members of the community.
-		</p>
+		<h3>Messages</h3>
+		<p>Messages are discreet conversations shared with a small group of people.</p>
+		<p>When every person with access to a message has deleted it, the shared conversation and all comments will be physically deleted.</p>
 	</div>
 </div> <!-- / about -->
 {% endblock%}

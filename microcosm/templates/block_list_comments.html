@@ -3,9 +3,9 @@
     <div class="col-sm-12">
       <div class="list-collection-row-icon">
       {% if result.parent_item_type == 'huddle' %}
-        <a class="sprite sprite-envelope" title="Huddle"></a>
+        <a class="sprite sprite-envelope" title="Message"></a>
       {% elif result.parent_item_type == 'profile' %}
-        <a class="sprite sprite-user" title="Huddle"></a>
+        <a class="sprite sprite-user" title="Profile"></a>
       {% else %}
         <a class="sprite sprite-speech-bubble-single" title="Comment"></a>
       {% endif %}
@@ -25,7 +25,7 @@
         <div class="row-meta">
             in
             {% if result.parent_item_type == 'huddle' %}
-            <a href="{% url 'list-huddle' %}">Huddles</a>
+            <a href="{% url 'list-huddle' %}">Messages</a>
             {% elif result.parent_item_type == 'profile' %}
             <a href="{% url 'single-profile' result.item.meta.created_by.id %}">Profiles</a>
             {% else %}

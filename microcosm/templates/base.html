@@ -92,7 +92,7 @@
 
 										</div>
 										<div class="navbar-profile-row-2">
-											<a href="{% url 'list-huddle'%}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope-small"></span></span>{% else %}<span class="sprite sprite-envelope-small"></span>{% endif %} <strong>Huddles</strong></a>
+											<a href="{% url 'list-huddle'%}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope-small"></span></span>{% else %}<span class="sprite sprite-envelope-small"></span>{% endif %} <strong>Messages</strong></a>
 										</div>
 									{% else %}
 										<div class="navbar-profile-row-4">
@@ -156,7 +156,7 @@
 									</div>
 								</div>
 								<div class="navbar-profile-row-2">
-									<a href="{% url 'list-huddle'%}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope-small"></span></span>{% else %}<span class="sprite sprite-envelope-small"></span>{% endif %} <strong>Huddles</strong></a>
+									<a href="{% url 'list-huddle'%}">{% if user and user.meta.stats.unreadHuddles > 0 %}<span class="label label-warning">{{ user.meta.stats.unreadHuddles }} <span class="sprite sprite-envelope-small"></span></span>{% else %}<span class="sprite sprite-envelope-small"></span>{% endif %} <strong>Messages</strong></a>
 								</div>
 							</div>
 							{% endif %}

@@ -183,7 +183,7 @@ class HuddleCreate(django.forms.Form):
 
     title = django.forms.CharField(
         max_length='150',
-        label='What is the subject of the huddle?',
+        label='What is the subject of the message?',
         error_messages={
             'required' : 'Please add a subject',
             'max_length' : 'The subject may not be longer than 150 characters'
@@ -191,7 +191,7 @@ class HuddleCreate(django.forms.Form):
     )
 
     is_confidential = django.forms.ChoiceField(
-        label='Is this huddle confidential',
+        label='Is this message confidential',
         choices = [(1, 'yes'),(0, 'no')],
         widget=django.forms.RadioSelect,
         error_messages={

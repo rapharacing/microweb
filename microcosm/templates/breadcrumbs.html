@@ -11,7 +11,7 @@
 	{% endfor %}
 	{% if content.isConfidential == True or content.isConfidential == False %}
 	<li>
-		<a href="{% url 'list-huddle' %}">Huddles</a>
+		<a href="{% url 'list-huddle' %}">Messages</a>
 	</li>
 	{% endif %}
 	{% if content.profiles or content.user_id %}
@@ -20,6 +20,6 @@
 	</li>
 	{% endif %}
 	<li>
-		<a href="{{ content.meta.links.self.href }}">{% if content.profile_name %}{{ content.profile_name }}{% elif content.markdown %}Comment by @{{ content.meta.created_by.profile_name }}{% elif content.title %}{{ content.title|safe }}{% else %}{% if 'huddles' in content.meta.links.self.href %}Huddles{% endif %}{% endif %}</a>
+		<a href="{{ content.meta.links.self.href }}">{% if content.profile_name %}{{ content.profile_name }}{% elif content.markdown %}Comment by @{{ content.meta.created_by.profile_name }}{% elif content.title %}{{ content.title|safe }}{% else %}{% if 'huddles' in content.meta.links.self.href %}Messages{% endif %}{% endif %}</a>
 	</li>
 </ol>
