@@ -168,7 +168,7 @@
 									<a href="{% url 'list-trending'%}">Trending</a>
 								</li>
 								<li {% if site_section == "updates"%}class="active"{% endif %}>
-									<a href="{% url 'list-updates' %}">Updates {% if user and user.meta.stats.unreadUpdates > 0 and site_section != "updates" %}<span class="label label-warning">NEW</span>{% endif %}</a>
+									<a href="{% url 'list-updates' %}">Updates</a>
 								</li>
 								<li {% if site_section == "people"%}class="active"{% endif %}>
 									<a href="{% url 'list-profiles' %}">People</a>
@@ -195,7 +195,7 @@
 									<a href="{% url 'updates-settings' %}">Updates Settings</a>
 								</li>
 								<li>
-									<a href="#" onclick="navigator.id.logout()">Logout</a>
+									<a href="#" onclick="navigator.id.logout()">Sign out</a>
 								</li>
 							</ul>
 							{% endif %}
