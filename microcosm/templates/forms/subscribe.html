@@ -13,19 +13,14 @@
 			<div class="btn-switch-state off">
 				<a class="btn-switch-on" href="javascript:void 0">
 				<strong>
-					{% if item_type == 'profile'%}Follow @{{ content.profile_name | safe }}{%else%}Subscribe{%endif%}
+					Follow{% if item_type == 'profile'%} @{{ content.profile_name | safe }}{%endif%}
 				</strong>
 				</a>
 			</div>
 			<div class="btn-switch-state on">
 				<span class="sprite sprite-ok-small"></span>
-				{% if item_type == 'profile'%}
 				<strong>Following</strong>
-				(<a class="btn-switch-off" href="javascript:void 0">Unfollow?</a>)
-				{% else %}
-				<strong>Added to updates</strong>
-				(<a class="btn-switch-off" href="javascript:void 0">Unsubscribe?</a>)
-				{% endif %}
+				(<a class="btn-switch-off" href="javascript:void 0">unfollow</a>)
 			</div>
 		</div>
 
@@ -35,9 +30,9 @@
 			<form method="POST" action="" id="email_me_form">
 			{% csrf_token %}
 			<span class="sprite sprite-branch-arrow-right"></span>
-				<label>
+				<label title="Emails will only be sent if emails are enabled in your notification settings">
 					<input type="checkbox" name="emailme" {% if content.meta.flags.sendEmail %}checked{% endif %} />
-						Instantly notify me by email
+						Notify me by email
 				</label>
 			</form>
 		</div>

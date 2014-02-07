@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Updates{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
+{% block title %}Following{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -13,7 +13,7 @@
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1>Updates</h1>
+	<h1>Following</h1>
 </div>
 
 <div class="content-body">
@@ -23,7 +23,7 @@
 
 			{% if not content.updates.items %}
 
-			<p>No updates yet. When your username is mentioned or a new comment is posted on an item you're watching, it'll show here.</p>
+			<p>No updates to show. When your name is mentioned or a new comment is posted on something that you are following, it will show here.</p>
 
 			{% else %} {# else has content.updates.items #}
 
@@ -250,10 +250,10 @@
 												</div>
 												<div class="btn-switch-state off">
 													<span class="sprite sprite-ok-small"></span>
-														removed from updates (<a class="btn-switch-on" href="javascript:void 0">undo?</a>)
+														Unfollowed (<a class="btn-switch-on" href="javascript:void 0">undo</a>)
 												</div>
 												<div class="btn-switch-state on">
-													<a class="btn-switch-off" href="javascript:void 0">unsubscribe</a>
+													<a class="btn-switch-off" href="javascript:void 0">Following</a>
 												</div>
 											</div>
 										</div>
@@ -279,7 +279,7 @@
 
 		{% else %} {# else not user #}
 
-		Please login to recieve updates
+		Please sign in to view updates on the items that you are following.
 
 		{% endif %}
 	</div> <!-- /list-updates -->
@@ -304,7 +304,7 @@
 	{% if user %}
 	<div class="metabar-module">
 		<div class="metabar-module-primary-buttons">
-			<a href="{% url 'updates-settings' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-comment"></span> Change your update settings</a>
+			<a href="{% url 'updates-settings' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-comment"></span> Change your notification settings</a>
 		</div>
 	</div> <!-- primary actions -->
 	{% endif %}
@@ -313,9 +313,9 @@
 	<div class="metabar-module">
 		<h5>About</h5>
 		<div class="metabar-module-title">
-			<h3>
-				Updates
-			</h3>
+			<h3>Following</h3>
+			<p>Updates on the items that you are following are shown with the most recent update at the top.</p>
+			<p>You can unfollow all updates except for @mentions and replies which will always be displayed.</p>
 		</div>
 	</div> <!-- / about -->
 

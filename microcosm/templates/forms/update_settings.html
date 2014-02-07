@@ -1,51 +1,50 @@
 {% extends 'base.html' %}
 
-{% block title %}Update settings | {{ site.title | safe }}{% endblock title %}
+{% block title %}Notification Settings | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
 <div class="content-header padded">
 	<div class="row">
 		<div class="col-sm-12">
-		{% include 'breadcrumbs.html' %}
+			{% include 'breadcrumbs.html' %}
 		</div>
 	</div>
 	<a href="{% url 'edit-profile' user.id %}" class="pull-right">Edit Profile &rarr;</a>
-	<h1>
-		Update Settings
-	</h1>
+	<h1>Notification Settings</h1>
 	<div class="clearfix"></div>
 </div>
-
 
 <div class="content-body">
 	<div class="row form-container">
 		<div class="col-sm-12">
-			<div class="form-container-inner padded">
-
 			<form action="" method="POST">
 				{% csrf_token %}
-
+				<div class="form-container-inner padded">
 					<div class="form-group">
 						<div class="row">
 							<div class="col-sm-12">
-
 								<div class="form-table-checkbox">
 									<table cellspacing=0 cellpadding=0 border=0>
 										<tr>
-											<th>Configure which updates you receive with the controls below.</th>
+											<th>Configure which notifications you receive with the controls below.</th>
 											<th>By Email</th>
 										</tr>
 										<tr class="highlight">
-											<td>Enable notifications</td>
-											<td><label>
-											<input name="profile_receive_email"
-														 class="master"
-														 type="checkbox" {% if globaloptions.emailNotifications %}checked="true"{% endif %}
-														 data-group="email" />
-											</label></td>
+											<td>
+												<b>Enable notifications</b><br/>
+												This is a global switch, and will override all other settings.
+											</td>
+											<td>
+												<label>
+													<input name="profile_receive_email"
+														class="master"
+														type="checkbox" {% if globaloptions.emailNotifications %}checked="true"{% endif %}
+														data-group="email"
+													/>
+												</label>
+											</td>
 										</tr>
-
 										{% for preference in content %}
 										<tr>
 											<td><span></span><p>{{ preference.description | safe }}</p></td>
@@ -53,105 +52,45 @@
 												<input type="hidden" name="id_{{ preference.id }}" value="{{ preference.id }}">
 												<label>
 													<input name="send_email_{{ preference.id }}"
-																 type="checkbox"
-																 {% if preference.send_email %}checked="true"{% endif %}
-																 data-group="email" />
+														type="checkbox"
+														{% if preference.send_email %}checked="true"{% endif %}
+														data-group="email"
+													/>
 												</label>
-												</td>
+											</td>
 										</tr>
 										{% endfor %}
-
 									</table>
 								</div>
-
-								{% comment %}
-
-								<div class="form-table-checkbox">
-									<table cellspacing=0 cellpadding=0 border=0>
-										<tr>
-											<th>How would you like to recieve notifications?</th>
-											<th>By Email</th>
-											<th>By SMS</th>
-										</tr>
-										<tr class="highlight">
-											<td>Enable notifications</td>
-											<td><label><input class="master" data-group="email" type="checkbox" /></label></td>
-											<td><label><input class="master" data-group="sms" type="checkbox" /></label></td>
-										</tr>
-										<tr>
-											<td><span></span><p>When a new conversation or event has been posted in a subscribed forum</p></td>
-											<td><label><input data-group="email" type="checkbox" /></label></td>
-											<td><label><input data-group="sms"  type="checkbox" /></label></td>
-										</tr>
-										<tr>
-											<td><span></span><p>When a new comment is posted in a subscribed conversation or event</p></td>
-											<td><label><input data-group="email" type="checkbox" /></label></td>
-											<td><label><input data-group="sms"  type="checkbox" /></label></td>
-										</tr>
-										<tr>
-											<td><span></span><p>When someone replies to your comment</p></td>
-											<td><label><input data-group="email" type="checkbox" /></label></td>
-											<td><label><input data-group="sms"  type="checkbox" /></label></td>
-										</tr>
-										<tr>
-											<td><span></span><p>When someone mentions you in a comment</p></td>
-											<td><label><input data-group="email" type="checkbox" /></label></td>
-											<td><label><input data-group="sms"  type="checkbox" /></label></td>
-										</tr>
-										<tr>
-											<td><span></span><p>When a new comment is added to a message</p></td>
-											<td><label><input data-group="email" type="checkbox" /></label></td>
-											<td><label><input data-group="sms"  type="checkbox" /></label></td>
-										</tr>
-										<tr>
-											<td><span></span><p>When someone joins an event you are attending</p></td>
-											<td><label><input data-group="email" type="checkbox" /></label></td>
-											<td><label><input data-group="sms" type="checkbox" /></label></td>
-										</tr>
-										<tr>
-											<td><span></span><p>When an event you are attending is due</p></td>
-											<td><label><input data-group="email" type="checkbox" /></label></td>
-											<td><label><input data-group="sms" type="checkbox" /></label></td>
-										</tr>
-									</table>
-								</div>
-
-								{% endcomment %}
-
 							</div>
 						</div>
 					</div> <!-- /form-group -->
-
-			</div> <!-- /form-container-inner -->
-			<div class="form-group form-footer padded">
-				<div class="row">
-					<div class="col-sm-12">
-						<div class="form-footer-buttons">
-							<input type="submit" class="btn btn-lg btn-primary" value="Save Changes">
-							<input type="reset" class="btn btn-lg btn-default" value="Cancel">
+				</div> <!-- /form-container-inner -->
+				<div class="form-group form-footer padded">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="form-footer-buttons">
+								<input type="submit" class="btn btn-lg btn-primary" value="Save Changes">
+								<input type="reset" class="btn btn-lg btn-default" value="Cancel">
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-
-				</form>
+			</form>
 		</div>
 	</div>
 </div>
-
 {% endblock %}
 
 {% block sidebar %}
-
 <div class="metabar-module">
 	<h5>About</h5>
 	<div class="metabar-module-title">
-		<h3>
-			Update Settings
-		</h3>
+		<h3>Notification Settings</h3>
+		<p>You can optionally receive notifications when someone mentions you in a comment, replies to one of your comments, and for items that you are following.</p>
+		<p>Even if you opt to receive emails instantly for items that you are following, disabling emails in the global setting will override all other settings.</p>
 	</div>
 </div> <!-- / about -->
-
 {% endblock %}
 
 {% block js %}
@@ -159,43 +98,34 @@
 (function(){
 
 	var FormCheckboxTable = (function(){
-
 		var formCheckboxTable = function(opts){
-
 			this.el = false;
 			if ( typeof opts.el !== "undefined"){
 				this.el  = document.querySelectorAll(opts.el);
 				this.$el = $(this.el);
 			}
-
 			this.bind();
 		}
 
-
 		formCheckboxTable.prototype.toggleGroup = function(group, enabled){
-
 			var group = this.$el.find('input[type=checkbox][data-group='+group+']');
-
 			for(var i=0,j=group.length;i<j;i++){
 				group[i].checked = enabled;
 				if (group[i].className.indexOf('master') === -1 ){
 					group[i].disabled = !enabled;
 				}
 			}
-
 		}
 
 		formCheckboxTable.prototype.changeHandler = function(e){
-
 			var _this     = e.currentTarget,
-					_$this    = $(e.currentTarget),
-					dataGroup = _$this.attr('data-group');
+				_$this    = $(e.currentTarget),
+				dataGroup = _$this.attr('data-group');
 
 			this.toggleGroup(dataGroup, _this.checked);
 		}
 
 		formCheckboxTable.prototype.bind = function(){
-
 			var events = [
 				['change', 'input[type=checkbox].master', 'changeHandler']
 			];
@@ -212,8 +142,5 @@
 	});
 
 })();
-
 </script>
-
-
 {% endblock %}

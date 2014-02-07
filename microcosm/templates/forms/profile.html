@@ -12,7 +12,7 @@
 		{% include 'breadcrumbs.html' %}
 		</div>
 	</div>
-	<a href="{% url 'updates-settings' %}" class="pull-right">Update settings &rarr;</a>
+	<a href="{% url 'updates-settings' %}" class="pull-right">Notification Settings &rarr;</a>
 	<h1>Edit Profile</h1>
 	<div class="clearfix"></div>
 </div>
@@ -74,14 +74,14 @@
 												/>
 											</label>
 											<div class="form-file-upload-text">
-												<h3>Click on or drag a image over the box on the left to update your picture</h3>
+												<h3>Click on or drag a image over the box on the left to change your picture</h3>
 
 												{% if avatar_error %}
 												<div class="has-error">
 													<div class="control-label">{{ avatar_error }}</div>
 												</div>
 												{% else %}
-												<p>Your avatar should be a square image under 30KB with jpg, png or gif file extension.</p>
+												<p>Your avatar should be a jpg, png or gif file.</p>
 												{% endif %}
 											</div>
 										</div>
