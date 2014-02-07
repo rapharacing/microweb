@@ -233,6 +233,10 @@
 											{% comment %}
 											Prevents you from unfollowing yourself
 											{% endcomment %}
+										{%  elif update.update_type == "reply_to_comment" or update.update_type == "mentioned" %}
+											{% comment %}
+											These are implicitly created updates and cannot be unfollowed
+											{% endcomment %}
 										{% else %}
 										&bull;
 										<div class="inline-subscribe">
