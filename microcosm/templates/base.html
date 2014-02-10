@@ -269,7 +269,7 @@
 
 		<script type="text/javascript">
 			navigator.id.watch({
-				loggedInUser: {% if user.email %}"{{user.email}}"{% else %}null{% endif %},
+				loggedInUser: {% if user.email %}'{{user.email}}'{% else %}null{% endif %},
 				onlogin: function(assertion) {
 					document.getElementById("Assertion").value = assertion;
 					document.getElementById("signin-form").submit();
