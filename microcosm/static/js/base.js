@@ -1,6 +1,9 @@
 function updateTimes() {
 	$('time').each(function(i) {
 		var t = $(this);
+
+		if (t.hasClass("plain")) {return;}
+
 		var dt = t.attr('datetime');
 		if (dt && dt.trim() != '') {
 			var m = moment(dt);
@@ -48,10 +51,12 @@ $('document').ready(function() {
 	// toggle <time> html -> title -> html
 	$('body').on('click', 'time', function() {
 		$('time').each(function(ii) {
-			var self = $(this),
-			title = self.attr('title'),
-			html  = self.html();
-			self.html(title).attr('title',html);
+			var t = $(this);
+			if (t.hasClass("plain")) {return;}
+
+			title = t.attr('title');
+			html  = t.html();
+			t.html(title).attr('title',html);
 		});
 	});
 });
