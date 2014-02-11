@@ -1,3 +1,4 @@
+{% load humanize %}
 <li class="list-collection-row">
   <div class="row">
     <div class="col-sm-8">
@@ -41,8 +42,8 @@
       <div class="row-stats">
         <ul class="list-stats list-stats-sm">
           <li>
-            <span>{{ item.item.total_comments|default:"0" }}</span>
-            comment{{ item.item.total_comments|pluralize:",s"}}
+            <span>{{ item.item.total_comments | default:0 | intcomma }}</span>
+            comment{{ item.item.total_comments | pluralize:",s" }}
           </li>
         </ul>
       </div>

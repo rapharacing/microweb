@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load humanize %}
+
 {% block title %}{{ site.title | safe }} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
 
 {% block content %}
@@ -62,12 +64,12 @@
 								<div class="row-stats">
 									<ul class="list-stats">
 										<li>
-											<span>{{ item.total_items }}</span>
-											conversation{{ item.total_items|pluralize:",s" }}
+											<span>{{ item.total_items | default:0 | intcomma }}</span>
+											conversation{{ item.total_items | default:0 | pluralize:",s" }}
 										</li>
 										<li>
-											<span>{{ item.total_comments }}</span>
-											comment{{ item.total_comments|pluralize:",s" }}
+											<span>{{ item.total_comments | default:0 | intcomma }}</span>
+											comment{{ item.total_comments | default:0 | pluralize:",s" }}
 										</li>
 									</ul>
 								</div>
@@ -140,23 +142,23 @@
 		<h5>Population</h5>
 		<ul class="list-group">
 			<li class="list-group-item">
-				<span class="badge-alt">{{ site.meta.stats.totalProfiles }}</span>
+				<span class="badge-alt">{{ site.meta.stats.totalProfiles | default:0 | intcomma }}</span>
 				<a href="/profiles/">Members</a>
 			</li>
 			<li class="list-group-item">
-				<span class="badge-alt">{{ site.meta.stats.totalConversations }}</span>
+				<span class="badge-alt">{{ site.meta.stats.totalConversations | default:0 | intcomma }}</span>
 				<a href="/search/?type=conversation">Conversations</a>
 			</li>
 			<li class="list-group-item">
-				<span class="badge-alt">{{ site.meta.stats.totalEvents }}</span>
+				<span class="badge-alt">{{ site.meta.stats.totalEvents | default:0 | intcomma }}</span>
 				<a href="/search/?type=event">Events</a>
 			</li>
 			<li class="list-group-item">
-				<span class="badge-alt">{{ site.meta.stats.totalComments }}</span>
+				<span class="badge-alt">{{ site.meta.stats.totalComments | default:0 | intcomma }}</span>
 				<a href="/search/?type=comment">Comments</a>
 			</li>
 			<li class="list-group-item">
-				<span class="badge-alt">{% if site.meta.stats.onlineProfiles > 1 %}{{ site.meta.stats.onlineProfiles }}{% else %}1{% endif %}</span>
+				<span class="badge-alt">{{ site.meta.stats.onlineProfiles | default:0 | intcomma }}</span>
 				<a href="/profiles/?online=true">Members online now</a>
 			</li>
 		</ul>

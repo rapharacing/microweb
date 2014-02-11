@@ -34,6 +34,9 @@ SITE_ID = 1
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+## DO NOT ENABLE THIS, it will break editing and other places that embed identifiers
+## within forms.
 #USE_THOUSAND_SEPARATOR = True 
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
@@ -95,6 +98,7 @@ WSGI_APPLICATION = 'microweb.wsgi.application'
 
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
+    'django.contrib.humanize',
     'django.contrib.staticfiles',
     'microcosm',
     'gunicorn',

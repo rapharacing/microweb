@@ -1,3 +1,4 @@
+{% load humanize %}
 <li id="{{ item.item_type }}{{ item.item.id }}"
 		class="list-collection-row{% if item.meta.flags.sticky %} row-pinned{% endif %} {% if item.is_deleted %} row-deleted{% endif %}" itemscope itemtype="http://schema.org/Article">
 
@@ -41,14 +42,14 @@
 				<ul class="list-stats list-stats-sm">
 					{% if item.item.total_comments >= 0 %}
 					<li>
-						<span>{{ item.item.total_comments }}</span>
-						comment{{ item.item.total_comments|pluralize:",s"}}
+						<span>{{ item.item.total_comments | default:0 | intcomma }}</span>
+						comment{{ item.item.total_comments | pluralize:",s" }}
 					</li>
 					{% endif %}
 					{% if item.item.total_views >= 0 %}
 					<li>
-						<span>{{ item.item.total_views }}</span>
-						view{{ item.item.total_views|pluralize:",s"}}
+						<span>{{ item.item.total_views | default:0 | intcomma }}</span>
+						view{{ item.item.total_views | pluralize:",s" }}
 					</li>
 					{% endif %}
 				</ul>
