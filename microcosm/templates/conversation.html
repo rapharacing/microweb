@@ -19,28 +19,24 @@
 	</div>
 </div>
 
-	<div class="content-body">
-
-
-		<div class="item">
-			<div class="item-header padded">
-				<h1>{{ content.title | safe }}</h1>
-				<div class="item-meta">
-					Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
-					{% include "forms/content-moderation.html" %}
-				</div>
-
+<div class="content-body" itemscope itemtype="http://schema.org/Article">
+	<div class="item">
+		<div class="item-header padded">
+			<h1 itemprop="name">{{ content.title | safe }}</h1>
+			<div class="item-meta">
+				Posted on <strong><time class="plain" itemprop="dateCreated" datetime="{{content.meta.created|date:"c"}}">{{ content.meta.created|date:"D jS, F Y"}}</time></strong>
+				{% include "forms/content-moderation.html" %}
 			</div>
-		</div> <!-- item -->
+		</div>
+	</div> <!-- item -->
 
-			<ul class="list-comments">
-			{% comments content.comments.items %}
-			</ul>
+	<ul class="list-comments">
+		{% comments content.comments.items %}
+	</ul>
 
-			{% include "forms/content-moderation.html" %}
+	{% include "forms/content-moderation.html" %}
 
-
-	</div> <!-- / content-body -->
+</div> <!-- / content-body -->
 
 <div class="content-footer padded">
 	<div class="row">
@@ -53,28 +49,27 @@
 </div>
 
 <a name="reply"></a>
-	<div class="reply-container">
-		<ul class="list-comments">
-			<li class="comment-item padded">
-				<div class="comment-item-inner">
-					<div class="comment-item-header">
-						<div class="comment-item-author">
-								{% if user %}
-									<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name | safe }}"/>
-								{% else %}
-									<img src="/static/img/avatar.gif" />
-								{% endif %}
-								<strong>Post a reply</strong>
-						</div>
-					</div>
-					<div class="comment-item-body">
-						{% commentBox %}
+<div class="reply-container">
+	<ul class="list-comments">
+		<li class="comment-item padded">
+			<div class="comment-item-inner">
+				<div class="comment-item-header">
+					<div class="comment-item-author">
+							{% if user %}
+								<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name | safe }}"/>
+							{% else %}
+								<img src="/static/img/avatar.gif" />
+							{% endif %}
+							<strong>Post a reply</strong>
 					</div>
 				</div>
-			</li>
-		</ul>
-	</div> <!-- /reply-container -->
-
+				<div class="comment-item-body">
+					{% commentBox %}
+				</div>
+			</div>
+		</li>
+	</ul>
+</div> <!-- /reply-container -->
 
 {% endblock content %}
 

@@ -13,14 +13,15 @@
 					</div>
 					<div class="item-event-icon-offset">
 						<div class="item-event-date">
-							<span class="item-event-date-digit">{{ content.when|date:"j"}}</span>
-							<span class="item-event-date-day">
-								{{ content.when|date:"l" }}
-								<strong>{{ content.when|date:"F Y" }}</strong>
-							</span>
+							<time class="plain" datetime="{{ content.when|date:"c"}}" itemprop="startDate">
+								<span class="item-event-date-digit">{{ content.when|date:"j"}}</span>
+								<span class="item-event-date-day">
+									{{ content.when|date:"l" }}
+									<strong>{{ content.when|date:"F Y" }}</strong>
+								</span>
+							</time>
 							<span class="item-event-date-time">
-
-								{{ content.when|date:"g:i  A" }}
+								<time class="plain" itemprop="duration" datetime="P{{content.duration}}M">{{ content.when|date:"g:i  A" }}
 								{% if event_dates.type == 'single' %}
 								- {{ event_dates.end|date:"g:i  A" }}
 								{% endif %}
@@ -36,14 +37,16 @@
 					</div>
 					<div class="item-event-icon-offset">
 						<div class="item-event-date">
-							<span class="item-event-date-digit">{{ event_dates.end|date:"j"}}</span>
-							<span class="item-event-date-day">
-								{{ event_dates.end|date:"l" }}
-								<strong>{{ event_dates.end|date:"F Y" }}</strong>
-							</span>
-							<span class="item-event-date-time">
-								{{ event_dates.end|date:"g:i  A" }}
-							</span>
+							<time class="plain" datetime="{{ event_dates.end|date:"c"}}" itemprop="endDate">
+								<span class="item-event-date-digit">{{ event_dates.end|date:"j"}}</span>
+								<span class="item-event-date-day">
+									{{ event_dates.end|date:"l" }}
+									<strong>{{ event_dates.end|date:"F Y" }}</strong>
+								</span>
+								<span class="item-event-date-time">
+									{{ event_dates.end|date:"g:i  A" }}
+								</span>
+							</time>
 						</div>
 					</div>
 				</li>
@@ -55,9 +58,12 @@
 						<span class="sprite sprite-map-marker"></span>
 					</div>
 					<div class="item-event-icon-offset">
-						<div class="item-event-location">
+						<div class="item-event-location" itemprop="location" itemscope itemtype="http://schema.org/Place">
 							{% if content.where %}
-								{{ content.where | safe }}
+								<span itemprop="name">{{ content.where | safe }}</span>
+								{% if content.lat != 0 and conten.lon != 0 %}
+								<span itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates" style="display:none"><span itemprop="latitude" content="{{ content.lat }}"></span><span itemprop="longitude" content="{{ content.lon }}"></span></span>
+								{% endif %}
 							{% else %}
 								TBA
 							{% endif %}
@@ -97,8 +103,8 @@
 							{% if rsvp_num_attending > 0 %}
 								{% for attendee in attendees.items.items|slice:":5" %}
 										{% if attendee.rsvp == "yes" %}
-											<li>
-												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" /></a>
+											<li itemprop="attendee" itemscope itemtype="http://schema.org/Person">
+												<a data-toggle="tooltip" href="{% url 'single-profile' attendee.profile_id %}" title="@{{ attendee.profile.profile_name | safe }}"><img src="{% if 'gravatar' in attendee.profile.avatar %}{{ attendee.profile.avatar }}{% elif 'files' in  attendee.profile.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ attendee.profile.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ attendee.profile.profile_name | safe }}" itemtype="url" /></a>
 											</li>
 										{% endif %}
 									{% endfor %}

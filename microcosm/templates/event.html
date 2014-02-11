@@ -25,10 +25,9 @@
 </div>
 
 <div class="content-body">
-	<div class="item">
-
+	<div class="item" itemscope itemtype="event">
 		<div class="item-header padded">
-			<h1>{{ content.title | safe }}</h1>
+			<h1 itemprop="name">{{ content.title | safe }}</h1>
 			<div class="item-meta">
 				Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
 			</div>
@@ -48,11 +47,11 @@
 
 	</div> <!-- item -->
 
-		<ul class="list-comments">
-			{% comments content.comments.items %}
-		</ul>
+	<ul class="list-comments">
+		{% comments content.comments.items %}
+	</ul>
 
-		{% include "forms/content-moderation.html" %}
+	{% include "forms/content-moderation.html" %}
 
 </div> <!-- / content-body -->
 
