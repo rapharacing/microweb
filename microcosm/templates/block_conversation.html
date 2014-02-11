@@ -1,14 +1,11 @@
 <li id="{{ item.item_type }}{{ item.item.id }}"
-		class="list-collection-row {% if item.is_pinned %}row-pinned{% endif %} {% if item.is_deleted %}row-deleted{% endif %}" itemscope itemtype="http://schema.org/Article">
+		class="list-collection-row{% if item.meta.flags.sticky %} row-pinned{% endif %} {% if item.is_deleted %} row-deleted{% endif %}" itemscope itemtype="http://schema.org/Article">
 
 	<div class="row">
 		<div class="col-sm-8 col-md-8 col-lg-8">
 
 			<div class="list-collection-row-icon">
-				{% if item.flags.sticky %}
-					<span class="sprite sprite-pushpin"></span>
-				{% endif %}
-					<a class="sprite sprite-speech-bubble" title="Conversation"></a>
+				<a class="sprite sprite-speech-bubble" title="Conversation"></a>
 			</div>
 
 			<div class="list-collection-row-offset">
