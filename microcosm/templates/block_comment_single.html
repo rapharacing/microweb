@@ -1,6 +1,5 @@
-
 {% load get_attachment %}
-<li id="comment{{ comment.id }}" class="comment-item padded">
+<li id="comment{{ comment.id }}" class="comment-item padded" itemscope itemtype="http://schema.org/UserComments">
 	<a name="{{ comment.id }}"></a>
 	<div class="comment-item-inner">
 		<div class="comment-item-header">
@@ -13,31 +12,31 @@
 				</div>
 			{% endif %}
 
-				<time datetime="{{ comment.meta.created|date:"c" }}"></time>
+				<time datetime="{{ comment.meta.created|date:"c" }}" itemprop="dateCreated"></time>
 				<span style="color:#eee">&bull;</span>
 				{% if hide_permalink %}
-					<a href="{% url 'single-comment' comment.id %}"><span class="sprite sprite-format-link"></span></a>
+					<a href="{% url 'single-comment' comment.id %}"><span class="sprite sprite-format-link" itemprop="discussionUrl"></span></a>
 				{% else %}
-				<a href="{% url 'single-comment' comment.id %}">#{{ forloop.counter|add:pagination.offset }}</a>
+				<a href="{% url 'single-comment' comment.id %}" itemprop="discussionUrl">#{{ forloop.counter|add:pagination.offset }}</a>
 				{% endif %}
 			</div>
 
-			<div class="comment-item-author">
+			<div class="comment-item-author" itemprop="author" itemscope itemtype="http://schema.org/Person">
 			{% if comment.meta.created_by %}
-				<a href="{% url 'single-profile' comment.meta.created_by.id %}"><img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name | safe }}" align="left" class="gravatar" /> <strong class="comment-item-author-name">{{ comment.meta.created_by.profile_name | safe | truncatechars:25 }}</strong></a>
+				<a href="{% url 'single-profile' comment.meta.created_by.id %}" itemprop="url"><img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name | safe }}" align="left" class="gravatar" itemprop="image" /> <strong class="comment-item-author-name" itemprop="name">{{ comment.meta.created_by.profile_name | safe | truncatechars:25 }}</strong></a>
 				{% endif %}
 
 				{% if comment.in_reply_to %}
-				<span class="comment-item-in-reply-to">
+				<span class="comment-item-in-reply-to" itemprop="mentions" itemscope itemtype="http://schema.org/Comment">
 					<span class="sprite sprite-arrow-forward"></span>
 					in reply to
-					<a href="{% url 'incontext-comment' comment.in_reply_to %}">@{{ comment.meta.links.inReplyToAuthor.title | safe }}</a>
+					<a href="{% url 'incontext-comment' comment.in_reply_to %}" itemprop="url">@{{ comment.meta.links.inReplyToAuthor.title | safe }}</a>
 				</span>
 				{% endif %}
 			</div>
 
 		</div>
-		<div class="comment-item-body">
+		<div class="comment-item-body" itemprop="text">
 			{{ comment.html|safe }}
 
 			{% if attachments %}

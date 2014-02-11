@@ -48,29 +48,6 @@
 
 </div> <!-- / content-body -->
 
-<!--
-<div class="reply-container">
-		<ul class="list-comments">
-			<li class="comment-item">
-				<div class="comment-item-inner">
-					<div class="comment-item-header">
-						<div class="comment-item-author">
-							{% if user %}
-								<img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name | safe }}"/>
-							{% else %}
-								<img src="/static/img/avatar.gif" />
-							{% endif %}
-								<strong>Post a reply</strong>
-						</div>
-					</div>
-					<div class="comment-item-body">
-
-					</div>
-				</div>
-			</li>
-		</ul>
-	</div>  /reply-container -->
-
 {% endblock content %}
 
 {% block sidebar %}
