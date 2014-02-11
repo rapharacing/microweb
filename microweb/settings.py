@@ -34,7 +34,7 @@ SITE_ID = 1
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-USE_THOUSAND_SEPARATOR = True 
+#USE_THOUSAND_SEPARATOR = True 
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT = ''
