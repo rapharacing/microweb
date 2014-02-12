@@ -1483,7 +1483,7 @@ class FileMetadata(object):
     @classmethod
     def from_create_form(cls, file_upload):
         file_metadata = cls()
-        file_metadata.file = {'files': file_upload.read()}
+        file_metadata.file = {file_upload.name: file_upload.read()}
         return file_metadata
 
     @classmethod
