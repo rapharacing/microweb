@@ -63,7 +63,19 @@
       // ugly way of keeping track of the reader.onload async events
       // we only want to call our ondragged callback when all "files" have been loaded
       callback = $.proxy(function(e,i){
-        this.stack.push($.extend({},this.input.files[i],{data:e.target.result}));
+
+        var modified_attachment;
+
+        // instance of progressevent assumes readasDataurl was triggered
+        if (e instanceof ProgressEvent){
+          modified_attachment = $.extend({},this.input.files[i],{data:e.target.result});
+          // we use Array.unshift here to push image files to the front of the stack (ie. opposite of Array.push)
+          // this makes it easier when we render to html (ie. will render all images first, then non-images)
+          this.stack.unshift(modified_attachment);
+        }else{
+          modified_attachment = this.input.files[i];
+          this.stack.push(modified_attachment);
+        }
 
         this.callback_counter--;
         if (this.callback_counter <= 0){
@@ -90,6 +102,8 @@
           })(i);
 
           reader.readAsDataURL(files[i]);
+        }else{
+          callback(files[i],i);
         }
       }
 

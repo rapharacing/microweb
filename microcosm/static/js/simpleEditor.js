@@ -159,8 +159,6 @@
         ajaxOptions = $.extend({},ajaxOptions, options);
       }
 
-      console.log(ajaxOptions);
-
       return $.ajax(ajaxOptions);
 
     };
@@ -172,29 +170,70 @@
 
 
     simpleEditor.prototype.renderAttachmentGallery = function(files){
-      var ul,li,img,span;
+      var ul,li,img,a,span,
+          recognised_file_exts = ['jpg','jpeg','gif','png','bmp'],
+          gallery = this.$el.find('.reply-box-attachments-gallery');
 
       ul = document.createElement('ul');
 
+      var gallery_ul = gallery.find('ul');
+      if (gallery_ul.length > 0){
+        gallery_ul.find('.new-attachment').remove();
+        ul = gallery_ul[0];
+      }
+
+      /*
+      *   note 1: this function checks for two states of data hence the various
+          checks below. The two states have different data structures.
+      *   1) directly from the form (check for file.type)
+      *   2) fetched via ajax from /attachments api endpoint (check for file.fileHash)
+
+      *   note 2: data-rel is used for removing/deleting an attachment from the comment
+      */
+
       if(files.length>0){
         for(var i=0,j=files.length;i<j;i++){
-          img = document.createElement('img');
-
-          if (typeof files[i].meta !== 'undefined'){
-            if (typeof files[i].meta.links !== 'undefined'){
-              img.src = this.static_url + files[i].meta.links[0].href;
-            }
-          }else{
-            img.src = files[i].data;
-          }
-          if (typeof files[i].fileHash !== 'undefined'){
-            img.name = files[i].fileHash;
-          }else{
-            img.name = files[i].name;
-          }
 
           li = document.createElement('li');
-          li.appendChild(img);
+
+          if ( (typeof files[i].type !== 'undefined' && files[i].type.match('image.*')) ||
+                (typeof files[i].fileExt !== 'undefined' && recognised_file_exts.indexOf(files[i].fileExt)>-1 ) ){
+            img = document.createElement('img');
+
+            if (typeof files[i].meta !== 'undefined'){
+              if (typeof files[i].meta.links !== 'undefined'){
+                img.src = this.static_url + files[i].meta.links[0].href;
+              }
+            }else{
+              img.src = files[i].data;
+            }
+            if (typeof files[i].fileHash !== 'undefined'){
+              img.setAttribute('data-rel', files[i].fileHash);
+            }else{
+              img.setAttribute('data-rel', files[i].name);
+              li.className = li.className + " new-attachment";
+            }
+
+            img.name = files[i].name || files[i].fileName;
+
+            li.appendChild(img);
+
+          }else{ // non-image attachments
+            a = document.createElement('a');
+
+            li.className = "attachments-gallery-row";
+
+            if (typeof files[i].fileHash !== 'undefined'){
+              a.setAttribute('data-rel', files[i].fileHash);
+            }else{
+              a.setAttribute('data-rel', files[i].name);
+              li.className = li.className + " new-attachment";
+            }
+            a.name = files[i].name || files[i].fileName;
+            a.innerHTML = files[i].name || files[i].fileName;
+
+            li.appendChild(a);
+          }
 
           span = document.createElement('span');
           span.className = 'remove';
@@ -204,14 +243,16 @@
           ul.appendChild(li);
         }
       }
-      this.$el.find('.reply-box-attachments-gallery').html(ul);
+      if (gallery_ul.length < 1){
+        this.$el.find('.reply-box-attachments-gallery').html(ul);
+      }
     };
 
 
     simpleEditor.prototype.removeAttachmentFile = function(e){
       var self = $(e.currentTarget),
           parent = self.parent(),
-          fileToBeRemoved = parent.find('img[name]');
+          fileToBeRemoved = parent.find('[data-rel]');
 
       var delete_confirm = window.confirm("Are you sure you want to remove this attachment?");
 
@@ -229,8 +270,8 @@
             this.form.append(field_attachments_delete);
           }
 
-          if (this.attachments_delete.indexOf(fileToBeRemoved.attr('name')) === -1){
-            this.attachments_delete.push(fileToBeRemoved.attr('name'));
+          if (this.attachments_delete.indexOf(fileToBeRemoved.attr('data-rel')) === -1){
+            this.attachments_delete.push(fileToBeRemoved.attr('data-rel'));
             field_attachments_delete.val(this.attachments_delete.join(','));
           }
 
