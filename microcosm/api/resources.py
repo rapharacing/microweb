@@ -1483,7 +1483,7 @@ class FileMetadata(object):
     @classmethod
     def from_create_form(cls, file_upload):
         file_metadata = cls()
-        file_metadata.file = {'files': file_upload.read()}
+        file_metadata.file = {file_upload.name: file_upload.read()}
         return file_metadata
 
     @classmethod
@@ -1528,6 +1528,8 @@ class Attachment(object):
         summary.meta       = data['meta']
         summary.file_hash  = data['fileHash']
         summary.created    = parse_timestamp(data['created'])
+        summary.file_name  = data['fileName']
+        summary.file_ext   = data['fileExt']
 
         return summary
 
@@ -1546,7 +1548,7 @@ class Attachment(object):
         return Attachment.from_api_response(resource)
 
     @staticmethod
-    def create(host, file_hash, profile_id=None, comment_id=None, access_token=None):
+    def create(host, file_hash, profile_id=None, comment_id=None, access_token=None, file_name='untitled.unk'):
         if profile_id:
             url = build_url(host, ['profiles', profile_id, 'attachments'])
         elif comment_id:
@@ -1554,7 +1556,7 @@ class Attachment(object):
         else:
             raise AssertionError, 'You must supply a profile_id or comment_id to attach to'
 
-        attachment = {'FileHash': file_hash}
+        attachment = {'FileHash': file_hash, 'FileName': file_name}
         headers = APIResource.make_request_headers(access_token)
         return APIResource.process_response(url, requests.post(url, data=attachment, headers=headers))
 

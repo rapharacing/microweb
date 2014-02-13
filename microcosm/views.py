@@ -1340,7 +1340,7 @@ class CommentView(object):
 						if not f.name in attachments_delete:
 							file_request = FileMetadata.from_create_form(f)
 							# If any files are over 5MB, reload form with validation error.
-							if len(file_request.file['files']) >= 5242880:
+							if len(file_request.file[f.name]) >= 5242880:
 								responses = response_list_to_dict(grequests.map(request.view_requests))
 								comment_form = CommentForm(
 									initial= {
@@ -1361,8 +1361,13 @@ class CommentView(object):
 							# Associate attachment with comment using attachments API.
 							else:
 								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
-								Attachment.create(request.META['HTTP_HOST'], file_metadata.file_hash,
-									comment_id=comment_response.id, access_token=request.access_token)
+								Attachment.create(
+									request.META['HTTP_HOST'],
+									file_metadata.file_hash,
+									comment_id=comment_response.id,
+									access_token=request.access_token,
+									file_name=f.name,
+								)
 
 				# API returns which page in the thread this comments appear in, so redirect there.
 				if comment_response.meta.links.get('commentPage'):
@@ -1406,7 +1411,7 @@ class CommentView(object):
 								file_request = FileMetadata.from_create_form(f)
 								# File must be under 5MB
 								# TODO: use Django's built-in field validators and error messaging
-								if len(file_request.file['files']) >= 5242880:
+								if len(file_request.file[f.name]) >= 5242880:
 									view_data['form'] = form
 									view_data['avatar_error'] = 'Sorry, the file you upload must be under 5MB and square.'
 									return render(request, CommentView.form_template, view_data)
