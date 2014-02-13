@@ -125,6 +125,11 @@
       return this;
     };
 
+    fileHandler.prototype.clickHandler = function(e){
+      this.input.value = null;
+      this.stack = [];
+    };
+
     fileHandler.prototype.changeHandler = function(e){
         if (!this.event_type){
           this.event_type = "changed";
@@ -149,7 +154,8 @@
     fileHandler.prototype.bind = function(){
 
       var events = [
-        ['change',    'input[type=file]', 'changeHandler']
+        ['change',    'input[type=file]', 'changeHandler'],
+        ['click',     'input[type=file]', 'clickHandler']
         // ['drop',      this.dropzone,      'dropHandler'],
         // ['dragover',  this.dropzone,      'dragHandler']
       ];

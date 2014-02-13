@@ -174,13 +174,15 @@
           recognised_file_exts = ['jpg','jpeg','gif','png','bmp'],
           gallery = this.$el.find('.reply-box-attachments-gallery');
 
-      ul = document.createElement('ul');
 
+      ul = document.createElement('ul');
+      // check if <ul> already exists if so re-use
       var gallery_ul = gallery.find('ul');
       if (gallery_ul.length > 0){
         gallery_ul.find('.new-attachment').remove();
         ul = gallery_ul[0];
       }
+
 
       /*
       *   note 1: this function checks for two states of data hence the various
@@ -210,7 +212,7 @@
             if (typeof files[i].fileHash !== 'undefined'){
               img.setAttribute('data-rel', files[i].fileHash);
             }else{
-              img.setAttribute('data-rel', files[i].name);
+              img.setAttribute('data-rel', files[i].name || files[i].fileName);
               li.className = li.className + " new-attachment";
             }
 
@@ -226,7 +228,7 @@
             if (typeof files[i].fileHash !== 'undefined'){
               a.setAttribute('data-rel', files[i].fileHash);
             }else{
-              a.setAttribute('data-rel', files[i].name);
+              a.setAttribute('data-rel', files[i].name || files[i].fileName);
               li.className = li.className + " new-attachment";
             }
             a.name = files[i].name || files[i].fileName;
