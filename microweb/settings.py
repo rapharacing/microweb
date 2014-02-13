@@ -37,7 +37,7 @@ USE_TZ = True
 
 ## DO NOT ENABLE THIS, it will break editing and other places that embed identifiers
 ## within forms.
-#USE_THOUSAND_SEPARATOR = True 
+#USE_THOUSAND_SEPARATOR = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT = ''
@@ -111,6 +111,7 @@ INSTALLED_APPS = (
     'microcosm.templatetags.list_comment',
     'microcosm.templatetags.get_attachment',
     'microcosm.templatetags.huddle',
+    'microcosm.templatetags.is_image',
 )
 
 # The values below in must be initialised in local_settings.py

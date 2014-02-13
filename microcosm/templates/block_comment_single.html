@@ -1,4 +1,5 @@
 {% load get_attachment %}
+{% load is_image %}
 <li id="comment{{ comment.id }}" class="comment-item padded" itemscope itemtype="http://schema.org/Comment">
 	<a name="{{ comment.id }}"></a>
 	<div class="comment-item-inner">
@@ -42,11 +43,25 @@
 			{% if attachments %}
 				{% get_attachment comment.id as comment_attachments %}
 				{% if comment_attachments %}
+					<ul class="comment-item-body-attachments">
 					{% for attachment in comment_attachments.items %}
-
-						<img src="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}" />
-
+						{# template_tags/is_image.py #}
+							{% if attachment.file_ext|is_image %}
+							<li class="attachment-image">
+								<img src="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}"
+									 alt="{{ attachment.file_name }}"
+									 title="{{ attachment.file_name }}" />
+							</li>
+							{% else %}
+							<li class="attachment-link">
+								<a href="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}"
+								 title="{{ attachment.file_name }}">
+								{{ attachment.file_name }}
+								</a>
+							</li>
+							{% endif %}
 					{% endfor %}
+					</ul>
 				{% endif %}
 			{% endif %}
 		</div>
@@ -60,7 +75,7 @@
 					><span class="sprite sprite-arrow-left"></span> Reply</a>
 			{% endif %}
 
-			
+
 			{% if content.meta.permissions.update or comment.meta.permissions.update or comment.meta.created_by.id == user.id %}
 			<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first {% if not comment.meta.permissions.delete %}comment-item-footer-btn-last{% endif %}"
 				 data-action="{% url 'edit-comment' comment.id %}"
