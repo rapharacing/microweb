@@ -642,7 +642,8 @@ class ProfileView(object):
 						request.META['HTTP_HOST'],
 						file_metadata.file_hash,
 						profile_id=user.id,
-						access_token=request.access_token
+						access_token=request.access_token,
+						file_name=request.FILES['avatar'].name
 					)
 				profile_request = Profile(form.cleaned_data)
 				profile_response = profile_request.update(request.META['HTTP_HOST'], request.access_token)
@@ -1417,8 +1418,13 @@ class CommentView(object):
 									return render(request, CommentView.form_template, view_data)
 								else:
 									file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
-									Attachment.create(request.META['HTTP_HOST'], file_metadata.file_hash,
-										comment_id=comment_response.id, access_token=request.access_token)
+									Attachment.create(
+										request.META['HTTP_HOST'],
+										file_metadata.file_hash,
+										comment_id=comment_response.id,
+										access_token=request.access_token,
+										file_name=f.name,
+									)
 							else:
 								attachments_delete = [a for a in attachments_delete if not a == f.name]
 
