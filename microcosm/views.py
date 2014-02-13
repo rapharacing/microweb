@@ -1361,8 +1361,13 @@ class CommentView(object):
 							# Associate attachment with comment using attachments API.
 							else:
 								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
-								Attachment.create(request.META['HTTP_HOST'], file_metadata.file_hash,
-									comment_id=comment_response.id, access_token=request.access_token)
+								Attachment.create(
+									request.META['HTTP_HOST'],
+									file_metadata.file_hash,
+									comment_id=comment_response.id,
+									access_token=request.access_token,
+									file_name=f.name,
+								)
 
 				# API returns which page in the thread this comments appear in, so redirect there.
 				if comment_response.meta.links.get('commentPage'):
