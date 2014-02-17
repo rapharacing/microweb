@@ -56,9 +56,9 @@ class ContextMiddleware():
                 except memcache.Error as e:
                     logger.error('Memcached error: %s' % str(e))
             except APIException, e:
-                logger.error(e.message)
+                logger.error('APIException: %s' % e.message)
             except requests.RequestException, e:
-                logger.error(e.message)
+                logger.error('RequestException: %s' % e.message)
         request.site = site
 
         return None

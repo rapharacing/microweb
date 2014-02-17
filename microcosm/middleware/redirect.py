@@ -47,9 +47,10 @@ class DomainRedirectMiddleware():
                     except memcache.Error as e:
                         logger.error('Memcached SET error: %s' % str(e))
                 except APIException, e:
-                    logger.error(e.message)
+                    logger.error('APIException: %s' % e.message)
                 except RequestException, e:
-                    logger.error(e.message)
+                    logger.error('RequestException: %s' % e.message)
+                    return HttpResponsePermanentRedirect('http://microco.sm/?siteNotReachable=%s' % str(host))
 
             # Site has a custom domain, so redirect
             if site and site.domain != '':

@@ -101,14 +101,20 @@ def response_list_to_dict(responses):
     """
 
     response_dict = {}
+
+    if responses is None:
+        return response_dict
+
     for response in responses:
-        # Only follow one redirect. This is specifically to handle the /whoami
-        # case where the client is redirected to /profiles/{id}
-        if response.history:
-            response_dict[discard_querystring(response.history[0].url)] = \
-                APIResource.process_response(response.history[0].url, response)
-        else:
-            response_dict[discard_querystring(response.url)] = APIResource.process_response(response.url, response)
+        # If the domain is gibberish (*.*.microco.sm) then response will be None
+        if response:
+            # Only follow one redirect. This is specifically to handle the /whoami
+            # case where the client is redirected to /profiles/{id}
+            if response.history:
+                response_dict[discard_querystring(response.history[0].url)] = \
+                    APIResource.process_response(response.history[0].url, response)
+            else:
+                response_dict[discard_querystring(response.url)] = APIResource.process_response(response.url, response)
     return response_dict
 
 
