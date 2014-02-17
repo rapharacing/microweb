@@ -79,7 +79,7 @@
 									{#<input type="checkbox" class="row-admin-checkbox" /> #}
 									{% if item.most_recent_update %}
 
-										<a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}">{{ item.most_recent_update.title | safe | truncatechars:30 }}</a>
+										<a href="{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}" title="{{ item.most_recent_update.title | safe }}">{{ item.most_recent_update.title | safe | truncatechars:30 }}</a>
 										{% if item.most_recent_update.total_comments %}
 											<time datetime="{{ item.most_recent_update.last_comment_created|date:"c" }}"></time>
 											{% comment %}
