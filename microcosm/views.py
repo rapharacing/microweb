@@ -319,6 +319,11 @@ class HuddleView(object):
 	@staticmethod
 	@exception_handler
 	def single(request, huddle_id):
+
+		# Need to be authenticated
+		if request.whoami_url == '':
+			return HttpResponseRedirect('/')
+
 		if request.method == 'GET':
 			# Offset for paging of event comments
 			offset = int(request.GET.get('offset', 0))
@@ -395,6 +400,12 @@ class HuddleView(object):
 		"""
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
+
+		# Need to be authenticated
+		if request.whoami_url == '':
+			return HttpResponseRedirect('/')
+
+
 		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
 
 		if request.method == 'POST':

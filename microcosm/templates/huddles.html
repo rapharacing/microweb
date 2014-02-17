@@ -20,20 +20,23 @@
 
 <div class="content-body">
 
-{% if content.huddles.items %}
-<div class="list-huddles">
-	<ul class="list-collection bordered padded">
-	{% for item in content.huddles.items %}
-		{% huddle item %}
-	{% endfor %}
-	</ul>
-</div>
+{% if user %}
 
+	{% if content.huddles.items %}
+	<div class="list-huddles">
+		<ul class="list-collection bordered padded">
+		{% for item in content.huddles.items %}
+			{% huddle item %}
+		{% endfor %}
+		</ul>
+	</div>
+	{% else %}
+		<p class="row-meta">You currently have no messages.</p>
+	{% endif %}
 {% else %}
-<p>
-	You currently have no messages
-</p>
+	<p class="row-meta">Sign-in to read your messages.</p>
 {% endif %}
+
 </div>
 
 {% endblock %}
