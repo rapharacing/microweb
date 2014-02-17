@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 
+{% load microcosm %}
+{% load profile %}
+{% load conversation %}
+{% load event %}
+{% load list_comment %}
+{% load huddle %}
+
 {% block title %}Following{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
@@ -30,40 +37,48 @@
 			<ul class="list-collection bordered padded">
 
 				{% for update in content.updates.items %}
+
+
+
+
+
+				<!-- Start item -->
+				{% if update.item_type == 'conversation' %}
+					{% conversation update %}
+				{% elif update.item_type == 'event' %}
+					{% event update %}
+				{% elif update.item_type == 'microcosm' %}
+					{% microcosm update %}
+				{% elif update.item_type == 'profile' %}
+					{% profile update %}
+				{% elif update.item_type == 'huddle' %}
+					{% huddle update %}
+				{% elif update.item_type == 'comment' %}
+					{% if update.update_type == 'new_comment' or update.update_type == 'new_comment_in_huddle'  %}
+						{% if update.parent_item_type == 'conversation' %}
+							{% conversation update.parent_item %}
+						{% elif update.parent_item_type == 'event' %}
+							{% event update.parent_item %}
+						{% elif update.parent_item_type == 'profile' %}
+							{% profile update.parent_item %}
+						{% elif update.parent_item_type == 'huddle' %}
+							{% huddle update.parent_item %}
+						{% else %}
+						{% endif %}
+					{% else %}
+						{% list_comment update.item %}
+					{% endif %}
+				{% else %}
+				{% endif %}
+				<!-- End item -->
+
+
+
+
 					<li class="list-collection-row">
 						<div class="row">
 
 							<div class="col-sm-10">
-
-								<div class="list-collection-row-icon">
-
-
-								{% if update.update_type == "reply_to_comment" or update.update_type == "mentioned" %}
-									<a class="sprite sprite-speech-bubble-single" title="Comment"></a>
-								{% else %}
-
-									{% if update.parent_item_type %}
-										{% if update.parent_item_type == "conversation" %}
-											<a class="sprite sprite-speech-bubble" title="Conversation"></a>
-										{% elif update.parent_item_type == "event" %}
-											<a class="sprite sprite-calendar" title="Event"></a>
-										{% elif update.parent_item_type == "huddle" %}
-											<a class="sprite sprite-envelope" title="Message"></a>
-										{% elif update.item.item_type == "profile" %}
-											<a class="sprite sprite-user" title="Profile"></a>
-										{% endif %}
-									{% else %}
-										{% if update.item_type == "conversation" %}
-											<a class="sprite sprite-speech-bubble" title="Conversation"></a>
-										{% elif update.item_type == "event" %}
-											<a class="sprite sprite-calendar" title="Event"></a>
-										{% elif update.item_type == "huddle" %}
-											<a class="sprite sprite-envelope" title="Huddle"></a>
-										{% endif %}
-									{% endif %}
-
-								{% endif %}
-								</div> <!--/list-collection-row-icon -->
 
 								<div class="list-collection-row-offset">
 
@@ -169,6 +184,13 @@
 											<a href="{{ update.parent_link }}">{{ update.parent_text }}</a>
 										{% endif %}
 									</div> <!-- /row-title-wrapper-->
+
+
+
+
+
+
+								
 
 									<div class="row-meta">
 										<span class="sprite sprite-arrow-right"></span>
