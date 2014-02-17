@@ -21,10 +21,12 @@
 <div class="content-body">
 
 	{% if not content.microcosms.items %}
-		<p>This is such a new site that there are no forums at the moment.</p>
+		<div class="row-meta">
+			<p>This is such a new site that there are no forums.</p>
 		{% if content.meta.permissions.create %}
-			<p>Will you be the first to create one?</p>
+			<p><a href="{% url 'create-microcosm' %}">Create your first forum.</a></p>
 		{% endif %}
+		</div>
 	{% else %}
 
 {% include "forms/content-moderation.html" %}
