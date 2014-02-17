@@ -143,24 +143,32 @@
 		<ul class="list-group">
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalProfiles | default:0 | intcomma }}</span>
-				<a href="/profiles/">Members</a>
+				<a href="/profiles/">People</a>
 			</li>
+			{% if site.meta.stats.onlineProfiles %}
+			<li class="list-group-item">
+				<span class="badge-alt">{{ site.meta.stats.onlineProfiles | default:0 | intcomma }}</span>
+				<a href="/profiles/?online=true">Online now</a>
+			</li>
+			{% endif %}
+			{% if site.meta.stats.totalConversations %}
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalConversations | default:0 | intcomma }}</span>
 				<a href="/search/?type=conversation">Conversations</a>
 			</li>
+			{% endif %}
+			{% if site.meta.stats.totalEvents %}
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalEvents | default:0 | intcomma }}</span>
 				<a href="/search/?type=event">Events</a>
 			</li>
+			{% endif %}
+			{% if site.meta.stats.totalComments %}
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalComments | default:0 | intcomma }}</span>
 				<a href="/search/?type=comment">Comments</a>
 			</li>
-			<li class="list-group-item">
-				<span class="badge-alt">{{ site.meta.stats.onlineProfiles | default:0 | intcomma }}</span>
-				<a href="/profiles/?online=true">Members online now</a>
-			</li>
+			{% endif %}
 		</ul>
 	</div> <!-- / population -->
 
