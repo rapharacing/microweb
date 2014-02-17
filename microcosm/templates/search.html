@@ -18,18 +18,15 @@
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1>Search results for: {{ content.query.searched }}</h1>
-	<p class="text-muted">
-		{{ content.results.total }} matches.  Search took {{ content.time_elapsed }} seconds.
-	</p>
+{% if not content.results %}
+	<h1>No valid search terms supplied.</h1>
 </div>
-
 <div class="content-body">
-{% if content.results.items|length == 0 %}
-<div class="list-search-empty bordered padded">
-	<h2>
-		We couldn't find any items that matched your search.
-	</h2>
+	<p>Please enter some search terms.</p>
+{% elif content.results.items|length == 0 %}
+	<h1>We couldn't find any items that matched your search.</h1>
+</div>
+<div class="content-body">
 	<p>
 		<h3>Suggestions:</h3>
 		<ul>
@@ -37,47 +34,34 @@
 			<li>Try different or more general keywords.</li>
 		</ul>
 	</p>
-</div>
 {% else %}
-
+	<h1>Search results for: {{ content.query.searched }}</h1>
+	<p class="text-muted">
+		{{ content.results.total }} matches.  Search took {{ content.time_elapsed }} seconds.
+	</p>
+</div>
+<div class="content-body">
 	<div class="list-search">
-
 		<ul class="list-collection bordered padded">
 			{% for result in content.results.items %}
-
 				{% if result.item_type == 'conversation' %}
-
 					{% conversation result %}
-
 				{% elif result.item_type == 'event' %}
-
 					{% event result %}
-
 				{% elif result.item_type == "microcosm" %}
-
 					{% microcosm result %}
-
 				{% elif result.item_type == "profile" %}
-
 					{% profile result %}
-
 				{% elif result.item_type == "comment" %}
-
 					{% list_comment result %}
-
 				{% elif result.item_type == "huddle" %}
-
 					{% huddle result %}
-
 				{% else %}
-
 				{% endif %}
-		{% endfor %}
-	</ul>
-
-</div>
+			{% endfor %}
+		</ul>
+	</div>
 {% endif %}
-
 </div> <!-- /content-body -->
 
 <div class="content-footer padded">

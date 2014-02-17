@@ -1586,8 +1586,11 @@ class Search(object):
         if data['query'].get('type'):
             for t in data['query']['type']:
                 search.type.append(t)
-        search.time_elapsed = data['timeTakenInMs']/float(1000)
-        search.results = PaginatedList(data['results'], SearchResult)
+        if data.get('timeTakenInMs'):
+            search.time_elapsed = data['timeTakenInMs']/float(1000)
+        if data.get('results'):
+            search.results = PaginatedList(data['results'], SearchResult)
+
         return search
 
     @staticmethod

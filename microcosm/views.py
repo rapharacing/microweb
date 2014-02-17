@@ -1763,7 +1763,7 @@ class SearchView(object):
 		if request.method == 'GET':
 			# pagination offset
 			offset = int(request.GET.get('offset', 0))
-			q = request.GET.get('q')
+			q = request.GET.get('q')	
 
 			url, params, headers = Search.build_request(
 				request.META['HTTP_HOST'],
@@ -1778,8 +1778,10 @@ class SearchView(object):
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 				'site': request.site,
 				'content': search,
-				'pagination': build_pagination_links(responses[url]['results']['links'], search.results)
 			}
+
+			if responses[url].get('results'):
+				view_data['pagination'] = build_pagination_links(responses[url]['results']['links'], search.results)
 
 			return render(request, SearchView.single_template, view_data)
 		else:
