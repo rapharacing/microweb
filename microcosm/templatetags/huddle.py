@@ -12,6 +12,6 @@ def huddle(context, item, **kwargs):
 	if 'unread' in kwargs:
 		context['unread'] = kwargs['unread']
 	else:
-		context['unread'] = context['item'].item.meta.flags.unread
+		context['unread'] = False
 
 	return context
