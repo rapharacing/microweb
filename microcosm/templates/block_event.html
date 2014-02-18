@@ -1,7 +1,5 @@
 {% load humanize %}
-<li id="{{ item.item_type }}{{ item.item.id }}"
-		class="list-collection-row{% if item.meta.flags.sticky %} row-pinned{% endif %} {% if item.is_deleted %} row-deleted{% endif %}" itemscope itemtype="http://schema.org/Event">
-
+<li class="list-collection-row{% if item.meta.flags.sticky %} row-pinned{% endif %} {% if item.is_deleted %} row-deleted{% endif %}" id="{{ item.item_type }}{{ item.item.id }}" itemscope itemtype="http://schema.org/Event">
 	<div class="row">
 		<div class="col-sm-8 col-md-8 col-lg-8">
 
@@ -13,7 +11,7 @@
 
 				<h3 class="row-title {% if item.highlight %}row-title-highlight{% endif %}" itemprop="name">
 					<a href="/{{ item.item_type }}s/{{ item.item.id }}/{% if user %}newest/{% endif %}" itemprop="url">{% if item.highlight %}{{ item.highlight | safe }}{% else %}{{ item.item.title | safe }}{% endif %}</a>
-					{% if item.item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
+					{% if unread or item.item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
 				</h3>
 
 				{% if not item.item.meta.flags.sticky %}
@@ -75,4 +73,4 @@
 
 		</div>
 	</div>
-	</li>
+</li>

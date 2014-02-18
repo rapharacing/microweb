@@ -10,7 +10,7 @@
 
         <h3 class="row-title">
           <a href="{% url 'newest-huddle' item.item.id %}">{{ item.item.title | safe }}</a>
-          {% if item.item.meta.flags.unread %}
+          {% if unread or item.item.meta.flags.unread %}
           <span class="label label-warning">NEW</span>
           {% endif %}
         </h3>

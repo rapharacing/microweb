@@ -1,4 +1,4 @@
-<li id="{{ profile.itemType }}{{ profile.item.id }}" class="list-collection-row">
+<li class="list-collection-row" id="{{ profile.itemType }}{{ profile.item.id }}">
   <div class="row">
     <div class="col-sm-12">
       {% if not no_icon%}
@@ -9,9 +9,9 @@
       <div class="list-collection-row-offset">
         <div class="row-title row-title-profile">
         {% if user and send_message %}
-          <a href="{% url 'create-huddle' %}?to={{ profile.item.id }}" class="pull-right">send message</a>
+          <a class="pull-right" href="{% url 'create-huddle' %}?to={{ profile.item.id }}">send message</a>
         {% endif %}
-          <a href="{% url 'single-profile' profile.item.id %}"><img src="{% if 'gravatar' in profile.item.avatar %}{{profile.item.avatar}}{% elif 'files' in profile.item.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.item.profile_name | safe }}" align="left" class="img-badge"/> <strong>@{{ profile.item.profile_name|safe }}</strong></a>
+          <a href="{% url 'single-profile' profile.item.id %}"><img src="{% if 'gravatar' in profile.item.avatar %}{{profile.item.avatar}}{% elif 'files' in profile.item.avatar %}https://{{site.subdomain_key}}.microco.sm{{profile.item.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{profile.item.profile_name | safe }}" align="left" class="img-badge" /> <strong>@{{ profile.item.profile_name|safe }}</strong></a>
         </div>
       </div>
     </div>
