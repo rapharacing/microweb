@@ -1,4 +1,23 @@
 <li class="list-collection-row">
+{% if action == 'reply_to_comment' %}
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="list-collection-row-icon"></div>
+      <div class="list-collection-row-offset row-meta">
+        <a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name | safe }}</a> replied to your comment
+      </div>
+    </div>
+  </div>
+{% elif action == 'mentioned' %}
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="list-collection-row-icon"></div>
+      <div class="list-collection-row-offset row-meta">
+        <a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name | safe }}</a> mentioned you
+      </div>
+    </div>
+  </div>
+{% endif %}
   <div class="row">
     <div class="col-sm-12">
       <div class="list-collection-row-icon">
@@ -11,7 +30,6 @@
       {% endif %}
       </div>
       <div class="list-collection-row-offset">
-
         <div class="row-title">
 
             {% if result.parent_item_type == 'profile' %}
@@ -20,6 +38,7 @@
             {% else %}
             <a href="{{ result.item.meta.links.self.href }}/incontext/"><h3 class="row-title">{{ result.parent_item.title | safe }}</h3></a>
             {% endif %}
+
         </div>
 
         <div class="row-meta">
@@ -43,7 +62,6 @@
               {% endif %}
             </div>
           </div>
-
         </div>
       </div>
     </div>

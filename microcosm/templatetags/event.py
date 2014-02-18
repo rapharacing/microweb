@@ -1,13 +1,17 @@
 from django import template
-import math
 register = template.Library()
 
 @register.inclusion_tag('block_event.html',takes_context=True)
 def event(context, item, **kwargs):
 
-  if hasattr(item,'item'):
-    context['item'] = item
-  else:
-    context['item'] = { 'item' : item }
+	if hasattr(item,'item'):
+		context['item'] = item
+	else:
+		context['item'] = { 'item' : item }
 
-  return context
+	if 'unread' in kwargs:
+		context['unread'] = kwargs['unread']
+	else:
+		context['unread'] = context['item'].item.meta.flags.unread
+
+	return context

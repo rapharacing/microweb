@@ -1,9 +1,14 @@
 from django import template
-import math
 register = template.Library()
 
 @register.inclusion_tag('block_microcosm.html',takes_context=True)
 def microcosm(context, microcosm, **kwargs):
 
-  context['microcosm'] = microcosm
-  return context
+	context['microcosm'] = microcosm
+
+	if 'unread' in kwargs:
+		context['unread'] = kwargs['unread']
+	else:
+		context['unread'] = context['item'].item.meta.flags.unread
+
+	return context
