@@ -23,23 +23,27 @@
 
 <div class="content-body">
 
+  {% if not content.items.items %}
 
-  <div class="list-items">
+    <p class="row-meta">Nothing is trending right now.</p>
 
-    <ul class="list-collection bordered padded">
-    {% for item in content.items.items %}
+  {% else %}
 
-      {% if item.item_type == "conversation" %}
-        {% conversation item %}
-      {% endif %}
+    <div class="list-items">
 
-      {% if item.item_type == "event" %}
-        {% event item %}
-      {% endif %}
+      <ul class="list-collection bordered padded">
+      {% for item in content.items.items %}
+        {% if item.item_type == "conversation" %}
+          {% conversation item %}
+        {% endif %}
+        {% if item.item_type == "event" %}
+          {% event item %}
+        {% endif %}
+      {% endfor %}
+      </ul>
+    </div>
 
-    {% endfor %}
-    </ul>
-  </div>
+  {% endif %}
 
 </div>
 
@@ -68,6 +72,7 @@
       <h3>
         Trending
       </h3>
+      <p>The 10 hottest items on the site at the moment.</p>
     </div>
   </div> <!-- / about -->
 
