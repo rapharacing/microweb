@@ -25,6 +25,7 @@
 					background-repeat: repeat;
 				{% elif site.background_position == "cover" %}
 					background-size: cover;
+					background-attachment: fixed;
 				{% else %}
 					background-repeat: no-repeat;
 					background-position: {{site.background_position}} top;
