@@ -1,38 +1,38 @@
 <div id="modal-huddle-leave" class="modal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header navbar-header-wrapper tiling-bg">
-        <img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      </div>
-      <div class="modal-body">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header navbar-header-wrapper tiling-bg">
+				<img src="{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" />
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			</div>
+			<div class="modal-body">
 
-        <div class="modal-item-icon">
-          <span class="sprite sprite-envelope"></span>
-        </div>
-        <div class="modal-item-title">{{ content.title | safe }}</div>
-        <div class="modal-item-meta">
-          <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name | safe }}" class="img-badge" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
-        </div>
-        <div id="modal-huddle">
+				<div class="modal-item-icon">
+					<span class="sprite sprite-envelope"></span>
+				</div>
+				<div class="modal-item-title">{{ content.title | safe }}</div>
+				<div class="modal-item-meta">
+					<a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name | safe }}" class="img-badge" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
+				</div>
+				<div id="modal-huddle">
 
-          <h2>Delete Message</h2>
-          <p>
-            <strong>Warning!</strong>
-            You will no longer be able to view any past or<br/>future messages in this shared conversation.
-          </p>
-          <p>
-            <form action="{% url 'delete-huddle' content.id %}" method="POST">
-              {% csrf_token %}
-              <input type="submit" class="btn btn-danger" value="Delete Message"/>
-            </form>
-          </p>
-        </div>
-      </div>
+					<h2>Delete Message</h2>
+					<p>
+						<strong>Warning!</strong>
+						You will no longer be able to view any past or<br/>future messages in this shared conversation.
+					</p>
+					<p>
+						<form action="{% url 'delete-huddle' content.id %}" method="POST">
+							{% csrf_token %}
+							<input type="submit" class="btn btn-danger" value="Delete Message"/>
+						</form>
+					</p>
+				</div>
+			</div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-small btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
+			<div class="modal-footer">
+				<button type="button" class="btn btn-small btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
 </div>

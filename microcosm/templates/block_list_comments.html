@@ -1,69 +1,69 @@
 <li class="list-collection-row">
 {% if action == 'reply_to_comment' %}
-  <div class="row">
-    <div class="col-sm-12">
-      <div class="list-collection-row-icon"></div>
-      <div class="list-collection-row-offset row-meta">
-        <a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name | safe }}</a> replied to your comment
-      </div>
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="list-collection-row-icon"></div>
+			<div class="list-collection-row-offset row-meta">
+				<a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name | safe }}</a> replied to your comment
+			</div>
+		</div>
+	</div>
 {% elif action == 'mentioned' %}
-  <div class="row">
-    <div class="col-sm-12">
-      <div class="list-collection-row-icon"></div>
-      <div class="list-collection-row-offset row-meta">
-        <a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name | safe }}</a> mentioned you
-      </div>
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="list-collection-row-icon"></div>
+			<div class="list-collection-row-offset row-meta">
+				<a href="{{ update.profile_link }}">@{{ update.item.meta.created_by.profile_name | safe }}</a> mentioned you
+			</div>
+		</div>
+	</div>
 {% endif %}
-  <div class="row">
-    <div class="col-sm-12">
-      <div class="list-collection-row-icon">
-      {% if result.parent_item_type == 'huddle' %}
-        <a class="sprite sprite-envelope" title="Message"></a>
-      {% elif result.parent_item_type == 'profile' %}
-        <a class="sprite sprite-user" title="Profile"></a>
-      {% else %}
-        <a class="sprite sprite-speech-bubble-single" title="Comment"></a>
-      {% endif %}
-      </div>
-      <div class="list-collection-row-offset">
-        <div class="row-title">
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="list-collection-row-icon">
+			{% if result.parent_item_type == 'huddle' %}
+				<a class="sprite sprite-envelope" title="Message"></a>
+			{% elif result.parent_item_type == 'profile' %}
+				<a class="sprite sprite-user" title="Profile"></a>
+			{% else %}
+				<a class="sprite sprite-speech-bubble-single" title="Comment"></a>
+			{% endif %}
+			</div>
+			<div class="list-collection-row-offset">
+				<div class="row-title">
 
-            {% if result.parent_item_type == 'profile' %}
-            <a href="{% url 'single-profile' result.item.meta.created_by.id %}"><h3 class="row-title">@{{ result.parent_item.profile_name | safe }}</h3></a>
+						{% if result.parent_item_type == 'profile' %}
+						<a href="{% url 'single-profile' result.item.meta.created_by.id %}"><h3 class="row-title">@{{ result.parent_item.profile_name | safe }}</h3></a>
 
-            {% else %}
-            <a href="{{ result.item.meta.links.self.href }}/incontext/"><h3 class="row-title">{{ result.parent_item.title | safe }}</h3></a>
-            {% endif %}
+						{% else %}
+						<a href="{{ result.item.meta.links.self.href }}/incontext/"><h3 class="row-title">{{ result.parent_item.title | safe }}</h3></a>
+						{% endif %}
 
-        </div>
+				</div>
 
-        <div class="row-meta">
-            in
-            {% if result.parent_item_type == 'huddle' %}
-            <a href="{% url 'list-huddle' %}">Messages</a>
-            {% elif result.parent_item_type == 'profile' %}
-            <a href="{% url 'single-profile' result.item.meta.created_by.id %}">Profiles</a>
-            {% else %}
-            <a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title | safe }}</a>
-            {% endif %}
-            &bull;
-            <time datetime="{{ result.item.meta.created|date:"c" }}">{{ result.item.meta.created|timesince }}</time>
-          <div class="row-meta-excerpt">
-            <a href="{% url 'single-profile' result.item.meta.created_by.id %}"><img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/></a>
-            <div class="row-meta-excerpt-text">
-              {% if result.highlight %}
-                {{ result.highlight|safe }}
-              {% else %}
-                {{ result.item.html|safe }}
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+				<div class="row-meta">
+						in
+						{% if result.parent_item_type == 'huddle' %}
+						<a href="{% url 'list-huddle' %}">Messages</a>
+						{% elif result.parent_item_type == 'profile' %}
+						<a href="{% url 'single-profile' result.item.meta.created_by.id %}">Profiles</a>
+						{% else %}
+						<a href="{{ result.parent_item.meta.links.microcosm.href }}">{{ result.parent_item.meta.links.microcosm.title | safe }}</a>
+						{% endif %}
+						&bull;
+						<time datetime="{{ result.item.meta.created|date:"c" }}">{{ result.item.meta.created|timesince }}</time>
+					<div class="row-meta-excerpt">
+						<a href="{% url 'single-profile' result.item.meta.created_by.id %}"><img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/></a>
+						<div class="row-meta-excerpt-text">
+							{% if result.highlight %}
+								{{ result.highlight|safe }}
+							{% else %}
+								{{ result.item.html|safe }}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </li>
