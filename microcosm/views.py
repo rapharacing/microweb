@@ -1563,9 +1563,11 @@ class UpdateView(object):
 		}
 
 		if not request.access_token:
-			pass
 			# FIXME: need a user friendly error page for unregistered users
 			# raise HttpResponseNotAllowed
+			view_data.update({
+				'site_section' : 'updates'
+			})
 		else:
 			# pagination offset
 			offset = int(request.GET.get('offset', 0))
