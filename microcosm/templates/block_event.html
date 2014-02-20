@@ -26,7 +26,7 @@
 						</span>
 						{% if item.item.where %}
 						<span class="pills-event-where" itemprop="location" itemscope itemtype="http://schema.org/Place">
-							<span itemprop="name">{{ item.item.where | safe }}</span>
+							<span itemprop="name" title="{{ item.item.where | safe }}">{{ item.item.where | safe }}</span>
 						</span>
 						{% endif %}
 					</div>
