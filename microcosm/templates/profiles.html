@@ -6,13 +6,13 @@
 <div class="content-header padded">
 	<div class="row">
 		<div class="col-sm-7">
-			{% include 'breadcrumbs.html' %}
+			{% include 'breadcrumbs.html' with skipself=True %}
 		</div>
 		<div class="col-sm-5">
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1>People</h1>
+	<h1><a href="{% url 'list-profiles' %}">People</a></h1>
 </div>
 
 <div class="content-body">
@@ -24,7 +24,7 @@
 			{% endif %}
 			Directory
 			{% if subtitle %}
-			<span class="text-muted"> // {{ subtitle }}</span>
+			<span class="text-muted"> / {{ subtitle }}</span>
 			{% endif %}
 		</h3>
 		<ul class="list-profiles">

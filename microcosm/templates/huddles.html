@@ -9,13 +9,13 @@
 <div class="content-header padded">
 	<div class="row">
 		<div class="col-sm-7">
-			{% include 'breadcrumbs.html' %}
+			{% include 'breadcrumbs.html' with skipself=True %}
 		</div>
 		<div class="col-sm-5">
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1>Messages</h1>
+	<h1><a href="{{ content.meta.links.self.href }}">Messages</a></h1>
 </div>
 
 <div class="content-body">

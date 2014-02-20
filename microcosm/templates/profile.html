@@ -12,7 +12,7 @@
 					<div class="content-header padded">
 						<div class="row">
 							<div class="col-xs-12">
-								{% include 'breadcrumbs.html' %}
+								{% include 'breadcrumbs.html' with skipself=True %}
 							</div>
 						</div>
 					</div>
@@ -24,7 +24,7 @@
 							<img class="profile-header-avatar"
 									 src="{% if 'gravatar' in content.avatar %}{{content.avatar}}{% elif 'files' in content.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.avatar}}{% else %}/static/img/avatar.gif{% endif %}" class="gravatar" alt="Avatar for {{ content.profile_name | safe }}" />
 							<div class="profile-header-text">
-								<h1>{{ content.profile_name | safe }}</h1>
+								<h1><a href="{{ content.meta.links.self.href }}">{{ content.profile_name | safe }}</a></h1>
 								Member since {{ content.created|date:"M Y" }}
 								&bull;
 								Last active {{content.last_active|date:"M Y"}}

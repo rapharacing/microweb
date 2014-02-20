@@ -16,7 +16,7 @@
 <div class="content-header padded">
 	<div class="row">
 		<div class="col-sm-7">
-			{% include 'breadcrumbs.html' %}
+			{% include 'breadcrumbs.html' with skipself=True %}
 		</div>
 		<div class="col-sm-5">
 			{% include 'pagination.html' %}
@@ -27,7 +27,7 @@
 <div class="content-body">
 	<div class="item" itemscope itemtype="event">
 		<div class="item-header padded">
-			<h1 itemprop="name">{{ content.title | safe }}</h1>
+			<h1 itemprop="name"><a href="{{ content.meta.links.self.href }}">{{ content.title | safe }}</a></h1>
 			<div class="item-meta">
 				Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
 			</div>
