@@ -49,7 +49,7 @@ Unit tests can be run with:
 python manage.py test
 ```
 
-### User authentication
+## User authentication
 
 Since authentication is handled by the API, custom middleware is used to provide the authentication context in views. In `middleware/context.py`:
 
