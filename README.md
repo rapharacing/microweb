@@ -8,7 +8,7 @@ Microweb is the official web client for the Microcosm API, written in Django. If
 
 If you find any problems, raise an issue on github and we'll respond ASAP.
 
-[![Build Status](https://travis-ci.org/microcosm-cc/microweb.png?branch=v2)](https://travis-ci.org/microcosm-cc/microweb)
+[![Build Status](https://travis-ci.org/microcosm-cc/microweb.png)](https://travis-ci.org/microcosm-cc/microweb)
 
 ## Project setup
 
