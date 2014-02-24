@@ -2,9 +2,9 @@
 
 [Microco.sm](http://microco.sm) is a new platform for discussion forums, founded by [David Kitchen](https://twitter.com/buro9) and [Matt Cottingham](https://twitter.com/mattrco).
 
-We have a live site where you can [see the microcosm platform in action](https://meta.microco.sm). You can also [read more about the project here](http://microco.sm).
+Communities are already using Microco.sm as their forum software of choice, e.g. the [Espruino Forum](http://forum.espruino.com) and [Islington Cycle Club](http://forum.islington.cc).
 
-Microweb is the official web client for the Microcosm API, written in Django. If you're not familiar with the Microcosm API, you should start by reading the [API documentation](http://microcosm-cc.github.io/) (it's up-to-date and readable, we promise).
+Microweb is the official web client for Microco.sm, written in Django. If you're not familiar with the Microcosm API, you should start by reading the [API documentation](http://microcosm-cc.github.io/) (it's up-to-date and readable, we promise).
 
 If you find any problems, raise an issue on github and we'll respond ASAP.
 
@@ -12,32 +12,19 @@ If you find any problems, raise an issue on github and we'll respond ASAP.
 
 ## Project setup
 
-We use Django 1.5 and Virtualenv. To create the necessary virtualenv, run the following:
+To create a python virtualenv, run the following:
 
 ```
-virtualenv envname
+virtualenv -p python2.7 envname
 source envname/bin/activate
 pip install -r requirements.txt
 ```
 
-This will install all dependencies listed in `requirements.txt`
+This will install all dependencies listed in `requirements.txt`. All commands should be executed with the virtual environment activated.
 
 ## Project structure
 
-The top-level structure looks like this:
-
-```
-├── microweb
-│   ├── fabfile.py
-│   ├── manage.py
-│   ├── microcosm
-│   ├── microweb
-│   ├── README.md
-│   ├── requirements.txt
-│   └── upstart.sh
-```
-
-Most of the files you'll care about are in the `microcosm` app:
+Currently most of the project is contained within the `microcosm` app (due to be split in a refactor):
 
 ```
 ├── microcosm
@@ -52,11 +39,19 @@ Most of the files you'll care about are in the `microcosm` app:
 │   ├── views.py
 ```
 
-The `api` package contains classes for communicating with the Microcosm API. If you're familiar with django, the rest of the packages and modules will look familiar.
+The `api` package contains classes for communicating with the Microcosm API. If you're familiar with Django, the rest of the packages and modules will look familiar.
 
-### Request middleware
+## Tests
 
-The `request` object is being used quite a bit here, which is possible because of `middleware/context.py`:
+Unit tests can be run with:
+
+```
+python manage.py test
+```
+
+### User authentication
+
+Since authentication is handled by the API, custom middleware is used to provide the authentication context in views. In `middleware/context.py`:
 
 ```python
 def process_request(self, request):
@@ -70,8 +65,6 @@ def process_request(self, request):
     request.access_token = None
     request.delete_token = False
     request.whoami = None
-    request.site = None
-    request.create_profile = False
 
     if request.COOKIES.has_key('access_token'):
         request.access_token = request.COOKIES['access_token']
@@ -87,4 +80,4 @@ def process_request(self, request):
 
 ```
 
-So on each request we make a couple (cached) calls to the API, to check if the user has a valid `access_token` cookie, and retrieve some basic site data (title, description).
+So on each request we make a couple of calls to the API to check if the user has a valid `access_token` cookie, and retrieve some basic site data (title, description).
