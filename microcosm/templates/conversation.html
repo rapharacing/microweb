@@ -25,7 +25,7 @@
 			<h1 itemprop="name"><a href="{{ content.meta.links.self.href }}">{{ content.title | safe }}</a></h1>
 			<div class="item-meta">
 				Posted on <strong><time class="plain" itemprop="dateCreated" datetime="{{content.meta.created|date:"c"}}">{{ content.meta.created|date:"D jS, F Y"}}</time></strong>
-				{% include "forms/content-moderation.html" %}
+				{# {% include "forms/content-moderation.html" %} #}
 			</div>
 		</div>
 	</div> <!-- item -->
@@ -34,7 +34,7 @@
 		{% comments content.comments.items %}
 	</ul>
 
-	{% include "forms/content-moderation.html" %}
+	{# {% include "forms/content-moderation.html" %} #}
 
 </div> <!-- / content-body -->
 
@@ -107,6 +107,7 @@
 		</div>
 	</div> <!-- / about -->
 
+	{% include 'forms/metabar-moderation.html' %}
 
 {% endblock %}
 
