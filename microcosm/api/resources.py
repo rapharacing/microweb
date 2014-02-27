@@ -101,13 +101,12 @@ def response_list_to_dict(responses):
     """
 
     response_dict = {}
-
     if responses is None:
         return response_dict
 
     for response in responses:
-        # If the domain is gibberish (*.*.microco.sm) then response will be None
-        if response:
+        # If host contains more than two dots (e.g. *.*.microco.sm), response will be None.
+        if response is not None:
             # Only follow one redirect. This is specifically to handle the /whoami
             # case where the client is redirected to /profiles/{id}
             if response.history:
