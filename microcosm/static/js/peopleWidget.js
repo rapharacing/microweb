@@ -125,7 +125,7 @@
 
     peopleWidget.prototype.ItemPerson = function(descriptor){
       var link    = document.createElement('a'),
-          name    = document.createTextNode(),
+          name    = document.createTextNode(''),
           avatar  = document.createElement('img');
 
       avatar.src       = this.static_url + descriptor.avatar;
