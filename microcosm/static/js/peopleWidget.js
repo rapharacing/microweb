@@ -124,16 +124,14 @@
     };
 
     peopleWidget.prototype.ItemPerson = function(descriptor){
-      var link    = document.createElement('a'),
-          name    = document.createTextNode(''),
-          avatar  = document.createElement('img');
-
-      avatar.src       = this.static_url + descriptor.avatar;
-      name.textContent = descriptor.profileName;
+      var link    = document.createElement('a');
+      var avatar  = document.createElement('img');
 
       link.id          = descriptor.id;
+      avatar.src       = this.static_url + descriptor.avatar;
+
       link.appendChild(avatar);
-      link.appendChild(name);
+      link.appendChild(document.createTextNode(descriptor.profileName));
 
       return link;
     };
