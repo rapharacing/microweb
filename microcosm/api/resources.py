@@ -143,6 +143,7 @@ class APIResource(object):
 
     @staticmethod
     def process_response(url, response):
+
         try:
             resource = response.json()
         except ValueError:

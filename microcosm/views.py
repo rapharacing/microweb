@@ -1851,12 +1851,16 @@ class LegalView(object):
 	@exception_handler
 	def single(request, doc_name):
 
+		if not doc_name in ['cookies', 'privacy', 'terms']:
+			raise Http404
+
 		url, params, headers = Legal.build_request(
 			request.META['HTTP_HOST'],
 			doc=doc_name,
 		)
 		request.view_requests.append(grequests.get(url, params=params, headers=headers))
 		responses = response_list_to_dict(grequests.map(request.view_requests))
+
 		legal = Legal.from_api_response(responses[url])
 
 		view_data = {
