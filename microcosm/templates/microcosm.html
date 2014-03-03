@@ -68,8 +68,8 @@
 			<h5>Got something to add?</h5>
 			<div class="metabar-module-primary-buttons">
 			{% if user %}
-				<a href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-speech-bubble-small"></span> Start a conversation</a>
-				<a href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-calendar-small"></span> Start an event</a>
+				<a id="create_conversation" href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-speech-bubble-small"></span> Start a conversation</a>
+				<a id="create_event" href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-calendar-small"></span> Start an event</a>
 			{% else %}
 				<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin"><span class="sprite sprite-speech-bubble-small"></span> Start a conversation</a>
 				<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin"><span class="sprite sprite-calendar-small"></span> Start an event</a>
