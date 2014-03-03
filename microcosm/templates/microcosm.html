@@ -18,7 +18,7 @@
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1><a href="{{ content.meta.links.self.href }}">{{ content.title|safe }}</a></h1>
+	<h1><a id="microcosm_title" href="{{ content.meta.links.self.href }}">{{ content.title|safe }}</a></h1>
 </div>
 
 <div class="content-body">
@@ -83,7 +83,7 @@
 		<h5>About</h5>
 		<div class="metabar-module-title">
 			<h3>
-				{{ content.title | safe }} {% if content.meta.permissions.admin or content.meta.permissions.super_user %}<a href="{% url 'edit-microcosm' content.id %}" title="Edit forum title and description"><span class="sprite sprite-pencil-small"></span></a>{% endif %}
+				{{ content.title | safe }} {% if content.meta.permissions.admin or content.meta.permissions.super_user %}<a id="edit_microcosm" href="{% url 'edit-microcosm' content.id %}" title="Edit forum title and description"><span class="sprite sprite-pencil-small"></span></a>{% endif %}
 			</h3>
 			<p class="metabar-module-author">
 				<a href="{% url 'single-profile' content.meta.created_by.id %}"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name | safe }}" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
