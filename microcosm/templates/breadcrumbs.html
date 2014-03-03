@@ -33,6 +33,8 @@
 	<li><a href="{{ content.meta.links.self.href }}">Messages</a></li>
 		{% elif content.title %}
 	<li><a href="{{ content.meta.links.self.href }}">{{ content.title|safe }}</a></li>
+		{% elif site_section == 'legal' %}
+	<li><a href="{% url 'list-legal' %}">Legal</a></li>
 		{% endif %}
 	{% endif %}
 </ol>

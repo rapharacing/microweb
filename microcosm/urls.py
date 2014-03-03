@@ -18,6 +18,7 @@ from microcosm.views import RobotsView
 from microcosm.views import SearchView
 from microcosm.views import HuddleView
 from microcosm.views import TrendingView
+from microcosm.views import LegalView
 
 
 urlpatterns = patterns('',
@@ -91,10 +92,12 @@ urlpatterns = patterns('',
 
 	url(r'^search/$', SearchView.single, name='single-search'),
 
-
 	# Trending
 	url(r'^trending/$', TrendingView.list, name='list-trending'),
 
+	# Legal
+	url(r'^legal/$', LegalView.list, name='list-legal'),
+	url(r'^legal/(?P<doc_name>[a-z]+)/$', LegalView.single, name='single-legal'),
 
 	# Proxy geocoding requests to the backend
 	url(r'^geocode/$', GeoView.geocode, name='geocode'),

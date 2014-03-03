@@ -62,6 +62,7 @@ from microcosm.api.resources import Search
 from microcosm.api.resources import Huddle
 from microcosm.api.resources import HuddleList
 from microcosm.api.resources import Trending
+from microcosm.api.resources import Legal
 
 from microcosm.api.resources import build_url
 from microcosm.api.resources import join_path_fragments
@@ -1825,6 +1826,48 @@ class TrendingView(object):
 		}
 
 		return render(request, TrendingView.list_template, view_data)
+
+class LegalView(object):
+
+	list_template = 'legals.html'
+	single_template = 'legal.html'
+
+	@staticmethod
+	@exception_handler
+	def list(request):
+
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+
+		view_data = {
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': request.site,
+			'site_section': 'legal'
+		}
+
+		return render(request, LegalView.list_template, view_data)
+
+
+	@staticmethod
+	@exception_handler
+	def single(request, doc_name):
+
+		url, params, headers = Legal.build_request(
+			request.META['HTTP_HOST'],
+			doc=doc_name,
+		)
+		request.view_requests.append(grequests.get(url, params=params, headers=headers))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		legal = Legal.from_api_response(responses[url])
+
+		view_data = {
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': request.site,
+			'content': legal,
+			'site_section': 'legal',
+			'page_section': doc_name
+		}
+
+		return render(request, LegalView.single_template, view_data)
 
 class ErrorView(object):
 

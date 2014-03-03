@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% load conversation %}
+{% load event %}
+
+{% block title %}Legal{% endblock title %}
+
+{% block content %}
+
+<div class="content-header padded">
+	<div class="row">
+		<div class="col-sm-7">
+			{% include 'breadcrumbs.html' with skipself=True %}
+		</div>
+		<div class="col-sm-5"></div>
+	</div>
+	<h1><a href="{{ content.meta.links.self.href }}">Legal</a></h1>
+</div>
+
+<div class="content-body">
+
+	<p>A number of legal documents describe how we treat data you provide and the provision of the forum.</p>
+
+	<p>We have attempted to make these documents easy to understand as possible, but if you have any trouble understanding them please let us know.</p>
+
+	<div class="list-items">
+		<ul class="list-collection bordered padded">
+			<li><a href="{% url 'single-legal' 'terms' %}">Our terms of use</a></li>
+			<li><a href="{% url 'single-legal' 'privacy' %}">Our privacy policy</a></li>
+			<li><a href="{% url 'single-legal' 'cookies' %}">Our use of cookies</a></li>
+		</ul>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block sidebar%}
+
+	<div class="metabar-module">
+		<h5>Legal</h5>
+	</div> <!-- / about -->
+
+{% endblock %}

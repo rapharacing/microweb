@@ -1656,3 +1656,34 @@ class Trending(APIResource):
         url, params, headers = Microcosm.build_request(host, offset, access_token)
         resource = APIResource.retrieve(url, params, headers)
         return Trending.from_api_response(resource)
+
+
+class Legal(APIResource):
+    """
+    Represents /legal/document
+    """
+
+    api_path_fragment = 'legal'
+
+    @classmethod
+    def from_api_response(cls, data):
+        legal = cls()
+
+        if data.get('link'):
+            legal.link = data['link']
+        if data.get('html'):
+            legal.html = data['html']
+
+        return legal
+
+    @staticmethod
+    def build_request(host, doc = '', access_token=None):
+        url = build_url(host, [Legal.api_path_fragment, doc])
+        headers = APIResource.make_request_headers(access_token)
+        return url, {}, headers
+
+    @staticmethod
+    def retrieve(host, offset=None, access_token=None):
+        url, params, headers = Microcosm.build_request(host, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return Legal.from_api_response(resource)

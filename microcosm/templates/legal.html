@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load conversation %}
+{% load event %}
+
+{% block title %}Legal{% endblock title %}
+
+{% block content %}
+
+<div class="content-header padded">
+	<div class="row">
+		<div class="col-sm-7">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-5"></div>
+	</div>
+</div>
+
+<div class="content-body">
+	{{ content.html | safe }}
+</div>
+
+{% endblock %}
+
+{% block sidebar%}
+
+	<div class="metabar-module">
+		
+		{% if page_section == 'terms' %}
+			<h5>Terms of Use</h5>
+			<p>This legal document describes the general terms of use of the forum.</p>
+		{% elif page_section == 'cookies' %}
+			<h5>Cookie Policy</h5>
+			<p>This legal document describes what data we store on your computer in the form of browser cookies, and how they are used by us to provide the forum service.</p>
+		{% elif page_section == 'privacy' %}
+			<h5>Privacy Policy</h5>
+			<p>This legal document outlines the data that we hold on you that identifies you or is confidential, and how we use that data to provide the forum service to you. It further describes how we store and secure your data, as well as your rights regarding this data.</p>
+		{% endif %}
+	</div> <!-- / about -->
+
+{% endblock %}
