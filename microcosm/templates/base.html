@@ -217,14 +217,14 @@
 		</div>
 		<div class="footer">
 			<div class="container">
+				<p>&copy; {{ site.title }}, powered by <a href="#">microcosm</a>.</p>
 				<p class="links">
-					<!--<a href="#">Help</a> &bull;
-					<a href="#">Developers</a> &bull;
-					<a href="#">Terms</a> &bull;
-					<a href="#">Privacy</a>-->
+					<a href="{% url 'list-legal' %}">About</a>
+					<a href="{% url 'single-legal' 'terms' %}">Terms of Use</a>
+					<a href="{% url 'single-legal' 'privacy' %}">Privacy Policy</a>
+					<a href="{% url 'single-legal' 'cookies' %}">Cookie Policy</a>
 					<a href="mailto:founders@microcosm.cc">Report a problem</a>
 				</p>
-				<p class="bold">Powered by <a href="http://microco.sm">Microcosm</a></p>
 			</div>
 		</div>
 
@@ -246,7 +246,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        Powered by <a href="#">Microcosm</a>
+                        &copy; {{ site.title }}, powered by <a href="#">microcosm</a>.<br/>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
