@@ -1,17 +1,18 @@
 {% if content.meta.permissions.moderator %}
 <div class="metabar-module">
-	<h5>Moderation</h5>
+	<h5>Moderation actions</h5>
 	<div class="metabar-admin">
-		<form class="metabar-admin-actions" action="" method="post">
-
+		<form class="metabar-admin-actions" action="{% url 'moderate-move' %}" method="GET">
+			<input type="hidden" name="item_id" value="{{ content.id }}" />
+			<input type="hidden" name="item_type" value="{{ item_type }}" />
 			<select id="metabar-admin-actions" class="cselect cselect-xs" name="action">
-				<option>Move {{ item_type }}</option>
-				<option>Delete {{ item_type }}</option>
-				<option>Undelete {{ item_type }}</option>
-				<option>Approve {{ item_type }}</option>
-				<option>Unapprove {{ item_type }}</option>
-				<option>Pin {{ item_type }}</option>
-				<option>Unpin {{ item_type }}</option>
+				<option value="move">Move this item</option>
+				<!--<option>Delete</option>-->
+				<!--<option>Undelete</option>-->
+				<!--<option>Approve</option>-->
+				<!--<option>Unapprove</option>-->
+				<!--<option>Pin</option>-->
+				<!--<option>Unpin</option>-->
 			</select>
 			<input type="submit" value="Go" class="btn btn-primary btn-xs"/>
 		</form>

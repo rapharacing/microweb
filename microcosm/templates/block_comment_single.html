@@ -7,12 +7,6 @@
 
 			<div class="comment-item-permalink">
 
-			{% if content.meta.permissions.moderator %}
-				<div class="comment-item-header-admin">
-					<input type="checkbox" />
-				</div>
-			{% endif %}
-
 				<time datetime="{{ comment.meta.created|date:"c" }}" itemprop="dateCreated"></time>
 				<span style="color:#eee">&bull;</span>
 				{% if hide_permalink %}

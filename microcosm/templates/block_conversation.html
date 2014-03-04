@@ -30,12 +30,6 @@
 
 		<div class="col-sm-4 col-md-4 col-lg-4">
 
-			{% if content.meta.permissions.moderator %}
-			<div class="list-collection-row-admin">
-				<input class="row-admin-checkbox" type="checkbox" />
-			</div>
-			{% endif %}
-
 			<div class="row-stats">
 				<ul class="list-stats list-stats-sm">
 					{% if item.item.total_comments >= 0 %}
