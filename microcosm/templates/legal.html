@@ -3,7 +3,7 @@
 {% load conversation %}
 {% load event %}
 
-{% block title %}Legal{% endblock title %}
+{% block title %}{% if page_section == 'terms' %}Terms of Use{% elif page_section == 'cookies' %}Cookie Policy{% elif page_section == 'privacy' %}Privacy Policy{% endif %} | About{% endblock title %}
 
 {% block content %}
 
@@ -28,13 +28,13 @@
 		
 		{% if page_section == 'terms' %}
 			<h5>Terms of Use</h5>
-			<p>This legal document describes the general terms of use of the forum.</p>
+			<p>This document describes the general terms of use of the forum.</p>
 		{% elif page_section == 'cookies' %}
 			<h5>Cookie Policy</h5>
-			<p>This legal document describes what data we store on your computer in the form of browser cookies, and how they are used by us to provide the forum service.</p>
+			<p>This document describes what data we store on your computer in the form of browser cookies, and how they are used by us to provide the forum service.</p>
 		{% elif page_section == 'privacy' %}
 			<h5>Privacy Policy</h5>
-			<p>This legal document outlines the data that we hold on you that identifies you or is confidential, and how we use that data to provide the forum service to you. It further describes how we store and secure your data, as well as your rights regarding this data.</p>
+			<p>This document outlines the data that we hold on you that identifies you or is confidential, and how we use that data to provide the forum service to you. It further describes how we store and secure your data, as well as your rights regarding this data.</p>
 		{% endif %}
 	</div> <!-- / about -->
 

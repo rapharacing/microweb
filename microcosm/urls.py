@@ -96,8 +96,8 @@ urlpatterns = patterns('',
 	url(r'^trending/$', TrendingView.list, name='list-trending'),
 
 	# Legal
-	url(r'^legal/$', LegalView.list, name='list-legal'),
-	url(r'^legal/(?P<doc_name>[a-z]+)/$', LegalView.single, name='single-legal'),
+	url(r'^about/$', LegalView.list, name='list-legal'),
+	url(r'^about/(?P<doc_name>[a-z]+)/$', LegalView.single, name='single-legal'),
 
 	# Proxy geocoding requests to the backend
 	url(r'^geocode/$', GeoView.geocode, name='geocode'),
