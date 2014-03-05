@@ -58,7 +58,7 @@ def rsync():
 
     rsync_project(
         env.serve_root,
-        extra_opts='--exclude .git/ --delete --rsync-path="sudo -u django rsync"'
+        extra_opts='--exclude .git/ --exclude ENV/ --delete --rsync-path="sudo -u django rsync"'
     )
 
 def start_service():
