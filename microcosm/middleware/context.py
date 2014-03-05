@@ -39,26 +39,5 @@ class ContextMiddleware():
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
             request.whoami_url = url
 
-        try:
-            site = self.mc.get(request.get_host())
-        except memcache.Error as e:
-            logger.error('Memcached error: %s' % str(e))
-            site = None
-
-        if site is None:
-            try:
-                site = Site.retrieve(request.get_host())
-                try:
-                    # Cached for 30 seconds to spare useless requests but still
-                    # provide a useful indication in the stats of how many people
-                    # are online now
-                    self.mc.set(request.get_host(), site, time=30)
-                except memcache.Error as e:
-                    logger.error('Memcached error: %s' % str(e))
-            except APIException, e:
-                logger.error('APIException: %s' % e.message)
-            except requests.RequestException, e:
-                logger.error('RequestException: %s' % e.message)
-        request.site = site
-
+        request.site = Site.retrieve(request.get_host())
         return None
