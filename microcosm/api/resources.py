@@ -619,7 +619,7 @@ class PermissionSet(object):
         self.update = data['update']
         self.delete = data['delete']
         self.guest = data['guest']
-        self.super_user = data['moderator']
+        self.moderator = data['moderator']
         self.owner = data['owner']
         self.admin = data['siteOwner']
 

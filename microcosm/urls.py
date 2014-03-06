@@ -19,6 +19,7 @@ from microcosm.views import SearchView
 from microcosm.views import HuddleView
 from microcosm.views import TrendingView
 from microcosm.views import LegalView
+from microcosm.views import ModerationView
 
 
 urlpatterns = patterns('',
@@ -90,6 +91,7 @@ urlpatterns = patterns('',
 	url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),
 	url(r'^profiles/(?P<profile_id>\d+)/edit/$', ProfileView.edit, name='edit-profile'),
 
+	# Search
 	url(r'^search/$', SearchView.single, name='single-search'),
 
 	# Trending
@@ -98,6 +100,9 @@ urlpatterns = patterns('',
 	# Legal
 	url(r'^about/$', LegalView.list, name='list-legal'),
 	url(r'^about/(?P<doc_name>[a-z]+)/$', LegalView.single, name='single-legal'),
+
+	# Moderation
+	url(r'^moderate/move/$', ModerationView.move, name='moderate-move'),
 
 	# Proxy geocoding requests to the backend
 	url(r'^geocode/$', GeoView.geocode, name='geocode'),

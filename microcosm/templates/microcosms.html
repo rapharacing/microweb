@@ -28,8 +28,6 @@
 		</div>
 	{% else %}
 
-{% include "forms/content-moderation.html" %}
-
 		<div class="list-microcosms">
 			<ul class="list-collection bordered padded">
 			{% for item in content.microcosms.items %}
@@ -55,12 +53,6 @@
 							</div>
 
 							<div class="col-sm-5 col-md-5">
-
-							{% if content.meta.permissions.moderator %}
-								<div class="list-collection-row-admin">
-									<input class="row-admin-checkbox" type="checkbox" />
-								</div>
-							{% endif %}
 
 								<div class="row-stats">
 									<ul class="list-stats">
@@ -102,8 +94,6 @@
 {% endif %}
 </div>
 
-{% include "forms/content-moderation.html" %}
-
 <div class="content-footer padded">
 	<div class="row">
 		<div class="col-sm-8">
@@ -122,7 +112,7 @@
 	{% if content.meta.permissions.create %}
 	<div class="metabar-module">
 		<h5>Got something to add?</h5>
-		<a href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-folder-open"></span> Create a forum</a>
+		<a id="create_microcosm" href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-folder-open"></span> Create a forum</a>
 	</div> <!-- primary actions -->
 	{% endif %}
 
