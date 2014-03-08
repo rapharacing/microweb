@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.http import HttpResponseRedirect
 
 import requests
 import grequests
@@ -39,5 +40,9 @@ class ContextMiddleware():
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
             request.whoami_url = url
 
-        request.site = Site.retrieve(request.get_host())
+        try:
+            request.site = Site.retrieve(request.get_host())
+        except APIException as e:
+            if e.status_code == 400:
+                return HttpResponseRedirect('https://microco.sm')
         return None
