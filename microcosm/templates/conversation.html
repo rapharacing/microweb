@@ -80,7 +80,7 @@
 		<div class="metabar-module-primary-buttons">
 			{% if user %}
 				{% if content.meta.permissions.update %}
-				<a id="edit_conversation" href="{% url 'edit-conversation' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit Conversation</a>
+				<a id="edit-conversation" href="{% url 'edit-conversation' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit Conversation</a>
 				{% endif %}
 			<a id="post-a-reply-handle" href="#reply" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-speech-bubble-small"></span> Post a reply</a>
 			{% else %}
