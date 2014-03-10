@@ -27,7 +27,7 @@
 <div class="content-body">
 	<div class="item" itemscope itemtype="event">
 		<div class="item-header padded">
-			<h1 itemprop="name"><a href="{{ content.meta.links.self.href }}">{{ content.title | safe }}</a></h1>
+			<h1 itemprop="name"><a id="title" href="{{ content.meta.links.self.href }}">{{ content.title | safe }}</a></h1>
 			<div class="item-meta">
 				Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
 			</div>
@@ -100,7 +100,7 @@
 		<div class="metabar-module-primary-buttons">
 		{% if user %}
 			{% if content.meta.permissions.update %}
-			<a href="{% url 'edit-event' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit Event</a>
+			<a id="edit-event" href="{% url 'edit-event' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit Event</a>
 			{% endif %}
 			<a id="post-a-reply-handle" href="#reply" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-speech-bubble-small"></span> Post a reply</a>
 		{% else %}
