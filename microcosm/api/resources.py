@@ -331,8 +331,6 @@ class Profile(object):
             self.comment_count = data['commentCount']
             self.created = parse_timestamp(data['created'])
             self.last_active = parse_timestamp(data['lastActive'])
-            self.banned = data['banned']
-            self.admin = data['admin']
 
     @classmethod
     def from_summary(cls, data):
