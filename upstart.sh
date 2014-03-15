@@ -18,6 +18,11 @@ source /srv/www/django/microwebenv/bin/activate
 
 cd /srv/www/django/microweb
 test -d $LOGDIR || mkdir -p $LOGDIR
-exec /srv/www/django/microwebenv/bin/gunicorn_django -b $HOST \
+
+NEW_RELIC_CONFIG_FILE=/srv/www/django/microweb/newrelic.ini
+export NEW_RELIC_CONFIG_FILE
+
+exec /srv/www/django/microwebenv/bin/newrelic-admin run-program \
+  /srv/www/django/microwebenv/bin/gunicorn_django -b $HOST \
   -w $NUM_WORKERS --user=$USER --group=$GROUP --log-level=info \
   --log-file=$LOGFILE 2>>$LOGFILE
