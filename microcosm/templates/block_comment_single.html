@@ -62,23 +62,7 @@
 		<div class="comment-item-footer">
 
 		{% if user %}
-			{% if not comment.meta.created_by.id == user.id %}
-					<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first comment-item-footer-btn-last"
-						data-action="{% url 'create-comment' %}"
-						data-ref="{{ comment.id }}" href="javascript:void 0"
-					><span class="sprite sprite-arrow-left"></span> Reply</a>
-			{% endif %}
-
-
-			{% if content.meta.permissions.update or comment.meta.permissions.update or comment.meta.created_by.id == user.id %}
-			<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first {% if not comment.meta.permissions.delete %}comment-item-footer-btn-last{% endif %}"
-				 data-action="{% url 'edit-comment' comment.id %}"
-				 data-source="{% url 'single-comment' comment.id %}"
-				 data-comment-id="{{ comment.id }}"
-				 data-num-attachments="{{ comment.attachments|default:"0"}}"
-				 href="javascript:void 0">Edit</a>
-			{% endif %}
-			{% if comment.meta.permissions.delete %}
+			{% if content.meta.permissions.siteOwner or comment.meta.permissions.delete %}
 			<div class="delete-comment">
 				<form action="{% url 'delete-comment' comment.id %}" method="POST">
 					{% csrf_token %}
@@ -86,6 +70,26 @@
 				</form>
 			</div>
 			{% endif %}
+
+			{% if content.meta.permissions.siteOwner or comment.meta.permissions.update or comment.meta.created_by.id == user.id %}
+			<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first {% if not comment.meta.permissions.delete %}comment-item-footer-btn-last{% endif %}"
+				 data-action="{% url 'edit-comment' comment.id %}"
+				 data-source="{% url 'single-comment' comment.id %}"
+				 data-comment-id="{{ comment.id }}"
+				 data-num-attachments="{{ comment.attachments|default:"0"}}"
+				 href="javascript:void 0">
+				 <span class="sprite sprite-pencil-small"></span>
+				 Edit</a>
+			{% endif %}
+
+			{% if not comment.meta.created_by.id == user.id %}
+				<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first comment-item-footer-btn-last comment-reply-button"
+					data-action="{% url 'create-comment' %}"
+					data-ref="{{ comment.id }}" href="javascript:void 0"
+				><span class="sprite sprite-arrow-left"></span> Reply</a>
+			{% endif %}
+
+
 		{% endif %}
 		</div>
 

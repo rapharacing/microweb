@@ -165,14 +165,14 @@
 		document.getElementById('profileform'),
 		{
 			rules : {
-				'{{ form.profileName.name }}'      : ['not_empty','maxlength', 'validChars']
+				'{{ form.profileName.name }}'      : ['not_empty', 'maxlength', 'validChars']
 			},
 			tests : {
 				'validChars': function(field){
 					var $field = $(field),
 							name   = $field.val();
 
-					return name.match(/[^a-z0-9\.\_\-\+]+/i).length == 0;
+					return name.match(/[^a-z0-9\.\_\-\+]+/i) === null;
 
 				 },
 				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }

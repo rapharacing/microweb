@@ -40,6 +40,8 @@
         this.deactivateLabel();
         return;
       }
+      // adds to <input> element
+      this.input[0].files = files;
 
       var reader = new FileReader();
 
