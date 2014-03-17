@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="content-header padded">
+        <div class="row">
+            <div class="col-sm-8">
+                {% include 'breadcrumbs.html' %}
+            </div>
+        </div>
+        <h1>
+            {% if action == 'move' %}
+                Move {{ content.title }} to:
+            {% elif action == 'delete' %}
+                Do you wish to delete "{{ content.title }}"?
+            {% endif %}
+        </h1>
+    </div>
+
+    <div class="content-body">
+        {% if action == 'move' %}
+            <div class="row form-container">
+                <div class="col-xs-12">
+                    <form role="form" action="" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="{{ action }}" />
+                        <input type="hidden" name="item_type" value="{{ item_type }}"/>
+                        <input type="hidden" name="item_id" value="{{ content.id }}"/>
+                        <select name="microcosm_id">
+                            {% for m in microcosms.microcosms.items %}
+                                <option value="{{ m.id }}">{{ m.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="submit" value="Go" class="btn btn-primary"/>
+                    </form>
+                </div>
+            </div>
+        {% elif action == 'delete' %}
+            <div class="row form-container">
+                <div class="col-xs-12">
+                    <form role="form" action="" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="{{ action }}" />
+                        <input type="hidden" name="item_type" value="{{ item_type }}"/>
+                        <input type="hidden" name="item_id" value="{{ content.id }}"/>
+                        <input type="hidden" name="microcosm_id" value="{{content.microcosm_id}}" />
+                        <input type="submit" value="Delete" class="btn btn-primary"/>
+                    </form>
+                    <a href={% url 'single-microcosm' content.microcosm_id %}>Cancel</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

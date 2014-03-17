@@ -102,7 +102,7 @@ urlpatterns = patterns('',
 	url(r'^about/(?P<doc_name>[a-z]+)/$', LegalView.single, name='single-legal'),
 
 	# Moderation
-	url(r'^moderate/move/$', ModerationView.move, name='moderate-move'),
+	url(r'^moderate/$', ModerationView.item, name='moderate-item'),
 
 	# Proxy geocoding requests to the backend
 	url(r'^geocode/$', GeoView.geocode, name='geocode'),
