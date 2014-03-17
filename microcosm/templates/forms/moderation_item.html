@@ -26,7 +26,7 @@
                         <input type="hidden" name="action" value="{{ action }}" />
                         <input type="hidden" name="item_type" value="{{ item_type }}"/>
                         <input type="hidden" name="item_id" value="{{ content.id }}"/>
-                        <select name="microcosm_id">
+                        <select name="microcosm_id" class="cselect">
                             {% for m in microcosms.microcosms.items %}
                                 <option value="{{ m.id }}">{{ m.title }}</option>
                             {% endfor %}
