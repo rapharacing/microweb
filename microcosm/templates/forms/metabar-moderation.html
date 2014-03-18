@@ -2,11 +2,12 @@
 <div class="metabar-module">
 	<h5>Moderation actions</h5>
 	<div class="metabar-admin">
-		<form class="metabar-admin-actions" action="{% url 'moderate-move' %}" method="GET">
+		<form class="metabar-admin-actions" action="{% url 'moderate-item' %}" method="GET">
 			<input type="hidden" name="item_id" value="{{ content.id }}" />
 			<input type="hidden" name="item_type" value="{{ item_type }}" />
 			<select id="metabar-admin-actions" class="cselect cselect-xs" name="action">
 				<option value="move">Move this item</option>
+				<option value="delete">Delete this item</option>
 				<!--<option>Delete</option>-->
 				<!--<option>Undelete</option>-->
 				<!--<option>Approve</option>-->
