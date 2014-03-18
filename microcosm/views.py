@@ -2,6 +2,7 @@ import requests
 import grequests
 import string
 import datetime
+import json
 
 from functools import wraps
 
@@ -1876,9 +1877,9 @@ class LegalView(object):
 class ModerationView(object):
 
 	@staticmethod
-	def move(request):
+	def item(request):
 		"""
-		Move an item to another forum.
+		View for moderation actions on a single item.
 		"""
 
 		if request.method == 'GET':
@@ -1896,39 +1897,46 @@ class ModerationView(object):
 				responses = response_list_to_dict(grequests.map(request.view_requests))
 				content = Event.from_api_response(responses[url])
 
-			else:
-				logger.error('Cannot move item type %s' % request.GET.get('item_type'))
-				return HttpResponseServerError()
-
-			# Fetch list of microcosms
-			microcosms = MicrocosmList.retrieve(request.META['HTTP_HOST'], access_token=request.access_token)
-
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False),
 				'site': request.site,
 				'content': content,
-				'microcosms': microcosms,
 				'item_type': request.GET.get('item_type'),
+				'action': request.GET.get('action'),
 			}
-			return render(request, 'forms/moderation_move.html', view_data)
+
+			if request.GET.get('action') == 'move':
+				# Fetch list of microcosms
+				view_data['microcosms'] = MicrocosmList.retrieve(request.META['HTTP_HOST'], access_token=request.access_token)
+
+			return render(request, 'forms/moderation_item.html', view_data)
 
 		if request.method == 'POST':
-			microcosm_id = request.POST.get('microcosm_id')
+			if request.POST.get('action') == 'move':
+				if request.POST.get('item_type') == 'event':
+					event = Event.retrieve(request.META['HTTP_HOST'], request.POST.get('item_id'),
+						access_token=request.access_token)
+					event.microcosm_id = int(request.POST.get('microcosm_id'))
+					event.meta = {'editReason': 'Moderator moved item'}
+					event.update(request.META['HTTP_HOST'], request.access_token)
+				elif request.POST.get('item_type') == 'conversation':
+					conversation = Conversation.retrieve(request.META['HTTP_HOST'],
+						request.POST.get('item_id'), access_token=request.access_token)
+					conversation.microcosm_id = int(request.POST.get('microcosm_id'))
+					conversation.meta = {'editReason' :'Moderator moved item'}
+					conversation.update(request.META['HTTP_HOST'], request.access_token)
 
-			if request.POST.get('item_type') == 'event':
-				event = Event.retrieve(request.META['HTTP_HOST'], request.POST.get('item_id'),
-					access_token=request.access_token)
-				event.microcosm_id = int(request.POST.get('microcosm_id'))
-				event.meta = {'editReason': 'Moderator moved item'}
-				event.update(request.META['HTTP_HOST'], request.access_token)
-			elif request.POST.get('item_type') == 'conversation':
-				conversation = Conversation.retrieve(request.META['HTTP_HOST'],
-					request.POST.get('item_id'), access_token=request.access_token)
-				conversation.microcosm_id = int(request.POST.get('microcosm_id'))
-				conversation.meta = {'editReason' :'Moderator moved item'}
-				conversation.update(request.META['HTTP_HOST'], request.access_token)
+			elif request.POST.get('action') == 'delete':
+				if request.POST.get('item_type') == 'conversation':
+					url, params, headers = Conversation.build_request(request.META['HTTP_HOST'], request.POST.get('item_id'), access_token=request.access_token)
+				if request.POST.get('item_type') == 'event':
+					url, params, headers = Event.build_request(request.META['HTTP_HOST'], request.POST.get('item_id'), access_token=request.access_token)
+				payload = json.dumps([{'op': 'replace', 'path': '/meta/flags/deleted', 'value': True}])
+				headers['Content-Type'] = 'application/json'
+				requests.patch(url, payload, headers=headers)
 
-			return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_id,)))
+			return HttpResponseRedirect(reverse('single-microcosm', args=(request.POST.get('microcosm_id'),)))
+
 
 class ErrorView(object):
 
