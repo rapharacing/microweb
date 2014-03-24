@@ -42,6 +42,8 @@ from microcosm.api.exceptions import APIException
 from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
+from microcosm.api.resources import Role
+from microcosm.api.resources import RoleList
 from microcosm.api.resources import UpdateList
 from microcosm.api.resources import Update
 from microcosm.api.resources import UpdatePreference
@@ -835,10 +837,21 @@ class MembershipView(object):
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
+		roles_url, params, headers = RoleList.build_request(
+			request.META['HTTP_HOST'],
+			id=microcosm_id,
+			offset=offset,
+			access_token=request.access_token
+		)
+		request.view_requests.append(grequests.get(roles_url, params=params, headers=headers))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		roles = RoleList.from_api_response(responses[roles_url])
+
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
+			'site': request.site,
 			'content': microcosm,
+			'memberships': roles,
 			'item_type': 'microcosm',
 			'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
 		}
@@ -872,6 +885,39 @@ class MembershipView(object):
 
 			return render(request, MembershipView.form_template, view_data)
 
+	@staticmethod
+	@exception_handler
+	def edit(request, microcosm_id):
+
+
+		if request.method == 'POST':
+			pass
+		elif request.method == 'GET':
+
+			offset = int(request.GET.get('offset', 0))
+
+			microcosm_url, params, headers = Microcosm.build_request(
+				request.META['HTTP_HOST'],
+				id=microcosm_id,
+				offset=offset,
+				access_token=request.access_token
+			)
+			request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
+			request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			microcosm = Microcosm.from_api_response(responses[microcosm_url])
+
+			view_data = {
+				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+				'site': request.site,
+				'content': microcosm,
+				'item_type': 'microcosm',
+				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+			}
+
+			return render(request, MembershipView.form_template, view_data)
+		else:
+			return HttpResponseNotAllowed(['GET', 'POST'])
 
 class EventView(object):
 	create_form = EventCreate
