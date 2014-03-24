@@ -18,10 +18,18 @@
 
 <div class="content-body">
 
+  <div class="row-meta">
+  {% if memberships.default_roles %}
+    <p>These are the default membership groups defined by the site owner and are applied to all new forums.</p>
+  {% else %}
+    <p>These are customer membership groups that apply to this forum only.</p>
+  {% endif %}
+  </div>
+
   <div class="list-memberships">
 
     <ul class="list-collection bordered padded">
-    {% for membership in memberships %}
+    {% for membership in memberships.items.items %}
         <li class="list-collection-row">
           <div class="row">
 
@@ -30,7 +38,7 @@
 
               </div> /list-collection-row-icon -->
               <div class="list-collection-row-offset">
-                <h2 class="row-title">{{ membership.name }}</h2>
+                <h2 class="row-title">{{ membership.title }}</h2>
                 <div class="row-meta">
 
                     <ul class="list-people list-people-sm">
@@ -41,42 +49,64 @@
 
                   <p class="list-membership-description">
 
-                    A <strong>{{ membership.name }}</strong>
-                    {% if membership.can_read %}
-                    <span class="green bold">can access</span>
-                    {%else%}
-                    <span class="red bold">cannot access</span>
-                    {% endif %}
-                    this forum.
+                    {% if membership.moderator %}
+                      As a moderator, they <span class="green bold">can create, read, update and delete</span> their own content, and <span class="green bold">can read, update and delete</span> the conversations, events and comments of others.
 
-                    {% if membership.can|length %}
-                      They <span class="green bold">can {{ membership.can|join:", " }}</span>
-                      their own conversations, events and comments.
-                    {% endif %}
-                    {% if membership.cannot|length %}
-                      They <span class="red bold">cannot {{ membership.cannot|join:", " }}</span>
-                      their own conversations, events and comments.
-                    {% endif %}
-                    {% if membership.is_moderator %}
-                      As moderator,
-                      {% if membership.can|length %}
-                      they <span class="green bold">can also {{ membership.can|join:", " }}</span>
-                      the conversations, events and comments of others.
+                    {% elif membership.banned %}
+                      As a member of a banned group, they <span class="red bold">cannot read, update or delete</span>
+                      any content in this forum.
+
+                    {% else %}
+                      <strong>{{ membership.title }}</strong>
+                      {% if membership.read %}
+                      <span class="green bold">can access</span>
+                      {%else%}
+                      <span class="red bold">cannot access</span>
                       {% endif %}
+                      this forum.<br>
+
+                      They
+                      {% if membership.create %}
+                      <span class="green bold">can create and edit</span>
+                      {%else%}
+                      <span class="red bold">cannot create and edit</span>
+                      {% endif %}
+                      their own conversations, events and comments.<br>
+
+                      They
+                      {% if membership.update %}
+                      <span class="green bold">can update</span>
+                      {%else%}
+                      <span class="red bold">cannot update</span>
+                      {% endif %}
+                      items created by others.<br>
+
+                      They
+                      {% if membership.delete %}
+                      <span class="green bold">can update</span>
+                      {%else%}
+                      <span class="red bold">cannot update</span>
+                      {% endif %}
+                      items created by others.
+
                     {% endif %}
                   </p>
                 </div>
               </div>
             </div>
 
+            {% if not memberships.default_roles %}
+
             <div class="col-sm-4">
               <div class="row-stats">
-                <a href="{% url 'form_edit_memberships' membership.microcosm.name|slugify membership.id %}" class="btn btn-default pull-right">Edit Group</a>
+                <a href="{% url 'edit-memberships' content.id membership.id %}" class="btn btn-default pull-right">Edit Group</a>
               </div>
               <div class="row-context">
               </div>
-
             </div>
+
+            {% endif %}
+
           </div>
         </li>
     {% endfor %}
@@ -97,21 +127,29 @@
 
 {% endblock content %}
 
-{% block metabar %}
+{% block sidebar %}
 
-<div class="metabar-module">
-  <h5>About</h5>
-  <div class="metabar-module-title">
-    <h3>
-      Membership groups
-    </h3>
-    <p>
-      Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
-      doloremque laudantium, totam rem aperiam.
-    </p>
-  </div>
-</div> <!-- / about -->
+  {# if content.meta.permissions.create #}
+    <div class="metabar-module">
+      <div class="metabar-module-primary-buttons">
+      {% if user %}
+        <a id="create_membership_group" href="{% url 'create-memberships' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-user-group"></span> Create a membership group</a>
+      {% endif %}
+      </div>
+    </div> <!-- primary actions -->
+  {# endif #}
 
 
+  <div class="metabar-module">
+    <h5>About</h5>
+    <div class="metabar-module-title">
+      <h3>
+        Membership groups
+      </h3>
+      <p>Membership groups control access and permissions within a forum.</p>
+      <p>People can be granted moderator responsibilities within a forum. It is also possible to ban people from a single forum without it impacting access to the rest of the site.</p>
+      <p>The vast majority of people are either guests (not signed-in) or members, and would usually be granted some permissions that allow them to view the forum and create new content.</p>
+    </div>
+  </div> <!-- / about -->
 
-{% endblock metabar %}
+{% endblock sidebar %}

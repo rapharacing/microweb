@@ -20,35 +20,40 @@
 			<div class="form-container-inner padded">
 				<form role="form">
 
+
 					<div class="form-group">
 						<div class="row">
+							<h3 class="col-sm-12">
+								What is the name of this membership group?
+							</h3>
+						</div>
 
-							<label class="col-sm-12" for="name">What should we call this membership group?</label>
+						<div class="row">
+
+							<label class="col-sm-12" for="name">Please enter a name for the group?</label>
 							<div class="col-sm-12">
 								<input type="text" class="form-control" id="name" name="name" placeholder="Name of group" />
 							</div>
+							<div class="col-sm-12 row-meta">Tip: A good name describes the role people within the group, i.e. "guests", "members", "banned", or "moderators".</div>
 
 						</div>
 					</div> <!-- /form-group -->
 
 					<div class="form-group">
 						<div class="row">
-							<label class="col-sm-12">
-								2. Complete at least one of either or a combination of 2a, 2b or 2c.
-							</label>
+							<h3 class="col-sm-12">
+								Who are the people that are in this group?
+							</h3>
 						</div>
-					</div> <!-- /form-group -->
-
-					<div class="form-group">
 						<div class="row">
 							<label class="col-sm-12">
-								2a. Type of user to include
+								Include people automatically:
 							</label>
 							<div class="col-md-6">
 								<ul class="list-toggles">
 									<li>
 										<span class="list-toggles-marker"></span>
-										<span class="list-toggles-text">Registered</span>
+										<span class="list-toggles-text">All signed-in users</span>
 										<div class="btn-group btn-group-xs pull-right">
 											<button type="button" class="btn btn-default">
 												<label>Yes <input type="radio" value="1" name="include_registered"></label>
@@ -60,7 +65,7 @@
 									</li>
 									<li>
 										<span class="list-toggles-marker"></span>
-										<span class="list-toggles-text">Unregistered users / guests</span>
+										<span class="list-toggles-text">All unregistered / guests users</span>
 										<div class="btn-group btn-group-xs pull-right">
 											<button type="button" class="btn btn-default">
 												<label>Yes <input type="radio" value="1" name="include_unregistered"></label>
@@ -70,27 +75,12 @@
 											</button>
 										</div>
 									</li>
-									<li>
-										<span class="list-toggles-marker"></span>
-										<span class="list-toggles-text">Banned</span>
-										<div class="btn-group btn-group-xs pull-right">
-											<button type="button" class="btn btn-default">
-												<label>Yes <input type="radio" value="1" name="include_banned"></label>
-											</button>
-											<button type="button" class="btn btn-default">
-												<label>No <input type="radio" value="0" name="include_banned"></label>
-											</button>
-										</div>
-									</li>
 								</ul>
 							</div>
 						</div>
-					</div> <!-- /form-group -->
-
-					<div class="form-group">
 						<div class="row">
 							<label class="col-sm-12">
-								2b. <span class="red">And/or</span> is there any criteria for joining this group?
+								Include people that match the following criteria:
 							</label>
 							<div class="form-widget criteria-list">
 								<div class="form-widget-empty-state">
@@ -137,12 +127,9 @@
 								</div>
 							</div><!-- /form-widget -->
 						</div>
-					</div> <!-- /form-group -->
-
-					<div class="form-group">
 						<div class="row">
 							<label class="col-sm-12">
-								2b. <span class="red">And/or</span> who do you want to join this group?
+								Include these individuals:
 							</label>
 							<div class="col-sm-12">
 								<div class="list-participants"></div>
@@ -160,11 +147,48 @@
 						</div>
 					</div> <!-- /form-group -->
 
-
 					<div class="form-group">
 						<div class="row">
+							<h3 class="col-sm-12">
+								What are these people able to do?
+							</h3>
+						</div>
+						<div class="row">
 							<label class="col-sm-12">
-								3. What can members in this group do in this forum?
+								Special permissions:
+							</label>
+							<div class="col-md-10">
+								<ul class="list-toggles">
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">People in this group are <span class="green bold">responsible for moderating</span> this forum</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="can_moderate"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="can_moderate"></label>
+											</button>
+										</div>
+									</li>
+									<li>
+										<span class="list-toggles-marker"></span>
+										<span class="list-toggles-text">People in this group are <span class="red bold">banned</span> and cannot see this forum or interact with it</span>
+										<div class="btn-group btn-group-xs pull-right">
+											<button type="button" class="btn btn-default">
+												<label>Yes <input type="radio" value="1" name="include_banned"></label>
+											</button>
+											<button type="button" class="btn btn-default">
+												<label>No <input type="radio" value="0" name="include_banned"></label>
+											</button>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-12">
+								Specific permissions:
 							</label>
 							<div class="col-md-10">
 								<ul class="list-toggles">
@@ -185,22 +209,10 @@
 										<span class="list-toggles-text">User can create, edit and delete their own conversations, events and comments</span>
 										<div class="btn-group btn-group-xs pull-right">
 											<button type="button" class="btn btn-default">
-												<label>Yes <input type="radio" value="1" name="can_edit"></label>
+												<label>Yes <input type="radio" value="1" name="can_create"></label>
 											</button>
 											<button type="button" class="btn btn-default">
-												<label>No <input type="radio" value="0" name="can_edit"></label>
-											</button>
-										</div>
-									</li>
-									<li>
-										<span class="list-toggles-marker"></span>
-										<span class="list-toggles-text">User can moderate this forum</span>
-										<div class="btn-group btn-group-xs pull-right">
-											<button type="button" class="btn btn-default">
-												<label>Yes <input type="radio" value="1" name="can_moderate"></label>
-											</button>
-											<button type="button" class="btn btn-default">
-												<label>No <input type="radio" value="0" name="can_moderate"></label>
+												<label>No <input type="radio" value="0" name="can_create"></label>
 											</button>
 										</div>
 									</li>

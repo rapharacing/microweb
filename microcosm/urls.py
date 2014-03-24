@@ -42,6 +42,7 @@ urlpatterns = patterns('',
 
 	url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/$', MembershipView.list, name="list-memberships"),
 	url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/create/$', MembershipView.create, name="create-memberships"),
+	url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/(?P<group_id>\d+)/edit/$', MembershipView.edit, name="edit-memberships"),
 
 	# Interstitial page for creating an item (Event, ...) within a microcosm.
 	url(r'^microcosms/(?P<microcosm_id>\d+)/create/$', MicrocosmView.create_item_choice, name='item-choice'),

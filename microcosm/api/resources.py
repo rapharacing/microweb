@@ -515,6 +515,67 @@ class MicrocosmList(object):
         return MicrocosmList(resource)
 
 
+class RoleList(object):
+    """
+    Represents a list of security roles for a given site (default roles) or
+    microcosm (custom roles)
+    """
+
+
+    def __init__(self, data):
+        self.items = PaginatedList(data['roles'], Role)
+        self.meta = Meta(data['meta'])
+
+        self.default_roles = False
+        if data.get('defaultRoles'):
+            self.default_roles = data['defaultRoles']
+
+    @staticmethod
+    def build_request(host, id, offset=None, access_token=None):
+        url = build_url(host, ['microcosms', id, 'roles'])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @classmethod
+    def from_api_response(cls, data):
+        rolelist = RoleList(data)
+        # if data.get('id'): microcosm.id = data['id']
+        # if data.get('siteId'): microcosm.site_id = data['siteId']
+        # if data.get('visibility'): microcosm.visibility = data['visibility']
+        # if data.get('title'): microcosm.title = data['title']
+        # if data.get('description'): microcosm.description = data['description']
+        # if data.get('moderators'): microcosm.moderators = data['moderators']
+        # if data.get('editReason'): microcosm.edit_reason = data['editReason']
+        # if data.get('meta'): microcosm.meta = Meta(data['meta'])
+        # if data.get('items'): microcosm.items = PaginatedList(data['items'], Item)
+        return rolelist
+
+
+class Role(object):
+
+    @classmethod
+    def from_summary(cls, data):
+        role = cls()
+        role.id = data['id']
+        role.title = data['title']
+        role.site_id = data['siteId']
+
+        role.moderator = data['moderator']
+        role.banned = data['banned']
+        role.include_guests = data['includeGuests']
+        role.create = data['create']
+        role.read = data['read']
+        role.update = data['update']
+        role.delete = data['delete']
+        role.close_own = data['closeOwn']
+        role.open_own = data['openOwn']
+        role.read_others = data['readOthers']
+
+        role.meta = Meta(data['meta'])
+
+        return role
+
 class Item(object):
     """
     Represents an item contained within a microcosm. Only used when
