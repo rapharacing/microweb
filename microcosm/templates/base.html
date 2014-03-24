@@ -59,7 +59,7 @@
 									<a href="/" title="Return to Homepage"><img src="{{ site.logo_url }}" alt="{{ site.title | safe }} - Powered by Microcosm" id="logo" /></a>
 								</div>
 
-								<div class="col-md-3 col-lg-2 navbar-profile">
+								<div class="col-md-3 col-lg-3 navbar-profile">
 									{% if user %}
 										<div class="navbar-profile-row-1">
 											<span id="logout" class="navbar-profile-logout"><a href="#" title="Sign out" class="sprite sprite-logout" onclick="navigator.id.logout()"></a></span>
@@ -121,7 +121,7 @@
 							</div>
 							{% endif %}
 							<ul class="nav navbar-nav">
-								<li class="col-sm-4 navbar-nav-search">
+								<li class="col-sm-4 col-md-3 navbar-nav-search">
 									<form class="navbar-form navbar-left" role="search" action="{% url 'single-search' %}">
 										<div class="input-group">
 											<input
