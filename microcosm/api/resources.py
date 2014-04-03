@@ -149,6 +149,8 @@ class APIResource(object):
         except ValueError:
             raise APIException('Response is not valid json:\n %s' % response.content, 500)
         if resource['error']:
+            if resource['data']:
+                logger.error(resource['data'])
             raise APIException(resource['error'], response.status_code)
         if resource['data'] is None:
             raise APIException('No data returned at: %s' % url)
