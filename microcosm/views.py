@@ -60,6 +60,7 @@ from microcosm.api.resources import response_list_to_dict
 from microcosm.api.resources import GlobalOptions
 from microcosm.api.resources import ProfileList
 from microcosm.api.resources import Search
+from microcosm.api.resources import Site
 from microcosm.api.resources import Huddle
 from microcosm.api.resources import HuddleList
 from microcosm.api.resources import Trending
@@ -170,7 +171,7 @@ class ConversationView(object):
 
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': request.site,
+				'site': Site(responses[request.site_url]),
 				'content': conversation,
 				'comment_form': comment_form,
 				'pagination': build_pagination_links(responses[conversation_url]['comments']['links'], conversation.comments),
@@ -188,7 +189,10 @@ class ConversationView(object):
 		"""
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
-		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+		view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False),
+            'site': Site(responses[request.site_url]),
+        }
 
 		if request.method == 'POST':
 			form = ConversationView.create_form(request.POST)
@@ -230,8 +234,11 @@ class ConversationView(object):
 		"""
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
-		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
-		view_data['state_edit'] = True
+		view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False),
+            'site': Site(responses[request.site_url]),
+		    'state_edit': True,
+        }
 
 		if request.method == 'POST':
 			form = ConversationView.edit_form(request.POST)
@@ -355,7 +362,7 @@ class HuddleView(object):
 
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': request.site,
+				'site': Site(responses[request.site_url]),
 				'content': huddle,
 				'comment_form': comment_form,
 				'pagination': build_pagination_links(responses[huddle_url]['comments']['links'], huddle.comments),
@@ -386,7 +393,7 @@ class HuddleView(object):
 
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 			'content': huddles,
 			'pagination': build_pagination_links(responses[huddle_url]['huddles']['links'], huddles.huddles)
 		}
@@ -407,8 +414,10 @@ class HuddleView(object):
 		if request.whoami_url == '':
 			return HttpResponseRedirect('/')
 
-
-		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+		view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False),
+            'site': Site(responses[request.site_url]),
+        }
 
 		if request.method == 'POST':
 			form = HuddleView.create_form(request.POST)
@@ -555,7 +564,7 @@ class ProfileView(object):
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'item_type': 'profile',
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 			'search': Search.from_api_response(responses[search_url]),
 			'site_section': 'people'
 		}
@@ -619,7 +628,7 @@ class ProfileView(object):
 
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 			'content': profiles,
 			'pagination': build_pagination_links(responses[profiles_url]['profiles']['links'], profiles.profiles),
 			'q': q,
@@ -643,7 +652,10 @@ class ProfileView(object):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		user = Profile(responses[request.whoami_url], summary=False)
-		view_data = dict(user=user, site=request.site)
+		view_data = {
+            'user': user,
+            'site': Site(responses[request.site_url]),
+        }
 
 		if request.method == 'POST':
 			form = ProfileView.edit_form(request.POST)
@@ -730,7 +742,7 @@ class MicrocosmView(object):
 
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': request.site,
+				'site': Site(responses[request.site_url]),
 				'content': microcosm,
 				'item_type': 'microcosm',
 				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
@@ -758,7 +770,7 @@ class MicrocosmView(object):
 
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 			'content': microcosms,
 			'item_type': 'site',
 			'pagination': build_pagination_links(responses[microcosms_url]['microcosms']['links'], microcosms.microcosms)
@@ -771,7 +783,10 @@ class MicrocosmView(object):
 	def create(request):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
-		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+		view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False),
+            'site': Site(responses[request.site_url]),
+        }
 
 		if request.method == 'POST':
 			form = MicrocosmView.create_form(request.POST)
@@ -795,7 +810,10 @@ class MicrocosmView(object):
 	def edit(request, microcosm_id):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
-		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+		view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False),
+            'site': Site(responses[request.site_url]),
+        }
 
 		if request.method == 'POST':
 			form = MicrocosmView.edit_form(request.POST)
@@ -845,7 +863,7 @@ class MicrocosmView(object):
 
 		view_data = {
 			'user' : Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site' : request.site,
+			'site' : Site(responses[request.site_url]),
 			'content' : Microcosm.from_api_response(responses[microcosm_url])
 		}
 
@@ -877,7 +895,7 @@ class MembershipView(object):
 
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': request.site,
+				'site': Site(responses[request.site_url]),
 				'content': microcosm,
 				'item_type': 'microcosm',
 				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
@@ -909,7 +927,7 @@ class MembershipView(object):
 
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': request.site,
+				'site': Site(responses[request.site_url]),
 				'content': microcosm,
 				'item_type': 'microcosm',
 				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
@@ -1013,7 +1031,7 @@ class EventView(object):
 
 			view_data = {
 				'user'              : user,
-				'site'              : request.site,
+				'site'              : Site(responses[request.site_url]),
 				'content'           : event,
 				'comment_form'      : comment_form,
 				'pagination'        : build_pagination_links(responses[event_url]['comments']['links'], event.comments),
@@ -1045,7 +1063,10 @@ class EventView(object):
 		"""
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
-		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+		view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False),
+            'site': Site(responses[request.site_url]),
+        }
 		user = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
 
 		if request.method == 'POST':
@@ -1111,8 +1132,11 @@ class EventView(object):
 		"""
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
-		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
-		view_data['state_edit'] = True
+		view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False),
+            'site': Site(responses[request.site_url]),
+            'state_edit': True
+        }
 
 		if request.method == 'POST':
 			form = EventView.edit_form(request.POST)
@@ -1309,7 +1333,7 @@ class CommentView(object):
 
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 			'content': content,
 			'comment_form' : comment_form,
 			'attachments'  : attachments
@@ -1333,7 +1357,7 @@ class CommentView(object):
 				responses = response_list_to_dict(grequests.map(request.view_requests))
 				view_data = {
 					'user': Profile(responses[request.whoami_url], summary=False),
-					'site': request.site,
+					'site': Site(responses[request.site_url]),
 					'form': form,
 				}
 				return render(request, CommentView.form_template, view_data)
@@ -1366,7 +1390,7 @@ class CommentView(object):
 								)
 								view_data = {
 									'user': Profile(responses[request.whoami_url], summary=False),
-									'site': request.site,
+									'site': Site(responses[request.site_url]),
 								    'content': comment_response,
 									'comment_form': comment_form,
 									'error': 'Sorry, one of your files was over 5MB. Please try again.',
@@ -1402,7 +1426,10 @@ class CommentView(object):
 			raise PermissionDenied
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
-		view_data = dict(user=Profile(responses[request.whoami_url], summary=False), site=request.site)
+		view_data = {
+            'user': Profile(responses[request.whoami_url], summary=False),
+            'site': Site(responses[request.site_url]),
+        }
 
 		if request.method == 'POST':
 			form = CommentForm(request.POST)
@@ -1559,17 +1586,14 @@ class UpdateView(object):
 	@exception_handler
 	def list(request):
 
-		view_data = {
-			'user': False,
-			'site': request.site
-		}
-
 		if not request.access_token:
-			# FIXME: need a user friendly error page for unregistered users
-			# raise HttpResponseNotAllowed
-			view_data.update({
-				'site_section' : 'updates'
-			})
+		# FIXME: need a user friendly error page for unregistered users
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			view_data = {
+				'user': False,
+				'site_section': 'updates',
+				'site': Site(responses[request.site_url]),
+			}
 		else:
 			# pagination offset
 			offset = int(request.GET.get('offset', 0))
@@ -1583,12 +1607,13 @@ class UpdateView(object):
 			responses = response_list_to_dict(grequests.map(request.view_requests))
 			updates_list = UpdateList(responses[url])
 
-			view_data.update({
+			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False),
 				'content': updates_list,
 				'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates),
-				'site_section' : 'updates'
-			})
+				'site_section': 'updates',
+				'site': Site(responses[request.site_url]),
+			}
 
 		return render(request, UpdateView.list_template, view_data)
 
@@ -1632,7 +1657,7 @@ class WatcherView(object):
 
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False),
-				'site': request.site,
+				'site': Site(responses[request.site_url]),
 				'content': watchers_list,
 				'pagination': build_pagination_links(responses[url]['watchers']['links'], watchers_list.watchers)
 			}
@@ -1733,7 +1758,7 @@ class UpdatePreferenceView(object):
 
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False),
-				'site': request.site,
+				'site': Site(responses[request.site_url]),
 				'content': preference_list,
 				'globaloptions': global_options,
 			}
@@ -1778,7 +1803,7 @@ class SearchView(object):
 		if request.method == 'GET':
 			# pagination offset
 			offset = int(request.GET.get('offset', 0))
-			q = request.GET.get('q')	
+			q = request.GET.get('q')
 
 			url, params, headers = Search.build_request(
 				request.META['HTTP_HOST'],
@@ -1791,7 +1816,7 @@ class SearchView(object):
 
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': request.site,
+				'site': Site(responses[request.site_url]),
 				'content': search,
 			}
 
@@ -1820,7 +1845,7 @@ class TrendingView(object):
 
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 			'content': trending,
 			'pagination': build_pagination_links(responses[url]['items']['links'], trending.items),
 			'site_section': 'trending'
@@ -1841,7 +1866,7 @@ class LegalView(object):
 
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 			'site_section': 'legal'
 		}
 
@@ -1866,7 +1891,7 @@ class LegalView(object):
 
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 			'content': legal,
 			'site_section': 'legal',
 			'page_section': doc_name
@@ -1899,7 +1924,7 @@ class ModerationView(object):
 
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False),
-				'site': request.site,
+				'site': Site(responses[request.site_url]),
 				'content': content,
 				'item_type': request.GET.get('item_type'),
 				'action': request.GET.get('action'),
@@ -1946,7 +1971,7 @@ class ErrorView(object):
 		responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site
+			'site': Site(responses[request.site_url]),
 		}
 		context = RequestContext(request, view_data)
 		return HttpResponseNotFound(loader.get_template('404.html').render(context))
@@ -1962,7 +1987,7 @@ class ErrorView(object):
 		except APIException as e:
 			if e.status_code == 401 or e.status_code == 403:
 				view_data['logout'] = True
-		view_data['site'] = request.site
+		view_data['site'] = Site(responses[request.site_url])
 		context = RequestContext(request, view_data)
 		response = HttpResponseForbidden(loader.get_template('403.html').render(context))
 		if view_data.get('logout'):
@@ -1975,7 +2000,7 @@ class ErrorView(object):
 		responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 		}
 		context = RequestContext(request, view_data)
 		return HttpResponseServerError(loader.get_template('500.html').render(context))
@@ -2017,10 +2042,7 @@ class AuthenticationView(object):
 		clear the user's access_token cookie.
 		"""
 
-		view_data = dict(site=request.site)
-		#response = render(request, 'logout.html', view_data)
 		response = redirect('/')
-
 		if request.COOKIES.has_key('access_token'):
 			response.delete_cookie('access_token')
 			url = build_url(request.META['HTTP_HOST'], ['auth',request.access_token])

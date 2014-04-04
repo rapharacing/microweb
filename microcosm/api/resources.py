@@ -252,6 +252,11 @@ class Site(object):
         return Site(resource)
 
     @staticmethod
+    def build_request(host):
+        url = build_url(host, [Site.api_path_fragment])
+        return url, {}, {}
+
+    @staticmethod
     def resolve_cname(host):
         # TODO: separation of root site API and others
         # TODO: get rid of this string

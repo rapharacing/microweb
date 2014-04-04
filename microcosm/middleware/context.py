@@ -1,15 +1,12 @@
 import logging
 
 from django.conf import settings
-from django.http import HttpResponseRedirect
 
-import requests
 import grequests
 import pylibmc as memcache
 
 from microcosm.api.resources import Site
 from microcosm.api.resources import WhoAmI
-from microcosm.api.exceptions import APIException
 
 logger = logging.getLogger('microcosm.middleware')
 
@@ -30,19 +27,13 @@ class ContextMiddleware():
         """
 
         request.access_token = None
-        request.whoami_url = ''
+        request.whoami_url = None
         request.view_requests = []
-        request.site = None
+
+        request.site_url, params, headers = Site.build_request(request.get_host())
+        request.view_requests.append(grequests.get(request.site_url, params, headers))
 
         if request.COOKIES.has_key('access_token'):
             request.access_token = request.COOKIES['access_token']
-            url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
-            request.view_requests.append(grequests.get(url, params=params, headers=headers))
-            request.whoami_url = url
-
-        try:
-            request.site = Site.retrieve(request.get_host())
-        except APIException as e:
-            if e.status_code == 400:
-                return HttpResponseRedirect('https://microco.sm')
-        return None
+            request.whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
+            request.view_requests.append(grequests.get(request.whoami_url, params=params, headers=headers))
