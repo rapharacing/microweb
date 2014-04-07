@@ -27,13 +27,14 @@ class ContextMiddleware():
         """
 
         request.access_token = None
-        request.whoami_url = None
+        request.whoami_url = ''
         request.view_requests = []
-
-        request.site_url, params, headers = Site.build_request(request.get_host())
-        request.view_requests.append(grequests.get(request.site_url, params, headers))
 
         if request.COOKIES.has_key('access_token'):
             request.access_token = request.COOKIES['access_token']
             request.whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
             request.view_requests.append(grequests.get(request.whoami_url, params=params, headers=headers))
+
+        request.site_url, params, headers = Site.build_request(request.get_host())
+        request.view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+
