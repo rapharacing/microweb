@@ -3,10 +3,9 @@ import grequests
 import string
 import datetime
 import json
+import logging
 
 from functools import wraps
-
-from django.conf import settings
 
 from urllib import urlencode
 
@@ -14,9 +13,10 @@ from urlparse import parse_qs
 from urlparse import urlparse
 from urlparse import urlunparse
 
+from django.conf import settings
+
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
-
 
 from django.http import Http404
 from django.http import HttpResponseNotFound
@@ -80,7 +80,6 @@ from microcosm.forms.forms import ProfileEdit
 from microcosm.forms.forms import HuddleCreate
 from microcosm.forms.forms import HuddleEdit
 
-import logging
 logger = logging.getLogger('microcosm.views')
 
 def exception_handler(view_func):
@@ -123,20 +122,20 @@ def build_pagination_links(request, paged_list):
 		return {}
 
 	page_nav = {
-		'page'        : int(paged_list.page),
-		'total_pages' : int(paged_list.total_pages),
-		'limit'       : int(paged_list.limit),
-		'offset'      : int(paged_list.offset)
+	'page': int(paged_list.page),
+	'total_pages': int(paged_list.total_pages),
+	'limit': int(paged_list.limit),
+	'offset': int(paged_list.offset)
 	}
 
 	for item in request:
-		item['href'] = str.replace(str(item['href']),'/api/v1','')
+		item['href'] = str.replace(str(item['href']), '/api/v1', '')
 		page_nav[item['rel']] = item
 
 	return page_nav
 
-class ConversationView(object):
 
+class ConversationView(object):
 	create_form = ConversationCreate
 	edit_form = ConversationEdit
 	form_template = 'forms/conversation.html'
@@ -159,24 +158,26 @@ class ConversationView(object):
 			responses = response_list_to_dict(grequests.map(request.view_requests))
 			conversation = Conversation.from_api_response(responses[conversation_url])
 			comment_form = CommentForm(
-				initial=dict(itemId=conversation_id,itemType='conversation'))
+				initial=dict(itemId=conversation_id, itemType='conversation'))
 
 			# get attachments
 			attachments = {}
 			for comment in conversation.comments.items:
 				c = comment.as_dict
 				if 'attachments' in c:
-					c_attachments = Attachment.retrieve( request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
+					c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
+						access_token=request.access_token)
 					attachments[str(c['id'])] = c_attachments
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': Site(responses[request.site_url]),
-				'content': conversation,
-				'comment_form': comment_form,
-				'pagination': build_pagination_links(responses[conversation_url]['comments']['links'], conversation.comments),
-				'item_type': 'conversation',
-				'attachments' : attachments
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': conversation,
+			'comment_form': comment_form,
+			'pagination': build_pagination_links(responses[conversation_url]['comments']['links'],
+				conversation.comments),
+			'item_type': 'conversation',
+			'attachments': attachments
 			}
 
 			return render(request, ConversationView.single_template, view_data)
@@ -190,9 +191,9 @@ class ConversationView(object):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': Site(responses[request.site_url]),
-        }
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+		}
 
 		if request.method == 'POST':
 			form = ConversationView.create_form(request.POST)
@@ -201,12 +202,11 @@ class ConversationView(object):
 				conv_response = conv_request.create(request.META['HTTP_HOST'], request.access_token)
 				if conv_response.id > 0:
 					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
-
 						payload = {
-							'itemType'  : 'conversation',
-							'itemId'    : conv_response.id,
-							'markdown'  : request.POST.get('firstcomment'),
-							'inReplyTo' : 0
+						'itemType': 'conversation',
+						'itemId': conv_response.id,
+						'markdown': request.POST.get('firstcomment'),
+						'inReplyTo': 0
 						}
 						comment = Comment.from_create_form(payload)
 						comment.create(request.META['HTTP_HOST'], request.access_token)
@@ -235,10 +235,10 @@ class ConversationView(object):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': Site(responses[request.site_url]),
-		    'state_edit': True,
-        }
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+			'state_edit': True,
+		}
 
 		if request.method == 'POST':
 			form = ConversationView.edit_form(request.POST)
@@ -299,7 +299,7 @@ class ConversationView(object):
 			for link in response:
 				if link['rel'] == 'self':
 					response = link['href']
-			response = str.replace(str(response),'/api/v1','')
+			response = str.replace(str(response), '/api/v1', '')
 			pr = urlparse(response)
 			queries = parse_qs(pr[4])
 			frag = ""
@@ -311,14 +311,13 @@ class ConversationView(object):
 			for (key, value) in queries.items():
 				queries[key] = value[0]
 			queries = urlencode(queries)
-			response = urlunparse((pr[0],pr[1],pr[2],pr[3],queries,frag))
+			response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
 			return HttpResponseRedirect(response)
 		else:
 			return HttpResponseNotAllowed()
 
 
 class HuddleView(object):
-
 	create_form = HuddleCreate
 	edit_form = HuddleEdit
 	form_template = 'forms/huddle.html'
@@ -328,7 +327,6 @@ class HuddleView(object):
 	@staticmethod
 	@exception_handler
 	def single(request, huddle_id):
-
 		# Need to be authenticated
 		if request.whoami_url == '':
 			return HttpResponseRedirect('/')
@@ -353,22 +351,22 @@ class HuddleView(object):
 			for comment in huddle.comments.items:
 				c = comment.as_dict
 				if 'attachments' in c:
-					c_attachments = Attachment.retrieve( request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
+					c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
+						access_token=request.access_token)
 					attachments[str(c['id'])] = c_attachments
 
 			#participants json
-			import json
-			participants_json = [ p.as_dict for p in huddle.participants ]
+			participants_json = [p.as_dict for p in huddle.participants]
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': Site(responses[request.site_url]),
-				'content': huddle,
-				'comment_form': comment_form,
-				'pagination': build_pagination_links(responses[huddle_url]['comments']['links'], huddle.comments),
-				'item_type': 'huddle',
-				'attachments' : attachments,
-				'participants_json' : json.dumps(participants_json)
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': huddle,
+			'comment_form': comment_form,
+			'pagination': build_pagination_links(responses[huddle_url]['comments']['links'], huddle.comments),
+			'item_type': 'huddle',
+			'attachments': attachments,
+			'participants_json': json.dumps(participants_json)
 			}
 
 			return render(request, HuddleView.single_template, view_data)
@@ -376,7 +374,6 @@ class HuddleView(object):
 	@staticmethod
 	@exception_handler
 	def list(request):
-
 		# record offset for paging of huddles
 		offset = int(request.GET.get('offset', 0))
 
@@ -392,10 +389,10 @@ class HuddleView(object):
 		huddles = HuddleList(responses[huddle_url])
 
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
-			'content': huddles,
-			'pagination': build_pagination_links(responses[huddle_url]['huddles']['links'], huddles.huddles)
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
+		'content': huddles,
+		'pagination': build_pagination_links(responses[huddle_url]['huddles']['links'], huddles.huddles)
 		}
 
 		return render(request, HuddleView.list_template, view_data)
@@ -415,9 +412,9 @@ class HuddleView(object):
 			return HttpResponseRedirect('/')
 
 		view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': Site(responses[request.site_url]),
-        }
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+		}
 
 		if request.method == 'POST':
 			form = HuddleView.create_form(request.POST)
@@ -425,17 +422,16 @@ class HuddleView(object):
 				hud_request = Huddle.from_create_form(form.cleaned_data)
 				hud_response = hud_request.create(request.META['HTTP_HOST'], request.access_token)
 				if hud_response.id > 0:
-
 					if request.POST.get('invite'):
 						ids = [int(x) for x in request.POST.get('invite').split(',')]
 						Huddle.invite(request.META['HTTP_HOST'], hud_response.id, ids, request.access_token)
 
 					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
 						payload = {
-							'itemType': 'huddle',
-							'itemId': hud_response.id,
-							'markdown': request.POST.get('firstcomment'),
-							'inReplyTo': 0
+						'itemType': 'huddle',
+						'itemId': hud_response.id,
+						'markdown': request.POST.get('firstcomment'),
+						'inReplyTo': 0
 						}
 						comment = Comment.from_create_form(payload)
 						comment.create(request.META['HTTP_HOST'], request.access_token)
@@ -445,7 +441,6 @@ class HuddleView(object):
 				return render(request, HuddleView.form_template, view_data)
 
 		elif request.method == 'GET':
-
 			if request.GET.get('to'):
 				recipients = []
 				list_of_recipient_ids = request.GET.get('to').split(",");
@@ -454,12 +449,11 @@ class HuddleView(object):
 					recipient_profile = Profile.retrieve(request.META['HTTP_HOST'], recipient_id)
 					if recipient_profile.id > 0:
 						recipients.append({
-							'id' 					: recipient_profile.id,
-							'profileName' : recipient_profile.profile_name,
-							'avatar' 			: recipient_profile.avatar
+						'id': recipient_profile.id,
+						'profileName': recipient_profile.profile_name,
+						'avatar': recipient_profile.avatar
 						})
 
-				import json
 				view_data['recipients_json'] = json.dumps(recipients)
 
 			view_data['form'] = HuddleView.create_form(initial=dict())
@@ -519,7 +513,7 @@ class HuddleView(object):
 			for link in response:
 				if link['rel'] == 'self':
 					response = link['href']
-			response = str.replace(str(response),'/api/v1','')
+			response = str.replace(str(response), '/api/v1', '')
 			pr = urlparse(response)
 			queries = parse_qs(pr[4])
 			frag = ""
@@ -531,13 +525,13 @@ class HuddleView(object):
 			for (key, value) in queries.items():
 				queries[key] = value[0]
 			queries = urlencode(queries)
-			response = urlunparse((pr[0],pr[1],pr[2],pr[3],queries,frag))
+			response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
 			return HttpResponseRedirect(response)
 		else:
 			return HttpResponseNotAllowed()
 
-class ProfileView(object):
 
+class ProfileView(object):
 	edit_form = ProfileEdit
 	form_template = 'forms/profile.html'
 	single_template = 'profile.html'
@@ -553,20 +547,20 @@ class ProfileView(object):
 		# Search
 		search_url, params, headers = Search.build_request(
 			request.META['HTTP_HOST'],
-			params = dict(limit=5, q=u'type:microcosm type:conversation type:event type:comment authorId:' + profile_id, sort='date'),
+			params=dict(limit=5, q=u'type:microcosm type:conversation type:event type:comment authorId:' + profile_id,
+				sort='date'),
 			access_token=request.access_token
 		)
 		request.view_requests.append(grequests.get(search_url, params=params, headers=headers))
-		#responses = response_list_to_dict(grequests.map(request.view_requests))
 
 		# Profile
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'item_type': 'profile',
-			'site': Site(responses[request.site_url]),
-			'search': Search.from_api_response(responses[search_url]),
-			'site_section': 'people'
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'item_type': 'profile',
+		'site': Site(responses[request.site_url]),
+		'search': Search.from_api_response(responses[search_url]),
+		'site_section': 'people'
 		}
 
 		profile = Profile.retrieve(
@@ -582,7 +576,6 @@ class ProfileView(object):
 	@staticmethod
 	@exception_handler
 	def list(request):
-
 		# record offset for paging of profiles
 		offset = int(request.GET.get('offset', 0))
 		top = bool(request.GET.get('top', False))
@@ -592,12 +585,12 @@ class ProfileView(object):
 
 		profiles_url, params, headers = ProfileList.build_request(
 			request.META['HTTP_HOST'],
-			offset 				= offset,
-			top 					= top,
-			q 						= q,
-			following 		= following,
-			online 				= online,
-			access_token 	= request.access_token
+			offset=offset,
+			top=top,
+			q=q,
+			following=following,
+			online=online,
+			access_token=request.access_token
 		)
 
 		request.view_requests.append(grequests.get(profiles_url, params=params, headers=headers))
@@ -606,7 +599,7 @@ class ProfileView(object):
 		profiles = ProfileList(responses[profiles_url])
 
 		subtitle = "Showing everyone"
-		if q != "" and len(q)==1:
+		if q != "" and len(q) == 1:
 			subtitle = "names starting with %s" % (q.upper())
 		else:
 			subtitle = False
@@ -625,20 +618,19 @@ class ProfileView(object):
 		if len(filter_name) < 1:
 			filter_name.append("sorted alphabetically")
 
-
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
-			'content': profiles,
-			'pagination': build_pagination_links(responses[profiles_url]['profiles']['links'], profiles.profiles),
-			'q': q,
-			'top': top,
-			'following': following,
-			'alphabet': string.ascii_lowercase,
-			'site_section' : 'people',
-			'filter_name' : ", ".join(filter_name),
-			'subtitle' : subtitle,
-			'online' : online
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
+		'content': profiles,
+		'pagination': build_pagination_links(responses[profiles_url]['profiles']['links'], profiles.profiles),
+		'q': q,
+		'top': top,
+		'following': following,
+		'alphabet': string.ascii_lowercase,
+		'site_section': 'people',
+		'filter_name': ", ".join(filter_name),
+		'subtitle': subtitle,
+		'online': online
 		}
 
 		return render(request, ProfileView.list_template, view_data)
@@ -653,9 +645,9 @@ class ProfileView(object):
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		user = Profile(responses[request.whoami_url], summary=False)
 		view_data = {
-            'user': user,
-            'site': Site(responses[request.site_url]),
-        }
+			'user': user,
+			'site': Site(responses[request.site_url]),
+		}
 
 		if request.method == 'POST':
 			form = ProfileView.edit_form(request.POST)
@@ -675,26 +667,25 @@ class ProfileView(object):
 
 				# check for existing comment
 				if request.POST.get('markdown'):
-
 					payload = {
-						'itemType'  : 'profile',
-						'itemId'    : profile_response.id,
-						'markdown'  : request.POST.get('markdown'),
-						'inReplyTo' : 0
+					'itemType': 'profile',
+					'itemId': profile_response.id,
+					'markdown': request.POST.get('markdown'),
+					'inReplyTo': 0
 					}
 
 					# try to edit comment else create a new one
-					if hasattr(profile_response,'profile_comment'):
+					if hasattr(profile_response, 'profile_comment'):
 						payload['id'] = profile_response.profile_comment.id
 						if len(request.POST.get('markdown')) < 1:
 							payload['markdown'] = ""
-						comment_request  = Comment.from_edit_form(payload)
-						comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
+						comment_request = Comment.from_edit_form(payload)
+						comment_response = comment_request.update(request.META['HTTP_HOST'],
+							access_token=request.access_token)
 					else:
 						if len(request.POST.get('markdown')) > 0:
 							comment = Comment.from_create_form(payload)
 							comment.create(request.META['HTTP_HOST'], request.access_token)
-
 
 				return HttpResponseRedirect(reverse('single-profile', args=(profile_response.id,)))
 			else:
@@ -716,7 +707,6 @@ class ProfileView(object):
 
 
 class MicrocosmView(object):
-
 	create_form = MicrocosmCreate
 	edit_form = MicrocosmEdit
 	form_template = 'forms/microcosm.html'
@@ -741,11 +731,11 @@ class MicrocosmView(object):
 			microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': Site(responses[request.site_url]),
-				'content': microcosm,
-				'item_type': 'microcosm',
-				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': microcosm,
+			'item_type': 'microcosm',
+			'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
 			}
 
 			return render(request, MicrocosmView.single_template, view_data)
@@ -753,7 +743,6 @@ class MicrocosmView(object):
 	@staticmethod
 	@exception_handler
 	def list(request):
-
 		# record offset for paging of microcosms
 		offset = int(request.GET.get('offset', 0))
 
@@ -769,11 +758,11 @@ class MicrocosmView(object):
 		microcosms = MicrocosmList(responses[microcosms_url])
 
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
-			'content': microcosms,
-			'item_type': 'site',
-			'pagination': build_pagination_links(responses[microcosms_url]['microcosms']['links'], microcosms.microcosms)
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
+		'content': microcosms,
+		'item_type': 'site',
+		'pagination': build_pagination_links(responses[microcosms_url]['microcosms']['links'], microcosms.microcosms)
 		}
 
 		return render(request, MicrocosmView.list_template, view_data)
@@ -781,12 +770,11 @@ class MicrocosmView(object):
 	@staticmethod
 	@exception_handler
 	def create(request):
-
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': Site(responses[request.site_url]),
-        }
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+		}
 
 		if request.method == 'POST':
 			form = MicrocosmView.create_form(request.POST)
@@ -808,12 +796,11 @@ class MicrocosmView(object):
 	@staticmethod
 	@exception_handler
 	def edit(request, microcosm_id):
-
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': Site(responses[request.site_url]),
-        }
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+		}
 
 		if request.method == 'POST':
 			form = MicrocosmView.edit_form(request.POST)
@@ -862,23 +849,21 @@ class MicrocosmView(object):
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 
 		view_data = {
-			'user' : Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site' : Site(responses[request.site_url]),
-			'content' : Microcosm.from_api_response(responses[microcosm_url])
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
+		'content': Microcosm.from_api_response(responses[microcosm_url])
 		}
 
 		return render(request, 'create_item_choice.html', view_data)
 
 
 class MembershipView(object):
-
 	list_template = 'memberships.html'
 	form_template = 'forms/memberships.html'
 
 	@staticmethod
 	@exception_handler
 	def list(request, microcosm_id):
-
 		if request.method == 'GET':
 			# record offset for paging of items within the microcosm
 			offset = int(request.GET.get('offset', 0))
@@ -894,11 +879,11 @@ class MembershipView(object):
 			microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': Site(responses[request.site_url]),
-				'content': microcosm,
-				'item_type': 'microcosm',
-				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': microcosm,
+			'item_type': 'microcosm',
+			'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
 			}
 
 			return render(request, MembershipView.list_template, view_data)
@@ -906,12 +891,9 @@ class MembershipView(object):
 	@staticmethod
 	@exception_handler
 	def create(request, microcosm_id):
-
-
 		if request.method == 'POST':
 			pass
 		elif request.method == 'GET':
-
 			offset = int(request.GET.get('offset', 0))
 
 			microcosm_url, params, headers = Microcosm.build_request(
@@ -926,19 +908,19 @@ class MembershipView(object):
 			microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': Site(responses[request.site_url]),
-				'content': microcosm,
-				'item_type': 'microcosm',
-				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': microcosm,
+			'item_type': 'microcosm',
+			'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
 			}
 
 			return render(request, MembershipView.form_template, view_data)
 		else:
 			return HttpResponseNotAllowed(['GET', 'POST'])
 
-class EventView(object):
 
+class EventView(object):
 	create_form = EventCreate
 	edit_form = EventEdit
 	form_template = 'forms/event.html'
@@ -957,9 +939,9 @@ class EventView(object):
 
 			event_url, event_params, event_headers = Event.build_request(
 				request.META['HTTP_HOST'],
-				id           = event_id,
-				offset       = offset,
-				access_token = request.access_token
+				id=event_id,
+				offset=offset,
+				access_token=request.access_token
 			)
 			request.view_requests.append(grequests.get(event_url, params=event_params, headers=event_headers))
 
@@ -975,14 +957,12 @@ class EventView(object):
 			event = Event.from_api_response(responses[event_url])
 			comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
 
-
 			user = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
 
-
-			attendees           = AttendeeList(responses[att_url])
-			attendees_yes       = []
-			attendees_invited   = []
-			user_is_attending   = False
+			attendees = AttendeeList(responses[att_url])
+			attendees_yes = []
+			attendees_invited = []
+			user_is_attending = False
 			for attendee in attendees.items.items:
 				if attendee.rsvp == "yes":
 					attendees_yes.append(attendee)
@@ -994,19 +974,17 @@ class EventView(object):
 				elif attendee.rsvp == "maybe":
 					attendees_invited.append(attendee)
 
-
-			# dates
-			import datetime as dt
-			today    = dt.datetime.now()
-			end_date = event.when + dt.timedelta(minutes=event.duration)
+			# Dates.
+			today = datetime.datetime.now()
+			end_date = event.when + datetime.timedelta(minutes=event.duration)
 
 			is_same_day = False
 			if (end_date.strftime('%d%m%y') == event.when.strftime('%d%m%y') ):
 				is_same_day = True
 
 			event_dates = {
-				'type'  : 'multiple' if not is_same_day else 'single',
-				'end'   : end_date
+			'type': 'multiple' if not is_same_day else 'single',
+			'end': end_date
 			}
 
 			is_expired = True if int(end_date.strftime('%s')) < int(today.strftime('%s')) else False
@@ -1014,9 +992,9 @@ class EventView(object):
 			#rsvp
 			# FIXME: redundant. This code was written before the Event object was modified to include
 			# percentage as a default (see resources.py)
-			rsvp_limit    = int(responses[event_url]['rsvpLimit'])
+			rsvp_limit = int(responses[event_url]['rsvpLimit'])
 			num_attending = len(attendees_yes)
-			rsvp_percentage = (num_attending/float(rsvp_limit))*100 if rsvp_limit > 0 else 0
+			rsvp_percentage = (num_attending / float(rsvp_limit)) * 100 if rsvp_limit > 0 else 0
 
 			if (num_attending > 0 and rsvp_percentage < 10):
 				rsvp_percentage = 10
@@ -1026,31 +1004,32 @@ class EventView(object):
 			for comment in event.comments.items:
 				c = comment.as_dict
 				if 'attachments' in c:
-					c_attachments = Attachment.retrieve( request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
+					c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
+						access_token=request.access_token)
 					attachments[str(c['id'])] = c_attachments
 
 			view_data = {
-				'user'              : user,
-				'site'              : Site(responses[request.site_url]),
-				'content'           : event,
-				'comment_form'      : comment_form,
-				'pagination'        : build_pagination_links(responses[event_url]['comments']['links'], event.comments),
-				'item_type'         : 'event',
+			'user': user,
+			'site': Site(responses[request.site_url]),
+			'content': event,
+			'comment_form': comment_form,
+			'pagination': build_pagination_links(responses[event_url]['comments']['links'], event.comments),
+			'item_type': 'event',
 
-				'attendees'         : attendees,
-				'attendees_yes'     : attendees_yes,
-				'attendees_invited' : attendees_invited,
-				'user_is_attending' : user_is_attending,
+			'attendees': attendees,
+			'attendees_yes': attendees_yes,
+			'attendees_invited': attendees_invited,
+			'user_is_attending': user_is_attending,
 
-				'event_dates'       : event_dates,
+			'event_dates': event_dates,
 
-				'rsvp_num_attending': num_attending,
-				'rsvp_num_invited'  : len(attendees_invited),
-				'rsvp_percentage'   : rsvp_percentage,
+			'rsvp_num_attending': num_attending,
+			'rsvp_num_invited': len(attendees_invited),
+			'rsvp_percentage': rsvp_percentage,
 
-				'is_expired'        : is_expired,
+			'is_expired': is_expired,
 
-				'attachments'				: attachments
+			'attachments': attachments
 			}
 
 			return render(request, EventView.single_template, view_data)
@@ -1064,19 +1043,17 @@ class EventView(object):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': Site(responses[request.site_url]),
-        }
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+		}
 		user = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
 
 		if request.method == 'POST':
-
 			form = EventView.create_form(request.POST)
 			if form.is_valid():
 				event_request = Event.from_create_form(form.cleaned_data)
 				event_response = event_request.create(request.META['HTTP_HOST'], request.access_token)
 				if event_response.id > 0:
-
 					# invite attendees
 					invites = request.POST.get('invite')
 					if len(invites.strip()) > 0:
@@ -1086,10 +1063,10 @@ class EventView(object):
 							for userid in invited_list:
 								if (userid != ""):
 									attendees.append({
-										'rsvp' 		: 'maybe',
-										'profileId' : int(userid)
+									'rsvp': 'maybe',
+									'profileId': int(userid)
 									})
-							if (len(attendees)>0):
+							if (len(attendees) > 0):
 								Event.rsvp(
 									request.META['HTTP_HOST'],
 									event_response.id,
@@ -1101,10 +1078,10 @@ class EventView(object):
 					# create comment
 					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
 						payload = {
-							'itemType': 'event',
-							'itemId': event_response.id,
-							'markdown': request.POST.get('firstcomment'),
-							'inReplyTo': 0
+						'itemType': 'event',
+						'itemId': event_response.id,
+						'markdown': request.POST.get('firstcomment'),
+						'inReplyTo': 0
 						}
 						comment = Comment.from_create_form(payload)
 						comment.create(request.META['HTTP_HOST'], request.access_token)
@@ -1133,10 +1110,10 @@ class EventView(object):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': Site(responses[request.site_url]),
-            'state_edit': True
-        }
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+			'state_edit': True
+		}
 
 		if request.method == 'POST':
 			form = EventView.edit_form(request.POST)
@@ -1156,19 +1133,19 @@ class EventView(object):
 			view_data['microcosm_id'] = event.microcosm_id
 
 			# fetch attendees
-			view_data['attendees'] = Event.get_attendees(host=request.META['HTTP_HOST'], id=event_id, access_token=request.access_token)
+			view_data['attendees'] = Event.get_attendees(host=request.META['HTTP_HOST'], id=event_id,
+				access_token=request.access_token)
 
 			attendees_json = []
 			for attendee in view_data['attendees'].items.items:
 				attendees_json.append({
-					'id' 					: attendee.profile.id,
-					'profileName' : attendee.profile.profile_name,
-					'avatar' 			: attendee.profile.avatar,
-					'sticky'      : 'true'
+				'id': attendee.profile.id,
+				'profileName': attendee.profile.profile_name,
+				'avatar': attendee.profile.avatar,
+				'sticky': 'true'
 				})
 
 			if len(attendees_json) > 0:
-				import json
 				view_data['attendees_json'] = json.dumps(attendees_json)
 				print view_data['attendees_json']
 
@@ -1212,7 +1189,7 @@ class EventView(object):
 			for link in response:
 				if link['rel'] == 'self':
 					response = link['href']
-			response = str.replace(str(response),'/api/v1','')
+			response = str.replace(str(response), '/api/v1', '')
 			pr = urlparse(response)
 			queries = parse_qs(pr[4])
 			frag = ""
@@ -1224,7 +1201,7 @@ class EventView(object):
 			for (key, value) in queries.items():
 				queries[key] = value[0]
 			queries = urlencode(queries)
-			response = urlunparse((pr[0],pr[1],pr[2],pr[3],queries,frag))
+			response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
 			return HttpResponseRedirect(response)
 		else:
 			return HttpResponseNotAllowed()
@@ -1241,9 +1218,9 @@ class EventView(object):
 		if request.method == 'POST':
 			if user:
 				attendee = [{
-					'rsvp' : request.POST['rsvp'],
-					'profileId' : user.id
-				}]
+				            'rsvp': request.POST['rsvp'],
+				            'profileId': user.id
+				            }]
 				Event.rsvp(
 					request.META['HTTP_HOST'],
 					event_id,
@@ -1259,7 +1236,6 @@ class EventView(object):
 
 
 class CommentView(object):
-
 	create_form = CommentForm
 	edit_form = CommentForm
 	form_template = 'forms/create_comment.html'
@@ -1284,22 +1260,20 @@ class CommentView(object):
 
 	@staticmethod
 	def build_comment_location(comment):
-
 		path = join_path_fragments([RESOURCE_PLURAL[comment.item_type], comment.item_id])
 
-		if 'commentPage' in comment.meta.links and \
-			'offset' in comment.meta.links['commentPage']['href']:
-
+		if 'commentPage' in comment.meta.links and\
+		   'offset' in comment.meta.links['commentPage']['href']:
 			offset = comment.meta.links['commentPage']['href'].split('offset=')[1]
 			location = urlunparse((
-				'', '', path, '',
-				'offset=%s' % offset,
-				'comment%d' % comment.id,)
+			'', '', path, '',
+			'offset=%s' % offset,
+			'comment%d' % comment.id,)
 			)
 		else:
 			location = urlunparse((
-				'', '', path, '', '',
-				'comment%d' % comment.id,)
+			'', '', path, '', '',
+			'comment%d' % comment.id,)
 			)
 
 		return location
@@ -1317,10 +1291,10 @@ class CommentView(object):
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		content = Comment.from_api_response(responses[url])
 		comment_form = CommentForm(
-			initial= {
-				'itemId': content.item_id,
-				'itemType': content.item_type,
-				'comment_id': content.id,
+			initial={
+			'itemId': content.item_id,
+			'itemType': content.item_type,
+			'comment_id': content.id,
 			}
 		)
 
@@ -1328,15 +1302,16 @@ class CommentView(object):
 		attachments = {}
 		c = content.as_dict
 		if 'attachments' in c:
-			c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'], access_token=request.access_token)
+			c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
+				access_token=request.access_token)
 			attachments[str(c['id'])] = c_attachments
 
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
-			'content': content,
-			'comment_form' : comment_form,
-			'attachments'  : attachments
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
+		'content': content,
+		'comment_form': comment_form,
+		'attachments': attachments
 		}
 
 		return render(request, CommentView.single_template, view_data)
@@ -1356,9 +1331,9 @@ class CommentView(object):
 			if not form.is_valid():
 				responses = response_list_to_dict(grequests.map(request.view_requests))
 				view_data = {
-					'user': Profile(responses[request.whoami_url], summary=False),
-					'site': Site(responses[request.site_url]),
-					'form': form,
+				'user': Profile(responses[request.whoami_url], summary=False),
+				'site': Site(responses[request.site_url]),
+				'form': form,
 				}
 				return render(request, CommentView.form_template, view_data)
 
@@ -1381,19 +1356,19 @@ class CommentView(object):
 							if len(file_request.file[f.name]) >= 5242880:
 								responses = response_list_to_dict(grequests.map(request.view_requests))
 								comment_form = CommentForm(
-									initial= {
-										'itemId': comment_response.item_id,
-										'itemType': comment_response.item_type,
-										'comment_id': comment_response.id,
-									    'markdown': request.POST['markdown'],
+									initial={
+									'itemId': comment_response.item_id,
+									'itemType': comment_response.item_type,
+									'comment_id': comment_response.id,
+									'markdown': request.POST['markdown'],
 									}
 								)
 								view_data = {
-									'user': Profile(responses[request.whoami_url], summary=False),
-									'site': Site(responses[request.site_url]),
-								    'content': comment_response,
-									'comment_form': comment_form,
-									'error': 'Sorry, one of your files was over 5MB. Please try again.',
+								'user': Profile(responses[request.whoami_url], summary=False),
+								'site': Site(responses[request.site_url]),
+								'content': comment_response,
+								'comment_form': comment_form,
+								'error': 'Sorry, one of your files was over 5MB. Please try again.',
 								}
 								return render(request, CommentView.form_template, view_data)
 							# Associate attachment with comment using attachments API.
@@ -1427,9 +1402,9 @@ class CommentView(object):
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False),
-            'site': Site(responses[request.site_url]),
-        }
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+		}
 
 		if request.method == 'POST':
 			form = CommentForm(request.POST)
@@ -1439,22 +1414,20 @@ class CommentView(object):
 
 				# delete attachments if necessary
 				if comment_response.id > 0:
-
 					attachments_delete = []
 					if request.POST.get('attachments-delete'):
 						attachments_delete = request.POST.get('attachments-delete').split(",")
 
 					if request.FILES.has_key('attachments'):
-
 						for f in request.FILES.getlist('attachments'):
-
 							if not f.name in attachments_delete:
 								file_request = FileMetadata.from_create_form(f)
 								# File must be under 5MB
 								# TODO: use Django's built-in field validators and error messaging
 								if len(file_request.file[f.name]) >= 5242880:
 									view_data['form'] = form
-									view_data['avatar_error'] = 'Sorry, the file you upload must be under 5MB and square.'
+									view_data[
+									'avatar_error'] = 'Sorry, the file you upload must be under 5MB and square.'
 									return render(request, CommentView.form_template, view_data)
 								else:
 									file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
@@ -1529,7 +1502,7 @@ class CommentView(object):
 			for link in response:
 				if link['rel'] == 'self':
 					response = link['href']
-			response = str.replace(str(response),'/api/v1','')
+			response = str.replace(str(response), '/api/v1', '')
 			pr = urlparse(response)
 			queries = parse_qs(pr[4])
 			frag = ""
@@ -1541,7 +1514,7 @@ class CommentView(object):
 			for (key, value) in queries.items():
 				queries[key] = value[0]
 			queries = urlencode(queries)
-			response = urlunparse((pr[0],pr[1],pr[2],pr[3],queries,frag))
+			response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
 			return HttpResponseRedirect(response)
 		else:
 			return HttpResponseNotAllowed()
@@ -1578,21 +1551,20 @@ class CommentView(object):
 		)
 		return HttpResponse(response, content_type='application/json')
 
-class UpdateView(object):
 
+class UpdateView(object):
 	list_template = 'updates.html'
 
 	@staticmethod
 	@exception_handler
 	def list(request):
-
 		if not request.access_token:
 		# FIXME: need a user friendly error page for unregistered users
 			responses = response_list_to_dict(grequests.map(request.view_requests))
 			view_data = {
-				'user': False,
-				'site_section': 'updates',
-				'site': Site(responses[request.site_url]),
+			'user': False,
+			'site_section': 'updates',
+			'site': Site(responses[request.site_url]),
 			}
 		else:
 			# pagination offset
@@ -1608,11 +1580,11 @@ class UpdateView(object):
 			updates_list = UpdateList(responses[url])
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False),
-				'content': updates_list,
-				'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates),
-				'site_section': 'updates',
-				'site': Site(responses[request.site_url]),
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'content': updates_list,
+			'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates),
+			'site_section': 'updates',
+			'site': Site(responses[request.site_url]),
 			}
 
 		return render(request, UpdateView.list_template, view_data)
@@ -1628,17 +1600,15 @@ class UpdateView(object):
 			Update.mark_viewed(request.META['HTTP_HOST'], update_id, request.access_token)
 			return HttpResponseRedirect(reverse('list-updates'))
 		else:
-			return HttpResponseNotAllowed(['POST',])
+			return HttpResponseNotAllowed(['POST', ])
 
 
 class WatcherView(object):
-
 	list_template = 'watchers.html'
 
 	@staticmethod
 	@exception_handler
 	def list(request):
-
 		if not request.access_token:
 			raise HttpResponseNotAllowed
 
@@ -1656,10 +1626,10 @@ class WatcherView(object):
 			watchers_list = WatcherList(responses[url])
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False),
-				'site': Site(responses[request.site_url]),
-				'content': watchers_list,
-				'pagination': build_pagination_links(responses[url]['watchers']['links'], watchers_list.watchers)
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+			'content': watchers_list,
+			'pagination': build_pagination_links(responses[url]['watchers']['links'], watchers_list.watchers)
 			}
 
 			return render(request, WatcherView.list_template, view_data)
@@ -1672,9 +1642,9 @@ class WatcherView(object):
 						Watcher.delete(request.META['HTTP_HOST'], w, request.access_token)
 					else:
 						postdata = {
-							'id': int(w),
-							'sendEmail': bool(request.POST.get('send_email_'+str(w))),
-							'receiveSMS': False,
+						'id': int(w),
+						'sendEmail': bool(request.POST.get('send_email_' + str(w))),
+						'receiveSMS': False,
 						}
 						Watcher.update(
 							request.META['HTTP_HOST'],
@@ -1684,7 +1654,7 @@ class WatcherView(object):
 						)
 			return HttpResponseRedirect(reverse('list-watchers'))
 		else:
-			return HttpResponseNotAllowed(['POST',])
+			return HttpResponseNotAllowed(['POST', ])
 
 
 	@staticmethod
@@ -1692,9 +1662,9 @@ class WatcherView(object):
 	def single(request):
 		if request.method == 'POST':
 			postdata = {
-				'updateTypeId': 1,
-				'itemType': request.POST.get('itemType'),
-				'itemId': int(request.POST.get('itemId')),
+			'updateTypeId': 1,
+			'itemType': request.POST.get('itemType'),
+			'itemId': int(request.POST.get('itemId')),
 			}
 			if request.POST.get('delete'):
 				response = Watcher.delete(
@@ -1705,9 +1675,9 @@ class WatcherView(object):
 				return HttpResponse()
 			elif request.POST.get('patch'):
 				postdata = {
-					'itemType': request.REQUEST.get('itemType'),
-					'itemId': int(request.REQUEST.get('itemId')),
-					'sendEmail': "true" == request.REQUEST.get('emailMe')
+				'itemType': request.REQUEST.get('itemType'),
+				'itemId': int(request.REQUEST.get('itemId')),
+				'sendEmail': "true" == request.REQUEST.get('emailMe')
 				}
 				response = Watcher.update(
 					request.META['HTTP_HOST'],
@@ -1726,22 +1696,19 @@ class WatcherView(object):
 				)
 				return HttpResponse(responsedata, content_type='application/json')
 		else:
-			return HttpResponseNotAllowed(['POST','PATCH'])
+			return HttpResponseNotAllowed(['POST', 'PATCH'])
 
 
 class UpdatePreferenceView(object):
-
 	list_template = 'forms/update_settings.html'
 
 	@staticmethod
 	@exception_handler
 	def settings(request):
-
 		if not request.access_token:
 			raise HttpResponseNotAllowed
 
 		if request.method == 'GET':
-
 			url, params, headers = UpdatePreference.build_request(
 				request.META['HTTP_HOST'],
 				request.access_token
@@ -1757,31 +1724,31 @@ class UpdatePreferenceView(object):
 			global_options = GlobalOptions.from_api_response(responses[url2])
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False),
-				'site': Site(responses[request.site_url]),
-				'content': preference_list,
-				'globaloptions': global_options,
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+			'content': preference_list,
+			'globaloptions': global_options,
 			}
 			return render(request, UpdatePreferenceView.list_template, view_data)
 
 		if request.method == 'POST':
-			for x in range(1,10):
-				if request.POST.get('id_'+str(x)):
+			for x in range(1, 10):
+				if request.POST.get('id_' + str(x)):
 					postdata = {
-						'id': int(request.POST['id_'+str(x)]),
-						'sendEmail': bool(request.POST.get('send_email_'+str(x))),
-						'sendSMS': False,
+					'id': int(request.POST['id_' + str(x)]),
+					'sendEmail': bool(request.POST.get('send_email_' + str(x))),
+					'sendSMS': False,
 					}
 					UpdatePreference.update(
 						request.META['HTTP_HOST'],
-						request.POST['id_'+str(x)],
+						request.POST['id_' + str(x)],
 						postdata,
 						request.access_token
 					)
 
 			postdata = {
-				'sendEmail': bool(request.POST.get('profile_receive_email')),
-				'sendSMS': False,
+			'sendEmail': bool(request.POST.get('profile_receive_email')),
+			'sendSMS': False,
 			}
 			GlobalOptions.update(
 				request.META['HTTP_HOST'],
@@ -1794,12 +1761,11 @@ class UpdatePreferenceView(object):
 
 
 class SearchView(object):
-
 	single_template = 'search.html'
+
 	@staticmethod
 	@exception_handler
 	def single(request):
-
 		if request.method == 'GET':
 			# pagination offset
 			offset = int(request.GET.get('offset', 0))
@@ -1807,7 +1773,7 @@ class SearchView(object):
 
 			url, params, headers = Search.build_request(
 				request.META['HTTP_HOST'],
-				params = request.GET.dict(),
+				params=request.GET.dict(),
 				access_token=request.access_token
 			)
 			request.view_requests.append(grequests.get(url, params=params, headers=headers))
@@ -1815,9 +1781,9 @@ class SearchView(object):
 			search = Search.from_api_response(responses[url])
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-				'site': Site(responses[request.site_url]),
-				'content': search,
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': search,
 			}
 
 			if responses[url].get('results'):
@@ -1825,16 +1791,15 @@ class SearchView(object):
 
 			return render(request, SearchView.single_template, view_data)
 		else:
-			return HttpResponseNotAllowed(['POST',])
+			return HttpResponseNotAllowed(['POST', ])
+
 
 class TrendingView(object):
-
 	list_template = 'trending.html'
 
 	@staticmethod
 	@exception_handler
 	def list(request):
-
 		url, params, headers = Trending.build_request(
 			request.META['HTTP_HOST'],
 			access_token=request.access_token
@@ -1844,30 +1809,29 @@ class TrendingView(object):
 		trending = Trending.from_api_response(responses[url])
 
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
-			'content': trending,
-			'pagination': build_pagination_links(responses[url]['items']['links'], trending.items),
-			'site_section': 'trending'
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
+		'content': trending,
+		'pagination': build_pagination_links(responses[url]['items']['links'], trending.items),
+		'site_section': 'trending'
 		}
 
 		return render(request, TrendingView.list_template, view_data)
 
-class LegalView(object):
 
+class LegalView(object):
 	list_template = 'legals.html'
 	single_template = 'legal.html'
 
 	@staticmethod
 	@exception_handler
 	def list(request):
-
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
-			'site_section': 'legal'
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
+		'site_section': 'legal'
 		}
 
 		return render(request, LegalView.list_template, view_data)
@@ -1876,7 +1840,6 @@ class LegalView(object):
 	@staticmethod
 	@exception_handler
 	def single(request, doc_name):
-
 		if not doc_name in ['cookies', 'privacy', 'terms']:
 			raise Http404
 
@@ -1890,17 +1853,17 @@ class LegalView(object):
 		legal = Legal.from_api_response(responses[url])
 
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
-			'content': legal,
-			'site_section': 'legal',
-			'page_section': doc_name
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
+		'content': legal,
+		'site_section': 'legal',
+		'page_section': doc_name
 		}
 
 		return render(request, LegalView.single_template, view_data)
 
-class ModerationView(object):
 
+class ModerationView(object):
 	@staticmethod
 	def item(request):
 		"""
@@ -1923,16 +1886,17 @@ class ModerationView(object):
 				content = Event.from_api_response(responses[url])
 
 			view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False),
-				'site': Site(responses[request.site_url]),
-				'content': content,
-				'item_type': request.GET.get('item_type'),
-				'action': request.GET.get('action'),
+			'user': Profile(responses[request.whoami_url], summary=False),
+			'site': Site(responses[request.site_url]),
+			'content': content,
+			'item_type': request.GET.get('item_type'),
+			'action': request.GET.get('action'),
 			}
 
 			if request.GET.get('action') == 'move':
 				# Fetch list of microcosms
-				view_data['microcosms'] = MicrocosmList.retrieve(request.META['HTTP_HOST'], access_token=request.access_token)
+				view_data['microcosms'] = MicrocosmList.retrieve(request.META['HTTP_HOST'],
+					access_token=request.access_token)
 
 			return render(request, 'forms/moderation_item.html', view_data)
 
@@ -1948,14 +1912,16 @@ class ModerationView(object):
 					conversation = Conversation.retrieve(request.META['HTTP_HOST'],
 						request.POST.get('item_id'), access_token=request.access_token)
 					conversation.microcosm_id = int(request.POST.get('microcosm_id'))
-					conversation.meta = {'editReason' :'Moderator moved item'}
+					conversation.meta = {'editReason': 'Moderator moved item'}
 					conversation.update(request.META['HTTP_HOST'], request.access_token)
 
 			elif request.POST.get('action') == 'delete':
 				if request.POST.get('item_type') == 'conversation':
-					url, params, headers = Conversation.build_request(request.META['HTTP_HOST'], request.POST.get('item_id'), access_token=request.access_token)
+					url, params, headers = Conversation.build_request(request.META['HTTP_HOST'],
+						request.POST.get('item_id'), access_token=request.access_token)
 				if request.POST.get('item_type') == 'event':
-					url, params, headers = Event.build_request(request.META['HTTP_HOST'], request.POST.get('item_id'), access_token=request.access_token)
+					url, params, headers = Event.build_request(request.META['HTTP_HOST'], request.POST.get('item_id'),
+						access_token=request.access_token)
 				payload = json.dumps([{'op': 'replace', 'path': '/meta/flags/deleted', 'value': True}])
 				headers['Content-Type'] = 'application/json'
 				requests.patch(url, payload, headers=headers)
@@ -1964,14 +1930,13 @@ class ModerationView(object):
 
 
 class ErrorView(object):
-
 	@staticmethod
 	def not_found(request):
 		# Only fetch the first element of view_requests (whoami)
 		responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
 		}
 		context = RequestContext(request, view_data)
 		return HttpResponseNotFound(loader.get_template('404.html').render(context))
@@ -2004,15 +1969,14 @@ class ErrorView(object):
 		# Only fetch the first element of view_requests (whoami)
 		responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
 		view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
+		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+		'site': Site(responses[request.site_url]),
 		}
 		context = RequestContext(request, view_data)
 		return HttpResponseServerError(loader.get_template('500.html').render(context))
 
 
 class AuthenticationView(object):
-
 	@staticmethod
 	@exception_handler
 	def login(request):
@@ -2033,7 +1997,7 @@ class AuthenticationView(object):
 		access_token = response.json()['data']
 
 		response = HttpResponseRedirect(target_url if target_url != '' else '/')
-		expires = datetime.datetime.fromtimestamp(2**31-1)
+		expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)
 		response.set_cookie('access_token', access_token, expires=expires, httponly=True)
 		return response
 
@@ -2050,13 +2014,13 @@ class AuthenticationView(object):
 		response = redirect('/')
 		if request.COOKIES.has_key('access_token'):
 			response.delete_cookie('access_token')
-			url = build_url(request.META['HTTP_HOST'], ['auth',request.access_token])
+			url = build_url(request.META['HTTP_HOST'], ['auth', request.access_token])
 			requests.post(url, params={'method': 'DELETE', 'access_token': request.access_token})
 
 		return response
 
-class GeoView(object):
 
+class GeoView(object):
 	@staticmethod
 	@exception_handler
 	def geocode(request):
@@ -2082,13 +2046,11 @@ def echo_headers(request):
 
 
 class FaviconView(RedirectView):
-
 	def get_redirect_url(self, **kwargs):
 		return settings.STATIC_URL + 'img/favico.png'
 
 
 class RobotsView(TemplateView):
-
 	template_name = 'robots.txt'
 	content_type = 'text/plain'
 
