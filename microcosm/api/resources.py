@@ -1182,8 +1182,8 @@ class Event(APIResource):
         event.rsvp_limit = data['rsvpLimit']
 
         # For progress bar
+        event.rsvp_percentage = 0
         if event.rsvp_limit > 0:
-            event.rsvp_percentage = 0
             if data.get('rsvpAttend'):
                 event.rsvp_percentage = (event.rsvp_attend/float(event.rsvp_limit))*100
 

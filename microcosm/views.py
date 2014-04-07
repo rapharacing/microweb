@@ -929,86 +929,76 @@ class EventView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET'])
 	def single(request, event_id):
 		"""
 		Display a single event with comments and attendees.
 		"""
-		if request.method == 'GET':
-			# Offset for paging of event comments
-			offset = int(request.GET.get('offset', 0))
 
-			event_url, event_params, event_headers = Event.build_request(
-				request.META['HTTP_HOST'],
-				id=event_id,
-				offset=offset,
-				access_token=request.access_token
-			)
-			request.view_requests.append(grequests.get(event_url, params=event_params, headers=event_headers))
+		# Comment offset.
+		offset = int(request.GET.get('offset', 0))
 
-			att_url, att_params, att_headers = Event.build_attendees_request(
-				request.META['HTTP_HOST'],
-				event_id,
-				request.access_token
-			)
-			request.view_requests.append(grequests.get(att_url, params=att_params, headers=att_headers))
+		# Create request for event resource.
+		event_url, event_params, event_headers = Event.build_request(request.get_host(), id=event_id,
+			offset=offset, access_token=request.access_token)
+		request.view_requests.append(grequests.get(event_url, params=event_params, headers=event_headers))
 
-			responses = response_list_to_dict(grequests.map(request.view_requests))
+		# Create request for event attendees.
+		att_url, att_params, att_headers = Event.build_attendees_request(request.get_host(), event_id,
+			request.access_token)
+		request.view_requests.append(grequests.get(att_url, params=att_params, headers=att_headers))
 
-			event = Event.from_api_response(responses[event_url])
-			comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
+		# Perform requests and instantiate view objects.
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		event = Event.from_api_response(responses[event_url])
+		comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
+		if request.whoami_url:
+			user = Profile(responses[request.whoami_url], summary=False)
 
-			user = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
+		attendees = AttendeeList(responses[att_url])
+		attendees_yes = []
+		attendees_invited = []
+		user_is_attending = False
 
-			attendees = AttendeeList(responses[att_url])
-			attendees_yes = []
-			attendees_invited = []
-			user_is_attending = False
-			for attendee in attendees.items.items:
-				if attendee.rsvp == "yes":
-					attendees_yes.append(attendee)
+		for attendee in attendees.items.items:
+			if attendee.rsvp == 'yes':
+				attendees_yes.append(attendee)
+				if request.whoami_url:
+					if attendee.profile.id == user.id:
+						user_is_attending = True
+			elif attendee.rsvp == 'maybe':
+				attendees_invited.append(attendee)
 
-					if user:
-						if (attendee.profile.id == user.id):
-							user_is_attending = True
+		# Determine whether the event spans more than one day and if it has expired.
+		# TODO: move stuff that is purely rendering to the template.
+		today = datetime.datetime.now()
+		end_date = event.when + datetime.timedelta(minutes=event.duration)
 
-				elif attendee.rsvp == "maybe":
-					attendees_invited.append(attendee)
-
-			# Dates.
-			today = datetime.datetime.now()
-			end_date = event.when + datetime.timedelta(minutes=event.duration)
-
-			is_same_day = False
-			if (end_date.strftime('%d%m%y') == event.when.strftime('%d%m%y') ):
-				is_same_day = True
-
-			event_dates = {
+		is_same_day = False
+		if end_date.strftime('%d%m%y') == event.when.strftime('%d%m%y'):
+			is_same_day = True
+		event_dates = {
 			'type': 'multiple' if not is_same_day else 'single',
 			'end': end_date
-			}
+		}
+		is_expired = True if int(end_date.strftime('%s')) < int(today.strftime('%s')) else False
 
-			is_expired = True if int(end_date.strftime('%s')) < int(today.strftime('%s')) else False
+		# Why is this a minimum of 10%?
+		rsvp_percentage = event.rsvp_percentage
+		if len(attendees_yes) and event.rsvp_percentage < 10:
+			rsvp_percentage = 10
 
-			#rsvp
-			# FIXME: redundant. This code was written before the Event object was modified to include
-			# percentage as a default (see resources.py)
-			rsvp_limit = int(responses[event_url]['rsvpLimit'])
-			num_attending = len(attendees_yes)
-			rsvp_percentage = (num_attending / float(rsvp_limit)) * 100 if rsvp_limit > 0 else 0
+		# Fetch attachments for all comments on this page.
+		# TODO: the code that does this should be in one place.
+		attachments = {}
+		for comment in event.comments.items:
+			c = comment.as_dict
+			if 'attachments' in c:
+				c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
+					access_token=request.access_token)
+				attachments[str(c['id'])] = c_attachments
 
-			if (num_attending > 0 and rsvp_percentage < 10):
-				rsvp_percentage = 10
-
-			# get attachments
-			attachments = {}
-			for comment in event.comments.items:
-				c = comment.as_dict
-				if 'attachments' in c:
-					c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
-						access_token=request.access_token)
-					attachments[str(c['id'])] = c_attachments
-
-			view_data = {
+		view_data = {
 			'user': user,
 			'site': Site(responses[request.site_url]),
 			'content': event,
@@ -1023,16 +1013,15 @@ class EventView(object):
 
 			'event_dates': event_dates,
 
-			'rsvp_num_attending': num_attending,
+			'rsvp_num_attending': len(attendees_yes),
 			'rsvp_num_invited': len(attendees_invited),
 			'rsvp_percentage': rsvp_percentage,
 
 			'is_expired': is_expired,
-
 			'attachments': attachments
-			}
+		}
 
-			return render(request, EventView.single_template, view_data)
+		return render(request, EventView.single_template, view_data)
 
 	@staticmethod
 	@exception_handler
