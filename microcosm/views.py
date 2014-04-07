@@ -1979,19 +1979,24 @@ class ErrorView(object):
 	@staticmethod
 	def forbidden(request):
 		view_data = {}
-		# If fetching user login data results in HTTP 401, the access token is invalid
+
 		try:
-			# Only fetch the first element of view_requests (whoami)
-			responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
-			view_data['user'] = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			if request.whoami_url:
+				view_data['user'] = Profile(responses[request.whoami_url], summary=False)
+			view_data['site'] = Site(responses[request.site_url])
 		except APIException as e:
+			# HTTP 401 indicates a not valid access token was supplied.
+			# TODO: use API detailed error codes to provide a useful message.
 			if e.status_code == 401 or e.status_code == 403:
+				# Template uses this in error message.
 				view_data['logout'] = True
-		view_data['site'] = Site(responses[request.site_url])
+				# Try to fetch site data without access token as it may not have succeeded above.
+				if not view_data.has_key('site'):
+					view_data['site'] = Site.retrieve(request.META['HTTP_HOST'])
+
 		context = RequestContext(request, view_data)
 		response = HttpResponseForbidden(loader.get_template('403.html').render(context))
-		if view_data.get('logout'):
-			response.delete_cookie('access_token')
 		return response
 
 	@staticmethod
