@@ -515,7 +515,7 @@ class ProfileView(object):
 		"""
 
 		# Search
-		search_q = 'type:microcosm type:conversation type:event type:comment authorId:%d' % profile_id
+		search_q = 'type:microcosm type:conversation type:event type:comment authorId:%s' % profile_id
 		search_params = {'limit': 5, 'q': search_q, 'sort': 'date'}
 		search_url, params, headers = Search.build_request(request.get_host(), search_params,
 			access_token=request.access_token)
