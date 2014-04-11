@@ -24,7 +24,6 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseServerError
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
-from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 
 from django.shortcuts import redirect
@@ -105,9 +104,22 @@ def exception_handler(view_func):
 				raise Http404
 			else:
 				raise
-
 	return decorator
 
+
+def require_authentication(view_func):
+	"""
+	Returns HTTP 401 if request.access_token is not present.
+	"""
+
+	@wraps(view_func)
+	def decorator(request, *args, **kwargs):
+		if hasattr(request, 'access_token'):
+			return view_func(request, *args, **kwargs)
+		else:
+			# TODO: this should redirect to a page where the user can log in.
+			raise PermissionDenied
+	return decorator
 
 def build_pagination_links(request, paged_list):
 	"""
@@ -143,33 +155,29 @@ class ConversationView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def single(request, conversation_id):
-		if request.method == 'GET':
-			# Offset for paging of event comments
-			offset = int(request.GET.get('offset', 0))
 
-			conversation_url, params, headers = Conversation.build_request(
-				request.META['HTTP_HOST'],
-				id=conversation_id,
-				offset=offset,
-				access_token=request.access_token
-			)
-			request.view_requests.append(grequests.get(conversation_url, params=params, headers=headers))
-			responses = response_list_to_dict(grequests.map(request.view_requests))
-			conversation = Conversation.from_api_response(responses[conversation_url])
-			comment_form = CommentForm(
-				initial=dict(itemId=conversation_id, itemType='conversation'))
+		# Offset of comments.
+		offset = int(request.GET.get('offset', 0))
 
-			# get attachments
-			attachments = {}
-			for comment in conversation.comments.items:
-				c = comment.as_dict
-				if 'attachments' in c:
-					c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
-						access_token=request.access_token)
-					attachments[str(c['id'])] = c_attachments
+		conversation_url, params, headers = Conversation.build_request(request.get_host(), id=conversation_id,
+			offset=offset, access_token=request.access_token)
+		request.view_requests.append(grequests.get(conversation_url, params=params, headers=headers))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		conversation = Conversation.from_api_response(responses[conversation_url])
+		comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
 
-			view_data = {
+		# get attachments
+		attachments = {}
+		for comment in conversation.comments.items:
+			c = comment.as_dict
+			if 'attachments' in c:
+				c_attachments = Attachment.retrieve(request.get_host(), "comments", c['id'],
+					access_token=request.access_token)
+				attachments[str(c['id'])] = c_attachments
+
+		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'site': Site(responses[request.site_url]),
 			'content': conversation,
@@ -178,12 +186,13 @@ class ConversationView(object):
 				conversation.comments),
 			'item_type': 'conversation',
 			'attachments': attachments
-			}
+		}
 
-			return render(request, ConversationView.single_template, view_data)
+		return render(request, ConversationView.single_template, view_data)
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET', 'POST',])
 	def create(request, microcosm_id):
 		"""
 		Create a conversation and first comment in the conversation.
@@ -199,17 +208,17 @@ class ConversationView(object):
 			form = ConversationView.create_form(request.POST)
 			if form.is_valid():
 				conv_request = Conversation.from_create_form(form.cleaned_data)
-				conv_response = conv_request.create(request.META['HTTP_HOST'], request.access_token)
+				conv_response = conv_request.create(request.get_host(), request.access_token)
 				if conv_response.id > 0:
 					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
 						payload = {
-						'itemType': 'conversation',
-						'itemId': conv_response.id,
-						'markdown': request.POST.get('firstcomment'),
-						'inReplyTo': 0
+							'itemType': 'conversation',
+							'itemId': conv_response.id,
+							'markdown': request.POST.get('firstcomment'),
+							'inReplyTo': 0
 						}
 						comment = Comment.from_create_form(payload)
-						comment.create(request.META['HTTP_HOST'], request.access_token)
+						comment.create(request.get_host(), request.access_token)
 
 					return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
 				else:
@@ -218,16 +227,15 @@ class ConversationView(object):
 				view_data['form'] = form
 				return render(request, ConversationView.form_template, view_data)
 
-		elif request.method == 'GET':
+		if request.method == 'GET':
 			view_data['form'] = ConversationView.create_form(initial=dict(microcosmId=microcosm_id))
 			view_data['microcosm_id'] = microcosm_id
 			return render(request, ConversationView.form_template, view_data)
 
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET', 'POST',])
 	def edit(request, conversation_id):
 		"""
 		Edit a conversation.
@@ -245,76 +253,60 @@ class ConversationView(object):
 
 			if form.is_valid():
 				conv_request = Conversation.from_edit_form(form.cleaned_data)
-				conv_response = conv_request.update(request.META['HTTP_HOST'], request.access_token)
+				conv_response = conv_request.update(request.get_host(), request.access_token)
 				return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
 			else:
 				view_data['form'] = form
 				return render(request, ConversationView.form_template, view_data)
 
-		elif request.method == 'GET':
-			conversation = Conversation.retrieve(
-				request.META['HTTP_HOST'],
-				id=conversation_id,
-				access_token=request.access_token
-			)
+		if request.method == 'GET':
+			conversation = Conversation.retrieve(request.get_host(), id=conversation_id,
+				access_token=request.access_token)
 			view_data['form'] = ConversationView.edit_form.from_conversation_instance(conversation)
 
 			return render(request, ConversationView.form_template, view_data)
 
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
-
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['POST',])
 	def delete(request, conversation_id):
 		"""
 		Delete a conversation and be redirected to the parent microcosm.
 		"""
 
-		if request.method == 'POST':
-			conversation = Conversation.retrieve(
-				request.META['HTTP_HOST'],
-				conversation_id,
-				access_token=request.access_token
-			)
-			conversation.delete(request.META['HTTP_HOST'], request.access_token)
-			return HttpResponseRedirect(reverse('single-microcosm', args=(conversation.microcosm_id,)))
-		else:
-			return HttpResponseNotAllowed()
+		conversation = Conversation.retrieve(request.get_host(), conversation_id, access_token=request.access_token)
+		conversation.delete(request.get_host(), request.access_token)
+		return HttpResponseRedirect(reverse('single-microcosm', args=(conversation.microcosm_id,)))
+
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def newest(request, conversation_id):
 		"""
 		Get redirected to the first unread post in a conversation
 		"""
-		if request.method == 'GET':
-			response = Conversation.newest(
-				request.META['HTTP_HOST'],
-				conversation_id,
-				access_token=request.access_token
-			)
-			# because redirects are always followed, we can't just get the 'location' value
-			response = response['comments']['links']
-			for link in response:
-				if link['rel'] == 'self':
-					response = link['href']
-			response = str.replace(str(response), '/api/v1', '')
-			pr = urlparse(response)
-			queries = parse_qs(pr[4])
-			frag = ""
-			if queries.get('comment_id'):
-				frag = 'comment' + queries['comment_id'][0]
-				del queries['comment_id']
-			# queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
-			# urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
-			for (key, value) in queries.items():
-				queries[key] = value[0]
-			queries = urlencode(queries)
-			response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
-			return HttpResponseRedirect(response)
-		else:
-			return HttpResponseNotAllowed()
+
+		response = Conversation.newest(request.get_host(), conversation_id, access_token=request.access_token)
+		# because redirects are always followed, we can't just get the 'location' value
+		response = response['comments']['links']
+		for link in response:
+			if link['rel'] == 'self':
+				response = link['href']
+		response = str.replace(str(response), '/api/v1', '')
+		pr = urlparse(response)
+		queries = parse_qs(pr[4])
+		frag = ""
+		if queries.get('comment_id'):
+			frag = 'comment' + queries['comment_id'][0]
+			del queries['comment_id']
+		# queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
+		# urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
+		for (key, value) in queries.items():
+			queries[key] = value[0]
+		queries = urlencode(queries)
+		response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
+		return HttpResponseRedirect(response)
 
 
 class HuddleView(object):
@@ -326,39 +318,33 @@ class HuddleView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET',])
 	def single(request, huddle_id):
-		# Need to be authenticated
-		if request.whoami_url == '':
-			return HttpResponseRedirect('/')
 
-		if request.method == 'GET':
-			# Offset for paging of event comments
-			offset = int(request.GET.get('offset', 0))
+		# Comment offset.
+		offset = int(request.GET.get('offset', 0))
 
-			huddle_url, params, headers = Huddle.build_request(
-				request.META['HTTP_HOST'],
-				id=huddle_id,
-				offset=offset,
-				access_token=request.access_token
-			)
-			request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
-			responses = response_list_to_dict(grequests.map(request.view_requests))
-			huddle = Huddle.from_api_response(responses[huddle_url])
-			comment_form = CommentForm(initial=dict(itemId=huddle_id, itemType='huddle'))
+		huddle_url, params, headers = Huddle.build_request(request.get_host(), id=huddle_id, offset=offset,
+			access_token=request.access_token)
+		request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		huddle = Huddle.from_api_response(responses[huddle_url])
+		comment_form = CommentForm(initial=dict(itemId=huddle_id, itemType='huddle'))
 
-			# get attachments
-			attachments = {}
-			for comment in huddle.comments.items:
-				c = comment.as_dict
-				if 'attachments' in c:
-					c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
-						access_token=request.access_token)
-					attachments[str(c['id'])] = c_attachments
+		# Fetch attachments.
+		attachments = {}
+		for comment in huddle.comments.items:
+			c = comment.as_dict
+			if 'attachments' in c:
+				c_attachments = Attachment.retrieve(request.get_host(), "comments", c['id'],
+					access_token=request.access_token)
+				attachments[str(c['id'])] = c_attachments
 
-			#participants json
-			participants_json = [p.as_dict for p in huddle.participants]
+		# Fetch huddle participants.
+		participants_json = [p.as_dict for p in huddle.participants]
 
-			view_data = {
+		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'site': Site(responses[request.site_url]),
 			'content': huddle,
@@ -367,21 +353,20 @@ class HuddleView(object):
 			'item_type': 'huddle',
 			'attachments': attachments,
 			'participants_json': json.dumps(participants_json)
-			}
+		}
 
-			return render(request, HuddleView.single_template, view_data)
+		return render(request, HuddleView.single_template, view_data)
+
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def list(request):
 		# record offset for paging of huddles
 		offset = int(request.GET.get('offset', 0))
 
-		huddle_url, params, headers = HuddleList.build_request(
-			request.META['HTTP_HOST'],
-			offset=offset,
-			access_token=request.access_token
-		)
+		huddle_url, params, headers = HuddleList.build_request(request.get_host(), offset=offset,
+			access_token=request.access_token)
 
 		request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
 		responses = response_list_to_dict(grequests.map(request.view_requests))
@@ -389,28 +374,24 @@ class HuddleView(object):
 		huddles = HuddleList(responses[huddle_url])
 
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
-		'content': huddles,
-		'pagination': build_pagination_links(responses[huddle_url]['huddles']['links'], huddles.huddles)
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': huddles,
+			'pagination': build_pagination_links(responses[huddle_url]['huddles']['links'], huddles.huddles)
 		}
-
 		return render(request, HuddleView.list_template, view_data)
 
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def create(request):
 		"""
 		Create a huddle.
 		"""
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
-
-		# Need to be authenticated
-		if request.whoami_url == '':
-			return HttpResponseRedirect('/')
-
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False),
 			'site': Site(responses[request.site_url]),
@@ -420,11 +401,11 @@ class HuddleView(object):
 			form = HuddleView.create_form(request.POST)
 			if form.is_valid():
 				hud_request = Huddle.from_create_form(form.cleaned_data)
-				hud_response = hud_request.create(request.META['HTTP_HOST'], request.access_token)
+				hud_response = hud_request.create(request.get_host(), request.access_token)
 				if hud_response.id > 0:
 					if request.POST.get('invite'):
 						ids = [int(x) for x in request.POST.get('invite').split(',')]
-						Huddle.invite(request.META['HTTP_HOST'], hud_response.id, ids, request.access_token)
+						Huddle.invite(request.get_host(), hud_response.id, ids, request.access_token)
 
 					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
 						payload = {
@@ -434,19 +415,19 @@ class HuddleView(object):
 						'inReplyTo': 0
 						}
 						comment = Comment.from_create_form(payload)
-						comment.create(request.META['HTTP_HOST'], request.access_token)
+						comment.create(request.get_host(), request.access_token)
 					return HttpResponseRedirect(reverse('single-huddle', args=(hud_response.id,)))
 			else:
 				view_data['form'] = form
 				return render(request, HuddleView.form_template, view_data)
 
-		elif request.method == 'GET':
+		if request.method == 'GET':
 			if request.GET.get('to'):
 				recipients = []
 				list_of_recipient_ids = request.GET.get('to').split(",");
 
 				for recipient_id in list_of_recipient_ids:
-					recipient_profile = Profile.retrieve(request.META['HTTP_HOST'], recipient_id)
+					recipient_profile = Profile.retrieve(request.get_host(), recipient_id)
 					if recipient_profile.id > 0:
 						recipients.append({
 						'id': recipient_profile.id,
@@ -459,76 +440,64 @@ class HuddleView(object):
 			view_data['form'] = HuddleView.create_form(initial=dict())
 			return render(request, HuddleView.form_template, view_data)
 
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
-
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST', ])
 	def invite(request, huddle_id):
 		"""
 		Invite participants to a huddle.
 		"""
 
-		if request.method == 'POST':
-			ids = [int(x) for x in request.POST.get('invite_profile_id').split()]
-			Huddle.invite(request.META['HTTP_HOST'], huddle_id, ids, request.access_token)
-			return HttpResponseRedirect(reverse('single-huddle', args=(huddle_id,)))
+		ids = [int(x) for x in request.POST.get('invite_profile_id').split()]
+		Huddle.invite(request.get_host(), huddle_id, ids, request.access_token)
+		return HttpResponseRedirect(reverse('single-huddle', args=(huddle_id,)))
 
-		else:
-			return HttpResponseNotAllowed(['POST'])
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST', ])
 	def delete(request, huddle_id):
 		"""
 		Delete a huddle and be redirected to the parent microcosm.
 		"""
 
-		if request.method == 'POST':
-			huddle = Huddle.retrieve(
-				request.META['HTTP_HOST'],
-				huddle_id,
-				access_token=request.access_token
-			)
-			huddle.delete(request.META['HTTP_HOST'], request.access_token)
-			return HttpResponseRedirect(reverse('list-huddle'))
-		else:
-			return HttpResponseNotAllowed()
+		huddle = Huddle.retrieve(request.get_host(), huddle_id, access_token=request.access_token)
+		huddle.delete(request.get_host(), request.access_token)
+		return HttpResponseRedirect(reverse('list-huddle'))
+
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', ])
 	def newest(request, huddle_id):
 		"""
 		Get redirected to the first unread post in a huddle
 		"""
-		if request.method == 'GET':
-			response = Huddle.newest(
-				request.META['HTTP_HOST'],
-				huddle_id,
-				access_token=request.access_token
-			)
-			#because redirects are always followed, we can't just get the 'location' value
-			response = response['comments']['links']
-			for link in response:
-				if link['rel'] == 'self':
-					response = link['href']
-			response = str.replace(str(response), '/api/v1', '')
-			pr = urlparse(response)
-			queries = parse_qs(pr[4])
-			frag = ""
-			if queries.get('comment_id'):
-				frag = 'comment' + queries['comment_id'][0]
-				del queries['comment_id']
-			# queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
-			# urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
-			for (key, value) in queries.items():
-				queries[key] = value[0]
-			queries = urlencode(queries)
-			response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
-			return HttpResponseRedirect(response)
-		else:
-			return HttpResponseNotAllowed()
+
+		response = Huddle.newest(request.get_host(), huddle_id, access_token=request.access_token)
+		#because redirects are always followed, we can't just get the 'location' value
+		response = response['comments']['links']
+		for link in response:
+			if link['rel'] == 'self':
+				response = link['href']
+		response = str.replace(str(response), '/api/v1', '')
+		pr = urlparse(response)
+		queries = parse_qs(pr[4])
+		frag = ""
+		if queries.get('comment_id'):
+			frag = 'comment' + queries['comment_id'][0]
+			del queries['comment_id']
+		# queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
+		# urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
+		for (key, value) in queries.items():
+			queries[key] = value[0]
+		queries = urlencode(queries)
+		response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
+		return HttpResponseRedirect(response)
 
 
 class ProfileView(object):
@@ -539,70 +508,56 @@ class ProfileView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET', ])
 	def single(request, profile_id):
 		"""
 		Display a single profile by ID.
 		"""
 
 		# Search
-		search_url, params, headers = Search.build_request(
-			request.META['HTTP_HOST'],
-			params=dict(limit=5, q=u'type:microcosm type:conversation type:event type:comment authorId:' + profile_id,
-				sort='date'),
-			access_token=request.access_token
-		)
+		search_q = 'type:microcosm type:conversation type:event type:comment authorId:%d' % profile_id
+		search_params = {'limit': 5, 'q': search_q, 'sort': 'date'}
+		search_url, params, headers = Search.build_request(request.get_host(), search_params,
+			access_token=request.access_token)
 		request.view_requests.append(grequests.get(search_url, params=params, headers=headers))
 
 		# Profile
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'item_type': 'profile',
-		'site': Site(responses[request.site_url]),
-		'search': Search.from_api_response(responses[search_url]),
-		'site_section': 'people'
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'item_type': 'profile',
+			'site': Site(responses[request.site_url]),
+			'search': Search.from_api_response(responses[search_url]),
+			'site_section': 'people'
 		}
 
-		profile = Profile.retrieve(
-			request.META['HTTP_HOST'],
-			profile_id,
-			request.access_token
-		)
-
+		profile = Profile.retrieve(request.get_host(), profile_id, request.access_token)
 		view_data['content'] = profile
-
 		return render(request, ProfileView.single_template, view_data)
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET', ])
 	def list(request):
-		# record offset for paging of profiles
+
+		# Record offset for paging of profiles.
 		offset = int(request.GET.get('offset', 0))
 		top = bool(request.GET.get('top', False))
 		q = request.GET.get('q', "")
 		following = bool(request.GET.get('following', False))
 		online = bool(request.GET.get('online', False))
 
-		profiles_url, params, headers = ProfileList.build_request(
-			request.META['HTTP_HOST'],
-			offset=offset,
-			top=top,
-			q=q,
-			following=following,
-			online=online,
-			access_token=request.access_token
-		)
+		profiles_url, params, headers = ProfileList.build_request(request.get_host(), offset=offset, top=top,
+			q=q, following=following, online=online, access_token=request.access_token)
 
 		request.view_requests.append(grequests.get(profiles_url, params=params, headers=headers))
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 
 		profiles = ProfileList(responses[profiles_url])
 
-		subtitle = "Showing everyone"
+		subtitle = False
 		if q != "" and len(q) == 1:
 			subtitle = "names starting with %s" % (q.upper())
-		else:
-			subtitle = False
 
 		filter_name = []
 
@@ -619,24 +574,25 @@ class ProfileView(object):
 			filter_name.append("sorted alphabetically")
 
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
-		'content': profiles,
-		'pagination': build_pagination_links(responses[profiles_url]['profiles']['links'], profiles.profiles),
-		'q': q,
-		'top': top,
-		'following': following,
-		'alphabet': string.ascii_lowercase,
-		'site_section': 'people',
-		'filter_name': ", ".join(filter_name),
-		'subtitle': subtitle,
-		'online': online
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': profiles,
+			'pagination': build_pagination_links(responses[profiles_url]['profiles']['links'], profiles.profiles),
+			'q': q,
+			'top': top,
+			'following': following,
+			'alphabet': string.ascii_lowercase,
+			'site_section': 'people',
+			'filter_name': ", ".join(filter_name),
+			'subtitle': subtitle,
+			'online': online
 		}
 
 		return render(request, ProfileView.list_template, view_data)
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET', 'POST',])
 	def edit(request, profile_id):
 		"""
 		Edit a user profile (profile name or avatar).
@@ -654,56 +610,47 @@ class ProfileView(object):
 			if form.is_valid():
 				if request.FILES.has_key('avatar'):
 					file_request = FileMetadata.from_create_form(request.FILES['avatar'])
-					file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token, 100, 100)
+					file_metadata = file_request.create(request.get_host(), request.access_token, 100, 100)
 					Attachment.create(
-						request.META['HTTP_HOST'],
+						request.get_host(),
 						file_metadata.file_hash,
 						profile_id=user.id,
 						access_token=request.access_token,
 						file_name=request.FILES['avatar'].name
 					)
 				profile_request = Profile(form.cleaned_data)
-				profile_response = profile_request.update(request.META['HTTP_HOST'], request.access_token)
+				profile_response = profile_request.update(request.get_host(), request.access_token)
 
-				# check for existing comment
+				# Check for existing comment attached to profile.
 				if request.POST.get('markdown'):
 					payload = {
-					'itemType': 'profile',
-					'itemId': profile_response.id,
-					'markdown': request.POST.get('markdown'),
-					'inReplyTo': 0
+						'itemType': 'profile',
+						'itemId': profile_response.id,
+						'markdown': request.POST.get('markdown'),
+						'inReplyTo': 0
 					}
 
-					# try to edit comment else create a new one
+					# Create new comment or edit the existing one.
 					if hasattr(profile_response, 'profile_comment'):
 						payload['id'] = profile_response.profile_comment.id
 						if len(request.POST.get('markdown')) < 1:
 							payload['markdown'] = ""
 						comment_request = Comment.from_edit_form(payload)
-						comment_response = comment_request.update(request.META['HTTP_HOST'],
-							access_token=request.access_token)
+						comment_request.update(request.get_host(), access_token=request.access_token)
 					else:
 						if len(request.POST.get('markdown')) > 0:
 							comment = Comment.from_create_form(payload)
-							comment.create(request.META['HTTP_HOST'], request.access_token)
+							comment.create(request.get_host(), request.access_token)
 
 				return HttpResponseRedirect(reverse('single-profile', args=(profile_response.id,)))
 			else:
 				view_data['form'] = form
 				return render(request, ProfileView.form_template, view_data)
 
-		elif request.method == 'GET':
-			user_profile = Profile.retrieve(
-				request.META['HTTP_HOST'],
-				profile_id,
-				request.access_token
-			)
-
+		if request.method == 'GET':
+			user_profile = Profile.retrieve(request.get_host(), profile_id, request.access_token)
 			view_data['form'] = ProfileView.edit_form(user_profile.as_dict)
 			return render(request, ProfileView.form_template, view_data)
-
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
 
 
 class MicrocosmView(object):
@@ -715,60 +662,57 @@ class MicrocosmView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def single(request, microcosm_id):
-		if request.method == 'GET':
-			# record offset for paging of items within the microcosm
-			offset = int(request.GET.get('offset', 0))
 
-			microcosm_url, params, headers = Microcosm.build_request(
-				request.META['HTTP_HOST'],
-				id=microcosm_id,
-				offset=offset,
-				access_token=request.access_token
-			)
-			request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
-			responses = response_list_to_dict(grequests.map(request.view_requests))
-			microcosm = Microcosm.from_api_response(responses[microcosm_url])
+		# Pagination offset of items within the microcosm.
+		offset = int(request.GET.get('offset', 0))
 
-			view_data = {
+		microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
+			offset=offset, access_token=request.access_token)
+		request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		microcosm = Microcosm.from_api_response(responses[microcosm_url])
+
+		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'site': Site(responses[request.site_url]),
 			'content': microcosm,
 			'item_type': 'microcosm',
 			'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
-			}
+		}
 
-			return render(request, MicrocosmView.single_template, view_data)
+		return render(request, MicrocosmView.single_template, view_data)
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def list(request):
-		# record offset for paging of microcosms
+
+		# Pagination offset of microcosms.
 		offset = int(request.GET.get('offset', 0))
 
-		microcosms_url, params, headers = MicrocosmList.build_request(
-			request.META['HTTP_HOST'],
-			offset=offset,
-			access_token=request.access_token
-		)
-
+		microcosms_url, params, headers = MicrocosmList.build_request(request.get_host(), offset=offset,
+			access_token=request.access_token)
 		request.view_requests.append(grequests.get(microcosms_url, params=params, headers=headers))
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 
 		microcosms = MicrocosmList(responses[microcosms_url])
 
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
-		'content': microcosms,
-		'item_type': 'site',
-		'pagination': build_pagination_links(responses[microcosms_url]['microcosms']['links'], microcosms.microcosms)
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': microcosms,
+			'item_type': 'site',
+			'pagination': build_pagination_links(responses[microcosms_url]['microcosms']['links'], microcosms.microcosms)
 		}
 
 		return render(request, MicrocosmView.list_template, view_data)
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def create(request):
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
@@ -780,21 +724,21 @@ class MicrocosmView(object):
 			form = MicrocosmView.create_form(request.POST)
 			if form.is_valid():
 				microcosm_request = Microcosm.from_create_form(form.cleaned_data)
-				microcosm_response = microcosm_request.create(request.META['HTTP_HOST'], request.access_token)
+				microcosm_response = microcosm_request.create(request.get_host(), request.access_token)
 				return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_response.id,)))
 			else:
 				view_data['form'] = form
 				return render(request, MicrocosmView.form_template, view_data)
 
-		elif request.method == 'GET':
+		if request.method == 'GET':
 			view_data['form'] = MicrocosmView.create_form()
 			return render(request, MicrocosmView.form_template, view_data)
 
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def edit(request, microcosm_id):
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
@@ -806,55 +750,26 @@ class MicrocosmView(object):
 			form = MicrocosmView.edit_form(request.POST)
 			if form.is_valid():
 				microcosm_request = Microcosm.from_edit_form(form.cleaned_data)
-				microcosm_response = microcosm_request.update(request.META['HTTP_HOST'], request.access_token)
+				microcosm_response = microcosm_request.update(request.get_host(), request.access_token)
 				return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_response.id,)))
 			else:
 				view_data['form'] = form
 				return render(request, MicrocosmView.form_template, view_data)
 
-		elif request.method == 'GET':
-			microcosm = Microcosm.retrieve(
-				request.META['HTTP_HOST'],
-				id=microcosm_id,
-				access_token=request.access_token
-			)
+		if request.method == 'GET':
+			microcosm = Microcosm.retrieve(request.get_host(), id=microcosm_id, access_token=request.access_token)
 			view_data['form'] = MicrocosmView.edit_form(microcosm.as_dict)
 			return render(request, MicrocosmView.form_template, view_data)
 
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST',])
 	def delete(request, microcosm_id):
-		if request.method == 'POST':
-			microcosm = Microcosm.retrieve(request.META['HTTP_HOST'], microcosm_id, access_token=request.access_token)
-			microcosm.delete(request.META['HTTP_HOST'], request.access_token)
-			return HttpResponseRedirect(reverse(MicrocosmView.list))
-		return HttpResponseNotAllowed(['POST'])
-
-	@staticmethod
-	@exception_handler
-	def create_item_choice(request, microcosm_id):
-		"""
-		Interstitial page for creating an item (e.g. Event) belonging to a microcosm.
-		"""
-
-		microcosm_url, params, headers = Microcosm.build_request(
-			request.META['HTTP_HOST'],
-			microcosm_id,
-			access_token=request.access_token
-		)
-		request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
-		responses = response_list_to_dict(grequests.map(request.view_requests))
-
-		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
-		'content': Microcosm.from_api_response(responses[microcosm_url])
-		}
-
-		return render(request, 'create_item_choice.html', view_data)
+		microcosm = Microcosm.retrieve(request.get_host(), microcosm_id, access_token=request.access_token)
+		microcosm.delete(request.get_host(), request.access_token)
+		return HttpResponseRedirect(reverse(MicrocosmView.list))
 
 
 class MembershipView(object):
@@ -863,61 +778,52 @@ class MembershipView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def list(request, microcosm_id):
-		if request.method == 'GET':
-			# record offset for paging of items within the microcosm
-			offset = int(request.GET.get('offset', 0))
+		offset = int(request.GET.get('offset', 0))
 
-			microcosm_url, params, headers = Microcosm.build_request(
-				request.META['HTTP_HOST'],
-				id=microcosm_id,
-				offset=offset,
-				access_token=request.access_token
-			)
-			request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
-			responses = response_list_to_dict(grequests.map(request.view_requests))
-			microcosm = Microcosm.from_api_response(responses[microcosm_url])
+		microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id, offset=offset,
+				access_token=request.access_token)
+		request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
-			view_data = {
+		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'site': Site(responses[request.site_url]),
 			'content': microcosm,
 			'item_type': 'microcosm',
 			'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
-			}
+		}
 
-			return render(request, MembershipView.list_template, view_data)
+		return render(request, MembershipView.list_template, view_data)
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def create(request, microcosm_id):
 		if request.method == 'POST':
 			pass
 		elif request.method == 'GET':
 			offset = int(request.GET.get('offset', 0))
 
-			microcosm_url, params, headers = Microcosm.build_request(
-				request.META['HTTP_HOST'],
-				id=microcosm_id,
-				offset=offset,
-				access_token=request.access_token
-			)
+			microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
+				offset=offset, access_token=request.access_token)
 			request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
 			request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
 			responses = response_list_to_dict(grequests.map(request.view_requests))
 			microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
 			view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': Site(responses[request.site_url]),
-			'content': microcosm,
-			'item_type': 'microcosm',
-			'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+				'site': Site(responses[request.site_url]),
+				'content': microcosm,
+				'item_type': 'microcosm',
+				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
 			}
 
 			return render(request, MembershipView.form_template, view_data)
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
 
 
 class EventView(object):
@@ -929,7 +835,7 @@ class EventView(object):
 
 	@staticmethod
 	@exception_handler
-	@require_http_methods(['GET'])
+	@require_http_methods(['GET',])
 	def single(request, event_id):
 		"""
 		Display a single event with comments and attendees.
@@ -994,7 +900,7 @@ class EventView(object):
 		for comment in event.comments.items:
 			c = comment.as_dict
 			if 'attachments' in c:
-				c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
+				c_attachments = Attachment.retrieve(request.get_host(), "comments", c['id'],
 					access_token=request.access_token)
 				attachments[str(c['id'])] = c_attachments
 
@@ -1025,6 +931,8 @@ class EventView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def create(request, microcosm_id):
 		"""
 		Create an event within a microcosm.
@@ -1041,7 +949,7 @@ class EventView(object):
 			form = EventView.create_form(request.POST)
 			if form.is_valid():
 				event_request = Event.from_create_form(form.cleaned_data)
-				event_response = event_request.create(request.META['HTTP_HOST'], request.access_token)
+				event_response = event_request.create(request.get_host(), request.access_token)
 				if event_response.id > 0:
 					# invite attendees
 					invites = request.POST.get('invite')
@@ -1050,19 +958,14 @@ class EventView(object):
 						attendees = []
 						if len(invited_list) > 0:
 							for userid in invited_list:
-								if (userid != ""):
+								if userid != "":
 									attendees.append({
 									'rsvp': 'maybe',
 									'profileId': int(userid)
 									})
-							if (len(attendees) > 0):
-								Event.rsvp(
-									request.META['HTTP_HOST'],
-									event_response.id,
-									user.id,
-									attendees,
-									access_token=request.access_token
-								)
+							if len(attendees) > 0:
+								Event.rsvp(request.get_host(), event_response.id, user.id, attendees,
+									access_token=request.access_token)
 
 					# create comment
 					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
@@ -1073,7 +976,7 @@ class EventView(object):
 						'inReplyTo': 0
 						}
 						comment = Comment.from_create_form(payload)
-						comment.create(request.META['HTTP_HOST'], request.access_token)
+						comment.create(request.get_host(), request.access_token)
 					return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
 				else:
 					return HttpResponseServerError()
@@ -1082,16 +985,16 @@ class EventView(object):
 				view_data['microcosm_id'] = microcosm_id
 				return render(request, EventView.form_template, view_data)
 
-		elif request.method == 'GET':
+		if request.method == 'GET':
 			view_data['form'] = EventView.create_form(initial=dict(microcosmId=microcosm_id))
 			view_data['microcosm_id'] = microcosm_id
 			return render(request, EventView.form_template, view_data)
 
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def edit(request, event_id):
 		"""
 		Edit an event.
@@ -1108,7 +1011,7 @@ class EventView(object):
 			form = EventView.edit_form(request.POST)
 			if form.is_valid():
 				event_request = Event.from_edit_form(form.cleaned_data)
-				event_response = event_request.update(request.META['HTTP_HOST'], request.access_token)
+				event_response = event_request.update(request.get_host(), request.access_token)
 				return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
 			else:
 				view_data['form'] = form
@@ -1116,13 +1019,13 @@ class EventView(object):
 
 				return render(request, EventView.form_template, view_data)
 
-		elif request.method == 'GET':
-			event = Event.retrieve(request.META['HTTP_HOST'], id=event_id, access_token=request.access_token)
+		if request.method == 'GET':
+			event = Event.retrieve(request.get_host(), id=event_id, access_token=request.access_token)
 			view_data['form'] = EventView.edit_form.from_event_instance(event)
 			view_data['microcosm_id'] = event.microcosm_id
 
 			# fetch attendees
-			view_data['attendees'] = Event.get_attendees(host=request.META['HTTP_HOST'], id=event_id,
+			view_data['attendees'] = Event.get_attendees(host=request.get_host(), id=event_id,
 				access_token=request.access_token)
 
 			attendees_json = []
@@ -1140,88 +1043,71 @@ class EventView(object):
 
 			return render(request, EventView.form_template, view_data)
 
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST',])
 	def delete(request, event_id):
 		"""
 		Delete an event and be redirected to the parent microcosm.
 		"""
 
-		if request.method == 'POST':
-			event = Event.retrieve(
-				request.META['HTTP_HOST'],
-				event_id,
-				access_token=request.access_token
-			)
-			event.delete(request.META['HTTP_HOST'], request.access_token)
-			return HttpResponseRedirect(reverse('single-microcosm', args=(event.microcosm_id,)))
-		else:
-			return HttpResponseNotAllowed()
+		event = Event.retrieve(request.get_host(), event_id, access_token=request.access_token)
+		event.delete(request.get_host(), request.access_token)
+		return HttpResponseRedirect(reverse('single-microcosm', args=(event.microcosm_id,)))
+
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', ])
 	def newest(request, event_id):
 		"""
 		Get redirected to the first unread post in a conversation
 		"""
-		if request.method == 'GET':
-			response = Event.newest(
-				request.META['HTTP_HOST'],
-				event_id,
-				access_token=request.access_token
-			)
-			# Because redirects are always followed, we can't just use Location.
-			response = response['comments']['links']
-			for link in response:
-				if link['rel'] == 'self':
-					response = link['href']
-			response = str.replace(str(response), '/api/v1', '')
-			pr = urlparse(response)
-			queries = parse_qs(pr[4])
-			frag = ""
-			if queries.get('comment_id'):
-				frag = 'comment' + queries['comment_id'][0]
-				del queries['comment_id']
-			# queries is a dictionary of 1-item lists (as we don't re-use keys in our query string).
-			# urlencode will encode the lists into the url (offset=[25]) etc. So get the values straight.
-			for (key, value) in queries.items():
-				queries[key] = value[0]
-			queries = urlencode(queries)
-			response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
-			return HttpResponseRedirect(response)
-		else:
-			return HttpResponseNotAllowed()
+		response = Event.newest(request.get_host(), event_id, access_token=request.access_token)
+		# Because redirects are always followed, we can't just use Location.
+		response = response['comments']['links']
+		for link in response:
+			if link['rel'] == 'self':
+				response = link['href']
+		response = str.replace(str(response), '/api/v1', '')
+		pr = urlparse(response)
+		queries = parse_qs(pr[4])
+		frag = ""
+		if queries.get('comment_id'):
+			frag = 'comment' + queries['comment_id'][0]
+			del queries['comment_id']
+		# queries is a dictionary of 1-item lists (as we don't re-use keys in our query string).
+		# urlencode will encode the lists into the url (offset=[25]) etc. So get the values straight.
+		for (key, value) in queries.items():
+			queries[key] = value[0]
+		queries = urlencode(queries)
+		response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
+		return HttpResponseRedirect(response)
+
 
 	@staticmethod
+	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST',])
 	def rsvp(request, event_id):
 		"""
 		Create an attendee (RSVP) for an event. An attendee can be in one of four states:
-		invited, confirmed, maybe, no.
+		invited, yes, maybe, no.
 		"""
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		user = Profile(responses[request.whoami_url], summary=False)
 
-		if request.method == 'POST':
-			if user:
-				attendee = [{
-				            'rsvp': request.POST['rsvp'],
-				            'profileId': user.id
-				            }]
-				Event.rsvp(
-					request.META['HTTP_HOST'],
-					event_id,
-					user.id,
-					attendee,
-					access_token=request.access_token
-				)
-				return HttpResponseRedirect(reverse('single-event', args=(event_id,)))
-			else:
-				raise PermissionDenied
-		else:
-			raise HttpResponseNotAllowed(['POST'])
+		attendee = [dict(rsvp=request.POST['rsvp'],profileId=user.id),]
+		try:
+			Event.rsvp(request.get_host(), event_id, user.id, attendee, access_token=request.access_token)
+		except APIException:
+			# TODO: return forbidden response with error detail
+			raise PermissionDenied
+
+		return HttpResponseRedirect(reverse('single-event', args=(event_id,)))
 
 
 class CommentView(object):
@@ -1269,12 +1155,13 @@ class CommentView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def single(request, comment_id):
 		"""
 		Display a single comment.
 		"""
 
-		url, params, headers = Comment.build_request(request.META['HTTP_HOST'], id=comment_id,
+		url, params, headers = Comment.build_request(request.get_host(), id=comment_id,
 			access_token=request.access_token)
 		request.view_requests.append(grequests.get(url, params=params, headers=headers))
 		responses = response_list_to_dict(grequests.map(request.view_requests))
@@ -1291,28 +1178,32 @@ class CommentView(object):
 		attachments = {}
 		c = content.as_dict
 		if 'attachments' in c:
-			c_attachments = Attachment.retrieve(request.META['HTTP_HOST'], "comments", c['id'],
+			c_attachments = Attachment.retrieve(request.get_host(), "comments", c['id'],
 				access_token=request.access_token)
 			attachments[str(c['id'])] = c_attachments
 
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
-		'content': content,
-		'comment_form': comment_form,
-		'attachments': attachments
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': content,
+			'comment_form': comment_form,
+			'attachments': attachments
 		}
 
 		return render(request, CommentView.single_template, view_data)
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST',])
 	def create(request):
 		"""
 		Create a comment, processing any attachments (including deletion of attachments) and
 		redirecting to the single comment form if there are any validation errors.
 		"""
 
+		# TODO: determine whether the single comment creation form will use this view.
+		# Remove the conditional if not.
 		if request.method == 'POST':
 			form = CommentForm(request.POST)
 
@@ -1328,7 +1219,7 @@ class CommentView(object):
 
 			# Create comment with API.
 			comment_request = Comment.from_create_form(form.cleaned_data)
-			comment_response = comment_request.create(request.META['HTTP_HOST'], access_token=request.access_token)
+			comment_response = comment_request.create(request.get_host(), access_token=request.access_token)
 
 			# If comment creation successful, handle attachment creation and deletion.
 			if comment_response.id:
@@ -1362,9 +1253,9 @@ class CommentView(object):
 								return render(request, CommentView.form_template, view_data)
 							# Associate attachment with comment using attachments API.
 							else:
-								file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+								file_metadata = file_request.create(request.get_host(), request.access_token)
 								Attachment.create(
-									request.META['HTTP_HOST'],
+									request.get_host(),
 									file_metadata.file_hash,
 									comment_id=comment_response.id,
 									access_token=request.access_token,
@@ -1381,13 +1272,12 @@ class CommentView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def edit(request, comment_id):
 		"""
 		Edit a comment.
 		"""
-
-		if not request.access_token:
-			raise PermissionDenied
 
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
@@ -1399,7 +1289,7 @@ class CommentView(object):
 			form = CommentForm(request.POST)
 			if form.is_valid():
 				comment_request = Comment.from_edit_form(form.cleaned_data)
-				comment_response = comment_request.update(request.META['HTTP_HOST'], access_token=request.access_token)
+				comment_response = comment_request.update(request.get_host(), access_token=request.access_token)
 
 				# delete attachments if necessary
 				if comment_response.id > 0:
@@ -1419,9 +1309,9 @@ class CommentView(object):
 									'avatar_error'] = 'Sorry, the file you upload must be under 5MB and square.'
 									return render(request, CommentView.form_template, view_data)
 								else:
-									file_metadata = file_request.create(request.META['HTTP_HOST'], request.access_token)
+									file_metadata = file_request.create(request.get_host(), request.access_token)
 									Attachment.create(
-										request.META['HTTP_HOST'],
+										request.get_host(),
 										file_metadata.file_hash,
 										comment_id=comment_response.id,
 										access_token=request.access_token,
@@ -1432,7 +1322,7 @@ class CommentView(object):
 
 					if len(attachments_delete) > 0:
 						for fileHash in attachments_delete:
-							Attachment.delete(request.META['HTTP_HOST'], Comment.api_path_fragment,
+							Attachment.delete(request.get_host(), Comment.api_path_fragment,
 								comment_response.id, fileHash)
 
 				if comment_response.meta.links.get('commentPage'):
@@ -1443,101 +1333,84 @@ class CommentView(object):
 				view_data['form'] = form
 				return render(request, CommentView.form_template, view_data)
 
-		elif request.method == 'GET':
-			comment = Comment.retrieve(
-				request.META['HTTP_HOST'],
-				comment_id,
-				access_token=request.access_token
-			)
+		if request.method == 'GET':
+			comment = Comment.retrieve(request.get_host(), comment_id, access_token=request.access_token)
 			view_data['form'] = CommentForm(comment.as_dict)
 			return render(request, CommentView.form_template, view_data)
 
-		else:
-			return HttpResponseNotAllowed(['GET', 'POST'])
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST',])
 	def delete(request, comment_id):
 		"""
 		Delete a comment and be redirected to the item.
 		"""
 
-		if request.method == 'POST':
-			comment = Comment.retrieve(request.META['HTTP_HOST'], comment_id, access_token=request.access_token)
-			comment.delete(request.META['HTTP_HOST'], request.access_token)
-			if comment.item_type == 'event':
-				return HttpResponseRedirect(reverse('single-event', args=(comment.item_id,)))
-			elif comment.item_type == 'conversation':
-				return HttpResponseRedirect(reverse('single-conversation', args=(comment.item_id,)))
-			else:
-				return HttpResponseRedirect(reverse('microcosm-list'))
+		comment = Comment.retrieve(request.get_host(), comment_id, access_token=request.access_token)
+		comment.delete(request.get_host(), request.access_token)
+		if comment.item_type == 'event':
+			return HttpResponseRedirect(reverse('single-event', args=(comment.item_id,)))
+		elif comment.item_type == 'conversation':
+			return HttpResponseRedirect(reverse('single-conversation', args=(comment.item_id,)))
 		else:
-			return HttpResponseNotAllowed()
+			return HttpResponseRedirect(reverse('microcosm-list'))
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET',])
 	def incontext(request, comment_id):
 		"""
 		Get redirected to the first unread post in a conversation
 		"""
-		if request.method == 'GET':
-			response = Comment.incontext(
-				request.META['HTTP_HOST'],
-				comment_id,
-				access_token=request.access_token
-			)
-			#because redirects are always followed, we can't just get the 'location' value
-			response = response['comments']['links']
-			for link in response:
-				if link['rel'] == 'self':
-					response = link['href']
-			response = str.replace(str(response), '/api/v1', '')
-			pr = urlparse(response)
-			queries = parse_qs(pr[4])
-			frag = ""
-			if queries.get('comment_id'):
-				frag = 'comment' + queries['comment_id'][0]
-				del queries['comment_id']
-			# queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
-			# urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
-			for (key, value) in queries.items():
-				queries[key] = value[0]
-			queries = urlencode(queries)
-			response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
-			return HttpResponseRedirect(response)
-		else:
-			return HttpResponseNotAllowed()
+
+		response = Comment.incontext(request.get_host(), comment_id, access_token=request.access_token)
+		#because redirects are always followed, we can't just get the 'location' value
+		response = response['comments']['links']
+		for link in response:
+			if link['rel'] == 'self':
+				response = link['href']
+		response = str.replace(str(response), '/api/v1', '')
+		pr = urlparse(response)
+		queries = parse_qs(pr[4])
+		frag = ""
+		if queries.get('comment_id'):
+			frag = 'comment' + queries['comment_id'][0]
+			del queries['comment_id']
+		# queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
+		# urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
+		for (key, value) in queries.items():
+			queries[key] = value[0]
+		queries = urlencode(queries)
+		response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
+		return HttpResponseRedirect(response)
 
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET',])
 	def source(request, comment_id):
 		"""
 		Retrieve the markdown source for a comment.
 		"""
-		if request.access_token is None:
-			raise PermissionDenied
-		response = Comment.source(
-			request.META['HTTP_HOST'],
-			comment_id,
-			request.access_token
-		)
+
+		response = Comment.source(request.get_host(), comment_id, request.access_token)
 		return HttpResponse(response, content_type='application/json')
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET',])
 	def attachments(request, comment_id):
 		"""
-		Retrieve the markdown source for a comment.
+		Retrieve a comment's attachments.
 		"""
-		if request.access_token is None:
-			raise PermissionDenied
-		response = Attachment.source(
-			request.META['HTTP_HOST'],
-			type=Comment.api_path_fragment,
-			id=comment_id,
-			access_token=request.access_token
-		)
+
+		response = Attachment.source(request.get_host(), type=Comment.api_path_fragment, id=comment_id,
+			access_token=request.access_token)
 		return HttpResponse(response, content_type='application/json')
 
 
@@ -1546,50 +1419,48 @@ class UpdateView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def list(request):
+		# TODO: need a user friendly error page for unregistered users
+		# TODO: remove 'site_section'
 		if not request.access_token:
-		# FIXME: need a user friendly error page for unregistered users
 			responses = response_list_to_dict(grequests.map(request.view_requests))
 			view_data = {
-			'user': False,
-			'site_section': 'updates',
-			'site': Site(responses[request.site_url]),
+				'user': False,
+				'site_section': 'updates',
+				'site': Site(responses[request.site_url]),
 			}
 		else:
 			# pagination offset
 			offset = int(request.GET.get('offset', 0))
 
-			url, params, headers = UpdateList.build_request(
-				request.META['HTTP_HOST'],
-				offset=offset,
-				access_token=request.access_token
-			)
+			url, params, headers = UpdateList.build_request(request.get_host(), offset=offset,
+				access_token=request.access_token)
 			request.view_requests.append(grequests.get(url, params=params, headers=headers))
 			responses = response_list_to_dict(grequests.map(request.view_requests))
 			updates_list = UpdateList(responses[url])
 
 			view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False),
-			'content': updates_list,
-			'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates),
-			'site_section': 'updates',
-			'site': Site(responses[request.site_url]),
+				'user': Profile(responses[request.whoami_url], summary=False),
+				'content': updates_list,
+				'pagination': build_pagination_links(responses[url]['updates']['links'], updates_list.updates),
+				'site_section': 'updates',
+				'site': Site(responses[request.site_url]),
 			}
 
 		return render(request, UpdateView.list_template, view_data)
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST',])
 	def mark_viewed(request, update_id):
 		"""
 		Mark a update as viewed by setting a 'viewed' attribute.
 		"""
 
-		if request.method == 'POST':
-			Update.mark_viewed(request.META['HTTP_HOST'], update_id, request.access_token)
-			return HttpResponseRedirect(reverse('list-updates'))
-		else:
-			return HttpResponseNotAllowed(['POST', ])
+		Update.mark_viewed(request.get_host(), update_id, request.access_token)
+		return HttpResponseRedirect(reverse('list-updates'))
 
 
 class WatcherView(object):
@@ -1597,95 +1468,72 @@ class WatcherView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def list(request):
-		if not request.access_token:
-			raise HttpResponseNotAllowed
+
+		if request.method == 'POST':
+			if 'watcher_id' in request.POST:
+				watchers = request.POST.getlist('watcher_id')
+				# TODO: get rid of casts
+				for w in watchers:
+					if request.POST.get('delete_watcher_' + str(w)):
+						Watcher.delete(request.get_host(), w, request.access_token)
+					else:
+						postdata = {
+							'id': int(w),
+							'sendEmail': bool(request.POST.get('send_email_' + str(w))),
+							'receiveSMS': False,
+						}
+						Watcher.update(request.get_host(), int(w), postdata, request.access_token)
+			return HttpResponseRedirect(reverse('list-watchers'))
 
 		if request.method == 'GET':
 			# pagination offset
 			offset = int(request.GET.get('offset', 0))
 
-			url, params, headers = WatcherList.build_request(
-				request.META['HTTP_HOST'],
-				offset=offset,
-				access_token=request.access_token
-			)
+			url, params, headers = WatcherList.build_request(request.get_host(), offset=offset,
+				access_token=request.access_token)
 			request.view_requests.append(grequests.get(url, params=params, headers=headers))
 			responses = response_list_to_dict(grequests.map(request.view_requests))
 			watchers_list = WatcherList(responses[url])
 
 			view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False),
-			'site': Site(responses[request.site_url]),
-			'content': watchers_list,
-			'pagination': build_pagination_links(responses[url]['watchers']['links'], watchers_list.watchers)
+				'user': Profile(responses[request.whoami_url], summary=False),
+				'site': Site(responses[request.site_url]),
+				'content': watchers_list,
+				'pagination': build_pagination_links(responses[url]['watchers']['links'], watchers_list.watchers)
 			}
 
 			return render(request, WatcherView.list_template, view_data)
 
-		if request.method == 'POST':
-			if 'watcher_id' in request.POST:
-				watchers = request.POST.getlist('watcher_id')
-				for w in watchers:
-					if request.POST.get('delete_watcher_' + str(w)):
-						Watcher.delete(request.META['HTTP_HOST'], w, request.access_token)
-					else:
-						postdata = {
-						'id': int(w),
-						'sendEmail': bool(request.POST.get('send_email_' + str(w))),
-						'receiveSMS': False,
-						}
-						Watcher.update(
-							request.META['HTTP_HOST'],
-							int(w),
-							postdata,
-							request.access_token
-						)
-			return HttpResponseRedirect(reverse('list-watchers'))
-		else:
-			return HttpResponseNotAllowed(['POST', ])
-
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['POST',])
 	def single(request):
-		if request.method == 'POST':
-			postdata = {
+		postdata = {
 			'updateTypeId': 1,
 			'itemType': request.POST.get('itemType'),
 			'itemId': int(request.POST.get('itemId')),
-			}
-			if request.POST.get('delete'):
-				response = Watcher.delete(
-					request.META['HTTP_HOST'],
-					postdata,
-					request.access_token
-				)
-				return HttpResponse()
-			elif request.POST.get('patch'):
-				postdata = {
+		}
+		if request.POST.get('delete'):
+			Watcher.delete(request.get_host(), postdata, request.access_token)
+			return HttpResponse()
+		elif request.POST.get('patch'):
+			postdata = {
 				'itemType': request.REQUEST.get('itemType'),
 				'itemId': int(request.REQUEST.get('itemId')),
 				'sendEmail': "true" == request.REQUEST.get('emailMe')
-				}
-				response = Watcher.update(
-					request.META['HTTP_HOST'],
-					postdata,
-					request.access_token
-				)
-				if response.status_code == requests.codes.ok:
-					return HttpResponse()
-				else:
-					return HttpResponseBadRequest()
+			}
+			response = Watcher.update(request.get_host(), postdata, request.access_token)
+			if response.status_code == requests.codes.ok:
+				return HttpResponse()
 			else:
-				responsedata = Watcher.create(
-					request.META['HTTP_HOST'],
-					postdata,
-					request.access_token
-				)
-				return HttpResponse(responsedata, content_type='application/json')
+				return HttpResponseBadRequest()
 		else:
-			return HttpResponseNotAllowed(['POST', 'PATCH'])
+			responsedata = Watcher.create(request.get_host(), postdata, request.access_token)
+			return HttpResponse(responsedata, content_type='application/json')
 
 
 class UpdatePreferenceView(object):
@@ -1693,32 +1541,9 @@ class UpdatePreferenceView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def settings(request):
-		if not request.access_token:
-			raise HttpResponseNotAllowed
-
-		if request.method == 'GET':
-			url, params, headers = UpdatePreference.build_request(
-				request.META['HTTP_HOST'],
-				request.access_token
-			)
-			request.view_requests.append(grequests.get(url, params=params, headers=headers))
-			url2, params2, headers2 = GlobalOptions.build_request(
-				request.META['HTTP_HOST'],
-				request.access_token
-			)
-			request.view_requests.append(grequests.get(url2, params=params2, headers=headers2))
-			responses = response_list_to_dict(grequests.map(request.view_requests))
-			preference_list = UpdatePreference.from_list(responses[url])
-			global_options = GlobalOptions.from_api_response(responses[url2])
-
-			view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False),
-			'site': Site(responses[request.site_url]),
-			'content': preference_list,
-			'globaloptions': global_options,
-			}
-			return render(request, UpdatePreferenceView.list_template, view_data)
 
 		if request.method == 'POST':
 			for x in range(1, 10):
@@ -1729,7 +1554,7 @@ class UpdatePreferenceView(object):
 					'sendSMS': False,
 					}
 					UpdatePreference.update(
-						request.META['HTTP_HOST'],
+						request.get_host(),
 						request.POST['id_' + str(x)],
 						postdata,
 						request.access_token
@@ -1739,14 +1564,27 @@ class UpdatePreferenceView(object):
 			'sendEmail': bool(request.POST.get('profile_receive_email')),
 			'sendSMS': False,
 			}
-			GlobalOptions.update(
-				request.META['HTTP_HOST'],
-				postdata,
-				request.access_token
-			)
+			GlobalOptions.update(request.get_host(), postdata, request.access_token)
 			return HttpResponseRedirect(reverse('updates-settings'))
-		else:
-			return HttpResponseNotAllowed(['GET'])
+
+		if request.method == 'GET':
+			url, params, headers = UpdatePreference.build_request(request.get_host(), request.access_token)
+			request.view_requests.append(grequests.get(url, params=params, headers=headers))
+
+			url2, params2, headers2 = GlobalOptions.build_request(request.get_host(), request.access_token)
+			request.view_requests.append(grequests.get(url2, params=params2, headers=headers2))
+
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			preference_list = UpdatePreference.from_list(responses[url])
+			global_options = GlobalOptions.from_api_response(responses[url2])
+
+			view_data = {
+				'user': Profile(responses[request.whoami_url], summary=False),
+				'site': Site(responses[request.site_url]),
+				'content': preference_list,
+				'globaloptions': global_options,
+			}
+			return render(request, UpdatePreferenceView.list_template, view_data)
 
 
 class SearchView(object):
@@ -1754,33 +1592,29 @@ class SearchView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def single(request):
-		if request.method == 'GET':
-			# pagination offset
-			offset = int(request.GET.get('offset', 0))
-			q = request.GET.get('q')
 
-			url, params, headers = Search.build_request(
-				request.META['HTTP_HOST'],
-				params=request.GET.dict(),
-				access_token=request.access_token
-			)
-			request.view_requests.append(grequests.get(url, params=params, headers=headers))
-			responses = response_list_to_dict(grequests.map(request.view_requests))
-			search = Search.from_api_response(responses[url])
+		# pagination offset
+		offset = int(request.GET.get('offset', 0))
+		q = request.GET.get('q')
 
-			view_data = {
+		url, params, headers = Search.build_request(request.get_host(), params=request.GET.dict(),
+			access_token=request.access_token)
+		request.view_requests.append(grequests.get(url, params=params, headers=headers))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		search = Search.from_api_response(responses[url])
+
+		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'site': Site(responses[request.site_url]),
 			'content': search,
-			}
+		}
 
-			if responses[url].get('results'):
-				view_data['pagination'] = build_pagination_links(responses[url]['results']['links'], search.results)
+		if responses[url].get('results'):
+			view_data['pagination'] = build_pagination_links(responses[url]['results']['links'], search.results)
 
-			return render(request, SearchView.single_template, view_data)
-		else:
-			return HttpResponseNotAllowed(['POST', ])
+		return render(request, SearchView.single_template, view_data)
 
 
 class TrendingView(object):
@@ -1788,21 +1622,19 @@ class TrendingView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def list(request):
-		url, params, headers = Trending.build_request(
-			request.META['HTTP_HOST'],
-			access_token=request.access_token
-		)
+		url, params, headers = Trending.build_request(request.get_host(), access_token=request.access_token)
 		request.view_requests.append(grequests.get(url, params=params, headers=headers))
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		trending = Trending.from_api_response(responses[url])
 
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
-		'content': trending,
-		'pagination': build_pagination_links(responses[url]['items']['links'], trending.items),
-		'site_section': 'trending'
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': trending,
+			'pagination': build_pagination_links(responses[url]['items']['links'], trending.items),
+			'site_section': 'trending'
 		}
 
 		return render(request, TrendingView.list_template, view_data)
@@ -1814,13 +1646,14 @@ class LegalView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def list(request):
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
-		'site_section': 'legal'
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'site_section': 'legal'
 		}
 
 		return render(request, LegalView.list_template, view_data)
@@ -1828,25 +1661,23 @@ class LegalView(object):
 
 	@staticmethod
 	@exception_handler
+	@require_http_methods(['GET',])
 	def single(request, doc_name):
 		if not doc_name in ['cookies', 'privacy', 'terms']:
-			raise Http404
+			return HttpResponseNotFound()
 
-		url, params, headers = Legal.build_request(
-			request.META['HTTP_HOST'],
-			doc=doc_name,
-		)
+		url, params, headers = Legal.build_request(request.get_host(), doc=doc_name)
 		request.view_requests.append(grequests.get(url, params=params, headers=headers))
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 
 		legal = Legal.from_api_response(responses[url])
 
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
-		'content': legal,
-		'site_section': 'legal',
-		'page_section': doc_name
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'content': legal,
+			'site_section': 'legal',
+			'page_section': doc_name
 		}
 
 		return render(request, LegalView.single_template, view_data)
@@ -1854,68 +1685,71 @@ class LegalView(object):
 
 class ModerationView(object):
 	@staticmethod
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
 	def item(request):
 		"""
 		View for moderation actions on a single item.
 		"""
 
-		if request.method == 'GET':
-			if request.GET.get('item_type') == 'conversation':
-				url, params, headers = Conversation.build_request(request.META['HTTP_HOST'],
-					request.GET.get('item_id'), access_token=request.access_token)
-				request.view_requests.append(grequests.get(url, params=params, headers=headers))
-				responses = response_list_to_dict(grequests.map(request.view_requests))
-				content = Conversation.from_api_response(responses[url])
-
-			elif request.GET.get('item_type') == 'event':
-				url, params, headers = Event.build_request(request.META['HTTP_HOST'],
-					request.GET.get('item_id'), access_token=request.access_token)
-				request.view_requests.append(grequests.get(url, params=params, headers=headers))
-				responses = response_list_to_dict(grequests.map(request.view_requests))
-				content = Event.from_api_response(responses[url])
-
-			view_data = {
-			'user': Profile(responses[request.whoami_url], summary=False),
-			'site': Site(responses[request.site_url]),
-			'content': content,
-			'item_type': request.GET.get('item_type'),
-			'action': request.GET.get('action'),
-			}
-
-			if request.GET.get('action') == 'move':
-				# Fetch list of microcosms
-				view_data['microcosms'] = MicrocosmList.retrieve(request.META['HTTP_HOST'],
-					access_token=request.access_token)
-
-			return render(request, 'forms/moderation_item.html', view_data)
-
 		if request.method == 'POST':
 			if request.POST.get('action') == 'move':
 				if request.POST.get('item_type') == 'event':
-					event = Event.retrieve(request.META['HTTP_HOST'], request.POST.get('item_id'),
+					event = Event.retrieve(request.get_host(), request.POST.get('item_id'),
 						access_token=request.access_token)
 					event.microcosm_id = int(request.POST.get('microcosm_id'))
 					event.meta = {'editReason': 'Moderator moved item'}
-					event.update(request.META['HTTP_HOST'], request.access_token)
+					event.update(request.get_host(), request.access_token)
 				elif request.POST.get('item_type') == 'conversation':
-					conversation = Conversation.retrieve(request.META['HTTP_HOST'],
+					conversation = Conversation.retrieve(request.get_host(),
 						request.POST.get('item_id'), access_token=request.access_token)
 					conversation.microcosm_id = int(request.POST.get('microcosm_id'))
 					conversation.meta = {'editReason': 'Moderator moved item'}
-					conversation.update(request.META['HTTP_HOST'], request.access_token)
+					conversation.update(request.get_host(), request.access_token)
 
 			elif request.POST.get('action') == 'delete':
 				if request.POST.get('item_type') == 'conversation':
-					url, params, headers = Conversation.build_request(request.META['HTTP_HOST'],
+					url, params, headers = Conversation.build_request(request.get_host(),
 						request.POST.get('item_id'), access_token=request.access_token)
 				if request.POST.get('item_type') == 'event':
-					url, params, headers = Event.build_request(request.META['HTTP_HOST'], request.POST.get('item_id'),
+					url, params, headers = Event.build_request(request.get_host(), request.POST.get('item_id'),
 						access_token=request.access_token)
 				payload = json.dumps([{'op': 'replace', 'path': '/meta/flags/deleted', 'value': True}])
 				headers['Content-Type'] = 'application/json'
 				requests.patch(url, payload, headers=headers)
 
 			return HttpResponseRedirect(reverse('single-microcosm', args=(request.POST.get('microcosm_id'),)))
+
+		if request.method == 'GET':
+			if request.GET.get('item_type') == 'conversation':
+				url, params, headers = Conversation.build_request(request.get_host(),
+					request.GET.get('item_id'), access_token=request.access_token)
+				request.view_requests.append(grequests.get(url, params=params, headers=headers))
+				responses = response_list_to_dict(grequests.map(request.view_requests))
+				content = Conversation.from_api_response(responses[url])
+
+			elif request.GET.get('item_type') == 'event':
+				url, params, headers = Event.build_request(request.get_host(),
+					request.GET.get('item_id'), access_token=request.access_token)
+				request.view_requests.append(grequests.get(url, params=params, headers=headers))
+				responses = response_list_to_dict(grequests.map(request.view_requests))
+				content = Event.from_api_response(responses[url])
+
+			view_data = {
+				'user': Profile(responses[request.whoami_url], summary=False),
+				'site': Site(responses[request.site_url]),
+				'content': content,
+				'item_type': request.GET.get('item_type'),
+				'action': request.GET.get('action'),
+			}
+
+			if request.GET.get('action') == 'move':
+				# Fetch list of microcosms
+				view_data['microcosms'] = MicrocosmList.retrieve(request.get_host(),
+					access_token=request.access_token)
+
+			return render(request, 'forms/moderation_item.html', view_data)
+
 
 
 class ErrorView(object):
@@ -1947,7 +1781,7 @@ class ErrorView(object):
 				view_data['logout'] = True
 				# Try to fetch site data without access token as it may not have succeeded above.
 				if not view_data.has_key('site'):
-					view_data['site'] = Site.retrieve(request.META['HTTP_HOST'])
+					view_data['site'] = Site.retrieve(request.get_host())
 
 		context = RequestContext(request, view_data)
 		response = HttpResponseForbidden(loader.get_template('403.html').render(context))
@@ -1981,7 +1815,7 @@ class AuthenticationView(object):
 
 		data = dict(Assertion=assertion, ClientSecret=settings.CLIENT_SECRET)
 
-		url = build_url(request.META['HTTP_HOST'], ['auth'])
+		url = build_url(request.get_host(), ['auth'])
 		response = requests.post(url, data=data, headers={})
 		access_token = response.json()['data']
 
@@ -2003,7 +1837,7 @@ class AuthenticationView(object):
 		response = redirect('/')
 		if request.COOKIES.has_key('access_token'):
 			response.delete_cookie('access_token')
-			url = build_url(request.META['HTTP_HOST'], ['auth', request.access_token])
+			url = build_url(request.get_host(), ['auth', request.access_token])
 			requests.post(url, params={'method': 'DELETE', 'access_token': request.access_token})
 
 		return response
@@ -2017,7 +1851,7 @@ class GeoView(object):
 			raise PermissionDenied
 		if request.GET.has_key('q'):
 			response = GeoCode.retrieve(
-				request.META['HTTP_HOST'],
+				request.get_host(),
 				request.GET['q'],
 				request.access_token
 			)
