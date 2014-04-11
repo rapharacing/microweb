@@ -17,6 +17,7 @@ from django.conf import settings
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
 
 from django.http import Http404
 from django.http import HttpResponseNotFound
@@ -146,6 +147,33 @@ def build_pagination_links(request, paged_list):
 
 	return page_nav
 
+def process_attachments(request, comment):
+
+	"""
+	For the provided request, check if files are to be attached or deleted
+	from the provided comment. Raises a ValidationError if any files are larger
+	than 5MB.
+	"""
+
+	# Check if any existing comment attachments are to be deleted.
+	if request.POST.get('attachments-delete'):
+		attachments_delete = request.POST.get('attachments-delete').split(",")
+		for fileHash in attachments_delete:
+			Attachment.delete(request.get_host(), Comment.api_path_fragment, comment.id, fileHash)
+
+	# Check if any files have been uploaded with the request.
+	if request.FILES.has_key('attachments'):
+		for f in request.FILES.getlist('attachments'):
+			file_request = FileMetadata.from_create_form(f)
+			# Maximum file size is 5MB.
+			if len(file_request.file[f.name]) >= 5242880:
+				raise ValidationError
+			# Associate attachment with comment using attachments API.
+			else:
+				file_metadata = file_request.create(request.get_host(), request.access_token)
+				Attachment.create(request.get_host(), file_metadata.file_hash,
+					comment_id=comment.id, access_token=request.access_token, file_name=f.name)
+
 
 class ConversationView(object):
 	create_form = ConversationCreate
@@ -207,22 +235,41 @@ class ConversationView(object):
 		if request.method == 'POST':
 			form = ConversationView.create_form(request.POST)
 			if form.is_valid():
-				conv_request = Conversation.from_create_form(form.cleaned_data)
-				conv_response = conv_request.create(request.get_host(), request.access_token)
-				if conv_response.id > 0:
-					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
-						payload = {
-							'itemType': 'conversation',
-							'itemId': conv_response.id,
-							'markdown': request.POST.get('firstcomment'),
-							'inReplyTo': 0
-						}
-						comment = Comment.from_create_form(payload)
-						comment.create(request.get_host(), request.access_token)
+				conv_req = Conversation.from_create_form(form.cleaned_data)
+				conv = conv_req.create(request.get_host(), request.access_token)
 
-					return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
-				else:
-					return HttpResponseServerError()
+				if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
+					payload = {
+						'itemType': 'conversation',
+						'itemId': conv.id,
+						'markdown': request.POST.get('firstcomment'),
+						'inReplyTo': 0,
+					}
+					comment_req = Comment.from_create_form(payload)
+					comment = comment_req.create(request.get_host(), request.access_token)
+
+					try:
+						process_attachments(request, comment)
+					except ValidationError:
+						responses = response_list_to_dict(grequests.map(request.view_requests))
+						comment_form = CommentForm(
+						initial={
+							'itemId': comment.item_id,
+							'itemType': comment.item_type,
+							'comment_id': comment.id,
+							'markdown': request.POST['markdown'],
+						})
+						view_data = {
+							'user': Profile(responses[request.whoami_url], summary=False),
+							'site': Site(responses[request.site_url]),
+							'content': comment,
+							'comment_form': comment_form,
+							'error': 'Sorry, one of your files was over 5MB. Please try again.',
+						}
+						return render(request, ConversationView.form_template, view_data)
+
+				return HttpResponseRedirect(reverse('single-conversation', args=(conv.id,)))
+
 			else:
 				view_data['form'] = form
 				return render(request, ConversationView.form_template, view_data)
@@ -950,36 +997,55 @@ class EventView(object):
 			if form.is_valid():
 				event_request = Event.from_create_form(form.cleaned_data)
 				event_response = event_request.create(request.get_host(), request.access_token)
-				if event_response.id > 0:
-					# invite attendees
-					invites = request.POST.get('invite')
-					if len(invites.strip()) > 0:
-						invited_list = invites.split(",")
-						attendees = []
-						if len(invited_list) > 0:
-							for userid in invited_list:
-								if userid != "":
-									attendees.append({
+				# invite attendees
+				invites = request.POST.get('invite')
+				if len(invites.strip()) > 0:
+					invited_list = invites.split(",")
+					attendees = []
+					if len(invited_list) > 0:
+						for userid in invited_list:
+							if userid != "":
+								attendees.append({
 									'rsvp': 'maybe',
 									'profileId': int(userid)
-									})
-							if len(attendees) > 0:
-								Event.rsvp(request.get_host(), event_response.id, user.id, attendees,
-									access_token=request.access_token)
+								})
+						if len(attendees) > 0:
+							Event.rsvp(request.get_host(), event_response.id, user.id, attendees,
+								access_token=request.access_token)
 
-					# create comment
-					if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
-						payload = {
+				# create comment
+				if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
+					payload = {
 						'itemType': 'event',
 						'itemId': event_response.id,
 						'markdown': request.POST.get('firstcomment'),
 						'inReplyTo': 0
+					}
+					comment_req = Comment.from_create_form(payload)
+					comment = comment_req.create(request.get_host(), request.access_token)
+
+					try:
+						process_attachments(request, comment)
+					except ValidationError:
+						responses = response_list_to_dict(grequests.map(request.view_requests))
+						comment_form = CommentForm(
+							initial={
+								'itemId': comment.item_id,
+								'itemType': comment.item_type,
+								'comment_id': comment.id,
+								'markdown': request.POST['markdown'],
+							})
+						view_data = {
+							'user': Profile(responses[request.whoami_url], summary=False),
+							'site': Site(responses[request.site_url]),
+							'content': comment,
+							'comment_form': comment_form,
+							'error': 'Sorry, one of your files was over 5MB. Please try again.',
 						}
-						comment = Comment.from_create_form(payload)
-						comment.create(request.get_host(), request.access_token)
-					return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
-				else:
-					return HttpResponseServerError()
+						return render(request, EventView.form_template, view_data)
+
+				return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
+
 			else:
 				view_data['form'] = form
 				view_data['microcosm_id'] = microcosm_id
@@ -1211,64 +1277,39 @@ class CommentView(object):
 			if not form.is_valid():
 				responses = response_list_to_dict(grequests.map(request.view_requests))
 				view_data = {
-				'user': Profile(responses[request.whoami_url], summary=False),
-				'site': Site(responses[request.site_url]),
-				'form': form,
+					'user': Profile(responses[request.whoami_url], summary=False),
+					'site': Site(responses[request.site_url]),
+					'form': form,
 				}
 				return render(request, CommentView.form_template, view_data)
 
 			# Create comment with API.
 			comment_request = Comment.from_create_form(form.cleaned_data)
-			comment_response = comment_request.create(request.get_host(), access_token=request.access_token)
+			comment = comment_request.create(request.get_host(), access_token=request.access_token)
+			try:
+				process_attachments(request, comment)
+			except ValidationError:
+				responses = response_list_to_dict(grequests.map(request.view_requests))
+				comment_form = CommentForm(
+					initial={
+					'itemId': comment.item_id,
+					'itemType': comment.item_type,
+					'comment_id': comment.id,
+					'markdown': request.POST['markdown'],
+					}
+				)
+				view_data = {
+					'user': Profile(responses[request.whoami_url], summary=False),
+					'site': Site(responses[request.site_url]),
+					'content': comment,
+					'comment_form': comment_form,
+					'error': 'Sorry, one of your files was over 5MB. Please try again.',
+				}
+				return render(request, CommentView.form_template, view_data)
 
-			# If comment creation successful, handle attachment creation and deletion.
-			if comment_response.id:
-				# Check if any attachments are to be deleted.
-				attachments_delete = []
-				if request.POST.get('attachments-delete'):
-					attachments_delete = request.POST.get('attachments-delete').split(",")
-				# Check if any files have been uploaded with the comment.
-				if request.FILES.has_key('attachments'):
-					for f in request.FILES.getlist('attachments'):
-						if not f.name in attachments_delete:
-							file_request = FileMetadata.from_create_form(f)
-							# If any files are over 5MB, reload form with validation error.
-							if len(file_request.file[f.name]) >= 5242880:
-								responses = response_list_to_dict(grequests.map(request.view_requests))
-								comment_form = CommentForm(
-									initial={
-									'itemId': comment_response.item_id,
-									'itemType': comment_response.item_type,
-									'comment_id': comment_response.id,
-									'markdown': request.POST['markdown'],
-									}
-								)
-								view_data = {
-								'user': Profile(responses[request.whoami_url], summary=False),
-								'site': Site(responses[request.site_url]),
-								'content': comment_response,
-								'comment_form': comment_form,
-								'error': 'Sorry, one of your files was over 5MB. Please try again.',
-								}
-								return render(request, CommentView.form_template, view_data)
-							# Associate attachment with comment using attachments API.
-							else:
-								file_metadata = file_request.create(request.get_host(), request.access_token)
-								Attachment.create(
-									request.get_host(),
-									file_metadata.file_hash,
-									comment_id=comment_response.id,
-									access_token=request.access_token,
-									file_name=f.name,
-								)
-
-				# API returns which page in the thread this comments appear in, so redirect there.
-				if comment_response.meta.links.get('commentPage'):
-					return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
-
-			# Comment creation unsuccessful, show an error page. TODO: more useful error report.
-			else:
-				raise APIException("Could not create comment")
+			# API returns which page in the thread this comments appear in, so redirect there.
+			if comment.meta.links.get('commentPage'):
+				return HttpResponseRedirect(CommentView.build_comment_location(comment))
 
 	@staticmethod
 	@exception_handler
@@ -1289,46 +1330,32 @@ class CommentView(object):
 			form = CommentForm(request.POST)
 			if form.is_valid():
 				comment_request = Comment.from_edit_form(form.cleaned_data)
-				comment_response = comment_request.update(request.get_host(), access_token=request.access_token)
+				comment = comment_request.update(request.get_host(), access_token=request.access_token)
 
-				# delete attachments if necessary
-				if comment_response.id > 0:
-					attachments_delete = []
-					if request.POST.get('attachments-delete'):
-						attachments_delete = request.POST.get('attachments-delete').split(",")
+				try:
+					process_attachments(request, comment)
+				except ValidationError:
+					responses = response_list_to_dict(grequests.map(request.view_requests))
+					comment_form = CommentForm(
+						initial={
+							'itemId': comment.item_id,
+							'itemType': comment.item_type,
+							'comment_id': comment.id,
+							'markdown': request.POST['markdown'],
+						})
+					view_data = {
+						'user': Profile(responses[request.whoami_url], summary=False),
+						'site': Site(responses[request.site_url]),
+						'content': comment,
+						'comment_form': comment_form,
+						'error': 'Sorry, one of your files was over 5MB. Please try again.',
+					}
+					return render(request, CommentView.form_template, view_data)
 
-					if request.FILES.has_key('attachments'):
-						for f in request.FILES.getlist('attachments'):
-							if not f.name in attachments_delete:
-								file_request = FileMetadata.from_create_form(f)
-								# File must be under 5MB
-								# TODO: use Django's built-in field validators and error messaging
-								if len(file_request.file[f.name]) >= 5242880:
-									view_data['form'] = form
-									view_data[
-									'avatar_error'] = 'Sorry, the file you upload must be under 5MB and square.'
-									return render(request, CommentView.form_template, view_data)
-								else:
-									file_metadata = file_request.create(request.get_host(), request.access_token)
-									Attachment.create(
-										request.get_host(),
-										file_metadata.file_hash,
-										comment_id=comment_response.id,
-										access_token=request.access_token,
-										file_name=f.name,
-									)
-							else:
-								attachments_delete = [a for a in attachments_delete if not a == f.name]
-
-					if len(attachments_delete) > 0:
-						for fileHash in attachments_delete:
-							Attachment.delete(request.get_host(), Comment.api_path_fragment,
-								comment_response.id, fileHash)
-
-				if comment_response.meta.links.get('commentPage'):
-					return HttpResponseRedirect(CommentView.build_comment_location(comment_response))
+				if comment.meta.links.get('commentPage'):
+					return HttpResponseRedirect(CommentView.build_comment_location(comment))
 				else:
-					return HttpResponseRedirect(reverse('single-comment', args=(comment_response.id,)))
+					return HttpResponseRedirect(reverse('single-comment', args=(comment.id,)))
 			else:
 				view_data['form'] = form
 				return render(request, CommentView.form_template, view_data)
@@ -1337,7 +1364,6 @@ class CommentView(object):
 			comment = Comment.retrieve(request.get_host(), comment_id, access_token=request.access_token)
 			view_data['form'] = CommentForm(comment.as_dict)
 			return render(request, CommentView.form_template, view_data)
-
 
 	@staticmethod
 	@exception_handler
@@ -1386,7 +1412,6 @@ class CommentView(object):
 		queries = urlencode(queries)
 		response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
 		return HttpResponseRedirect(response)
-
 
 	@staticmethod
 	@exception_handler
