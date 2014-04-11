@@ -22,7 +22,7 @@
 
 	<div class="row form-container">
 		<div class="col-xs-12">
-			<form id="eventForm" class="form-create-event" role="form" action="" method="POST">
+			<form id="eventForm" class="form-create-event" role="form" action="" method="POST" enctype="multipart/form-data">
 				<div class="form-container-inner padded">
 
 					{% csrf_token %}
@@ -427,6 +427,7 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
 {% if not state_edit %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>

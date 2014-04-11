@@ -16,7 +16,7 @@
 		<div class="row form-container">
 			<div class="col-lg-12">
 				<div class="form-container-inner padded">
-					<form role="form" action="" method="POST" id="conversationForm">
+					<form role="form" action="" method="POST" id="conversationForm" enctype="multipart/form-data">
 
 						{% csrf_token %}
 						{{ form.microcosmId }}
@@ -132,11 +132,12 @@
 
 {% block js %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
 {% if not state_edit %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}js/simpleEditor.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
 {% endif %}
 <script type="text/javascript">
 (function(){
