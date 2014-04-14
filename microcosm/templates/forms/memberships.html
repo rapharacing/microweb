@@ -18,8 +18,7 @@
 	<div class="row form-container">
 		<div class="col-lg-12">
 			<div class="form-container-inner padded">
-				<form role="form">
-
+				<form role="form" id="createForm">
 
 					<div class="form-group">
 						<div class="row">
@@ -29,13 +28,13 @@
 						</div>
 
 						<div class="row">
-
-							<label class="col-sm-12" for="name">Please enter a name for the group?</label>
+							<label class="col-sm-12" for="name">Please enter a name for the group:</label>
+							<div class="col-sm-12 row-meta">
+								<p class="alert-warning">Tip: A good name describes the role people within the group, i.e. "guests", "members", "banned", "moderators", "committee members", etc.</p>
+							</div>
 							<div class="col-sm-12">
 								<input type="text" class="form-control" id="name" name="name" placeholder="Name of group" />
 							</div>
-							<div class="col-sm-12 row-meta">Tip: A good name describes the role people within the group, i.e. "guests", "members", "banned", or "moderators".</div>
-
 						</div>
 					</div> <!-- /form-group -->
 
@@ -47,7 +46,7 @@
 						</div>
 						<div class="row">
 							<label class="col-sm-12">
-								Include people automatically:
+								<h4>Include people automatically:</h4>
 							</label>
 							<div class="col-md-6">
 								<ul class="list-toggles">
@@ -80,8 +79,11 @@
 						</div>
 						<div class="row">
 							<label class="col-sm-12">
-								Include people that match the following criteria:
+								<h4>Include people that match the following criteria:</h4>
 							</label>
+							<div class="col-sm-12 row-meta">
+								<p class="alert-warning">Tip: Use criteria to manage a large number of people. This allows you to re-use these criterium on other subforums and makes management of permissions for a large number of people across many subforums easier.</p>
+							</div>
 							<div class="form-widget criteria-list">
 								<div class="form-widget-empty-state">
 									No criteria is set for this group.
@@ -90,38 +92,37 @@
 								<div class="form-widget-list"></div>
 								<div class="form-widget-inlineform">
 									<label>Add a criteria</label>
-									<div class="btn-group btn-group-xs">
+
+									<div class="btn-group btn-group-xs toggle">
 										<button type="button" class="btn btn-default">
-											<label>And <input type="radio" value="add" name="switch" checked="checked"></label>
+											<label class="active">And <input type="radio" value="and" name="switch" checked="checked"></label>
 										</button>
 										<button type="button" class="btn btn-default">
 											<label>Or <input type="radio" value="or" name="switch"></label>
 										</button>
 									</div>
 
-									<span>where</span>
-
-									<select name="condition" class="form-control btn btn-primary first">
-										<option>Post count</option>
-										<option>Member since</option>
-										<option>Comment count</option>
-										<option>Option 1</option>
-										<option>Option 2</option>
-										<option>Option 3</option>
-										<option>Option 4</option>
+									<select name="condition" class="form-control first">
+										<option value="commentCount">Comment count</option>
+										<option value="created">Join Date</option>
+										<option value="profileName">Profile Name</option>
+										<option value="">Custom Attribute</option>
 									</select>
 
 									<span>is</span>
 
-									<select name="predicate" class="form-control btn btn-primary last">
-										<option>Equal</option>
-										<option>Equal or more than</option>
-										<option>Equal or less than</option>
-										<option>More than</option>
-										<option>Less than</option>
+									<select name="predicate" class="form-control last">
+										<option value="gt">Greater than</option>
+										<option value="ge">Greater than or equals</option>
+										<option value="eq">Equals</option>
+										<option value="le">Less than or equals</option>
+										<option value="lt">Less than</option>
+										<option value="neq">Not equal to</option>
+										<option value="substr">Contains</option>
+										<option value="nsubstr">Does not contain</option>
 									</select>
 
-									<input type="text" class="form-control" name="value" placeholder="Enter a value..."/>
+									<input type="text" class="form-control" name="value" placeholder="Value"/>
 
 									<button type="button" class="btn btn-primary submit">Add</button>
 								</div>
@@ -129,10 +130,24 @@
 						</div>
 						<div class="row">
 							<label class="col-sm-12">
-								Include these individuals:
+								<h4>Include these individuals:</h4>
 							</label>
+							<div class="col-sm-12 row-meta">
+								<p class="alert-warning">Tip: Use this method to add named individuals to specific subforums, this works best on small groups for one-off permissions such as a subforum for an organising committee.</p>
+							</div>
 							<div class="col-sm-12">
-								<div class="list-participants"></div>
+								<!-- <div class="list-participants"></div> -->
+
+								<div class="list-participants" style="display: none">
+									<ul class="list-people list-people-sm">
+									<!--
+										<li>
+											<a id="6"><img src="https://dev1.microco.sm/api/v1/files/17d40c20956ab63266d6ae67c76bdbda4ebd264a">Velocio<span class="remove">×</span></a>
+										</li>
+									-->
+									</ul>
+								</div>
+
 							</div>
 							<div class="col-sm-12">
 								<div class="input-group">
@@ -164,10 +179,10 @@
 										<span class="list-toggles-text">People in this group are <span class="green bold">responsible for moderating</span> this forum</span>
 										<div class="btn-group btn-group-xs pull-right">
 											<button type="button" class="btn btn-default">
-												<label>Yes <input type="radio" value="1" name="can_moderate"></label>
+												<label>Yes <input type="radio" value="1" name="is_moderator"></label>
 											</button>
 											<button type="button" class="btn btn-default">
-												<label>No <input type="radio" value="0" name="can_moderate"></label>
+												<label>No <input type="radio" value="0" name="is_moderator"></label>
 											</button>
 										</div>
 									</li>
@@ -176,10 +191,10 @@
 										<span class="list-toggles-text">People in this group are <span class="red bold">banned</span> and cannot see this forum or interact with it</span>
 										<div class="btn-group btn-group-xs pull-right">
 											<button type="button" class="btn btn-default">
-												<label>Yes <input type="radio" value="1" name="include_banned"></label>
+												<label>Yes <input type="radio" value="1" name="is_banned"></label>
 											</button>
 											<button type="button" class="btn btn-default">
-												<label>No <input type="radio" value="0" name="include_banned"></label>
+												<label>No <input type="radio" value="0" name="is_banned"></label>
 											</button>
 										</div>
 									</li>
@@ -252,7 +267,7 @@
 						<div class="col-sm-12">
 							<div class="form-footer-buttons">
 								<input type="submit" class="btn btn-lg btn-primary" value="Create group"/>
-								<input type="reset" class="btn btn-lg btn-default" value="Cancel"/>
+								<a href="{% url 'list-memberships' content.id %}" class="btn btn-lg btn-default">Cancel</a>
 							</div>
 						</div>
 					</div>
@@ -273,9 +288,8 @@
 		<h3>
 			Create a new membership group
 		</h3>
-		<p>
-			{{ membership.microcosm.name }}
-		</p>
+		<p>A membership group is a group of people that have collectively been granted some permissions.</p>
+		<p>By default a person has no permission to do anything at all, and permission is granted through membership of one or more membership groups.</p>
 	</div>
 </div> <!-- / about -->
 
@@ -285,6 +299,31 @@
 
 
 {% block js %}
-<script type="text/javascript" src="{{STATIC_URL}}js/peopleWidget.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/membership_groups_form.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/membership_form.js"></script>
+
+<script type="text/javascript">
+var role = new Role(
+	{
+		criteria   : '.criteria-list',
+		individuals: '.list-participants',
+		mappings   : {
+			'name'         : {el: 'input[name=name]',                 value: "" },
+			'members'      : {el: 'input[name=invite]',               value: "" },
+			'includeUsers' : {el: 'input[name=include_registered]',   value: "0" },
+			'includeGuests': {el: 'input[name=include_unregistered]', value: "0" },
+			'isModerator'  : {el: 'input[name=is_moderator]',         value: "0" },
+			'isBanned'     : {el: 'input[name=is_banned]',            value: "0" },
+			'canRead'      : {el: 'input[name=can_read]',             value: "0" },
+			'canCreate'    : {el: 'input[name=can_create]',           value: "0" },
+			'canEdit'      : {el: 'input[name=can_edit_others]',      value: "0" },
+			'canDelete'    : {el: 'input[name=can_delete_others]',    value: "0" }
+		}
+	},
+	[
+		{profileColumn:"commentCount", key:null, predicate:"gt", value:1000},
+	]
+);
+role.updateForm();
+</script>
 {% endblock %}
