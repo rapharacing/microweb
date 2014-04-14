@@ -278,8 +278,6 @@ Role.prototype.updateState = function(){
 				}
 			});
 
-			alert([fields_values])
-
 			this.add([fields_values]);
 
 			// re-render the list
@@ -618,6 +616,8 @@ $(document).ready(function() {
 			command: "role",
 			content: {
 				"title": role.mappings.name.value,
+				"includeGuests": (role.mappings.includeGuests.value == "1"),
+				"includeUsers": (role.mappings.includeUsers.value == "1"),
 				"moderator": (role.mappings.isModerator.value == "1"),
 				"banned": (role.mappings.isBanned.value == "1"),
 				"read": (role.mappings.canRead.value == "1"),
@@ -633,7 +633,7 @@ $(document).ready(function() {
 		// Profiles
 		reqs[reqs.length] = {
 			command: "profiles_delete",
-			content: ""
+			content: "[]"
 		}
 
 		var pids = [];
@@ -651,7 +651,7 @@ $(document).ready(function() {
 		// Criteria
 		reqs[reqs.length] = {
 			command: "criteria_delete",
-			content: ""
+			content: "[]"
 		}
 		
 		var crits = [];
@@ -705,10 +705,8 @@ $(document).ready(function() {
 			}
 		}
 
+		if crits.length == 0 && pids.length == 0 && 
+
 		return false;
 	});
 });
-
-
-
-
