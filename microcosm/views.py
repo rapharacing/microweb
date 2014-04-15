@@ -885,6 +885,16 @@ class MembershipView(object):
 			responses = response_list_to_dict(grequests.map(request.view_requests))
 			roles = RoleList.from_api_response(responses[roles_url])
 
+			roles_url, params, headers = RoleList.build_request(
+				request.META['HTTP_HOST'],
+				id=microcosm_id,
+				offset=offset,
+				access_token=request.access_token
+			)
+			request.view_requests.append(grequests.get(roles_url, params=params, headers=headers))
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			roles = RoleList.from_api_response(responses[roles_url])
+
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 				'site': Site(responses[request.site_url]),
