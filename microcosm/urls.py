@@ -44,6 +44,9 @@ urlpatterns = patterns('',
 	url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/create/$', MembershipView.create, name="create-memberships"),
 	url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/(?P<group_id>\d+)/edit/$', MembershipView.edit, name="edit-memberships"),
 
+	# Proxy and batch requests to the backend
+	url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/api/$', MembershipView.api, name="api-memberships"),
+
 	# Events
 	url(r'^microcosms/(?P<microcosm_id>\d+)/create/event/$', EventView.create, name='create-event'),
 	url(r'^events/(?P<event_id>\d+)/$', EventView.single, name='single-event'),

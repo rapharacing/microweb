@@ -849,7 +849,7 @@ class MembershipView(object):
 
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-			'site': request.site,
+			'site': Site(responses[request.site_url]),
 			'content': microcosm,
 			'memberships': roles,
 			'item_type': 'microcosm',
@@ -857,6 +857,26 @@ class MembershipView(object):
 		}
 
 		return render(request, MembershipView.list_template, view_data)
+
+	@staticmethod
+	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST',])
+	def api(request, microcosm_id):
+
+		data = json.loads(request.body)
+
+		print data
+
+		if request.POST.has_key('reqs'):
+			response = Role.api(
+				request.get_host(),
+				request.POST['reqs'],
+				request.access_token
+			)
+			return HttpResponse(response, content_type='application/json')
+		else:
+			return HttpResponseBadRequest()
 
 	@staticmethod
 	@exception_handler

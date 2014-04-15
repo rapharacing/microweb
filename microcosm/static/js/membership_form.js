@@ -609,50 +609,33 @@ $(document).ready(function() {
 			return false;
 		}
 
-		reqs = [];
+		data = {};
 
 		// Core role info
-		reqs[reqs.length] = {
-			command: "role",
-			content: {
-				"title": role.mappings.name.value,
-				"includeGuests": (role.mappings.includeGuests.value == "1"),
-				"includeUsers": (role.mappings.includeUsers.value == "1"),
-				"moderator": (role.mappings.isModerator.value == "1"),
-				"banned": (role.mappings.isBanned.value == "1"),
-				"read": (role.mappings.canRead.value == "1"),
-				"create": (role.mappings.canCreate.value == "1"),
-				"update": (role.mappings.canEdit.value == "1"),
-				"delete": (role.mappings.canDelete.value == "1"),
-				"closeOwn": (role.mappings.canDelete.value == "1"),
-				"openOwn": (role.mappings.canDelete.value == "1"),
-				"readOthers": (role.mappings.canRead.value == "1")
-			}
+		data.role = {
+			"title": role.mappings.name.value,
+			"includeGuests": (role.mappings.includeGuests.value == "1"),
+			"includeUsers": (role.mappings.includeUsers.value == "1"),
+			"moderator": (role.mappings.isModerator.value == "1"),
+			"banned": (role.mappings.isBanned.value == "1"),
+			"read": (role.mappings.canRead.value == "1"),
+			"create": (role.mappings.canCreate.value == "1"),
+			"update": (role.mappings.canEdit.value == "1"),
+			"delete": (role.mappings.canDelete.value == "1"),
+			"closeOwn": (role.mappings.canDelete.value == "1"),
+			"openOwn": (role.mappings.canDelete.value == "1"),
+			"readOthers": (role.mappings.canRead.value == "1")
 		}
 
 		// Profiles
-		reqs[reqs.length] = {
-			command: "profiles_delete",
-			content: "[]"
-		}
+		data.profiles = [];
 
-		var pids = [];
 		$('div.list-participants ul li a:visible').each(function(i, v) {
-			pids[pids.length] = {id: v.id};
+			data.profiles[data.profiles.length] = v.id;
 		});
 
-		if (pids.length > 0) {
-			reqs[reqs.length] = {
-				command: "profiles_create",
-				content: pids
-			}
-		}
-
 		// Criteria
-		reqs[reqs.length] = {
-			command: "criteria_delete",
-			content: "[]"
-		}
+		data.criteria = [];
 		
 		var crits = [];
 		var orGroup = 0;
@@ -695,17 +678,44 @@ $(document).ready(function() {
 					break;
 			}
 
-			crits[crits.length] = crit 
+			data.criteria[data.criteria] = crit 
 		}
 
-		if (crits.length > 0) {
-			reqs[reqs.length] = {
-				command: "criteria_create",
-				content: crits
+		function getCookie(name) {
+			var cookieValue = null;
+			if (document.cookie && document.cookie != '') {
+				var cookies = document.cookie.split(';');
+				for (var i = 0; i < cookies.length; i++) {
+					var cookie = jQuery.trim(cookies[i]);
+					// Does this cookie string begin with the name we want?
+					if (cookie.substring(0, name.length + 1) == (name + '=')) {
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+						break;
+					}
+				}
 			}
+			return cookieValue;
 		}
+		var csrftoken = getCookie('csrftoken');
 
-		if crits.length == 0 && pids.length == 0 && 
+		$.ajaxSetup({
+			beforeSend: function(xhr, settings) {
+				xhr.setRequestHeader("X-CSRFToken", csrftoken);
+			}
+		});
+
+		console.log(data);
+		$.ajax({
+			type: 'POST',
+			url: '../api/',
+			contentType: 'application/json; charset=UTF-8',
+			processData: false,
+			data: JSON.stringify(data),
+			dataType: 'json',
+			success: function(data) {
+				console.log(data);
+			},
+		});
 
 		return false;
 	});

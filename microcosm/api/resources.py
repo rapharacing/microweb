@@ -569,6 +569,7 @@ class Role(object):
         role.moderator = data['moderator']
         role.banned = data['banned']
         role.include_guests = data['includeGuests']
+        role.include_users = data['includeUsers']
         role.create = data['create']
         role.read = data['read']
         role.update = data['update']
@@ -580,6 +581,31 @@ class Role(object):
         role.meta = Meta(data['meta'])
 
         return role
+
+    @classmethod
+    def from_api_response(cls, data):
+        return Role.from_summary(cls, data)
+
+    @classmethod
+    def api(data):
+
+        return data
+
+        # params = {'reqs': reqs}
+        # headers = APIResource.make_request_headers(access_token)
+        # response = requests.get(build_url(host, ['geocode']), params=params, headers=headers)
+        # return response.content
+
+class RoleProfile(APIResource):
+    """
+    Represents profiles associated to a role
+    """
+
+class RoleCriteria(APIResource):
+    """
+    Represents criteria used to define membership of a role
+    """
+
 
 class Item(object):
     """
@@ -1752,3 +1778,4 @@ class Legal(APIResource):
         url, params, headers = Microcosm.build_request(host, offset, access_token)
         resource = APIResource.retrieve(url, params, headers)
         return Legal.from_api_response(resource)
+
