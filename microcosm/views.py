@@ -905,8 +905,8 @@ class EventView(object):
 		responses = response_list_to_dict(grequests.map(request.view_requests))
 		event = Event.from_api_response(responses[event_url])
 		comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
-		if request.whoami_url:
-			user = Profile(responses[request.whoami_url], summary=False)
+
+		user = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
 
 		attendees = AttendeeList(responses[att_url])
 		attendees_yes = []
