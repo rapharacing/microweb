@@ -9,5 +9,6 @@ ENV
 *.iml
 
 # Local settings.
+newrelic.ini
 local_settings.py
 microweb/local_settings.py
