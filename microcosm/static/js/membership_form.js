@@ -356,9 +356,11 @@ function validateCondition() {
 			break;
 		default:
 			var kv = prompt('Please enter the profile attribute name', 'is_member');
-			$(condition_selected).text(kv).val(kv);
-			restrictPredicates('all');
-			$('input[name=value]').attr('placeholder','Value').val('');
+			if (kv) {
+				$(condition_selected).text(kv).val(kv);
+				restrictPredicates('all');
+				$('input[name=value]').attr('placeholder','Value').val('');
+			}
 	}
 
 } // function validateCondition()
@@ -383,6 +385,7 @@ function validateValue() {
 			break;
 		case "created":
 			// Date
+			// This handles YYYY-MM-DD as it's being typed by making each char optional
 			if (!/^(\d(\d(\d(\d(\-(\d(\d(\-(\d(\d)?)?)?)?)?)?)?)?)?)$/.test(valueField.val())) {
 				valueField.val('');
 			}
@@ -640,6 +643,7 @@ $(document).ready(function() {
 		var crits = [];
 		var orGroup = 0;
 		for (var ii = 0; ii < criteria.data.length; ii++) {
+
 			var c = criteria.data[ii];
 			if (c[0] == "or") {
 				orGroup++;
@@ -678,7 +682,7 @@ $(document).ready(function() {
 					break;
 			}
 
-			data.criteria[data.criteria] = crit 
+			data.criteria[data.criteria.length] = crit 
 		}
 
 		function getCookie(name) {
@@ -714,6 +718,7 @@ $(document).ready(function() {
 			dataType: 'json',
 			success: function(data) {
 				console.log(data);
+				alert(true);
 			},
 		});
 

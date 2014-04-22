@@ -866,14 +866,42 @@ class MembershipView(object):
 
 		data = json.loads(request.body)
 
-		print data
+		if data.has_key('role'):
+			role = Role.from_create_json(data['role'])
 
-		if request.POST.has_key('reqs'):
-			response = Role.api(
-				request.get_host(),
-				request.POST['reqs'],
-				request.access_token
-			)
+			if role.id == 0:
+				print 'create role'
+				response = role.create_api(request.get_host(), request.access_token)
+			else:
+				print 'update role'
+				response = role.update_api(request.get_host(), request.access_token)
+
+			# Check response, if 200 continue other return JSON error
+
+			if data.has_key('criteria') and len(data['criteria']) > 0:
+				# Loop
+					# Add all criteria
+					# Check response, if 200 continue other return JSON error
+				print 'has criteria'
+
+			else:
+				# Delete all criteria
+				# Check response, if 200 continue other return JSON error
+				print 'no criteria'
+
+			if data.has_key('profiles') and len(data['profiles']) > 0:
+				# Loop
+					# Add all profiles
+					# Check response, if 200 continue other return JSON error
+				print 'has profiles'
+
+			else:
+				# Delete all profiles
+				# Check response, if 200 continue other return JSON error
+				print 'no profiles'
+
+			# Return 200 OK JSON success
+
 			return HttpResponse(response, content_type='application/json')
 		else:
 			return HttpResponseBadRequest()

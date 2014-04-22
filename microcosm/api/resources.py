@@ -557,14 +557,18 @@ class RoleList(object):
         return rolelist
 
 
-class Role(object):
+class Role(APIResource):
 
     @classmethod
     def from_summary(cls, data):
         role = cls()
-        role.id = data['id']
+
+        if data.get('id'):
+            role.id = data['id']
+        else:
+            role.id = 0
+
         role.title = data['title']
-        role.site_id = data['siteId']
 
         role.moderator = data['moderator']
         role.banned = data['banned']
@@ -578,23 +582,53 @@ class Role(object):
         role.open_own = data['openOwn']
         role.read_others = data['readOthers']
 
-        role.meta = Meta(data['meta'])
+        if data.get('meta'):
+            role.meta = Meta(data['meta'])
+
+        if data.get('microcosm_id'):
+            role.microcosm_id = data['microcosm_id']
+        else:
+            role.microcosm_id = 0
 
         return role
 
     @classmethod
     def from_api_response(cls, data):
-        return Role.from_summary(cls, data)
+        return Role.from_summary(data)
+
+    def as_dict(self):
+        repr = {}
+        repr['id'] = self.id
+        repr['microcosmId'] = self.microcosm_id
+        repr['title'] = self.title
+        repr['moderator'] = self.moderator
+        repr['banned'] = self.banned
+        repr['includeGuests'] = self.include_guests
+        repr['includeUsers'] = self.include_users
+        repr['create'] = self.create
+        repr['read'] = self.read
+        repr['update'] = self.update
+        repr['delete'] = self.delete
+        repr['closeOwn'] = self.close_own
+        repr['openOwn'] = self.open_own
+        repr['readOthers'] = self.read_others
+        return repr
 
     @classmethod
-    def api(data):
+    def from_create_json(cls, data):
+        return Role.from_summary(data)
 
-        return data
+    def create_api(self, host, access_token):
+        url = build_url(host, ['microcosms/', str(self.microcosm_id), '/roles'])
+        payload = json.dumps(self.as_dict())
+        resource = APIResource.create(url, payload, {}, APIResource.make_request_headers(access_token))
+        return Role.from_api_response(resource)
 
-        # params = {'reqs': reqs}
-        # headers = APIResource.make_request_headers(access_token)
-        # response = requests.get(build_url(host, ['geocode']), params=params, headers=headers)
-        # return response.content
+    def update_api(self, host, access_token):
+        url = build_url(host, ['microcosms/', str(self.microcosm_id), '/roles/', str(self.id)])
+        payload = json.dumps(self.as_dict())
+        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
+        return Role.from_api_response(resource)
 
 class RoleProfile(APIResource):
     """
