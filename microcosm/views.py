@@ -45,6 +45,7 @@ from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import Role
 from microcosm.api.resources import RoleCriteria
 from microcosm.api.resources import RoleList
+from microcosm.api.resources import RoleProfile
 from microcosm.api.resources import UpdateList
 from microcosm.api.resources import Update
 from microcosm.api.resources import UpdatePreference
@@ -919,9 +920,16 @@ class MembershipView(object):
 
 			if data.has_key('profiles') and len(data['profiles']) > 0:
 				# Loop
-					# Add all profiles
-					# Check response, if 200 continue other return JSON error
-				print 'has profiles'
+				pids = []
+				for pid in data['profiles']:
+					pids.append({'id': int(pid)})
+
+				print pids
+
+				response = RoleProfile.update_api(request.get_host(), role.microcosm_id, role.id, pids, request.access_token)
+				print 'Prof1: ' + str(response.status_code)
+				if response.status_code != requests.codes.ok:
+					return HttpResponseBadRequest()
 
 			else:
 				# Delete all profiles

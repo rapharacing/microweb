@@ -637,6 +637,17 @@ class RoleProfile(APIResource):
     """
     Represents profiles associated to a role
     """
+    @staticmethod
+    def update_api(host, microcosm_id, role_id, data, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/profiles'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.put(url, data=json.dumps(data), headers=headers)
+
+    @staticmethod
+    def delete_api(host, microcosm_id, role_id, profile_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/profiles/', str(profile_id)])
+        return requests.delete(url, headers=APIResource.make_request_headers(access_token))
 
 class RoleCriteria(APIResource):
     """
