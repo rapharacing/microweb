@@ -585,16 +585,12 @@ class Role(APIResource):
         if data.get('meta'):
             role.meta = Meta(data['meta'])
 
-        if data.get('microcosm_id'):
-            role.microcosm_id = data['microcosm_id']
+        if data.get('microcosmId'):
+            role.microcosm_id = data['microcosmId']
         else:
             role.microcosm_id = 0
 
         return role
-
-    @classmethod
-    def from_api_response(cls, data):
-        return Role.from_summary(data)
 
     def as_dict(self):
         repr = {}
@@ -615,20 +611,27 @@ class Role(APIResource):
         return repr
 
     @classmethod
-    def from_create_json(cls, data):
+    def from_api_response(cls, data):
         return Role.from_summary(data)
 
-    def create_api(self, host, access_token):
-        url = build_url(host, ['microcosms/', str(self.microcosm_id), '/roles'])
-        payload = json.dumps(self.as_dict())
-        resource = APIResource.create(url, payload, {}, APIResource.make_request_headers(access_token))
-        return Role.from_api_response(resource)
+    @staticmethod
+    def create_api(host, data, access_token):
+        url = build_url(host, ['microcosms/', str(data.microcosm_id), '/roles'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.post(url, data=json.dumps(data.as_dict()), headers=headers)
 
-    def update_api(self, host, access_token):
-        url = build_url(host, ['microcosms/', str(self.microcosm_id), '/roles/', str(self.id)])
-        payload = json.dumps(self.as_dict())
-        resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
-        return Role.from_api_response(resource)
+    @staticmethod
+    def update_api(host, data, access_token):
+        url = build_url(host, ['microcosms/', str(data.microcosm_id), '/roles/', str(data.id)])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.put(url, data=json.dumps(data.as_dict()), headers=headers)
+
+    @staticmethod
+    def delete_api(host, microcosm_id, role_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id)])
+        return requests.delete(url, headers=APIResource.make_request_headers(access_token))
 
 class RoleProfile(APIResource):
     """
@@ -639,7 +642,68 @@ class RoleCriteria(APIResource):
     """
     Represents criteria used to define membership of a role
     """
+    @classmethod
+    def from_summary(cls, data):
+        crit = cls()
 
+        if data.get('id'):
+            crit.id = data['id']
+        else:
+            crit.id = 0
+
+        if data.get('orGroup'):
+            crit.or_group = data['orGroup']
+        else:
+            crit.or_group = 0
+
+        if data.get('profileColumn'):
+            crit.profile_column = data['profileColumn']
+
+        if data.get('attrKey'):
+            crit.attr_key = data['attrKey']
+
+        crit.predicate = data['predicate']
+        crit.value = data['value']
+
+        return crit
+
+    def as_dict(self):
+        repr = {}
+        repr['orGroup'] = self.or_group
+        repr['id'] = self.id
+
+        if hasattr(self, 'profile_column'):
+            repr['profileColumn'] = self.profile_column
+
+        if hasattr(self, 'attr_key'):
+            repr['attrKey'] = self.attr_key
+
+        repr['predicate'] = self.predicate
+        repr['value'] = self.value
+        return repr
+
+    @classmethod
+    def from_api_response(cls, data):
+        return RoleCriteria.from_summary(data)
+
+    @staticmethod
+    def create_api(host, microcosm_id, role_id, data, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.post(url, data=json.dumps(data.as_dict()), headers=headers)
+
+    @staticmethod
+    def update_api(host, microcosm_id, role_id, data, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria/', str(data.id)])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.put(url, data=json.dumps(data.as_dict()), headers=headers)
+
+    @staticmethod
+    def delete_api(host, microcosm_id, role_id, criteria_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria/', str(criteria_id)])
+        return requests.delete(url, headers=APIResource.make_request_headers(access_token))
 
 class Item(object):
     """

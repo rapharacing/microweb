@@ -43,6 +43,7 @@ from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
 from microcosm.api.resources import Role
+from microcosm.api.resources import RoleCriteria
 from microcosm.api.resources import RoleList
 from microcosm.api.resources import UpdateList
 from microcosm.api.resources import Update
@@ -867,27 +868,54 @@ class MembershipView(object):
 		data = json.loads(request.body)
 
 		if data.has_key('role'):
-			role = Role.from_create_json(data['role'])
+			role = Role.from_summary(data['role'])
+			role.microcosm_id = int(microcosm_id)
+			print role.as_dict()
+			print request.access_token
 
 			if role.id == 0:
-				print 'create role'
-				response = role.create_api(request.get_host(), request.access_token)
+				response = Role.create_api(request.get_host(), role, request.access_token)
+				print 'Role1: ' + str(response.status_code)
+				if response.status_code != requests.codes.ok:
+					print response.text
+					return HttpResponseBadRequest()
+				role = Role.from_summary(response.json()['data'])
+				print role.as_dict()
 			else:
-				print 'update role'
-				response = role.update_api(request.get_host(), request.access_token)
+				response = Role.update_api(request.get_host(), role, request.access_token)
+				print 'Role2: ' + str(response.status_code)
+				if response.status_code != requests.codes.ok:
+					print response.text
+					return HttpResponseBadRequest()
+				role = Role.from_summary(response.json()['data'])
 
-			# Check response, if 200 continue other return JSON error
-
+			# Do we have criteria
 			if data.has_key('criteria') and len(data['criteria']) > 0:
+				print 'Criteria'
 				# Loop
-					# Add all criteria
-					# Check response, if 200 continue other return JSON error
-				print 'has criteria'
+				for clob in data['criteria']:
+					print clob
+					crit = RoleCriteria.from_summary(clob)
 
+					if crit.id == 0:
+						response = RoleCriteria.create_api(request.get_host(), role.microcosm_id, role.id, crit, request.access_token)
+						print 'Crit1: ' + str(response.status_code)
+						if response.status_code != requests.codes.ok:
+							return HttpResponseBadRequest()
+						crit = RoleCriteria.from_summary(response.json()['data'])
+					else:
+						response = RoleCriteria.update_api(request.get_host(), role.microcosm_id, role.id, crit, request.access_token)
+						print 'Crit1: ' + str(response.status_code)
+						if response.status_code != requests.codes.ok:
+							return HttpResponseBadRequest()
+						crit = RoleCriteria.from_summary(response.json()['data'])
 			else:
 				# Delete all criteria
 				# Check response, if 200 continue other return JSON error
+				# TODO: Is there an endpoint to delete all criteria?
 				print 'no criteria'
+				if response.status_code != requests.codes.ok:
+					return HttpResponseBadRequest()
 
 			if data.has_key('profiles') and len(data['profiles']) > 0:
 				# Loop
@@ -898,9 +926,11 @@ class MembershipView(object):
 			else:
 				# Delete all profiles
 				# Check response, if 200 continue other return JSON error
+				# TODO: Is there an endpoint to delete all criteria?
 				print 'no profiles'
+				if response.status_code != requests.codes.ok:
+					return HttpResponseBadRequest()
 
-			# Return 200 OK JSON success
 
 			return HttpResponse(response, content_type='application/json')
 		else:
