@@ -103,6 +103,10 @@ def exception_handler(view_func):
 				raise PermissionDenied
 			elif e.status_code == 404:
 				raise Http404
+			elif e.status_code == 400:
+				# Error code 14 indicates that the requested forum does not exist.
+				if e.detail['errorCode'] == 14:
+					return HttpResponseRedirect('http://microco.sm')
 			else:
 				raise
 	return decorator
