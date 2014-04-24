@@ -1,13 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}Error 403 (Forbidden) | {{ site.title | safe }}{% endblock title %}
+{% block title %}{% if logout %}Logged out{% else %}Not permitted{% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
-	{% if logout %}
-	<p>Your login session has expired so you've been signed out.</p>
-	<p><a href="javascript:login()">Click here to sign in again</a>.</p>
-	{% else %}
-	<p>You don't have permission to access that. This might happen if you're trying to view a private item.</p>
-	<p><a href="/">Click here to return to the home page</a>.</p>
-	{% endif %}
+{% if logout %}
+<div class="content-header padded">
+    <h1>Logged out</h1>
+</div>
+<p class="row-meta">It looks like your login session has expired so you've been signed out.</p>
+<p class="row-meta">You can sign in again using the button above.</p>
+{% else %}
+<div class="content-header padded">
+    <h1>Not permitted</h1>
+</div>
+<p class="row-meta">It looks like you don't have permission to do that.</p>
+<p class="row-meta">This might happen if you're trying to view a private subforum.</p>
+<p><a href="/">Click here to return to the home page</a>.</p>
+{% endif %}
 {% endblock %}
