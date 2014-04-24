@@ -54,7 +54,6 @@ def build_url(host, path_fragments):
     on CPython and we are not going to change interpreter.
     """
 
-    host = host.split(':')[0]
     if host.endswith(settings.API_DOMAIN_NAME):
         url = settings.API_SCHEME + host
     else:
