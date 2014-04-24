@@ -9,7 +9,7 @@ from microcosm.api.exceptions import APIException
 
 from requests import RequestException
 
-logger = logging.getLogger('microcosm.middleware')
+logger = logging.getLogger('microcosm.middleware.redirect')
 
 
 class DomainRedirectMiddleware():
