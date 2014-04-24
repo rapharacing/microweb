@@ -1781,10 +1781,10 @@ class ErrorView(object):
 	@staticmethod
 	def not_found(request):
 		# Only fetch the first element of view_requests (whoami)
-		responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
 		}
 		context = RequestContext(request, view_data)
 		return HttpResponseNotFound(loader.get_template('404.html').render(context))
@@ -1815,10 +1815,10 @@ class ErrorView(object):
 	@staticmethod
 	def server_error(request):
 		# Only fetch the first element of view_requests (whoami)
-		responses = response_list_to_dict(grequests.map(request.view_requests[:1]))
+		responses = response_list_to_dict(grequests.map(request.view_requests))
 		view_data = {
-		'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-		'site': Site(responses[request.site_url]),
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
 		}
 		context = RequestContext(request, view_data)
 		return HttpResponseServerError(loader.get_template('500.html').render(context))
