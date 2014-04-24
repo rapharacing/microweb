@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Error 500 (Internal Server Error) | {{ site.title | safe }}{% endblock title %}
+{% block title %}Server Error | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
-	<p>Sorry, something bad happened when we tried to process your request. The error has been recorded and we'll look into it.</p>
-	<p><a href="/">Click to go back to the homepage</a>.</p>
+    <div class="content-header padded">
+        <h1>Server Error</h1>
+    </div>
+	<p class="row-meta">We're sorry, there was a temporary error when we tried to process your request.</p>
+    <p class="row-meta">The error has been logged. Please try again later.</p>
+	<p class="row-meta"><a href="/">Click here to go back to the homepage</a>.</p>
 {% endblock %}
