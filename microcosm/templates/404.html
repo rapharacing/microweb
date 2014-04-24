@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Error 404 (Not Found) | {{ site.title | safe }}{% endblock title %}
+{% block title %}Not Found | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
-<p>Sorry, couldn't find that &mdash; it might have been deleted. <a href="/">Click here to leave this place.</a></p>
+<div class="content-header padded">
+    <h1>Not Found</h1>
+</div>
+<p class="row-meta">Sorry, we couldn't find that. It might have been deleted.</p>
+<p class="row-meta"><a href="/">Click here to go back to the homepage</a>.</p>
 {% endblock %}
