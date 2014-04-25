@@ -31,10 +31,14 @@
 	<li><a href="{{ content.meta.links.self.href }}">{{ content.profile_name|safe }}</a></li>
 		{% elif 'huddles' in content.meta.links.self.href %}
 	<li><a href="{{ content.meta.links.self.href }}">Messages</a></li>
-		{% elif content.title %}
-	<li><a href="{{ content.meta.links.self.href }}">{{ content.title|safe }}</a></li>
 		{% elif site_section == 'legal' %}
 	<li><a href="{% url 'list-legal' %}">About</a></li>
+		{% elif content.title %}
+	<li><a href="{{ content.meta.links.self.href }}">{{ content.title|safe }}</a></li>
 		{% endif %}
+	{% endif %}
+
+	{% if site_section == 'memberships' %}
+		<li><a id="groupslink" href="{% url 'list-memberships' content.id %}">Membership Groups</a></li>
 	{% endif %}
 </ol>

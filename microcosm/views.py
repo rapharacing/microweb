@@ -852,6 +852,7 @@ class MembershipView(object):
 		view_data = {
 			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 			'site': Site(responses[request.site_url]),
+			'site_section': 'memberships',
 			'content': microcosm,
 			'memberships': roles,
 			'item_type': 'microcosm',
@@ -940,7 +941,7 @@ class MembershipView(object):
 					return HttpResponseBadRequest()
 
 
-			return HttpResponse(response, content_type='application/json')
+			return HttpResponse()
 		else:
 			return HttpResponseBadRequest()
 
@@ -984,6 +985,7 @@ class MembershipView(object):
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 				'site': Site(responses[request.site_url]),
+				'site_section': 'memberships',
 				'content': microcosm,
 				'memberships': roles,
 				'item_type': 'microcosm',
@@ -1017,6 +1019,7 @@ class MembershipView(object):
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 				'site': request.site,
+				'site_section': 'memberships',
 				'content': microcosm,
 				'item_type': 'microcosm',
 				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
@@ -1051,6 +1054,7 @@ class MembershipView(object):
 			view_data = {
 				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
 				'site': request.site,
+				'site_section': 'memberships',
 				'content': microcosm,
 				'item_type': 'microcosm',
 				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)

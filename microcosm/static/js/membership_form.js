@@ -603,7 +603,6 @@ $(document).ready(function() {
 
 $(document).ready(function() {
 	$('#createForm').on("submit", function(e) {
-
 		role.updateState();
 
 		if ($.trim(role.mappings.name.value) == '') {
@@ -708,7 +707,8 @@ $(document).ready(function() {
 			}
 		});
 
-		console.log(data);
+		var navigate = true;
+		$("form :input").attr("disabled","disabled");
 		$.ajax({
 			type: 'POST',
 			url: '../api/',
@@ -717,9 +717,14 @@ $(document).ready(function() {
 			data: JSON.stringify(data),
 			dataType: 'json',
 			success: function(data) {
-				console.log(data);
-				alert(true);
+				// Once done, go up a level to show the list
+				$('#createForm').unbind();
+				$('#groupslink')[0].click();
 			},
+			error: function() {
+				// If error, re-enable the form so people can fix things
+				$("form :input").removeAttr('disabled');
+			}
 		});
 
 		return false;
