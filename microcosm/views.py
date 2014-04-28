@@ -1784,7 +1784,6 @@ class ModerationView(object):
 class ErrorView(object):
     @staticmethod
     def not_found(request):
-        # Only fetch the first element of view_requests (whoami)
         responses = response_list_to_dict(grequests.map(request.view_requests))
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
@@ -1818,7 +1817,6 @@ class ErrorView(object):
 
     @staticmethod
     def server_error(request):
-        # Only fetch the first element of view_requests (whoami)
         responses = response_list_to_dict(grequests.map(request.view_requests))
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
