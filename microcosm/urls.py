@@ -108,7 +108,7 @@ urlpatterns = patterns('',
     url(r'^headers/', 'microcosm.views.echo_headers'),
 
     # Break things
-    url(r'error/', ErrorView.server_error),
+    url(r'error/', ErrorView.server_error, name='server-error'),
     url(r'notfound/', ErrorView.not_found),
     url(r'forbidden/', ErrorView.forbidden),
 )
