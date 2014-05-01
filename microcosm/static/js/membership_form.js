@@ -598,11 +598,11 @@ $(document).ready(function() {
 	})();
 })();
 
-
-
-
 $(document).ready(function() {
-	$('#createForm').on("submit", function(e) {
+	$('#submit').click(function(e) {
+
+		e.preventDefault()
+
 		role.updateState();
 
 		if ($.trim(role.mappings.name.value) == '') {
@@ -707,8 +707,7 @@ $(document).ready(function() {
 			}
 		});
 
-		var navigate = true;
-		$("form :input").attr("disabled","disabled");
+		$("#createForm :input").attr("disabled","disabled");
 		$.ajax({
 			type: 'POST',
 			url: '../api/',
@@ -716,17 +715,11 @@ $(document).ready(function() {
 			processData: false,
 			data: JSON.stringify(data),
 			dataType: 'json',
-			success: function(data) {
-				// Once done, go up a level to show the list
-				$('#createForm').unbind();
-				$('#groupslink')[0].click();
-			},
-			error: function() {
-				// If error, re-enable the form so people can fix things
-				$("form :input").removeAttr('disabled');
-			}
+		}).done(function() {
+			window.location = $('#submit').attr('href');
+		}).fail(function() {
+			// If error, re-enable the form so people can fix things
+			$("#createForm :input").removeAttr('disabled');
 		});
-
-		return false;
 	});
 });
