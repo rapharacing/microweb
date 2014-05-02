@@ -4,7 +4,6 @@ from django.conf.urls import patterns
 from microcosm.views import MicrocosmView
 from microcosm.views import MembershipView
 from microcosm.views import EventView
-from microcosm.views import ConversationView
 from microcosm.views import UpdateView
 from microcosm.views import WatcherView
 from microcosm.views import UpdatePreferenceView
@@ -51,13 +50,6 @@ urlpatterns = patterns('',
     url(r'^events/(?P<event_id>\d+)/newest/$', EventView.newest, name='newest-event'),
     # RSVP to an event
     url(r'^events/(?P<event_id>\d+)/rsvp/$', EventView.rsvp, name='rsvp-event'),
-
-    # Conversations
-    url(r'^microcosms/(?P<microcosm_id>\d+)/create/conversation/$', ConversationView.create, name='create-conversation'),
-    url(r'^conversations/(?P<conversation_id>\d+)/$' , ConversationView.single, name='single-conversation'),
-    url(r'^conversations/(?P<conversation_id>\d+)/edit/$', ConversationView.edit, name='edit-conversation'),
-    url(r'^conversations/(?P<conversation_id>\d+)/delete/$', ConversationView.delete, name='delete-conversation'),
-    url(r'^conversations/(?P<conversation_id>\d+)/newest/$', ConversationView.newest, name='newest-conversation'),
 
     # Comments
     url(r'comments/create/$', CommentView.create, name='create-comment'),

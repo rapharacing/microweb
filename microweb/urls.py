@@ -8,6 +8,7 @@ from microweb import settings
 urlpatterns = patterns(
     '',
     url(r'', include('microcosm.urls')),
+    url(r'', include('conversations.urls')),
 )
 
 # Serve static files with gunicorn if DEBUG is true.
