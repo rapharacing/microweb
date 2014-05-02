@@ -3,7 +3,6 @@ from django.conf.urls import patterns
 
 from microcosm.views import MicrocosmView
 from microcosm.views import MembershipView
-from microcosm.views import EventView
 from microcosm.views import UpdateView
 from microcosm.views import WatcherView
 from microcosm.views import UpdatePreferenceView
@@ -11,7 +10,6 @@ from microcosm.views import CommentView
 from microcosm.views import ProfileView
 from microcosm.views import AuthenticationView
 from microcosm.views import ErrorView
-from microcosm.views import GeoView
 from microcosm.views import FaviconView
 from microcosm.views import RobotsView
 from microcosm.views import SearchView
@@ -41,15 +39,6 @@ urlpatterns = patterns('',
 
     url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/$', MembershipView.list, name="list-memberships"),
     url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/create/$', MembershipView.create, name="create-memberships"),
-
-    # Events
-    url(r'^microcosms/(?P<microcosm_id>\d+)/create/event/$', EventView.create, name='create-event'),
-    url(r'^events/(?P<event_id>\d+)/$', EventView.single, name='single-event'),
-    url(r'^events/(?P<event_id>\d+)/edit/$', EventView.edit, name='edit-event'),
-    url(r'^events/(?P<event_id>\d+)/delete/$', EventView.delete, name='delete-event'),
-    url(r'^events/(?P<event_id>\d+)/newest/$', EventView.newest, name='newest-event'),
-    # RSVP to an event
-    url(r'^events/(?P<event_id>\d+)/rsvp/$', EventView.rsvp, name='rsvp-event'),
 
     # Comments
     url(r'comments/create/$', CommentView.create, name='create-comment'),
@@ -92,9 +81,6 @@ urlpatterns = patterns('',
 
     # Moderation
     url(r'^moderate/$', ModerationView.item, name='moderate-item'),
-
-    # Proxy geocoding requests to the backend
-    url(r'^geocode/$', GeoView.geocode, name='geocode'),
 
     # Echoes request headers
     url(r'^headers/', 'microcosm.views.echo_headers'),

@@ -9,6 +9,7 @@ urlpatterns = patterns(
     '',
     url(r'', include('microcosm.urls')),
     url(r'', include('conversations.urls')),
+    url(r'', include('events.urls')),
 )
 
 # Serve static files with gunicorn if DEBUG is true.

@@ -102,6 +102,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'microcosm',
     'conversations',
+    'events',
     'gunicorn',
     'microcosm.templatetags.comments',
     'microcosm.templatetags.conversation',
