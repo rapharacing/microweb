@@ -55,16 +55,23 @@
   function geoQueryResult(data, response, xhr){
 
     // And if it's not found, show an error
-    if (!data.found) {
+    if (!data.place_id) {
       return;
     }
-    // Otherwise get the location
-    var p = data.features[0];
+
+    console.log(data);
+
     // Zoom to where it is
-    formMap.map.fitBounds(p.bounds);
+    // data.boundingbox = ["52.381053","52.6087058","-2.0336486","-1.7288578"]
+    formMap.map.fitBounds(
+      [
+        [data.boundingbox[0], data.boundingbox[2]],
+        [data.boundingbox[1], data.boundingbox[3]]
+      ]
+    );
 
     // And drop a pin
-    var newLatLng = new L.LatLng(p.centroid.coordinates[0], p.centroid.coordinates[1]);
+    var newLatLng = new L.LatLng(data.lat, data.lon);
     formMap
       .clearMarkers()
       .addMarker(newLatLng)
@@ -85,7 +92,6 @@
     }
 
   });
-
 
 })();
 

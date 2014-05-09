@@ -1,24 +1,23 @@
 import pylibmc as memcache
 import logging
 
-from django.http import HttpResponsePermanentRedirect
+from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponseRedirect
 
 from microcosm.api.resources import Site
 from microcosm.api.exceptions import APIException
 
 from requests import RequestException
 
-logger = logging.getLogger('microcosm.middleware')
+logger = logging.getLogger('microcosm.middleware.redirect')
 
 
 class DomainRedirectMiddleware():
     """
     Where a site has a custom domain, the user should be permanently redirected to
     the custom domain from the microcosm subdomain.
-
-    TODO: expiry header on the redirect response, once an approach to site cache
-    invalidation has been decided.
     """
 
     def __init__(self):
@@ -43,23 +42,21 @@ class DomainRedirectMiddleware():
                 try:
                     site = Site.retrieve(host)
                     try:
-                        self.mc.set(host, site)
+                        self.mc.set(host, site, time=300)
                     except memcache.Error as e:
                         logger.error('Memcached SET error: %s' % str(e))
                 except APIException, e:
                     logger.error('APIException: %s' % e.message)
+                    return HttpResponseRedirect(reverse('server-error'))
                 except RequestException, e:
                     logger.error('RequestException: %s' % e.message)
-                    return HttpResponsePermanentRedirect('http://microco.sm/?siteNotReachable=%s' % str(host))
+                    return HttpResponseRedirect(reverse('server-error'))
 
-            # Site has a custom domain, so redirect
-            if site and site.domain != '':
-                # No custom domains can be SSL, so we must be redirecting to the
-                # http version regardless of how they came into the site
+            # Forum owner has configured their own domain, so 301 the client.
+            if hasattr(site, 'domain') and site.domain:
+                # We don't support SSL on custom domains yet, so ensure the scheme is http.
                 location = 'http://' + site.domain + request.get_full_path()
-
                 logger.debug('Redirecting subdomain to: %s' % location)
-                
                 return HttpResponsePermanentRedirect(location)
 
         return None

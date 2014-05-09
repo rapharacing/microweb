@@ -88,13 +88,8 @@ def first_deploy():
 
 def redeploy():
 
-    # service may not be running, which will
-    # stop the operation here if we don't set
-    # warn_only=True
-    with settings(warn_only=True):
-        stop_service()
     rsync()
     install_requirements()
     collectstatic()
     restart_memcached()
-    start_service()
+    restart_service()

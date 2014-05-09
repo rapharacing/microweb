@@ -8,7 +8,7 @@ import pylibmc as memcache
 from microcosm.api.resources import Site
 from microcosm.api.resources import WhoAmI
 
-logger = logging.getLogger('microcosm.middleware')
+logger = logging.getLogger('microcosm.middleware.context')
 
 class ContextMiddleware():
     """
