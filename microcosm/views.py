@@ -42,6 +42,12 @@ from microcosm.api.exceptions import APIException
 from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import Microcosm
 from microcosm.api.resources import MicrocosmList
+from microcosm.api.resources import Role
+from microcosm.api.resources import RoleCriteria
+from microcosm.api.resources import RoleCriteriaList
+from microcosm.api.resources import RoleList
+from microcosm.api.resources import RoleProfile
+from microcosm.api.resources import RoleProfileList
 from microcosm.api.resources import UpdateList
 from microcosm.api.resources import Update
 from microcosm.api.resources import UpdatePreference
@@ -824,57 +830,233 @@ class MicrocosmView(object):
 
 
 class MembershipView(object):
-    list_template = 'memberships.html'
-    form_template = 'forms/memberships.html'
+	list_template = 'memberships.html'
+	form_template = 'forms/memberships.html'
 
-    @staticmethod
-    @exception_handler
-    @require_http_methods(['GET',])
-    def list(request, microcosm_id):
-        offset = int(request.GET.get('offset', 0))
+	@staticmethod
+	@exception_handler
+	@require_http_methods(['GET',])
+	def list(request, microcosm_id):
+		offset = int(request.GET.get('offset', 0))
 
-        microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id, offset=offset,
-                access_token=request.access_token)
-        request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-        microcosm = Microcosm.from_api_response(responses[microcosm_url])
+		microcosm_url, params, headers = Microcosm.build_request(
+			request.get_host(),
+			id=microcosm_id,
+			offset=offset,
+			access_token=request.access_token
+		)
+		request.view_requests.append(
+			grequests.get(microcosm_url, params=params, headers=headers)
+		)
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-            'site': Site(responses[request.site_url]),
-            'content': microcosm,
-            'item_type': 'microcosm',
-            'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
-        }
+		roles_url, params, headers = RoleList.build_request(
+			request.META['HTTP_HOST'],
+			id=microcosm_id,
+			offset=offset,
+			access_token=request.access_token
+		)
+		request.view_requests.append(
+			grequests.get(roles_url, params=params, headers=headers)
+		)
+		responses = response_list_to_dict(grequests.map(request.view_requests))
+		roles = RoleList.from_api_response(responses[roles_url])
 
-        return render(request, MembershipView.list_template, view_data)
+		view_data = {
+			'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+			'site': Site(responses[request.site_url]),
+			'site_section': 'memberships',
+			'content': microcosm,
+			'memberships': roles,
+			'item_type': 'microcosm',
+			'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+		}
 
-    @staticmethod
-    @exception_handler
-    @require_authentication
-    @require_http_methods(['GET', 'POST',])
-    def create(request, microcosm_id):
-        if request.method == 'POST':
-            pass
-        elif request.method == 'GET':
-            offset = int(request.GET.get('offset', 0))
+		return render(request, MembershipView.list_template, view_data)
 
-            microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
-                offset=offset, access_token=request.access_token)
-            request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
-            request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
-            responses = response_list_to_dict(grequests.map(request.view_requests))
-            microcosm = Microcosm.from_api_response(responses[microcosm_url])
+	@staticmethod
+	@exception_handler
+	@require_authentication
+	@require_http_methods(['POST',])
+	def api(request, microcosm_id):
 
-            view_data = {
-                'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-                'site': Site(responses[request.site_url]),
-                'content': microcosm,
-                'item_type': 'microcosm',
-                'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
-            }
+		data = json.loads(request.body)
 
-            return render(request, MembershipView.form_template, view_data)
+		if data.has_key('role'):
+			role = Role.from_summary(data['role'])
+			role.microcosm_id = int(microcosm_id)
+
+			if role.id == 0:
+				response = Role.create_api(request.get_host(), role, request.access_token)
+				if response.status_code != requests.codes.ok:
+					return HttpResponseBadRequest()
+				role = Role.from_summary(response.json()['data'])
+			else:
+				response = Role.update_api(request.get_host(), role, request.access_token)
+				if response.status_code != requests.codes.ok:
+					return HttpResponseBadRequest()
+				role = Role.from_summary(response.json()['data'])
+
+			# Do we have criteria
+			if data.has_key('criteria') and len(data['criteria']) > 0:
+				# Loop
+				for clob in data['criteria']:
+					crit = RoleCriteria.from_summary(clob)
+
+					if crit.id == 0:
+						response = RoleCriteria.create_api(request.get_host(), role.microcosm_id, role.id, crit, request.access_token)
+						if response.status_code != requests.codes.ok:
+							return HttpResponseBadRequest()
+						crit = RoleCriteria.from_summary(response.json()['data'])
+					else:
+						response = RoleCriteria.update_api(request.get_host(), role.microcosm_id, role.id, crit, request.access_token)
+						if response.status_code != requests.codes.ok:
+							return HttpResponseBadRequest()
+						crit = RoleCriteria.from_summary(response.json()['data'])
+			else:
+				# Delete all criteria
+				# Check response, if 200 continue other return JSON error
+				# TODO: Is there an endpoint to delete all criteria?
+				if response.status_code != requests.codes.ok:
+					return HttpResponseBadRequest()
+
+			if data.has_key('profiles') and len(data['profiles']) > 0:
+				# Loop
+				pids = []
+				for pid in data['profiles']:
+					pids.append({'id': int(pid)})
+
+				response = RoleProfile.update_api(request.get_host(), role.microcosm_id, role.id, pids, request.access_token)
+				if response.status_code != requests.codes.ok:
+					return HttpResponseBadRequest()
+
+			else:
+				# Delete all profiles
+				# Check response, if 200 continue other return JSON error
+				# TODO: Is there an endpoint to delete all criteria?
+				if response.status_code != requests.codes.ok:
+					return HttpResponseBadRequest()
+
+			# Need to return a stub here to allow the callee (AJAX) to be happy
+			return HttpResponse('{"context": "","status": 200,"data": {}, "error": null}')
+		else:
+			return HttpResponseBadRequest()
+
+	@staticmethod
+	@exception_handler
+	@require_authentication
+	@require_http_methods(['GET', 'POST',])
+	def create(request, microcosm_id):
+		if request.method == 'POST':
+			pass
+		elif request.method == 'GET':
+			offset = int(request.GET.get('offset', 0))
+
+			microcosm_url, params, headers = Microcosm.build_request(
+				request.get_host(),
+				id=microcosm_id,
+				offset=offset,
+				access_token=request.access_token
+			)
+			request.view_requests.append(
+				grequests.get(microcosm_url, params=params, headers=headers)
+			)
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			microcosm = Microcosm.from_api_response(responses[microcosm_url])
+
+			roles_url, params, headers = RoleList.build_request(
+				request.META['HTTP_HOST'],
+				id=microcosm_id,
+				offset=offset,
+				access_token=request.access_token
+			)
+			request.view_requests.append(
+				grequests.get(roles_url, params=params, headers=headers)
+			)
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			roles = RoleList.from_api_response(responses[roles_url])
+
+			view_data = {
+				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+				'site': Site(responses[request.site_url]),
+				'site_section': 'memberships',
+				'content': microcosm,
+				'item_type': 'memberships',
+				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+			}
+
+			return render(request, MembershipView.form_template, view_data)
+
+	@staticmethod
+	@exception_handler
+	def edit(request, microcosm_id, group_id):
+
+		if request.method == 'POST':
+			pass
+		elif request.method == 'GET':
+
+			offset = int(request.GET.get('offset', 0))
+
+			microcosm_url, params, headers = Microcosm.build_request(
+				request.META['HTTP_HOST'],
+				id=microcosm_id,
+				offset=offset,
+				access_token=request.access_token
+			)
+			request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			microcosm = Microcosm.from_api_response(responses[microcosm_url])
+
+			role_url, params, headers = Role.build_request(
+				request.META['HTTP_HOST'],
+				microcosm_id=microcosm_id,
+				id=group_id,
+				offset=offset,
+				access_token=request.access_token
+			)
+			request.view_requests.append(grequests.get(role_url, params=params, headers=headers))
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			role = Role.from_api_response(responses[role_url])
+
+			criteria_url, params, headers = RoleCriteriaList.build_request(
+				request.META['HTTP_HOST'],
+				microcosm_id=microcosm_id,
+				id=group_id,
+				offset=offset,
+				access_token=request.access_token
+			)
+			request.view_requests.append(grequests.get(criteria_url, params=params, headers=headers))
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			criteria = RoleCriteriaList(responses[criteria_url])
+
+			profiles_url, params, headers = RoleProfileList.build_request(
+				request.META['HTTP_HOST'],
+				microcosm_id=microcosm_id,
+				id=group_id,
+				offset=offset,
+				access_token=request.access_token
+			)
+			request.view_requests.append(grequests.get(profiles_url, params=params, headers=headers))
+			responses = response_list_to_dict(grequests.map(request.view_requests))
+			profiles = RoleProfileList(responses[profiles_url])
+
+			view_data = {
+				'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+				'site': Site(responses[request.site_url]),
+				'site_section': 'memberships',
+				'content': microcosm,
+				'role': role,
+				'criteria': criteria,
+				'profiles': profiles,
+				'item_type': 'memberships',
+				'state_edit': True,
+				'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+			}
+
+			return render(request, MembershipView.form_template, view_data)
+		else:
+			return HttpResponseNotAllowed(['GET', 'POST'])
 
 
 class EventView(object):

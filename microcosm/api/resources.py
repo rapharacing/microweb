@@ -519,6 +519,264 @@ class MicrocosmList(object):
         return MicrocosmList(resource)
 
 
+class RoleList(object):
+    """
+    Represents a list of security roles for a given site (default roles) or
+    microcosm (custom roles)
+    """
+
+
+    def __init__(self, data):
+        self.items = PaginatedList(data['roles'], Role)
+        self.meta = Meta(data['meta'])
+
+        self.default_roles = False
+        if data.get('defaultRoles'):
+            self.default_roles = data['defaultRoles']
+
+    @staticmethod
+    def build_request(host, id, offset=None, access_token=None):
+        url = build_url(host, ['microcosms', id, 'roles'])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @classmethod
+    def from_api_response(cls, data):
+        rolelist = RoleList(data)
+        # if data.get('id'): microcosm.id = data['id']
+        # if data.get('siteId'): microcosm.site_id = data['siteId']
+        # if data.get('visibility'): microcosm.visibility = data['visibility']
+        # if data.get('title'): microcosm.title = data['title']
+        # if data.get('description'): microcosm.description = data['description']
+        # if data.get('moderators'): microcosm.moderators = data['moderators']
+        # if data.get('editReason'): microcosm.edit_reason = data['editReason']
+        # if data.get('meta'): microcosm.meta = Meta(data['meta'])
+        # if data.get('items'): microcosm.items = PaginatedList(data['items'], Item)
+        return rolelist
+
+
+class Role(APIResource):
+
+    @classmethod
+    def from_summary(cls, data):
+        role = cls()
+
+        if data.get('id'):
+            role.id = data['id']
+        else:
+            role.id = 0
+
+        role.title = data['title']
+
+        role.moderator = data['moderator']
+        role.banned = data['banned']
+        role.include_guests = data['includeGuests']
+        role.include_users = data['includeUsers']
+        role.create = data['create']
+        role.read = data['read']
+        role.update = data['update']
+        role.delete = data['delete']
+        role.close_own = data['closeOwn']
+        role.open_own = data['openOwn']
+        role.read_others = data['readOthers']
+
+        if data.get('meta'):
+            role.meta = Meta(data['meta'])
+
+        if data.get('microcosmId'):
+            role.microcosm_id = data['microcosmId']
+        else:
+            role.microcosm_id = 0
+
+        return role
+
+    def as_dict(self):
+        repr = {}
+        repr['id'] = self.id
+        repr['microcosmId'] = self.microcosm_id
+        repr['title'] = self.title
+        repr['moderator'] = self.moderator
+        repr['banned'] = self.banned
+        repr['includeGuests'] = self.include_guests
+        repr['includeUsers'] = self.include_users
+        repr['create'] = self.create
+        repr['read'] = self.read
+        repr['update'] = self.update
+        repr['delete'] = self.delete
+        repr['closeOwn'] = self.close_own
+        repr['openOwn'] = self.open_own
+        repr['readOthers'] = self.read_others
+        return repr
+
+    @staticmethod
+    def build_request(host, microcosm_id, id, offset=None, access_token=None):
+        url = build_url(host, ['microcosms', microcosm_id, 'roles', id])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @classmethod
+    def from_api_response(cls, data):
+        return Role.from_summary(data)
+
+    @staticmethod
+    def create_api(host, data, access_token):
+        url = build_url(host, ['microcosms/', str(data.microcosm_id), '/roles'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.post(url, data=json.dumps(data.as_dict()), headers=headers)
+
+    @staticmethod
+    def update_api(host, data, access_token):
+        url = build_url(host, ['microcosms/', str(data.microcosm_id), '/roles/', str(data.id)])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.put(url, data=json.dumps(data.as_dict()), headers=headers)
+
+    @staticmethod
+    def delete_api(host, microcosm_id, role_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id)])
+        return requests.delete(url, headers=APIResource.make_request_headers(access_token))
+
+class RoleProfile(APIResource):
+    """
+    Represents profiles associated to a role
+    """
+    @staticmethod
+    def update_api(host, microcosm_id, role_id, data, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/profiles'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.put(url, data=json.dumps(data), headers=headers)
+
+    @staticmethod
+    def delete_api(host, microcosm_id, role_id, profile_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/profiles/', str(profile_id)])
+        return requests.delete(url, headers=APIResource.make_request_headers(access_token))
+
+class RoleProfileList(object):
+    """
+    Represents a list of profiles on a given role.
+    """
+
+    def __init__(self, data):
+        self.profiles = PaginatedList(data['profiles'], Profile)
+        self.meta = Meta(data['meta'])
+
+    @staticmethod
+    def build_request(host, microcosm_id, id, offset=None, access_token=None):
+        url = build_url(host, ['microcosms', microcosm_id, 'roles', id, 'profiles'])
+        params = {'offset': offset, 'limit': '250'} if offset else {'limit': '250'}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, microcosm_id, id, offset=None, access_token=None):
+        url, params, headers = RoleProfileList.build_request(host, microcosm_id, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return RoleProfileList(resource)
+
+class RoleCriteria(APIResource):
+    """
+    Represents criteria used to define membership of a role
+    """
+    @classmethod
+    def from_summary(cls, data):
+        crit = cls()
+
+        if data.get('id'):
+            crit.id = data['id']
+        else:
+            crit.id = 0
+
+        if data.get('orGroup'):
+            crit.or_group = data['orGroup']
+        else:
+            crit.or_group = 0
+
+        if data.get('profileColumn'):
+            crit.profile_column = data['profileColumn']
+
+        if data.get('attrKey'):
+            crit.attr_key = data['attrKey']
+
+        crit.predicate = data['predicate']
+        crit.value = data['value']
+
+        return crit
+
+    def as_dict(self):
+        repr = {}
+        repr['orGroup'] = self.or_group
+        repr['id'] = self.id
+
+        if hasattr(self, 'profile_column'):
+            repr['profileColumn'] = self.profile_column
+
+        if hasattr(self, 'attr_key'):
+            repr['attrKey'] = self.attr_key
+
+        repr['predicate'] = self.predicate
+        repr['value'] = self.value
+        return repr
+
+    @classmethod
+    def from_api_response(cls, data):
+        return RoleCriteria.from_summary(data)
+
+    @staticmethod
+    def create_api(host, microcosm_id, role_id, data, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.post(url, data=json.dumps(data.as_dict()), headers=headers)
+
+    @staticmethod
+    def update_api(host, microcosm_id, role_id, data, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria/', str(data.id)])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.put(url, data=json.dumps(data.as_dict()), headers=headers)
+
+    @staticmethod
+    def delete_api(host, microcosm_id, role_id, criteria_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria/', str(criteria_id)])
+        return requests.delete(url, headers=APIResource.make_request_headers(access_token))
+
+class RoleCriteriaList(object):
+    """
+    Represents a list of criteria on a given role.
+    """
+
+    def __init__(self, data):
+        self.criteria = PaginatedList(data['criteria'], RoleCriteria)
+        self.meta = Meta(data['meta'])
+
+        # We can't do this in the template as templates do not have variables,
+        # so we have to work out whether this is an 'and' or 'or' statement here
+        or_group = 0
+        for crit in self.criteria.items:
+            if crit.or_group == or_group:
+                crit.andor = 'and'
+            else:
+                or_group = crit.or_group
+                crit.andor = 'or'
+
+
+    @staticmethod
+    def build_request(host, microcosm_id, id, offset=None, access_token=None):
+        url = build_url(host, ['microcosms', microcosm_id, 'roles', id, 'criteria'])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, microcosm_id, id, offset=None, access_token=None):
+        url, params, headers = RoleCriteriaList.build_request(host, microcosm_id, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return RoleCriteriaList(resource)
+
 class Item(object):
     """
     Represents an item contained within a microcosm. Only used when
@@ -1690,3 +1948,4 @@ class Legal(APIResource):
         url, params, headers = Microcosm.build_request(host, offset, access_token)
         resource = APIResource.retrieve(url, params, headers)
         return Legal.from_api_response(resource)
+
