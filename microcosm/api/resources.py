@@ -610,6 +610,13 @@ class Role(APIResource):
         repr['readOthers'] = self.read_others
         return repr
 
+    @staticmethod
+    def build_request(host, microcosm_id, id, offset=None, access_token=None):
+        url = build_url(host, ['microcosms', microcosm_id, 'roles', id])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
     @classmethod
     def from_api_response(cls, data):
         return Role.from_summary(data)
@@ -648,6 +655,28 @@ class RoleProfile(APIResource):
     def delete_api(host, microcosm_id, role_id, profile_id, access_token):
         url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/profiles/', str(profile_id)])
         return requests.delete(url, headers=APIResource.make_request_headers(access_token))
+
+class RoleProfileList(object):
+    """
+    Represents a list of profiles on a given role.
+    """
+
+    def __init__(self, data):
+        self.profiles = PaginatedList(data['profiles'], Profile)
+        self.meta = Meta(data['meta'])
+
+    @staticmethod
+    def build_request(host, microcosm_id, id, offset=None, access_token=None):
+        url = build_url(host, ['microcosms', microcosm_id, 'roles', id, 'profiles'])
+        params = {'offset': offset, 'limit': '250'} if offset else {'limit': '250'}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, microcosm_id, id, offset=None, access_token=None):
+        url, params, headers = RoleProfileList.build_request(host, microcosm_id, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return RoleProfileList(resource)
 
 class RoleCriteria(APIResource):
     """
@@ -715,6 +744,39 @@ class RoleCriteria(APIResource):
     def delete_api(host, microcosm_id, role_id, criteria_id, access_token):
         url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria/', str(criteria_id)])
         return requests.delete(url, headers=APIResource.make_request_headers(access_token))
+
+class RoleCriteriaList(object):
+    """
+    Represents a list of criteria on a given role.
+    """
+
+    def __init__(self, data):
+        self.criteria = PaginatedList(data['criteria'], RoleCriteria)
+        self.meta = Meta(data['meta'])
+
+        # We can't do this in the template as templates do not have variables,
+        # so we have to work out whether this is an 'and' or 'or' statement here
+        or_group = 0
+        for crit in self.criteria.items:
+            if crit.or_group == or_group:
+                crit.andor = 'and'
+            else:
+                or_group = crit.or_group
+                crit.andor = 'or'
+
+
+    @staticmethod
+    def build_request(host, microcosm_id, id, offset=None, access_token=None):
+        url = build_url(host, ['microcosms', microcosm_id, 'roles', id, 'criteria'])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+    @staticmethod
+    def retrieve(host, microcosm_id, id, offset=None, access_token=None):
+        url, params, headers = RoleCriteriaList.build_request(host, microcosm_id, id, offset, access_token)
+        resource = APIResource.retrieve(url, params, headers)
+        return RoleCriteriaList(resource)
 
 class Item(object):
     """

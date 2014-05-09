@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Create a membership group | {{ site.title | safe }}{% endblock title %}
+{% block title %}{% if state_edit %}Edit membership group{% else %}Create a membership group{% endif %}Create a membership group | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -10,7 +10,7 @@
 			{% include 'breadcrumbs.html' with skipself=False %}
 		</div>
 	</div>
-	<h1>Create a Membership Group</h1>
+	<h1>{% if state_edit %}Edit{% else %}Create{% endif %} a Membership Group</h1>
 </div>
 
 <div class="content-body">
@@ -33,7 +33,7 @@
 								<p class="alert-warning">Tip: A good name describes the role people within the group, i.e. "guests", "members", "banned", "moderators", "committee members", etc.</p>
 							</div>
 							<div class="col-sm-12">
-								<input type="text" class="form-control" id="name" name="name" placeholder="Name of group" />
+								<input type="text" class="form-control" id="name" name="name" placeholder="Name of group" value="{{ role.title | safe }}" />
 							</div>
 						</div>
 					</div> <!-- /form-group -->
@@ -140,11 +140,11 @@
 
 								<div class="list-participants" style="display: none">
 									<ul class="list-people list-people-sm">
-									<!--
+									{% for p in profiles.profiles.items %}
 										<li>
-											<a id="6"><img src="https://dev1.microco.sm/api/v1/files/17d40c20956ab63266d6ae67c76bdbda4ebd264a">Velocio<span class="remove">×</span></a>
+											<a id="{{p.id}}">{% if p.avatar %}<img src="{{p.avatar}}">{% endif %}{{p.profile_name}}<span class="remove">×</span></a>
 										</li>
-									-->
+									{% endfor %}
 									</ul>
 								</div>
 
@@ -154,10 +154,9 @@
 									<div class="input-group-addon">
 										<span class="sprite sprite-search-small"></span>
 									</div>
-									<input id="invite" class="form-control" autocomplete="off" placeholder="Type in a user's name"/>
-									<input name="invite" type="hidden" />
+									<input id="invite" class="form-control" autocomplete="off" placeholder="Type in a user's name" />
+									<input name="invite" type="hidden" value="5" />
 								</div>
-
 							</div>
 						</div>
 					</div> <!-- /form-group -->
@@ -303,27 +302,96 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/membership_form.js"></script>
 
 <script type="text/javascript">
-var role = new Role(
-	{
-		criteria   : '.criteria-list',
-		individuals: '.list-participants',
-		mappings   : {
-			'name'         : {el: 'input[name=name]',                 value: "" },
-			'members'      : {el: 'input[name=invite]',               value: "" },
-			'includeUsers' : {el: 'input[name=include_registered]',   value: "0" },
-			'includeGuests': {el: 'input[name=include_unregistered]', value: "0" },
-			'isModerator'  : {el: 'input[name=is_moderator]',         value: "0" },
-			'isBanned'     : {el: 'input[name=is_banned]',            value: "0" },
-			'canRead'      : {el: 'input[name=can_read]',             value: "0" },
-			'canCreate'    : {el: 'input[name=can_create]',           value: "0" },
-			'canEdit'      : {el: 'input[name=can_edit_others]',      value: "0" },
-			'canDelete'    : {el: 'input[name=can_delete_others]',    value: "0" }
+$(document).ready(function() {
+	// initialize
+	var criteria = new ListWidget(
+		{
+			el   : '.criteria-list',
+			{% if criteria.criteria.items %}
+			data : {
+				{% for crit in criteria.criteria.items %}
+					{{ crit.id }}: ["{{ crit.andor }}","{% if crit.profile_column %}{{ crit.profile_column }}{% else %}{{ crit.attr_key }}{% endif %}","{{ crit.predicate }}", "{{ crit.value }}"],
+				{% endfor %}
+			}
+			{% endif %}
 		}
-	},
-	[
-		{profileColumn:"commentCount", key:null, predicate:"gt", value:1000},
-	]
-);
-role.updateForm();
+	);
+	criteria.render();
+
+	//  people widget
+	var subdomain = $('meta[name="subdomain"]').attr('content');
+
+	var participating = new Participating({
+		el         : '.list-participants',
+		className  : 'list-people list-people-sm',
+		static_url : subdomain
+	});
+
+	participating.render([
+		{% for p in profiles.profiles.items %}
+			{"id": {{p.id}}, "profileName": "{{p.profile_name}}", "sticky": "true", "avatar": "{{p.avatar}}" },
+		{% endfor %}
+		]
+	).show();
+
+	var peopleWidget = new PeopleWidget({
+		el         : '#invite',
+		is_textbox : true,
+		static_url : subdomain,
+		dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q='
+	});
+
+	// update the hidden input box
+	var invite_input_field = $('input[name="invite"]');
+	var updateInvitedField = function(){
+		invite_input_field.val(peopleWidget.invitedListToDelimitedString());
+	};
+
+	// triggers when user clicks on a person in the autocomplete dropdown
+	peopleWidget.onSelection(function(invited){
+		if (invited.length > 0){
+			participating.render(invited).show();
+		}else{
+			participating.hide();
+		}
+		peopleWidget.show();
+		updateInvitedField();
+	});
+
+	// triggers when the user clicks on a person in the participants list
+	participating.$el.on('click', 'li', function(e){
+		var id = e.currentTarget.rel;
+		peopleWidget.removePersonFromInvitedById(id).render();
+		if (peopleWidget.people_invited.length>0) {
+			participating.render(peopleWidget.people_invited).show();
+		}else{
+			participating.hide();
+		}
+		updateInvitedField();
+	});
+
+	var role = new Role(
+		{
+			criteria   : '.criteria-list',
+			individuals: '.list-participants',
+			mappings   : {
+				'name'         : {el: 'input[name=name]',                 value: "{{ role.title | safe }}" },
+				'members'      : {el: 'input[name=invite]',               value: "5" },
+				'includeUsers' : {el: 'input[name=include_registered]',   value: "{% if role.include_users %}1{% else %}0{% endif %}" },
+				'includeGuests': {el: 'input[name=include_unregistered]', value: "{% if role.include_guests %}1{% else %}0{% endif %}" },
+				'isModerator'  : {el: 'input[name=is_moderator]',         value: "{% if role.moderator %}1{% else %}0{% endif %}" },
+				'isBanned'     : {el: 'input[name=is_banned]',            value: "{% if role.banned %}1{% else %}0{% endif %}" },
+				'canRead'      : {el: 'input[name=can_read]',             value: "{% if role.read %}1{% else %}0{% endif %}" },
+				'canCreate'    : {el: 'input[name=can_create]',           value: "{% if role.create %}1{% else %}0{% endif %}" },
+				'canEdit'      : {el: 'input[name=can_edit_others]',      value: "{% if role.edit %}1{% else %}0{% endif %}" },
+				'canDelete'    : {el: 'input[name=can_delete_others]',    value: "{% if role.delete %}1{% else %}0{% endif %}" }
+			}
+		},
+		[
+			{profileColumn:"commentCount", key:null, predicate:"gt", value:1000},
+		]
+	);
+	role.updateForm();
+});
 </script>
 {% endblock %}

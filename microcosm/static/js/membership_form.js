@@ -100,232 +100,222 @@ Role.prototype.updateState = function(){
 /////////////////////
 // criteria widget //
 /////////////////////
-(function(w, d, $, undefined) {
-	/*
-	inline form for membership groups criteria
-	-----------------------------------
+/*
+inline form for membership groups criteria
+-----------------------------------
 
-	assumes the following markup:
+assumes the following markup:
 
-	<div class="form-widget criteria-list">
-		<div class="form-widget-empty-state">
-			No criteria is set for this group.
-			<a href="javascript:void 0">Add a criteria for users to join this group</a>
-		</div>
-		<div class="form-widget-list"></div>
-		<div class="form-widget-inlineform"></div>
+<div class="form-widget criteria-list">
+	<div class="form-widget-empty-state">
+		No criteria is set for this group.
+		<a href="javascript:void 0">Add a criteria for users to join this group</a>
 	</div>
+	<div class="form-widget-list"></div>
+	<div class="form-widget-inlineform"></div>
+</div>
+*/
+
+var ListWidget = (function() {
+
+	var View = function(opts) {
+		this.el = false;
+		if (typeof opts.el !== "undefined") {
+			this.el = opts.el;
+		}
+
+		this.data = [];
+		if (typeof opts.data !== "undefined") {
+			this.add(opts.data);
+		}
+
+		this.$el = $(this.el);
+
+		this.$el.emptyState = this.$el.find('.form-widget-empty-state');
+		this.$el.display    = this.$el.find('.form-widget-list');
+		this.$el.form       = this.$el.find('.form-widget-inlineform');
+
+		this.bind();
+	};
+
+	View.prototype.add = function(datasets) {
+		if (typeof datasets === "object") {
+			for (var dataset in datasets) {
+				this.data.push( datasets[dataset] );
+			}
+		} else {
+			throw "add(): expected [object] but got [" + typeof keys + "]";
+		}
+	};
+
+	// renders list using this.data
+	// template is hardcoded! (FIXME)
+	View.prototype.render = function(){
+
+		var fragment = $('<ul></ul>'),
+				list_items = "";
+
+
+		for (var i=0, j=this.data.length; i < j; i++) {
+
+			list_items += '<li>';
+
+			if (i !== 0) {
+				if (this.data[i][0] === "and") {
+					list_items += 'and ';
+				} else {
+					list_items += '<em>or</em></li><li>';
+				}
+			}
+
+			var predicate = '';
+			switch (this.data[i][2]) {
+				case 'gt': predicate = "is greater than"; break;
+				case 'ge': predicate = "is greater than or equal to"; break;
+				case 'eq': predicate = "equals"; break;
+				case 'le': predicate = "is less than or equal to"; break;
+				case 'lt': predicate = "is less than"; break;
+				case 'neq': predicate = "is not equal to"; break;
+				case 'substr': predicate = "contains"; break;
+				case 'nsubstr': predicate = "does not contain"; break;
+			}
+
+			list_items +=
+				'<span class="text-warning remove align-right" data-index="' + i + '">Remove</span>' +
+				'<strong>' + this.data[i][1] + '</strong> ' +
+				predicate + ' ' +
+				'<strong>' + this.data[i][3] + '</strong>';
+
+			list_items += '</li>';
+		}
+
+		if (this.data.length < 1) {
+			this.$el.emptyState.show();
+			this.$el.display.hide();
+		} else {
+			this.$el.emptyState.hide();
+			this.$el.display.show();
+			fragment.append("<lh>Members join this group if:</lh>")
+				.append(list_items)
+				.append('<a class="form-list-form-toggle">Add criteria</a>');
+		}
+
+		this.$el.display.html(fragment);
+	};
+
+	// debug function
+	View.prototype.log = function() {
+		console.log('el: ', this.el);
+		console.log('data: ', this.data);
+	};
+
+	// removes items from this.data
+	View.prototype.remove = function(e) {
+		var li = $(e.currentTarget), index = li.attr('data-index');
+
+		if (typeof this.data[index] !== "undefined") {
+			this.data.splice(index,1);
+			this.render();
+		}
+	};
+
+	// unbinds widget from dom
+	View.prototype.destroy = function(){
+		this.$el.display.html("").off();
+		this.$el.display = null;
+
+		this.$el.form.off();
+		this.$el.form = null;
+
+		this.$el.off();
+	};
+
+	// form events
+
+	/**
+	*   submit
+	*   scrapes form elements inside this.$el.form, saves values into an array,
+	*   adds to this.data and re-renders the list
 	*/
+	View.prototype.submit = function() {
 
-	var ListWidget = (function() {
-
-		var View = function(opts) {
-			this.el = false;
-			if (typeof opts.el !== "undefined") {
-				this.el = opts.el;
-			}
-
-			this.data = [];
-			if (typeof opts.data !== "undefined") {
-				this.add(opts.data);
-			}
-
-			this.$el = $(this.el);
-
-			this.$el.emptyState = this.$el.find('.form-widget-empty-state');
-			this.$el.display    = this.$el.find('.form-widget-list');
-			this.$el.form       = this.$el.find('.form-widget-inlineform');
-
-			this.bind();
-		};
-
-		View.prototype.add = function(datasets) {
-			if (typeof datasets === "object") {
-				for (var dataset in datasets) {
-					this.data.push( datasets[dataset] );
+		var valueField = $('input[name=value]');
+		if ($.trim(valueField.val()) == '') {
+			alert('A value must be specified');
+			valueField.focus();
+			return;
+		} else {
+			if ($('select[name=condition] option:checked').val() == 'created') {
+				if (valueField.val().length != 10 || isNaN(parseIsoDate(valueField.val()))) {
+					alert('A date value in ISO format 2014-02-14 must be specified');
+					valueField.focus();
+					return;
 				}
-			} else {
-				throw "add(): expected [object] but got [" + typeof keys + "]";
-			}
-		};
+			} 
+		}
 
-		// renders list using this.data
-		// template is hardcoded! (FIXME)
-		View.prototype.render = function(){
+		var fields_values = [];
 
-			var fragment = $('<ul></ul>'),
-					list_items = "";
+		// assumes:-
+		// 1. we know nothing of the form
+		// 2. <input>s and <select>s with "name" attribute are valid fields
+		var fields = this.$el.form.find('input[name], select[name]');
 
-
-			for (var i=0, j=this.data.length; i < j; i++) {
-
-				list_items += '<li>';
-
-				if (i !== 0) {
-					if (this.data[i][0] === "and") {
-						list_items += 'and ';
-					} else {
-						list_items += '<em>or</em></li><li>';
-					}
-				}
-
-				var predicate = '';
-				switch (this.data[i][2]) {
-					case 'gt': predicate = "is greater than"; break;
-					case 'ge': predicate = "is greater than or equal to"; break;
-					case 'eq': predicate = "equals"; break;
-					case 'le': predicate = "is less than or equal to"; break;
-					case 'lt': predicate = "is less than"; break;
-					case 'neq': predicate = "is not equal to"; break;
-					case 'substr': predicate = "contains"; break;
-					case 'nsubstr': predicate = "does not contain"; break;
-				}
-
-				list_items +=
-					'<span class="text-warning remove align-right" data-index="' + i + '">Remove</span>' +
-					'<strong>' + this.data[i][1] + '</strong> ' +
-					predicate + ' ' +
-					'<strong>' + this.data[i][3] + '</strong>';
-
-				list_items += '</li>';
-			}
-
-			if (this.data.length < 1) {
-				this.$el.emptyState.show();
-				this.$el.display.hide();
-			} else {
-				this.$el.emptyState.hide();
-				this.$el.display.show();
-				fragment.append("<lh>Members join this group if:</lh>")
-					.append(list_items)
-					.append('<a class="form-list-form-toggle">Add criteria</a>');
-			}
-
-			this.$el.display.html(fragment);
-		};
-
-		// debug function
-		View.prototype.log = function() {
-			console.log('el: ', this.el);
-			console.log('data: ', this.data);
-		};
-
-		// removes items from this.data
-		View.prototype.remove = function(e) {
-			var li = $(e.currentTarget), index = li.attr('data-index');
-
-			if (typeof this.data[index] !== "undefined") {
-				this.data.splice(index,1);
-				this.render();
-			}
-		};
-
-		// unbinds widget from dom
-		View.prototype.destroy = function(){
-			this.$el.display.html("").off();
-			this.$el.display = null;
-
-			this.$el.form.off();
-			this.$el.form = null;
-
-			this.$el.off();
-		};
-
-		// form events
-
-		/**
-		*   submit
-		*   scrapes form elements inside this.$el.form, saves values into an array,
-		*   adds to this.data and re-renders the list
-		*/
-		View.prototype.submit = function() {
-
-			var valueField = $('input[name=value]');
-			if ($.trim(valueField.val()) == '') {
-				alert('A value must be specified');
-				valueField.focus();
-				return;
-			} else {
-				if ($('select[name=condition] option:checked').val() == 'created') {
-					if (valueField.val().length != 10 || isNaN(parseIsoDate(valueField.val()))) {
-						alert('A date value in ISO format 2014-02-14 must be specified');
-						valueField.focus();
-						return;
-					}
-				} 
-			}
-
-			var fields_values = [];
-
-			// assumes:-
-			// 1. we know nothing of the form
-			// 2. <input>s and <select>s with "name" attribute are valid fields
-			var fields = this.$el.form.find('input[name], select[name]');
-
-			fields_values = $.map(fields,function(field,index) {
-				if (field.tagName === "INPUT") {
-					if (field.type == 'radio') {
-						if (field.checked) {
-							return field.value;
-						}
-					} else {
+		fields_values = $.map(fields,function(field,index) {
+			if (field.tagName === "INPUT") {
+				if (field.type == 'radio') {
+					if (field.checked) {
 						return field.value;
 					}
-				} else if (field.tagName === "SELECT") {
-					return field.value;
 				} else {
-					// pass
+					return field.value;
 				}
-			});
-
-			this.add([fields_values]);
-
-			// re-render the list
-			this.render();
-		};
-
-		View.prototype.toggleForm = function(){
-			this.$el.form.toggle();
-		};
-
-		// bind events
-		View.prototype.bind = function(){
-			this.$el.emptyState.on('click',$.proxy(function() {
-				this.toggleForm();
-			}, this));
-
-			// only binds for elements inside this.$el.display
-			var display_events = [
-				['click', '.remove', 'remove'],
-				['click', '.form-list-form-toggle', 'toggleForm']
-			];
-
-			for (var i in display_events) {
-				this.$el.display.on(display_events[i][0], display_events[i][1], $.proxy(this[display_events[i][2]], this));
+			} else if (field.tagName === "SELECT") {
+				return field.value;
+			} else {
+				// pass
 			}
+		});
 
-			// only binds for elements inside this.$el.form
-			var form_events = [
-				['click', '.submit', 'submit']
-			];
+		this.add([fields_values]);
 
-			for (i in form_events) {
-				this.$el.form.on(form_events[i][0], form_events[i][1], $.proxy(this[form_events[i][2]], this));
-			}
-		};
+		// re-render the list
+		this.render();
+	};
 
-		return View;
-	})();
+	View.prototype.toggleForm = function(){
+		this.$el.form.toggle();
+	};
 
-	// initialize
-	criteria = new ListWidget({
-		el : '.criteria-list'
-	});
+	// bind events
+	View.prototype.bind = function(){
+		this.$el.emptyState.on('click',$.proxy(function() {
+			this.toggleForm();
+		}, this));
 
-	criteria.render();
+		// only binds for elements inside this.$el.display
+		var display_events = [
+			['click', '.remove', 'remove'],
+			['click', '.form-list-form-toggle', 'toggleForm']
+		];
 
-})(window,document,jQuery,undefined);
+		for (var i in display_events) {
+			this.$el.display.on(display_events[i][0], display_events[i][1], $.proxy(this[display_events[i][2]], this));
+		}
 
+		// only binds for elements inside this.$el.form
+		var form_events = [
+			['click', '.submit', 'submit']
+		];
+
+		for (i in form_events) {
+			this.$el.form.on(form_events[i][0], form_events[i][1], $.proxy(this[form_events[i][2]], this));
+		}
+	};
+
+	return View;
+
+})(); // ListWidget()
 
 // Events for the criteria form to ensure validation
 function validateCondition() {
@@ -536,69 +526,13 @@ function restrictPredicates(datatype) {
 }
 
 $(document).ready(function() {
+
 	validateCondition();
+
 	$('select[name=condition]').bind("change", validateCondition);
+
 	$('input[name=value]').bind("keyup", validateValue);
-});
 
-
-
-/////////////////////
-//  people widget  //
-/////////////////////
-(function() {
-	'use strict';
-
-	(function() {
-		'use strict'
-
-		var subdomain = $('meta[name="subdomain"]').attr('content');
-
-		var participating = new Participating({
-			el         : '.list-participants',
-			className  : 'list-people list-people-sm',
-			static_url : subdomain
-		});
-
-		var peopleWidget = new PeopleWidget({
-			el         : '#invite',
-			is_textbox : true,
-			static_url : subdomain,
-			dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q='
-		});
-
-		// update the hidden input box
-		var invite_input_field = $('input[name="invite"]');
-		var updateInvitedField = function(){
-			invite_input_field.val(peopleWidget.invitedListToDelimitedString());
-		};
-
-		// triggers when user clicks on a person in the autocomplete dropdown
-		peopleWidget.onSelection(function(invited){
-			if (invited.length > 0){
-				participating.render(invited).show();
-			}else{
-				participating.hide();
-			}
-			peopleWidget.show();
-			updateInvitedField();
-		});
-
-		// triggers when the user clicks on a person in the participants list
-		participating.$el.on('click', 'li', function(e){
-			var id = e.currentTarget.rel;
-			peopleWidget.removePersonFromInvitedById(id).render();
-			if (peopleWidget.people_invited.length>0) {
-				participating.render(peopleWidget.people_invited).show();
-			}else{
-				participating.hide();
-			}
-			updateInvitedField();
-		});
-	})();
-})();
-
-$(document).ready(function() {
 	$('#submit').click(function(e) {
 
 		e.preventDefault()
