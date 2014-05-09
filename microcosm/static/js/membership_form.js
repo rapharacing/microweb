@@ -1,4 +1,11 @@
 function Role (opts, criterion) {
+
+	this.id = 0;
+	if (typeof opts.id !== 'undefined') {
+		this.id = opts.id;
+	}
+
+
 	// criteria container element
 	this.list_criteria = '.criteria-list';
 	if (typeof opts.criteria !== 'undefined') {
@@ -549,6 +556,7 @@ $(document).ready(function() {
 
 		// Core role info
 		data.role = {
+			"id": role.id,
 			"title": role.mappings.name.value,
 			"includeGuests": (role.mappings.includeGuests.value == "1"),
 			"includeUsers": (role.mappings.includeUsers.value == "1"),
@@ -617,6 +625,9 @@ $(document).ready(function() {
 
 			data.criteria[data.criteria.length] = crit 
 		}
+
+		console.log(data);
+		return;
 
 		function getCookie(name) {
 			var cookieValue = null;

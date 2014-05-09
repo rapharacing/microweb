@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if state_edit %}Edit membership group{% else %}Create a membership group{% endif %}Create a membership group | {{ site.title | safe }}{% endblock title %}
+{% block title %}{% if state_edit %}Edit{% else %}Create{% endif %} membership group | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -10,7 +10,7 @@
 			{% include 'breadcrumbs.html' with skipself=False %}
 		</div>
 	</div>
-	<h1>{% if state_edit %}Edit{% else %}Create{% endif %} a Membership Group</h1>
+	<h1>{% if state_edit %}Edit{% else %}Create{% endif %} Membership Group</h1>
 </div>
 
 <div class="content-body">
@@ -140,11 +140,6 @@
 
 								<div class="list-participants" style="display: none">
 									<ul class="list-people list-people-sm">
-									{% for p in profiles.profiles.items %}
-										<li>
-											<a id="{{p.id}}">{% if p.avatar %}<img src="{{p.avatar}}">{% endif %}{{p.profile_name}}<span class="remove">×</span></a>
-										</li>
-									{% endfor %}
 									</ul>
 								</div>
 
@@ -155,7 +150,7 @@
 										<span class="sprite sprite-search-small"></span>
 									</div>
 									<input id="invite" class="form-control" autocomplete="off" placeholder="Type in a user's name" />
-									<input name="invite" type="hidden" value="5" />
+									<input name="invite" type="hidden" value="" />
 								</div>
 							</div>
 						</div>
@@ -265,7 +260,7 @@
 					<div class="row col-sm-12" style="margin:0; padding:0;">
 						<div class="form-footer-buttons pull-right">
 							<a href="{% url 'list-memberships' content.id %}" class="btn btn-lg btn-default">Cancel</a>
-							<a href="{% url 'list-memberships' content.id %}" class="btn btn-lg btn-primary" id="submit">Create group</a>
+							<a href="{% url 'list-memberships' content.id %}" class="btn btn-lg btn-primary" id="submit">{% if state_edit %}Save{% else %}Create{% endif %} group</a>
 						</div>
 					</div>
 				</div> <!-- form-footer -->
@@ -302,7 +297,6 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/membership_form.js"></script>
 
 <script type="text/javascript">
-$(document).ready(function() {
 	// initialize
 	var criteria = new ListWidget(
 		{
@@ -372,11 +366,12 @@ $(document).ready(function() {
 
 	var role = new Role(
 		{
+			id: {% if role.id %}{{ role.id}}{% else %}0{% endif %},
 			criteria   : '.criteria-list',
 			individuals: '.list-participants',
 			mappings   : {
 				'name'         : {el: 'input[name=name]',                 value: "{{ role.title | safe }}" },
-				'members'      : {el: 'input[name=invite]',               value: "5" },
+				'members'      : {el: 'input[name=invite]',               value: "" },
 				'includeUsers' : {el: 'input[name=include_registered]',   value: "{% if role.include_users %}1{% else %}0{% endif %}" },
 				'includeGuests': {el: 'input[name=include_unregistered]', value: "{% if role.include_guests %}1{% else %}0{% endif %}" },
 				'isModerator'  : {el: 'input[name=is_moderator]',         value: "{% if role.moderator %}1{% else %}0{% endif %}" },
@@ -386,12 +381,8 @@ $(document).ready(function() {
 				'canEdit'      : {el: 'input[name=can_edit_others]',      value: "{% if role.edit %}1{% else %}0{% endif %}" },
 				'canDelete'    : {el: 'input[name=can_delete_others]',    value: "{% if role.delete %}1{% else %}0{% endif %}" }
 			}
-		},
-		[
-			{profileColumn:"commentCount", key:null, predicate:"gt", value:1000},
-		]
+		}
 	);
 	role.updateForm();
-});
 </script>
 {% endblock %}
