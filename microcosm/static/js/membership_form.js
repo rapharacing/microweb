@@ -626,9 +626,6 @@ $(document).ready(function() {
 			data.criteria[data.criteria.length] = crit 
 		}
 
-		console.log(data);
-		return;
-
 		function getCookie(name) {
 			var cookieValue = null;
 			if (document.cookie && document.cookie != '') {
@@ -652,10 +649,15 @@ $(document).ready(function() {
 			}
 		});
 
+		var apiUrl = '../api/';
+		if (role.id > 0) {
+			apiUrl = '../../api/';
+		}
+
 		$("#createForm :input").attr("disabled","disabled");
 		$.ajax({
 			type: 'POST',
-			url: '../api/',
+			url: apiUrl,
 			contentType: 'application/json; charset=UTF-8',
 			processData: false,
 			data: JSON.stringify(data),
