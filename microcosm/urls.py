@@ -13,7 +13,6 @@ from microcosm.views import ErrorView
 from microcosm.views import FaviconView
 from microcosm.views import RobotsView
 from microcosm.views import SearchView
-from microcosm.views import HuddleView
 from microcosm.views import TrendingView
 from microcosm.views import LegalView
 from microcosm.views import ModerationView
@@ -52,14 +51,6 @@ urlpatterns = patterns('',
     url(r'comments/(?P<comment_id>\d+)/incontext/$', CommentView.incontext, name='incontext-comment'),
     url(r'comments/(?P<comment_id>\d+)/source/$', CommentView.source, name='source-comment'),
     url(r'comments/(?P<comment_id>\d+)/attachments/$', CommentView.attachments, name='attachment-comment'),
-
-    # Huddles
-    url(r'^huddles/$', HuddleView.list, name='list-huddle'),
-    url(r'^huddles/create/$', HuddleView.create, name='create-huddle'),
-    url(r'^huddles/(?P<huddle_id>\d+)/$' , HuddleView.single, name='single-huddle'),
-    url(r'^huddles/(?P<huddle_id>\d+)/leave/$', HuddleView.delete, name='delete-huddle'),
-    url(r'^huddles/(?P<huddle_id>\d+)/invite/$', HuddleView.invite, name='invite-huddle'),
-    url(r'^huddles/(?P<huddle_id>\d+)/newest/$', HuddleView.newest, name='newest-huddle'),
 
     # Updates
     url(r'^updates/$', UpdateView.list, name='list-updates'),

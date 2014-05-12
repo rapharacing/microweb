@@ -5,11 +5,13 @@ from microcosm.views import ErrorView
 
 from microweb import settings
 
+
 urlpatterns = patterns(
     '',
     url(r'', include('microcosm.urls')),
     url(r'', include('conversations.urls')),
     url(r'', include('events.urls')),
+    url(r'', include('huddles.urls')),
 )
 
 # Serve static files with gunicorn if DEBUG is true.
