@@ -39,6 +39,10 @@ urlpatterns = patterns('',
 
     url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/$', MembershipView.list, name="list-memberships"),
     url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/create/$', MembershipView.create, name="create-memberships"),
+    url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/(?P<group_id>\d+)/edit/$', MembershipView.edit, name="edit-memberships"),
+
+    # Proxy and batch requests to the backend
+    url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/api/$', MembershipView.api, name="api-memberships"),
 
     # Comments
     url(r'comments/create/$', CommentView.create, name='create-comment'),
@@ -86,7 +90,7 @@ urlpatterns = patterns('',
     url(r'^headers/', 'microcosm.views.echo_headers'),
 
     # Break things
-    url(r'error/', ErrorView.server_error, name='server-error'),
+    url(r'error/', ErrorView.server_error),
     url(r'notfound/', ErrorView.not_found),
     url(r'forbidden/', ErrorView.forbidden),
 )

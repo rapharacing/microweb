@@ -82,7 +82,7 @@ MIDDLEWARE_CLASSES = (
     'microcosm.middleware.context.ContextMiddleware',
 
     # cache busting for static files
-    'microcosm.middleware.modtimeurls.ModTimeUrlsMiddleware',
+    #'microcosm.middleware.modtimeurls.ModTimeUrlsMiddleware',
 
     # time all requests and report to riemann
     'microcosm.middleware.timing.TimingMiddleware',

@@ -11,4 +11,5 @@ ENV
 # Local settings.
 newrelic.ini
 local_settings.py
+newrelic.ini
 microweb/local_settings.py
