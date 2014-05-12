@@ -65,8 +65,6 @@ from microcosm.api.resources import GlobalOptions
 from microcosm.api.resources import ProfileList
 from microcosm.api.resources import Search
 from microcosm.api.resources import Site
-from microcosm.api.resources import Huddle
-from microcosm.api.resources import HuddleList
 from microcosm.api.resources import Trending
 from microcosm.api.resources import Legal
 
@@ -78,8 +76,6 @@ from microcosm.forms.forms import MicrocosmEdit
 
 from microcosm.forms.forms import CommentForm
 from microcosm.forms.forms import ProfileEdit
-from microcosm.forms.forms import HuddleCreate
-from microcosm.forms.forms import HuddleEdit
 
 logger = logging.getLogger('microcosm.views')
 
