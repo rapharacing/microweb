@@ -7,7 +7,7 @@ import requests
 
 from dateutil.parser import parse as parse_timestamp
 
-from microcosm.api.exceptions import APIException
+from core.api.exceptions import APIException
 from microweb.helpers import DateTimeEncoder
 
 import logging

@@ -12,19 +12,19 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from microcosm.api.resources import UpdateList
-from microcosm.api.resources import Update
-from microcosm.api.resources import UpdatePreference
-from microcosm.api.resources import WatcherList
-from microcosm.api.resources import Watcher
-from microcosm.api.resources import Profile
-from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import GlobalOptions
-from microcosm.api.resources import Site
+from core.api.resources import UpdateList
+from core.api.resources import Update
+from core.api.resources import UpdatePreference
+from core.api.resources import WatcherList
+from core.api.resources import Watcher
+from core.api.resources import Profile
+from core.api.resources import response_list_to_dict
+from core.api.resources import GlobalOptions
+from core.api.resources import Site
 
-from microcosm.views import exception_handler
-from microcosm.views import build_pagination_links
-from microcosm.views import require_authentication
+from core.views import exception_handler
+from core.views import build_pagination_links
+from core.views import require_authentication
 
 logger = logging.getLogger('updates.views')
 

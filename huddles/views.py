@@ -16,21 +16,21 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from microcosm.api.resources import Comment
-from microcosm.api.resources import Profile
-from microcosm.api.resources import Attachment
-from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import Site
-from microcosm.api.resources import Huddle
-from microcosm.api.resources import HuddleList
+from core.api.resources import Comment
+from core.api.resources import Profile
+from core.api.resources import Attachment
+from core.api.resources import response_list_to_dict
+from core.api.resources import Site
+from core.api.resources import Huddle
+from core.api.resources import HuddleList
 
-from microcosm.views import exception_handler
-from microcosm.views import require_authentication
-from microcosm.views import build_pagination_links
+from core.views import exception_handler
+from core.views import require_authentication
+from core.views import build_pagination_links
 
-from microcosm.forms.forms import CommentForm
-from microcosm.forms.forms import HuddleCreate
-from microcosm.forms.forms import HuddleEdit
+from core.forms.forms import CommentForm
+from core.forms.forms import HuddleCreate
+from core.forms.forms import HuddleEdit
 
 logger = logging.getLogger('huddles.views')
 

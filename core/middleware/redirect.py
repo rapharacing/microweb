@@ -6,8 +6,8 @@ from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
 from django.http import HttpResponseRedirect
 
-from microcosm.api.resources import Site
-from microcosm.api.exceptions import APIException
+from core.api.resources import Site
+from core.api.exceptions import APIException
 
 from requests import RequestException
 

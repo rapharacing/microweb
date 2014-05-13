@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from microcosm.views import ErrorView
+from core.views import ErrorView
 
 from microweb import settings
 
@@ -9,7 +9,7 @@ from microweb import settings
 urlpatterns = patterns(
     '',
 	url(r'', include('microcosms.urls')),
-    url(r'', include('microcosm.urls')),
+    url(r'', include('core.urls')),
     url(r'', include('conversations.urls')),
     url(r'', include('events.urls')),
     url(r'', include('huddles.urls')),

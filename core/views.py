@@ -28,18 +28,18 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic.base import RedirectView
 from django.views.generic.base import TemplateView
 
-from microcosm.api.exceptions import APIException
-from microcosm.api.resources import FileMetadata
-from microcosm.api.resources import Comment
-from microcosm.api.resources import Profile
-from microcosm.api.resources import Attachment
-from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import Site
-from microcosm.api.resources import Legal
+from core.api.exceptions import APIException
+from core.api.resources import FileMetadata
+from core.api.resources import Comment
+from core.api.resources import Profile
+from core.api.resources import Attachment
+from core.api.resources import response_list_to_dict
+from core.api.resources import Site
+from core.api.resources import Legal
 
-from microcosm.api.resources import build_url
+from core.api.resources import build_url
 
-logger = logging.getLogger('microcosm.views')
+logger = logging.getLogger('core.views')
 
 def exception_handler(view_func):
     """

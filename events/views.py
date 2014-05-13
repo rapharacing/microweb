@@ -20,25 +20,25 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from microcosm.views import exception_handler
-from microcosm.views import require_authentication
-from microcosm.views import process_attachments
-from microcosm.views import build_pagination_links
+from core.views import exception_handler
+from core.views import require_authentication
+from core.views import process_attachments
+from core.views import build_pagination_links
 
-from microcosm.api.exceptions import APIException
-from microcosm.api.resources import Event
-from microcosm.api.resources import AttendeeList
-from microcosm.api.resources import Comment
-from microcosm.api.resources import Profile
-from microcosm.api.resources import Attachment
-from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import Site
-from microcosm.api.resources import GeoCode
+from core.api.exceptions import APIException
+from core.api.resources import Event
+from core.api.resources import AttendeeList
+from core.api.resources import Comment
+from core.api.resources import Profile
+from core.api.resources import Attachment
+from core.api.resources import response_list_to_dict
+from core.api.resources import Site
+from core.api.resources import GeoCode
 
-from microcosm.forms.forms import EventCreate
-from microcosm.forms.forms import EventEdit
+from core.forms.forms import EventCreate
+from core.forms.forms import EventEdit
 
-from microcosm.forms.forms import CommentForm
+from core.forms.forms import CommentForm
 
 class EventView(object):
     create_form = EventCreate

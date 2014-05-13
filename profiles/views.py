@@ -10,19 +10,19 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from microcosm.api.resources import FileMetadata
-from microcosm.api.resources import Comment
-from microcosm.api.resources import Profile
-from microcosm.api.resources import Attachment
-from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import ProfileList
-from microcosm.api.resources import Search
-from microcosm.api.resources import Site
+from core.api.resources import FileMetadata
+from core.api.resources import Comment
+from core.api.resources import Profile
+from core.api.resources import Attachment
+from core.api.resources import response_list_to_dict
+from core.api.resources import ProfileList
+from core.api.resources import Search
+from core.api.resources import Site
 
-from microcosm.forms.forms import ProfileEdit
+from core.forms.forms import ProfileEdit
 
-from microcosm.views import exception_handler
-from microcosm.views import build_pagination_links
+from core.views import exception_handler
+from core.views import build_pagination_links
 
 logger = logging.getLogger('microcosm.views')
 

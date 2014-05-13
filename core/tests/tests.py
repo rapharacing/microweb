@@ -10,15 +10,15 @@ from django.test.client import RequestFactory
 from mock import patch
 
 from microcosms.views import MicrocosmView
-from microcosm.views import build_pagination_links
+from core.views import build_pagination_links
 
-from microcosm.api.resources import Conversation
-from microcosm.api.resources import Microcosm
-from microcosm.api.resources import Profile
-from microcosm.api.resources import Site
-from microcosm.api.resources import Event
-from microcosm.api.resources import build_url
-from microcosm.api.exceptions import APIException
+from core.api.resources import Conversation
+from core.api.resources import Microcosm
+from core.api.resources import Profile
+from core.api.resources import Site
+from core.api.resources import Event
+from core.api.resources import build_url
+from core.api.exceptions import APIException
 
 TEST_ROOT = os.path.dirname(os.path.abspath(__file__))
 

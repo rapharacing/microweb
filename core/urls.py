@@ -1,11 +1,11 @@
 from django.conf.urls import url
 from django.conf.urls import patterns
 
-from microcosm.views import AuthenticationView
-from microcosm.views import ErrorView
-from microcosm.views import FaviconView
-from microcosm.views import RobotsView
-from microcosm.views import LegalView
+from core.views import AuthenticationView
+from core.views import ErrorView
+from core.views import FaviconView
+from core.views import RobotsView
+from core.views import LegalView
 
 
 urlpatterns = patterns('',

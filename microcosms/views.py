@@ -14,24 +14,24 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from microcosm.api.resources import Microcosm
-from microcosm.api.resources import MicrocosmList
-from microcosm.api.resources import Role
-from microcosm.api.resources import RoleCriteria
-from microcosm.api.resources import RoleCriteriaList
-from microcosm.api.resources import RoleList
-from microcosm.api.resources import RoleProfile
-from microcosm.api.resources import RoleProfileList
-from microcosm.api.resources import Profile
-from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import Site
+from core.api.resources import Microcosm
+from core.api.resources import MicrocosmList
+from core.api.resources import Role
+from core.api.resources import RoleCriteria
+from core.api.resources import RoleCriteriaList
+from core.api.resources import RoleList
+from core.api.resources import RoleProfile
+from core.api.resources import RoleProfileList
+from core.api.resources import Profile
+from core.api.resources import response_list_to_dict
+from core.api.resources import Site
 
-from microcosm.forms.forms import MicrocosmCreate
-from microcosm.forms.forms import MicrocosmEdit
+from core.forms.forms import MicrocosmCreate
+from core.forms.forms import MicrocosmEdit
 
-from microcosm.views import exception_handler
-from microcosm.views import build_pagination_links
-from microcosm.views import require_authentication
+from core.views import exception_handler
+from core.views import build_pagination_links
+from core.views import require_authentication
 
 logger = logging.getLogger('microcosms.views')
 
