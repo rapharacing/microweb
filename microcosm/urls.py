@@ -4,7 +4,6 @@ from django.conf.urls import patterns
 from microcosm.views import UpdateView
 from microcosm.views import WatcherView
 from microcosm.views import UpdatePreferenceView
-from microcosm.views import ProfileView
 from microcosm.views import AuthenticationView
 from microcosm.views import ErrorView
 from microcosm.views import FaviconView
@@ -31,11 +30,6 @@ urlpatterns = patterns('',
 
     # Watchers
     url(r'^watchers/$', WatcherView.single, name='single-watcher'),
-
-    # User profiles
-    url(r'^profiles/$', ProfileView.list, name='list-profiles'),
-    url(r'^profiles/(?P<profile_id>\d+)/$', ProfileView.single, name='single-profile'),
-    url(r'^profiles/(?P<profile_id>\d+)/edit/$', ProfileView.edit, name='edit-profile'),
 
     # Search
     url(r'^search/$', SearchView.single, name='single-search'),

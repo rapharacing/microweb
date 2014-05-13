@@ -13,6 +13,8 @@ urlpatterns = patterns(
     url(r'', include('conversations.urls')),
     url(r'', include('events.urls')),
     url(r'', include('huddles.urls')),
+    url(r'', include('comments.urls')),
+    url(r'', include('profiles.urls')),
 )
 
 # Serve static files with gunicorn if DEBUG is true.
