@@ -6,7 +6,6 @@ from microcosm.views import ErrorView
 from microcosm.views import FaviconView
 from microcosm.views import RobotsView
 from microcosm.views import LegalView
-from microcosm.views import ModerationView
 
 
 urlpatterns = patterns('',
@@ -22,9 +21,6 @@ urlpatterns = patterns('',
     # Legal
     url(r'^about/$', LegalView.list, name='list-legal'),
     url(r'^about/(?P<doc_name>[a-z]+)/$', LegalView.single, name='single-legal'),
-
-    # Moderation
-    url(r'^moderate/$', ModerationView.item, name='moderate-item'),
 
     # Echoes request headers
     url(r'^headers/', 'microcosm.views.echo_headers'),
