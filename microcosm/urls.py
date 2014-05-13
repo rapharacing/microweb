@@ -5,7 +5,6 @@ from microcosm.views import AuthenticationView
 from microcosm.views import ErrorView
 from microcosm.views import FaviconView
 from microcosm.views import RobotsView
-from microcosm.views import TrendingView
 from microcosm.views import LegalView
 from microcosm.views import ModerationView
 
@@ -19,9 +18,6 @@ urlpatterns = patterns('',
     # Auth
     url(r'^login/$', AuthenticationView.login, name='login'),
     url(r'^logout/$', AuthenticationView.logout, name='logout'),
-
-    # Trending
-    url(r'^trending/$', TrendingView.list, name='list-trending'),
 
     # Legal
     url(r'^about/$', LegalView.list, name='list-legal'),

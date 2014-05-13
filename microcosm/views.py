@@ -146,29 +146,6 @@ def process_attachments(request, comment):
                                   comment_id=comment.id, access_token=request.access_token, file_name=f.name)
 
 
-class TrendingView(object):
-    list_template = 'trending.html'
-
-    @staticmethod
-    @exception_handler
-    @require_http_methods(['GET',])
-    def list(request):
-        url, params, headers = Trending.build_request(request.get_host(), access_token=request.access_token)
-        request.view_requests.append(grequests.get(url, params=params, headers=headers))
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-        trending = Trending.from_api_response(responses[url])
-
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-            'site': Site(responses[request.site_url]),
-            'content': trending,
-            'pagination': build_pagination_links(responses[url]['items']['links'], trending.items),
-            'site_section': 'trending'
-        }
-
-        return render(request, TrendingView.list_template, view_data)
-
-
 class LegalView(object):
     list_template = 'legals.html'
     single_template = 'legal.html'
