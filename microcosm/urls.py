@@ -4,7 +4,6 @@ from django.conf.urls import patterns
 from microcosm.views import UpdateView
 from microcosm.views import WatcherView
 from microcosm.views import UpdatePreferenceView
-from microcosm.views import CommentView
 from microcosm.views import ProfileView
 from microcosm.views import AuthenticationView
 from microcosm.views import ErrorView
@@ -25,15 +24,6 @@ urlpatterns = patterns('',
     # Auth
     url(r'^login/$', AuthenticationView.login, name='login'),
     url(r'^logout/$', AuthenticationView.logout, name='logout'),
-
-    # Comments
-    url(r'comments/create/$', CommentView.create, name='create-comment'),
-    url(r'comments/(?P<comment_id>\d+)/$', CommentView.single, name='single-comment'),
-    url(r'comments/(?P<comment_id>\d+)/edit/$', CommentView.edit, name='edit-comment'),
-    url(r'comments/(?P<comment_id>\d+)/delete/$', CommentView.delete, name='delete-comment'),
-    url(r'comments/(?P<comment_id>\d+)/incontext/$', CommentView.incontext, name='incontext-comment'),
-    url(r'comments/(?P<comment_id>\d+)/source/$', CommentView.source, name='source-comment'),
-    url(r'comments/(?P<comment_id>\d+)/attachments/$', CommentView.attachments, name='attachment-comment'),
 
     # Updates
     url(r'^updates/$', UpdateView.list, name='list-updates'),
