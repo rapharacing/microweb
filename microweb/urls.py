@@ -8,6 +8,7 @@ from microweb import settings
 
 urlpatterns = patterns(
     '',
+	url(r'', include('microcosms.urls')),
     url(r'', include('microcosm.urls')),
     url(r'', include('conversations.urls')),
     url(r'', include('events.urls')),

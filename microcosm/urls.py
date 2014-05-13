@@ -1,8 +1,6 @@
 from django.conf.urls import url
 from django.conf.urls import patterns
 
-from microcosm.views import MicrocosmView
-from microcosm.views import MembershipView
 from microcosm.views import UpdateView
 from microcosm.views import WatcherView
 from microcosm.views import UpdatePreferenceView
@@ -27,21 +25,6 @@ urlpatterns = patterns('',
     # Auth
     url(r'^login/$', AuthenticationView.login, name='login'),
     url(r'^logout/$', AuthenticationView.logout, name='logout'),
-
-    # Microcosms
-    url(r'^$', MicrocosmView.list, name='index'),
-    url(r'^microcosms/$', MicrocosmView.list, name='list-microcosms'),
-    url(r'^microcosms/create/$', MicrocosmView.create, name='create-microcosm'),
-    url(r'^microcosms/(?P<microcosm_id>\d+)/$', MicrocosmView.single, name='single-microcosm'),
-    url(r'^microcosms/(?P<microcosm_id>\d+)/edit/$', MicrocosmView.edit, name='edit-microcosm'),
-    url(r'^microcosms/(?P<microcosm_id>\d+)/delete/$', MicrocosmView.delete, name='delete-microcosm'),
-
-    url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/$', MembershipView.list, name="list-memberships"),
-    url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/create/$', MembershipView.create, name="create-memberships"),
-    url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/(?P<group_id>\d+)/edit/$', MembershipView.edit, name="edit-memberships"),
-
-    # Proxy and batch requests to the backend
-    url(r'^microcosms/(?P<microcosm_id>\d+)/memberships/api/$', MembershipView.api, name="api-memberships"),
 
     # Comments
     url(r'comments/create/$', CommentView.create, name='create-comment'),
