@@ -1,15 +1,12 @@
 import requests
 import grequests
-import string
 import datetime
-import json
 import logging
 
 from functools import wraps
 
 from django.conf import settings
 
-from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 
@@ -33,16 +30,11 @@ from django.views.generic.base import TemplateView
 
 from microcosm.api.exceptions import APIException
 from microcosm.api.resources import FileMetadata
-from microcosm.api.resources import MicrocosmList
-from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
-from microcosm.api.resources import Conversation
 from microcosm.api.resources import Profile
 from microcosm.api.resources import Attachment
 from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import Search
 from microcosm.api.resources import Site
-from microcosm.api.resources import Trending
 from microcosm.api.resources import Legal
 
 from microcosm.api.resources import build_url
@@ -235,6 +227,7 @@ class ErrorView(object):
 
 
 class AuthenticationView(object):
+
     @staticmethod
     @exception_handler
     def login(request):
@@ -276,6 +269,7 @@ class AuthenticationView(object):
             requests.post(url, params={'method': 'DELETE', 'access_token': request.access_token})
 
         return response
+
 
 def echo_headers(request):
     view_data = '<html><body><table>'

@@ -544,15 +544,6 @@ class RoleList(object):
     @classmethod
     def from_api_response(cls, data):
         rolelist = RoleList(data)
-        # if data.get('id'): microcosm.id = data['id']
-        # if data.get('siteId'): microcosm.site_id = data['siteId']
-        # if data.get('visibility'): microcosm.visibility = data['visibility']
-        # if data.get('title'): microcosm.title = data['title']
-        # if data.get('description'): microcosm.description = data['description']
-        # if data.get('moderators'): microcosm.moderators = data['moderators']
-        # if data.get('editReason'): microcosm.edit_reason = data['editReason']
-        # if data.get('meta'): microcosm.meta = Meta(data['meta'])
-        # if data.get('items'): microcosm.items = PaginatedList(data['items'], Item)
         return rolelist
 
 
@@ -592,22 +583,22 @@ class Role(APIResource):
         return role
 
     def as_dict(self):
-        repr = {}
-        repr['id'] = self.id
-        repr['microcosmId'] = self.microcosm_id
-        repr['title'] = self.title
-        repr['moderator'] = self.moderator
-        repr['banned'] = self.banned
-        repr['includeGuests'] = self.include_guests
-        repr['includeUsers'] = self.include_users
-        repr['create'] = self.create
-        repr['read'] = self.read
-        repr['update'] = self.update
-        repr['delete'] = self.delete
-        repr['closeOwn'] = self.close_own
-        repr['openOwn'] = self.open_own
-        repr['readOthers'] = self.read_others
-        return repr
+        return {
+            'id': self.id,
+            'microcosmId': self.microcosm_id,
+            'title': self.title,
+            'moderator': self.moderator,
+            'banned': self.banned,
+            'includeGuests': self.include_guests,
+            'includeUsers': self.include_users,
+            'create': self.create,
+            'read': self.read,
+            'update': self.update,
+            'delete': self.delete,
+            'closeOwn': self.close_own,
+            'openOwn': self.open_own,
+            'readOthers': self.read_others
+        }
 
     @staticmethod
     def build_request(host, microcosm_id, id, offset=None, access_token=None):
@@ -632,7 +623,7 @@ class Role(APIResource):
         url = build_url(host, ['microcosms/', str(data.microcosm_id), '/roles/', str(data.id)])
         headers = APIResource.make_request_headers(access_token)
         headers['Content-Type'] = 'application/json'
-        return requests.put(url, data=json.dumps(data.as_dict()), headers=headers)
+        return requests.put(url, data=json.JSONEncoder().encode(data.as_dict()), headers=headers, allow_redirects=False)
 
     @staticmethod
     def delete_api(host, microcosm_id, role_id, access_token):
@@ -654,6 +645,13 @@ class RoleProfile(APIResource):
     def delete_api(host, microcosm_id, role_id, profile_id, access_token):
         url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/profiles/', str(profile_id)])
         return requests.delete(url, headers=APIResource.make_request_headers(access_token))
+
+    @staticmethod
+    def delete_all_api(host, microcosm_id, role_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/profiles'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.delete(url, data='[]', headers=headers)
 
 class RoleProfileList(object):
     """
@@ -743,6 +741,13 @@ class RoleCriteria(APIResource):
     def delete_api(host, microcosm_id, role_id, criteria_id, access_token):
         url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria/', str(criteria_id)])
         return requests.delete(url, headers=APIResource.make_request_headers(access_token))
+
+    @staticmethod
+    def delete_all_api(host, microcosm_id, role_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.delete(url, data='[]', headers=headers)
 
 class RoleCriteriaList(object):
     """

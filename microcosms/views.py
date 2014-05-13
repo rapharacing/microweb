@@ -213,18 +213,26 @@ class MembershipView(object):
             role = Role.from_summary(data['role'])
             role.microcosm_id = int(microcosm_id)
 
+            # Create or update the role
             if role.id == 0:
                 response = Role.create_api(request.get_host(), role, request.access_token)
                 if response.status_code != requests.codes.ok:
+                    print 'role: ' + response.text
                     return HttpResponseBadRequest()
                 role = Role.from_summary(response.json()['data'])
             else:
                 response = Role.update_api(request.get_host(), role, request.access_token)
-                if response.status_code != requests.codes.ok:
+                if response.status_code != requests.codes.found:
+                    print json.dumps(role.as_dict())
+                    print 'role: ' + response.text
                     return HttpResponseBadRequest()
-                role = Role.from_summary(response.json()['data'])
 
-            # Do we have criteria
+            # Delete all existing criteria and then add the new ones
+            response = RoleProfile.delete_all_api(request.get_host(), role.microcosm_id, role.id, request.access_token)
+            if response.status_code != requests.codes.ok:
+                print 'role profile delete all: ' + response.text
+                return HttpResponseBadRequest()
+
             if data.has_key('criteria') and len(data['criteria']) > 0:
                 # Loop
                 for clob in data['criteria']:
@@ -233,19 +241,21 @@ class MembershipView(object):
                     if crit.id == 0:
                         response = RoleCriteria.create_api(request.get_host(), role.microcosm_id, role.id, crit, request.access_token)
                         if response.status_code != requests.codes.ok:
+                            print 'role criteria: ' + response.text
                             return HttpResponseBadRequest()
                         crit = RoleCriteria.from_summary(response.json()['data'])
                     else:
                         response = RoleCriteria.update_api(request.get_host(), role.microcosm_id, role.id, crit, request.access_token)
                         if response.status_code != requests.codes.ok:
+                            print 'role criteria: ' + response.text
                             return HttpResponseBadRequest()
                         crit = RoleCriteria.from_summary(response.json()['data'])
-            else:
-                # Delete all criteria
-                # Check response, if 200 continue other return JSON error
-                # TODO: Is there an endpoint to delete all criteria?
-                if response.status_code != requests.codes.ok:
-                    return HttpResponseBadRequest()
+
+            # Delete all existing role profiles and then add the new ones
+            response = RoleProfile.delete_all_api(request.get_host(), role.microcosm_id, role.id, request.access_token)
+            if response.status_code != requests.codes.ok:
+                print 'role profile delete all: ' + response.text
+                return HttpResponseBadRequest()
 
             if data.has_key('profiles') and len(data['profiles']) > 0:
                 # Loop
@@ -255,13 +265,7 @@ class MembershipView(object):
 
                 response = RoleProfile.update_api(request.get_host(), role.microcosm_id, role.id, pids, request.access_token)
                 if response.status_code != requests.codes.ok:
-                    return HttpResponseBadRequest()
-
-            else:
-                # Delete all profiles
-                # Check response, if 200 continue other return JSON error
-                # TODO: Is there an endpoint to delete all criteria?
-                if response.status_code != requests.codes.ok:
+                    print 'role profiles: ' + response.text
                     return HttpResponseBadRequest()
 
             # Need to return a stub here to allow the callee (AJAX) to be happy

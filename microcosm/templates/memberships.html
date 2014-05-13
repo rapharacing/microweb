@@ -53,6 +53,10 @@
 
                   <p class="list-membership-description">
 
+                    {% if membership.include_users %}<p>This group includes <span class="green bold">anyone who is signed in</span>.</p>{% endif%}
+
+                    {% if membership.include_guests %}<p>This group includes <span class="green bold">guests who are not signed in</span>.</p>{% endif%}
+
                     {% if membership.moderator %}
                       As a moderator, they <span class="green bold">can create,
                       read, update and delete</span> their own content, and 

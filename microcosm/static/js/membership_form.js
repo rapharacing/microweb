@@ -532,7 +532,99 @@ function restrictPredicates(datatype) {
 	});
 }
 
+function pushRadioButton(name, value) {
+	var unselected = (value == "0") ? "1" : "0";
+
+	checked = $('input[name=' + name + '][value=' + value + ']').attr('checked', true).parent();
+	if (!checked.hasClass('active')) {
+		checked.addClass('active');
+	}
+
+	unchecked = $('input[name=' + name + '][value=' + unselected +']').attr('checked', false).parent();
+	if (unchecked.hasClass('active')) {
+		unchecked.removeClass('active');
+	}
+}
+
 $(document).ready(function() {
+
+	// Bind some validators
+
+	// If you are a guest you cannot own or create things, let alone moderate
+	$('input[name=include_unregistered]').change(function() {
+		if ($('input[name=include_unregistered]:checked').val() == '1') {
+			pushRadioButton('is_moderator', '0');
+			pushRadioButton('can_create', '0');
+			pushRadioButton('can_edit_others', '0');
+			pushRadioButton('can_delete_others', '0');
+		}
+	});
+
+	// If you are a moderator, you cannot be banned
+	$('input[name=is_moderator]').change(function() {
+		if ($('input[name=is_moderator]:checked').val() == '1') {
+			pushRadioButton('include_unregistered', '0');
+			pushRadioButton('is_banned', '0');
+			pushRadioButton('can_read', '1');
+			pushRadioButton('can_create', '1');
+			pushRadioButton('can_edit_others', '1');
+			pushRadioButton('can_delete_others', '1');
+		}
+	});
+
+	// If you are banned, you cannot be a moderator
+	$('input[name=is_banned]').change(function() {
+		if ($('input[name=is_banned]:checked').val() == '1') {
+			pushRadioButton('is_moderator', '0');
+			pushRadioButton('can_read', '0');
+			pushRadioButton('can_create', '0');
+			pushRadioButton('can_edit_others', '0');
+			pushRadioButton('can_delete_others', '0');
+		}
+	});
+
+	// If they can or cannot do specific things, then they can't be banned or a
+	// moderator, etc
+	$('input[name=can_read]').change(function() {
+		if ($('input[name=can_read]:checked').val() == '1') {
+			pushRadioButton('is_banned', '0');
+		} else {
+			pushRadioButton('is_moderator', '0');
+			pushRadioButton('can_create', '0');
+			pushRadioButton('can_edit_others', '0');
+			pushRadioButton('can_delete_others', '0');
+		}
+	});
+
+	$('input[name=can_create]').change(function() {
+		if ($('input[name=can_create]:checked').val() == '1') {
+			pushRadioButton('include_unregistered', '0');
+			pushRadioButton('is_banned', '0');
+			pushRadioButton('can_read', '1');
+		} else {
+			pushRadioButton('is_moderator', '0');
+		}
+	});
+
+	$('input[name=can_edit_others]').change(function() {
+		if ($('input[name=can_edit_others]:checked').val() == '1') {
+			pushRadioButton('include_unregistered', '0');
+			pushRadioButton('is_banned', '0');
+			pushRadioButton('can_read', '1');
+		} else {
+			pushRadioButton('is_moderator', '0');
+		}
+	});
+
+	$('input[name=can_delete_others]').change(function() {
+		if ($('input[name=can_delete_others]:checked').val() == '1') {
+			pushRadioButton('include_unregistered', '0');
+			pushRadioButton('is_banned', '0');
+			pushRadioButton('can_read', '1');
+		} else {
+			pushRadioButton('is_moderator', '0');
+		}
+	});
 
 	validateCondition();
 
@@ -540,6 +632,7 @@ $(document).ready(function() {
 
 	$('input[name=value]').bind("keyup", validateValue);
 
+	// Then bind the submit
 	$('#submit').click(function(e) {
 
 		e.preventDefault()
