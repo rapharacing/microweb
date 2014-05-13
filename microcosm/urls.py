@@ -1,9 +1,6 @@
 from django.conf.urls import url
 from django.conf.urls import patterns
 
-from microcosm.views import UpdateView
-from microcosm.views import WatcherView
-from microcosm.views import UpdatePreferenceView
 from microcosm.views import AuthenticationView
 from microcosm.views import ErrorView
 from microcosm.views import FaviconView
@@ -23,13 +20,6 @@ urlpatterns = patterns('',
     # Auth
     url(r'^login/$', AuthenticationView.login, name='login'),
     url(r'^logout/$', AuthenticationView.logout, name='logout'),
-
-    # Updates
-    url(r'^updates/$', UpdateView.list, name='list-updates'),
-    url(r'^updates/settings/$', UpdatePreferenceView.settings, name='updates-settings'),
-
-    # Watchers
-    url(r'^watchers/$', WatcherView.single, name='single-watcher'),
 
     # Search
     url(r'^search/$', SearchView.single, name='single-search'),
