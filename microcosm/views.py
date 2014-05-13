@@ -17,7 +17,6 @@ from django.http import Http404
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseServerError
-from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 
@@ -35,27 +34,18 @@ from django.views.generic.base import TemplateView
 from microcosm.api.exceptions import APIException
 from microcosm.api.resources import FileMetadata
 from microcosm.api.resources import MicrocosmList
-from microcosm.api.resources import UpdateList
-from microcosm.api.resources import Update
-from microcosm.api.resources import UpdatePreference
-from microcosm.api.resources import WatcherList
-from microcosm.api.resources import Watcher
 from microcosm.api.resources import Event
 from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Profile
 from microcosm.api.resources import Attachment
 from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import GlobalOptions
-from microcosm.api.resources import ProfileList
 from microcosm.api.resources import Search
 from microcosm.api.resources import Site
 from microcosm.api.resources import Trending
 from microcosm.api.resources import Legal
 
 from microcosm.api.resources import build_url
-
-from microcosm.forms.forms import ProfileEdit
 
 logger = logging.getLogger('microcosm.views')
 
@@ -154,36 +144,6 @@ def process_attachments(request, comment):
                 file_metadata = file_request.create(request.get_host(), request.access_token)
                 Attachment.create(request.get_host(), file_metadata.file_hash,
                                   comment_id=comment.id, access_token=request.access_token, file_name=f.name)
-
-
-class SearchView(object):
-    single_template = 'search.html'
-
-    @staticmethod
-    @exception_handler
-    @require_http_methods(['GET',])
-    def single(request):
-
-        # pagination offset
-        offset = int(request.GET.get('offset', 0))
-        q = request.GET.get('q')
-
-        url, params, headers = Search.build_request(request.get_host(), params=request.GET.dict(),
-            access_token=request.access_token)
-        request.view_requests.append(grequests.get(url, params=params, headers=headers))
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-        search = Search.from_api_response(responses[url])
-
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-            'site': Site(responses[request.site_url]),
-            'content': search,
-        }
-
-        if responses[url].get('results'):
-            view_data['pagination'] = build_pagination_links(responses[url]['results']['links'], search.results)
-
-        return render(request, SearchView.single_template, view_data)
 
 
 class TrendingView(object):

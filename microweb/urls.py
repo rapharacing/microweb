@@ -16,6 +16,7 @@ urlpatterns = patterns(
     url(r'', include('comments.urls')),
     url(r'', include('profiles.urls')),
     url(r'', include('updates.urls')),
+    url(r'', include('search.urls')),
 )
 
 # Serve static files with gunicorn if DEBUG is true.
