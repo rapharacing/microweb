@@ -550,9 +550,20 @@ $(document).ready(function() {
 
 	// Bind some validators
 
+	// If you are a guest you cannot own or create things, let alone moderate
+	$('input[name=include_unregistered]').change(function() {
+		if ($('input[name=include_unregistered]:checked').val() == '1') {
+			pushRadioButton('is_moderator', '0');
+			pushRadioButton('can_create', '0');
+			pushRadioButton('can_edit_others', '0');
+			pushRadioButton('can_delete_others', '0');
+		}
+	});
+
 	// If you are a moderator, you cannot be banned
 	$('input[name=is_moderator]').change(function() {
 		if ($('input[name=is_moderator]:checked').val() == '1') {
+			pushRadioButton('include_unregistered', '0');
 			pushRadioButton('is_banned', '0');
 			pushRadioButton('can_read', '1');
 			pushRadioButton('can_create', '1');
@@ -587,6 +598,7 @@ $(document).ready(function() {
 
 	$('input[name=can_create]').change(function() {
 		if ($('input[name=can_create]:checked').val() == '1') {
+			pushRadioButton('include_unregistered', '0');
 			pushRadioButton('is_banned', '0');
 			pushRadioButton('can_read', '1');
 		} else {
@@ -596,6 +608,7 @@ $(document).ready(function() {
 
 	$('input[name=can_edit_others]').change(function() {
 		if ($('input[name=can_edit_others]:checked').val() == '1') {
+			pushRadioButton('include_unregistered', '0');
 			pushRadioButton('is_banned', '0');
 			pushRadioButton('can_read', '1');
 		} else {
@@ -605,6 +618,7 @@ $(document).ready(function() {
 
 	$('input[name=can_delete_others]').change(function() {
 		if ($('input[name=can_delete_others]:checked').val() == '1') {
+			pushRadioButton('include_unregistered', '0');
 			pushRadioButton('is_banned', '0');
 			pushRadioButton('can_read', '1');
 		} else {

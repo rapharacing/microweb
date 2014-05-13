@@ -646,6 +646,13 @@ class RoleProfile(APIResource):
         url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/profiles/', str(profile_id)])
         return requests.delete(url, headers=APIResource.make_request_headers(access_token))
 
+    @staticmethod
+    def delete_all_api(host, microcosm_id, role_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/profiles'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.delete(url, data='[]', headers=headers)
+
 class RoleProfileList(object):
     """
     Represents a list of profiles on a given role.
@@ -734,6 +741,13 @@ class RoleCriteria(APIResource):
     def delete_api(host, microcosm_id, role_id, criteria_id, access_token):
         url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria/', str(criteria_id)])
         return requests.delete(url, headers=APIResource.make_request_headers(access_token))
+
+    @staticmethod
+    def delete_all_api(host, microcosm_id, role_id, access_token):
+        url = build_url(host, ['microcosms/', str(microcosm_id), '/roles/', str(role_id), '/criteria'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.delete(url, data='[]', headers=headers)
 
 class RoleCriteriaList(object):
     """

@@ -887,6 +887,7 @@ class MembershipView(object):
             role = Role.from_summary(data['role'])
             role.microcosm_id = int(microcosm_id)
 
+            # Create or update the role
             if role.id == 0:
                 response = Role.create_api(request.get_host(), role, request.access_token)
                 if response.status_code != requests.codes.ok:
@@ -900,7 +901,12 @@ class MembershipView(object):
                     print 'role: ' + response.text
                     return HttpResponseBadRequest()
 
-            # Do we have criteria
+            # Delete all existing criteria and then add the new ones
+            response = RoleProfile.delete_all_api(request.get_host(), role.microcosm_id, role.id, request.access_token)
+            if response.status_code != requests.codes.ok:
+                print 'role profile delete all: ' + response.text
+                return HttpResponseBadRequest()
+
             if data.has_key('criteria') and len(data['criteria']) > 0:
                 # Loop
                 for clob in data['criteria']:
@@ -918,13 +924,12 @@ class MembershipView(object):
                             print 'role criteria: ' + response.text
                             return HttpResponseBadRequest()
                         crit = RoleCriteria.from_summary(response.json()['data'])
-            # else:
-                # Delete all criteria
-                # Check response, if 200 continue other return JSON error
-                # TODO: Is there an endpoint to delete all criteria?
-                # if response.status_code != requests.codes.ok:
-                #     print 'delete role criteria: ' + response.text
-                #     return HttpResponseBadRequest()
+
+            # Delete all existing role profiles and then add the new ones
+            response = RoleProfile.delete_all_api(request.get_host(), role.microcosm_id, role.id, request.access_token)
+            if response.status_code != requests.codes.ok:
+                print 'role profile delete all: ' + response.text
+                return HttpResponseBadRequest()
 
             if data.has_key('profiles') and len(data['profiles']) > 0:
                 # Loop
@@ -936,14 +941,6 @@ class MembershipView(object):
                 if response.status_code != requests.codes.ok:
                     print 'role profiles: ' + response.text
                     return HttpResponseBadRequest()
-
-            # else:
-                # Delete all profiles
-                # Check response, if 200 continue other return JSON error
-                # TODO: Is there an endpoint to delete all criteria?
-                # if response.status_code != requests.codes.ok:
-                #     print 'delete role profiles: ' + response.text
-                #     return HttpResponseBadRequest()
 
             # Need to return a stub here to allow the callee (AJAX) to be happy
             return HttpResponse('{"context": "","status": 200,"data": {}, "error": null}')
