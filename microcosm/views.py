@@ -7,12 +7,6 @@ import logging
 
 from functools import wraps
 
-from urllib import urlencode
-
-from urlparse import parse_qs
-from urlparse import urlparse
-from urlparse import urlunparse
-
 from django.conf import settings
 
 from django.core.urlresolvers import reverse
@@ -51,8 +45,6 @@ from microcosm.api.resources import Comment
 from microcosm.api.resources import Conversation
 from microcosm.api.resources import Profile
 from microcosm.api.resources import Attachment
-from microcosm.api.resources import RESOURCE_PLURAL
-from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
 from microcosm.api.resources import response_list_to_dict
 from microcosm.api.resources import GlobalOptions
 from microcosm.api.resources import ProfileList
@@ -62,9 +54,7 @@ from microcosm.api.resources import Trending
 from microcosm.api.resources import Legal
 
 from microcosm.api.resources import build_url
-from microcosm.api.resources import join_path_fragments
 
-from microcosm.forms.forms import CommentForm
 from microcosm.forms.forms import ProfileEdit
 
 logger = logging.getLogger('microcosm.views')
