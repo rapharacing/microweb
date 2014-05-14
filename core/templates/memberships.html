@@ -149,7 +149,7 @@
 
 {% block sidebar %}
 
-  {# if content.meta.permissions.create #}
+  {% if content.meta.permissions.admin or content.meta.permissions.super_user %}
     <div class="metabar-module">
       <div class="metabar-module-primary-buttons">
       {% if user %}
@@ -163,7 +163,7 @@
       {% endif %}
       </div>
     </div> <!-- primary actions -->
-  {# endif #}
+  {% endif %}
 
 
   <div class="metabar-module">
