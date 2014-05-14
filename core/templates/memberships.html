@@ -63,22 +63,22 @@
                   <p class="list-membership-description">
 
                     {% if membership.moderator %}
-                      As a moderator, they <span class="green bold">can access,
-                      create, read, update and delete</span> their own content, and 
-                      <span class="green bold">can access, read, update and delete</span>
+                      As a moderator, they <span class="green bold">can read,
+                      create, update and delete</span> their own content, and 
+                      <span class="green bold">can read, update and delete</span>
                       the conversations, events and comments of others.
 
                     {% elif membership.banned %}
                       As a member of a banned group, they
-                      <span class="red bold">cannot access, read, update
+                      <span class="red bold">cannot read, create, update
                       or delete</span> any content in this forum.
 
                     {% else %}
                       <strong>{{ membership.title }}</strong>
                       {% if membership.read %}
-                      <span class="green bold">can access</span>
+                      <span class="green bold">can read</span>
                       {%else%}
-                      <span class="red bold">cannot access</span>
+                      <span class="red bold">cannot read</span>
                       {% endif %}
                       this forum.<br>
 
@@ -113,7 +113,7 @@
             </div>
 
             {% if not memberships.default_roles %}
-
+              {% if content.meta.permissions.admin or content.meta.permissions.super_user %}
             <div class="col-sm-4">
               <div class="row-stats">
                 <a
@@ -124,7 +124,7 @@
               <div class="row-context">
               </div>
             </div>
-
+              {% endif %}
             {% endif %}
 
           </div>
