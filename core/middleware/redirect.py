@@ -46,6 +46,9 @@ class DomainRedirectMiddleware():
                     except memcache.Error as e:
                         logger.error('Memcached SET error: %s' % str(e))
                 except APIException, e:
+                    # HTTP 400 indicates a non-existent site.
+                    if e.status_code == 400:
+                        return HttpResponseRedirect('http://microco.sm')
                     logger.error('APIException: %s' % e.message)
                     return HttpResponseRedirect(reverse('server-error'))
                 except RequestException, e:
