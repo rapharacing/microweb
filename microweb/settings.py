@@ -69,17 +69,17 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 TEMPLATE_DIRS = ()
 
 MIDDLEWARE_CLASSES = (
-    # Redirect to custom domain, if one exists for the site
-    'core.middleware.redirect.DomainRedirectMiddleware',
-
     # Note: if using messages, enable the sessions middleware too
     'django.middleware.common.CommonMiddleware',
 
     # CSRF protection on form submission
     'django.middleware.csrf.CsrfViewMiddleware',
 
-    # convenience for request context like site, user account, etc.
+    # Convenience for request context like site, user account, etc.
     'core.middleware.context.ContextMiddleware',
+
+    # Redirect to custom domain, if one exists for the site
+    'core.middleware.redirect.DomainRedirectMiddleware',
 
     # cache busting for static files
     #'core.middleware.modtimeurls.ModTimeUrlsMiddleware',
