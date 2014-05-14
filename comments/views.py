@@ -17,21 +17,21 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from microcosm.api.resources import Comment
-from microcosm.api.resources import Profile
-from microcosm.api.resources import Attachment
-from microcosm.api.resources import RESOURCE_PLURAL
-from microcosm.api.resources import COMMENTABLE_ITEM_TYPES
-from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import Site
+from core.api.resources import Comment
+from core.api.resources import Profile
+from core.api.resources import Attachment
+from core.api.resources import RESOURCE_PLURAL
+from core.api.resources import COMMENTABLE_ITEM_TYPES
+from core.api.resources import response_list_to_dict
+from core.api.resources import Site
 
-from microcosm.api.resources import join_path_fragments
+from core.api.resources import join_path_fragments
 
-from microcosm.forms.forms import CommentForm
+from core.forms.forms import CommentForm
 
-from microcosm.views import require_authentication
-from microcosm.views import exception_handler
-from microcosm.views import process_attachments
+from core.views import require_authentication
+from core.views import exception_handler
+from core.views import process_attachments
 
 logger = logging.getLogger('comments.views')
 

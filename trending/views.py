@@ -5,13 +5,13 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from microcosm.api.resources import Profile
-from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import Site
-from microcosm.api.resources import Trending
+from core.api.resources import Profile
+from core.api.resources import response_list_to_dict
+from core.api.resources import Site
+from core.api.resources import Trending
 
-from microcosm.views import exception_handler
-from microcosm.views import build_pagination_links
+from core.views import exception_handler
+from core.views import build_pagination_links
 
 logger = logging.getLogger('trending.views')
 

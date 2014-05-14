@@ -1,6 +1,5 @@
 import django.forms
 from django.core.exceptions import ValidationError
-from django.utils import formats
 
 longTextInput=django.forms.TextInput(attrs={'size':'80'})
 
@@ -45,6 +44,7 @@ class CommentForm(django.forms.Form):
     inReplyTo = django.forms.IntegerField(required=False, initial=0, widget=django.forms.HiddenInput)
 
     attachments = django.forms.IntegerField(required=False, initial=0, widget=django.forms.HiddenInput)
+
 
 class EventCreate(ItemForm):
     """
@@ -100,6 +100,7 @@ class EventCreate(ItemForm):
 
     invite = django.forms.CharField(widget=django.forms.HiddenInput,required=False)
     inviteObject = django.forms.CharField(widget=django.forms.HiddenInput,required=False)
+
 
 class EventEdit(EventCreate):
     """

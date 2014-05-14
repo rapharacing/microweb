@@ -10,14 +10,14 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from microcosm.api.resources import MicrocosmList
-from microcosm.api.resources import Event
-from microcosm.api.resources import Conversation
-from microcosm.api.resources import Profile
-from microcosm.api.resources import response_list_to_dict
-from microcosm.api.resources import Site
+from core.api.resources import MicrocosmList
+from core.api.resources import Event
+from core.api.resources import Conversation
+from core.api.resources import Profile
+from core.api.resources import response_list_to_dict
+from core.api.resources import Site
 
-from microcosm.views import require_authentication
+from core.views import require_authentication
 
 
 class ModerationView(object):

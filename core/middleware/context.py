@@ -5,10 +5,10 @@ from django.conf import settings
 import grequests
 import pylibmc as memcache
 
-from microcosm.api.resources import Site
-from microcosm.api.resources import WhoAmI
+from core.api.resources import Site
+from core.api.resources import WhoAmI
 
-logger = logging.getLogger('microcosm.middleware.context')
+logger = logging.getLogger('core.middleware.context')
 
 class ContextMiddleware():
     """

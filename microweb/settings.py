@@ -70,7 +70,7 @@ TEMPLATE_DIRS = ()
 
 MIDDLEWARE_CLASSES = (
     # Redirect to custom domain, if one exists for the site
-    'microcosm.middleware.redirect.DomainRedirectMiddleware',
+    'core.middleware.redirect.DomainRedirectMiddleware',
 
     # Note: if using messages, enable the sessions middleware too
     'django.middleware.common.CommonMiddleware',
@@ -79,16 +79,16 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
 
     # convenience for request context like site, user account, etc.
-    'microcosm.middleware.context.ContextMiddleware',
+    'core.middleware.context.ContextMiddleware',
 
     # cache busting for static files
-    #'microcosm.middleware.modtimeurls.ModTimeUrlsMiddleware',
+    #'core.middleware.modtimeurls.ModTimeUrlsMiddleware',
 
     # time all requests and report to riemann
-    'microcosm.middleware.timing.TimingMiddleware',
+    'core.middleware.timing.TimingMiddleware',
 
     # push exceptions to riemann
-    'microcosm.middleware.exception.ExceptionMiddleware',
+    'core.middleware.exception.ExceptionMiddleware',
 )
 
 ROOT_URLCONF = 'microweb.urls'
@@ -100,20 +100,28 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.humanize',
     'django.contrib.staticfiles',
-    'microcosm',
+    'core',
     'conversations',
     'events',
+    'microcosms',
+    'huddles',
+    'comments',
+    'profiles',
+    'updates',
+    'search',
+    'trending',
+    'moderation',
     'gunicorn',
-    'microcosm.templatetags.comments',
-    'microcosm.templatetags.conversation',
-    'microcosm.templatetags.event',
-    'microcosm.templatetags.commentBox',
-    'microcosm.templatetags.profile',
-    'microcosm.templatetags.microcosm',
-    'microcosm.templatetags.list_comment',
-    'microcosm.templatetags.get_attachment',
-    'microcosm.templatetags.huddle',
-    'microcosm.templatetags.is_image',
+    'core.templatetags.comments',
+    'core.templatetags.conversation',
+    'core.templatetags.event',
+    'core.templatetags.commentBox',
+    'core.templatetags.profile',
+    'core.templatetags.microcosm',
+    'core.templatetags.list_comment',
+    'core.templatetags.get_attachment',
+    'core.templatetags.huddle',
+    'core.templatetags.is_image',
 )
 
 # The values below in must be initialised in local_settings.py

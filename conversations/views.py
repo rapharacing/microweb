@@ -13,20 +13,20 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from microcosm.views import exception_handler
-from microcosm.views import build_pagination_links
-from microcosm.views import process_attachments
+from core.views import exception_handler
+from core.views import build_pagination_links
+from core.views import process_attachments
 
-from microcosm.forms.forms import ConversationCreate
-from microcosm.forms.forms import ConversationEdit
-from microcosm.forms.forms import CommentForm
+from core.forms.forms import ConversationCreate
+from core.forms.forms import ConversationEdit
+from core.forms.forms import CommentForm
 
-from microcosm.api.resources import Conversation
-from microcosm.api.resources import Comment
-from microcosm.api.resources import Profile
-from microcosm.api.resources import Attachment
-from microcosm.api.resources import Site
-from microcosm.api.resources import response_list_to_dict
+from core.api.resources import Conversation
+from core.api.resources import Comment
+from core.api.resources import Profile
+from core.api.resources import Attachment
+from core.api.resources import Site
+from core.api.resources import response_list_to_dict
 
 logger = logging.getLogger('conversations.views')
 
