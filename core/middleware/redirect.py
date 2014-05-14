@@ -11,7 +11,7 @@ from core.api.exceptions import APIException
 
 from requests import RequestException
 
-logger = logging.getLogger('microcosm.middleware.redirect')
+logger = logging.getLogger('core.middleware.redirect')
 
 
 class DomainRedirectMiddleware():

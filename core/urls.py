@@ -23,7 +23,7 @@ urlpatterns = patterns('',
     url(r'^about/(?P<doc_name>[a-z]+)/$', LegalView.single, name='single-legal'),
 
     # Echoes request headers
-    url(r'^headers/', 'microcosm.views.echo_headers'),
+    url(r'^headers/', 'core.views.echo_headers'),
 
     # Break things
     url(r'error/', ErrorView.server_error),
