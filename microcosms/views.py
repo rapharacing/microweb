@@ -196,7 +196,7 @@ class MembershipView(object):
         'content': microcosm,
         'memberships': roles,
         'item_type': 'microcosm',
-        'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+        'pagination': build_pagination_links(responses[roles_url]['roles']['links'], roles.items)
         }
 
         return render(request, MembershipView.list_template, view_data)

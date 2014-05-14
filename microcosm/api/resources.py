@@ -580,6 +580,9 @@ class Role(APIResource):
         else:
             role.microcosm_id = 0
 
+        if data.get('members'):
+            role.members = PaginatedList(data['members'], Profile)
+
         return role
 
     def as_dict(self):
@@ -827,16 +830,19 @@ class PaginatedList(object):
         self.total_pages = item_list['totalPages']
         self.page = item_list['page']
         self.type = item_list['type']
+
         if item_list.get('items'):
             self.items = [list_item_cls.from_summary(item) for item in item_list['items']]
         else:
             self.items = []
         self.links = {}
-        for item in item_list['links']:
-            if 'title' in item:
-                self.links[item['rel']] = {'href': item['href'], 'title': item['title']}
-            else:
-                self.links[item['rel']] = {'href': item['href']}
+
+        if item_list.get('links'):
+            for item in item_list['links']:
+                if 'title' in item:
+                    self.links[item['rel']] = {'href': item['href'], 'title': item['title']}
+                else:
+                    self.links[item['rel']] = {'href': item['href']}
 
 
 class Meta(object):
