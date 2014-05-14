@@ -47,7 +47,7 @@
                 <div class="row-meta">
                   {% if membership.members.total > 0 %}
 
-                    {{ membership.members.total | default:0 | intcomma }} profile{{ membership.members.total | pluralize:",s" }} in the membership group, including:
+                    {{ membership.members.total | default:0 | intcomma }} profile{{ membership.members.total | pluralize:",s" }}, including:
 
                     <ul class="list-people list-people-sm">
                       {% for member in membership.members.items %}
@@ -56,22 +56,22 @@
                     </ul>
                   {% endif %}
 
+                  {% if membership.include_users %}<p>This group includes <span class="green bold">anyone who is signed in</span>.</p>{% endif%}
+                  
+                  {% if membership.include_guests %}<p>This group includes <span class="green bold">people who are not signed in</span>.</p>{% endif%}
+
                   <p class="list-membership-description">
 
-                    {% if membership.include_users %}<p>This group includes <span class="green bold">anyone who is signed in</span>.</p>{% endif%}
-
-                    {% if membership.include_guests %}<p>This group includes <span class="green bold">guests who are not signed in</span>.</p>{% endif%}
-
                     {% if membership.moderator %}
-                      As a moderator, they <span class="green bold">can create,
-                      read, update and delete</span> their own content, and 
-                      <span class="green bold">can read, update and delete</span>
+                      As a moderator, they <span class="green bold">can access,
+                      create, read, update and delete</span> their own content, and 
+                      <span class="green bold">can access, read, update and delete</span>
                       the conversations, events and comments of others.
 
                     {% elif membership.banned %}
                       As a member of a banned group, they
-                      <span class="red bold">cannot read, update or delete</span>
-                      any content in this forum.
+                      <span class="red bold">cannot access, read, update
+                      or delete</span> any content in this forum.
 
                     {% else %}
                       <strong>{{ membership.title }}</strong>

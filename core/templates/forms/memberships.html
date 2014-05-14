@@ -275,9 +275,25 @@
 {% block sidebar %}
 
 <div class="metabar-module">
+
+	{% if state_edit %}
+		<div class="metabar-module">
+			<div class="metabar-module-primary-buttons">
+			{% if user %}
+				<a
+					id="delete_membership_group"
+					class="btn btn-large btn-block btn-danger"
+				><span class="sprite sprite-user-group"></span>
+				<span>Delete membership group</span>
+				</a>
+			{% endif %}
+			</div>
+		</div> <!-- primary actions -->
+	{% endif %}
+
 	<h5>About</h5>
 	<div class="metabar-module-title">
-		<h3>Create a new membership group</h3>
+		<h3>{% if state_edit %}Edit{% else %}Create{% endif %} Membership Group</h3>
 		<p>A membership group is a group of people that have collectively been granted some permissions.</p>
 		<p>By default a person has no permission to do anything, and permissions are granted through membership of one or more membership groups.</p>
 		<p>To create a semi-private forum (not indexable by Google and not visible to those not signed-in) do not create any membership group that contains guests and has "read" permission. But do create a membership group that contains signed-in users and grants them "read" permission.</p>
@@ -384,5 +400,55 @@
 		}
 	);
 	role.updateForm();
+
+	{% if state_edit %}
+	$('#delete_membership_group').click(function() {
+		if (confirm('Deleting a membership group will change permissions for all members of this groups.\n\nContinue with deletion?')) {
+
+			function getCookie(name) {
+				var cookieValue = null;
+				if (document.cookie && document.cookie != '') {
+					var cookies = document.cookie.split(';');
+					for (var i = 0; i < cookies.length; i++) {
+						var cookie = jQuery.trim(cookies[i]);
+						// Does this cookie string begin with the name we want?
+						if (cookie.substring(0, name.length + 1) == (name + '=')) {
+							cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+							break;
+						}
+					}
+				}
+				return cookieValue;
+			}
+			var csrftoken = getCookie('csrftoken');
+
+			$.ajaxSetup({
+				beforeSend: function(xhr, settings) {
+					xhr.setRequestHeader("X-CSRFToken", csrftoken);
+				}
+			});
+
+			var apiUrl = '../api/';
+			if (role.id > 0) {
+				apiUrl = '../../api/';
+			}
+
+			$("#createForm :input").attr("disabled","disabled");
+			$.ajax({
+				type: 'POST',
+				url: apiUrl,
+				contentType: 'application/json; charset=UTF-8',
+				processData: false,
+				data: JSON.stringify({ "deleteRole": {{role.id}} }),
+				dataType: 'json',
+			}).done(function() {
+				window.location = $('#submit').attr('href');
+			}).fail(function(xhr, status, err) {
+				// If error, re-enable the form so people can fix things
+				alert(status + ' ' + err);
+			});
+		}
+	});
+	{% endif %}
 </script>
 {% endblock %}

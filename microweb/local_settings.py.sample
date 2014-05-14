@@ -38,12 +38,12 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'microcosm.views': {
+        'core.views': {
             'handlers': ['stdout'],
             'level': 'DEBUG',
             'propagate' : True,
         },
-        'microcosm.middleware': {
+        'core.middleware': {
             'handlers': ['stdout'],
             'level': 'DEBUG',
             'propagate' : True,

@@ -209,7 +209,21 @@ class MembershipView(object):
 
         data = json.loads(request.body)
 
-        if data.has_key('role'):
+        if data.has_key('deleteRole'):
+            # Delete
+            roleId = data['deleteRole']
+
+            response = Role.delete_api(request.get_host(), microcosm_id, roleId, request.access_token)
+            if response.status_code != requests.codes.ok:
+                print 'role delete: ' + response.text
+                return HttpResponseBadRequest()
+
+            # Need to return a stub here to allow the callee (AJAX) to be happy
+            return HttpResponse('{"context": "","status": 200,"data": {}, "error": null}')
+
+        elif data.has_key('role'):
+            # Create or update
+
             role = Role.from_summary(data['role'])
             role.microcosm_id = int(microcosm_id)
 
@@ -228,9 +242,9 @@ class MembershipView(object):
                     return HttpResponseBadRequest()
 
             # Delete all existing criteria and then add the new ones
-            response = RoleProfile.delete_all_api(request.get_host(), role.microcosm_id, role.id, request.access_token)
+            response = RoleCriteria.delete_all_api(request.get_host(), role.microcosm_id, role.id, request.access_token)
             if response.status_code != requests.codes.ok:
-                print 'role profile delete all: ' + response.text
+                print 'role criteria delete all: ' + response.text
                 return HttpResponseBadRequest()
 
             if data.has_key('criteria') and len(data['criteria']) > 0:
