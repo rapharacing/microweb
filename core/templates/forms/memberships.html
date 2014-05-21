@@ -394,7 +394,7 @@
 				'isBanned'     : {el: 'input[name=is_banned]',            value: "{% if role.banned %}1{% else %}0{% endif %}" },
 				'canRead'      : {el: 'input[name=can_read]',             value: "{% if role.read %}1{% else %}0{% endif %}" },
 				'canCreate'    : {el: 'input[name=can_create]',           value: "{% if role.create %}1{% else %}0{% endif %}" },
-				'canEdit'      : {el: 'input[name=can_edit_others]',      value: "{% if role.edit %}1{% else %}0{% endif %}" },
+				'canEdit'      : {el: 'input[name=can_edit_others]',      value: "{% if role.update %}1{% else %}0{% endif %}" },
 				'canDelete'    : {el: 'input[name=can_delete_others]',    value: "{% if role.delete %}1{% else %}0{% endif %}" }
 			}
 		}

@@ -64,11 +64,12 @@ Role.prototype.updateForm = function(){
 				if (inputs[ii].type == 'radio') {
 					p = input.parent();
 					if (inputs[ii].value == this.mappings[i].value) {
-						inputs[ii].checked = true;
+						input.prop('checked', true);
 						if (!p.hasClass("active")) {
 							p.addClass("active");
 						}
 					} else {
+						input.prop('checked', false);
 						if (p.hasClass("active")) {
 							p.removeClass("active");
 						}
@@ -91,7 +92,7 @@ Role.prototype.updateState = function(){
 
 			for (var ii = 0; ii < inputs.length; ii++) {
 				if (inputs[ii].type == 'radio') {
-					if (inputs[ii].checked == true) {
+					if ($(inputs[ii]).is(':checked')) {
 						this.mappings[i].value = inputs[ii].value;
 					}
 				} else {
@@ -533,98 +534,179 @@ function restrictPredicates(datatype) {
 }
 
 function pushRadioButton(name, value) {
-	var unselected = (value == "0") ? "1" : "0";
+	var unselected = (value == '0') ? '1' : '0';
 
-	checked = $('input[name=' + name + '][value=' + value + ']').attr('checked', true).parent();
-	if (!checked.hasClass('active')) {
-		checked.addClass('active');
-	}
+	elems = $('input[name=' + name + ']');
 
-	unchecked = $('input[name=' + name + '][value=' + unselected +']').attr('checked', false).parent();
-	if (unchecked.hasClass('active')) {
-		unchecked.removeClass('active');
+	for (var i = 0; i < elems.length; i++) {
+		elem = $(elems[i]);
+		if (elem.val() == value) {
+			parent = elem.prop('checked', true).parent();
+			if (!parent.hasClass('active')) {
+				parent.addClass('active');
+			}
+		} else {
+			parent = elem.prop('checked', false).parent();
+			if (parent.hasClass('active')) {
+				parent.removeClass('active');
+			}
+		}
 	}
 }
 
 $(document).ready(function() {
 
 	// Bind some validators
+	$('button > label > input').parent().parent().on('click', function() {
 
-	// If you are a guest you cannot own or create things, let alone moderate
-	$('input[name=include_unregistered]').change(function() {
-		if ($('input[name=include_unregistered]:checked').val() == '1') {
-			pushRadioButton('is_moderator', '0');
-			pushRadioButton('can_create', '0');
-			pushRadioButton('can_edit_others', '0');
-			pushRadioButton('can_delete_others', '0');
+		input = $(this).find('input');
+		if (!input.is(':checked')) {
+			pushRadioButton(input.attr('name'), input.val());
+		}
+
+		switch (input.attr('name')) {
+			case 'include_unregistered':
+				if ($('input[name=include_unregistered]:checked').val() == '1') {
+					pushRadioButton('is_moderator', '0');
+					pushRadioButton('can_create', '0');
+					pushRadioButton('can_edit_others', '0');
+					pushRadioButton('can_delete_others', '0');
+				}
+				break;
+			case 'is_moderator':
+				if ($('input[name=is_moderator]:checked').val() == '1') {
+					pushRadioButton('include_unregistered', '0');
+					pushRadioButton('is_banned', '0');
+					pushRadioButton('can_read', '1');
+					pushRadioButton('can_create', '1');
+					pushRadioButton('can_edit_others', '1');
+					pushRadioButton('can_delete_others', '1');
+				}
+			case 'is_banned':
+				if ($('input[name=is_banned]:checked').val() == '1') {
+					pushRadioButton('is_moderator', '0');
+					pushRadioButton('can_read', '0');
+					pushRadioButton('can_create', '0');
+					pushRadioButton('can_edit_others', '0');
+					pushRadioButton('can_delete_others', '0');
+				}
+				break;
+			case 'can_read':
+				if ($('input[name=can_read]:checked').val() == '1') {
+					pushRadioButton('is_banned', '0');
+				} else {
+					pushRadioButton('is_moderator', '0');
+					pushRadioButton('can_create', '0');
+					pushRadioButton('can_edit_others', '0');
+					pushRadioButton('can_delete_others', '0');
+				}
+				break;
+			case 'can_create':
+				if ($('input[name=can_create]:checked').val() == '1') {
+					pushRadioButton('include_unregistered', '0');
+					pushRadioButton('is_banned', '0');
+					pushRadioButton('can_read', '1');
+				} else {
+					pushRadioButton('is_moderator', '0');
+				}
+				break;
+			case 'can_edit_others':
+				if ($('input[name=can_edit_others]:checked').val() == '1') {
+					pushRadioButton('include_unregistered', '0');
+					pushRadioButton('is_banned', '0');
+					pushRadioButton('can_read', '1');
+				} else {
+					pushRadioButton('is_moderator', '0');
+				}
+				break;
+			case 'can_delete_others':
+				if ($('input[name=can_delete_others]:checked').val() == '1') {
+					pushRadioButton('include_unregistered', '0');
+					pushRadioButton('is_banned', '0');
+					pushRadioButton('can_read', '1');
+				} else {
+					pushRadioButton('is_moderator', '0');
+				}
+				break;
+			default:
 		}
 	});
 
-	// If you are a moderator, you cannot be banned
-	$('input[name=is_moderator]').change(function() {
-		if ($('input[name=is_moderator]:checked').val() == '1') {
-			pushRadioButton('include_unregistered', '0');
-			pushRadioButton('is_banned', '0');
-			pushRadioButton('can_read', '1');
-			pushRadioButton('can_create', '1');
-			pushRadioButton('can_edit_others', '1');
-			pushRadioButton('can_delete_others', '1');
-		}
-	});
+	// // If you are a guest you cannot own or create things, let alone moderate
+	// $('input[name="include_unregistered"]').change(function() {
+	// 	if ($('input[name=include_unregistered]:checked').val() == '1') {
+	// 		pushRadioButton('is_moderator', '0');
+	// 		pushRadioButton('can_create', '0');
+	// 		pushRadioButton('can_edit_others', '0');
+	// 		pushRadioButton('can_delete_others', '0');
+	// 	}
+	// });
 
-	// If you are banned, you cannot be a moderator
-	$('input[name=is_banned]').change(function() {
-		if ($('input[name=is_banned]:checked').val() == '1') {
-			pushRadioButton('is_moderator', '0');
-			pushRadioButton('can_read', '0');
-			pushRadioButton('can_create', '0');
-			pushRadioButton('can_edit_others', '0');
-			pushRadioButton('can_delete_others', '0');
-		}
-	});
+	// // If you are a moderator, you cannot be banned
+	// $('input[name=is_moderator]').change(function() {
+	// 	if ($('input[name=is_moderator]:checked').val() == '1') {
+	// 		pushRadioButton('include_unregistered', '0');
+	// 		pushRadioButton('is_banned', '0');
+	// 		pushRadioButton('can_read', '1');
+	// 		pushRadioButton('can_create', '1');
+	// 		pushRadioButton('can_edit_others', '1');
+	// 		pushRadioButton('can_delete_others', '1');
+	// 	}
+	// });
 
-	// If they can or cannot do specific things, then they can't be banned or a
-	// moderator, etc
-	$('input[name=can_read]').change(function() {
-		if ($('input[name=can_read]:checked').val() == '1') {
-			pushRadioButton('is_banned', '0');
-		} else {
-			pushRadioButton('is_moderator', '0');
-			pushRadioButton('can_create', '0');
-			pushRadioButton('can_edit_others', '0');
-			pushRadioButton('can_delete_others', '0');
-		}
-	});
+	// // If you are banned, you cannot be a moderator
+	// $('input[name=is_banned]').change(function() {
+	// 	if ($('input[name=is_banned]:checked').val() == '1') {
+	// 		pushRadioButton('is_moderator', '0');
+	// 		pushRadioButton('can_read', '0');
+	// 		pushRadioButton('can_create', '0');
+	// 		pushRadioButton('can_edit_others', '0');
+	// 		pushRadioButton('can_delete_others', '0');
+	// 	}
+	// });
 
-	$('input[name=can_create]').change(function() {
-		if ($('input[name=can_create]:checked').val() == '1') {
-			pushRadioButton('include_unregistered', '0');
-			pushRadioButton('is_banned', '0');
-			pushRadioButton('can_read', '1');
-		} else {
-			pushRadioButton('is_moderator', '0');
-		}
-	});
+	// // If they can or cannot do specific things, then they can't be banned or a
+	// // moderator, etc
+	// $('input[name=can_read]').change(function() {
+	// 	if ($('input[name=can_read]:checked').val() == '1') {
+	// 		pushRadioButton('is_banned', '0');
+	// 	} else {
+	// 		pushRadioButton('is_moderator', '0');
+	// 		pushRadioButton('can_create', '0');
+	// 		pushRadioButton('can_edit_others', '0');
+	// 		pushRadioButton('can_delete_others', '0');
+	// 	}
+	// });
 
-	$('input[name=can_edit_others]').change(function() {
-		if ($('input[name=can_edit_others]:checked').val() == '1') {
-			pushRadioButton('include_unregistered', '0');
-			pushRadioButton('is_banned', '0');
-			pushRadioButton('can_read', '1');
-		} else {
-			pushRadioButton('is_moderator', '0');
-		}
-	});
+	// $('input[name=can_create]').change(function() {
+	// 	if ($('input[name=can_create]:checked').val() == '1') {
+	// 		pushRadioButton('include_unregistered', '0');
+	// 		pushRadioButton('is_banned', '0');
+	// 		pushRadioButton('can_read', '1');
+	// 	} else {
+	// 		pushRadioButton('is_moderator', '0');
+	// 	}
+	// });
 
-	$('input[name=can_delete_others]').change(function() {
-		if ($('input[name=can_delete_others]:checked').val() == '1') {
-			pushRadioButton('include_unregistered', '0');
-			pushRadioButton('is_banned', '0');
-			pushRadioButton('can_read', '1');
-		} else {
-			pushRadioButton('is_moderator', '0');
-		}
-	});
+	// $('input[name=can_edit_others]').change(function() {
+	// 	if ($('input[name=can_edit_others]:checked').val() == '1') {
+	// 		pushRadioButton('include_unregistered', '0');
+	// 		pushRadioButton('is_banned', '0');
+	// 		pushRadioButton('can_read', '1');
+	// 	} else {
+	// 		pushRadioButton('is_moderator', '0');
+	// 	}
+	// });
+
+	// $('input[name=can_delete_others]').change(function() {
+	// 	if ($('input[name=can_delete_others]:checked').val() == '1') {
+	// 		pushRadioButton('include_unregistered', '0');
+	// 		pushRadioButton('is_banned', '0');
+	// 		pushRadioButton('can_read', '1');
+	// 	} else {
+	// 		pushRadioButton('is_moderator', '0');
+	// 	}
+	// });
 
 	validateCondition();
 
@@ -635,7 +717,7 @@ $(document).ready(function() {
 	// Then bind the submit
 	$('#submit').click(function(e) {
 
-		e.preventDefault()
+		e.preventDefault();
 
 		role.updateState();
 
