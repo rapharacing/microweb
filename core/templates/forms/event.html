@@ -382,12 +382,11 @@
 						<div class="col-sm-12">
 							<div class="form-footer-buttons">
 								{% if state_edit %}
-								<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Edit event" tabindex="1" />
-								<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
+									<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Edit event" tabindex="1" />
 								{% else %}
-								<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Create event" tabindex="1" />
-								<input type="reset" class="btn btn-lg btn-default" value="Cancel" />
+									<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Create event" tabindex="1" />
 								{% endif %}
+								<input type="reset" class="btn btn-lg btn-default" value="Cancel" onclick="history.back(-1)" />
 
 							</div>
 						</div>
