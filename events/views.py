@@ -92,16 +92,24 @@ class EventView(object):
         # Determine whether the event spans more than one day and if it has expired.
         # TODO: move stuff that is purely rendering to the template.
         today = datetime.datetime.now()
-        end_date = event.when + datetime.timedelta(minutes=event.duration)
+        if hasattr(event, 'when'):
+            end_date = event.when + datetime.timedelta(minutes=event.duration)
 
-        is_same_day = False
-        if end_date.strftime('%d%m%y') == event.when.strftime('%d%m%y'):
-            is_same_day = True
-        event_dates = {
-            'type': 'multiple' if not is_same_day else 'single',
-            'end': end_date
-        }
-        is_expired = True if int(end_date.strftime('%s')) < int(today.strftime('%s')) else False
+            is_same_day = False
+            if end_date.strftime('%d%m%y') == event.when.strftime('%d%m%y'):
+                is_same_day = True
+
+            event_dates = {
+                'type': 'multiple' if not is_same_day else 'single',
+                'end': end_date
+            }
+
+            is_expired = True if int(end_date.strftime('%s')) < int(today.strftime('%s')) else False
+        else:
+            event_dates = {
+                'type': 'tba'
+            }
+            is_expired = False
 
         # Why is this a minimum of 10%?
         rsvp_percentage = event.rsvp_percentage
@@ -214,6 +222,7 @@ class EventView(object):
                 return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
 
             else:
+                print 'Event form is not valid'
                 view_data['form'] = form
                 view_data['microcosm_id'] = microcosm_id
                 return render(request, EventView.form_template, view_data)

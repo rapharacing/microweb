@@ -10,19 +10,23 @@
 					</div>
 					<div class="item-event-icon-offset">
 						<div class="item-event-date">
-							<time class="plain" datetime="{{ content.when|date:"c"}}" itemprop="startDate">
-								<span class="item-event-date-digit">{{ content.when|date:"j"}}</span>
-								<span class="item-event-date-day">
-									{{ content.when|date:"l" }}
-									<strong>{{ content.when|date:"F Y" }}</strong>
+							{% if content.when %}
+								<time class="plain" datetime="{{ content.when|date:"c"}}" itemprop="startDate">
+									<span class="item-event-date-digit">{{ content.when|date:"j"}}</span>
+									<span class="item-event-date-day">
+										{{ content.when|date:"l" }}
+										<strong>{{ content.when|date:"F Y" }}</strong>
+									</span>
+								</time>
+								<span class="item-event-date-time">
+									<time class="plain" itemprop="duration" datetime="P{{content.duration}}M">{{ content.when|date:"g:i  A" }}
+									{% if event_dates.type == 'single' %}
+									- {{ event_dates.end|date:"g:i  A" }}
+									{% endif %}
 								</span>
-							</time>
-							<span class="item-event-date-time">
-								<time class="plain" itemprop="duration" datetime="P{{content.duration}}M">{{ content.when|date:"g:i  A" }}
-								{% if event_dates.type == 'single' %}
-								- {{ event_dates.end|date:"g:i  A" }}
-								{% endif %}
-							</span>
+							{% else %}
+								<abbr title="To be determined">TBD</abbr>
+							{% endif %}
 						</div>
 					</div>
 				</li>
@@ -40,7 +44,7 @@
 								<span itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates" style="display:none"><span itemprop="latitude" content="{{ content.lat }}"></span><span itemprop="longitude" content="{{ content.lon }}"></span></span>
 								{% endif %}
 							{% else %}
-								TBA
+								<abbr title="To be determined">TBD</abbr>
 							{% endif %}
 						</div>
 					</div>

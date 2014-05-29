@@ -21,12 +21,22 @@
 					<span itemprop="attendee" itemscope itemtype="http://schema.org/Person"><a href="{% url 'single-profile' item.item.meta.created_by.id %}" itemprop="url">@<span itemprop="name">{{ item.item.meta.created_by.profile_name | safe | truncatechars:25 }}</span></a></span> started <time datetime="{{ item.item.meta.created|date:"c" }}"></time>
 					{% endif %}
 					<div class="pills-event">
+						{% if item.item.when %}
 						<span>
 							<time class="plain" datetime="{{item.item.when|date:"c"}}" itemprop="startDate">{{ item.item.when|date:"N jS" }}</time>
 						</span>
+						{% else %}
+						<span>
+							<time class="plain" title="Date to be determined">TBD</time>
+						</span>
+						{% endif %}
 						{% if item.item.where %}
 						<span class="pills-event-where" itemprop="location" itemscope itemtype="http://schema.org/Place">
 							<span itemprop="name" title="{{ item.item.where | safe }}">{{ item.item.where | safe }}</span>
+						</span>
+						{% else %}
+						<span class="pills-event-where">
+							<span title="Location to be determined">TBD</span>
 						</span>
 						{% endif %}
 					</div>

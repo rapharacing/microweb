@@ -50,6 +50,10 @@ $('document').ready(function() {
 
 	// toggle <time> html -> title -> html
 	$('body').on('click', 'time', function() {
+		if ($(this).parent().parent().hasClass('pills-event')) {
+			return;
+		}
+
 		$('time').each(function(ii) {
 			var t = $(this);
 			if (t.hasClass("plain")) {return;}
@@ -60,8 +64,6 @@ $('document').ready(function() {
 		});
 	});
 });
-
-
 
 ////////////////////
 //	pagination    //
@@ -93,12 +95,9 @@ $('document').ready(function() {
 	});
 })();
 
-
 ////////////////////
 //   btn-groups   //
 ////////////////////
-
-
 (function(){
 
 	var btn_groups = '.btn-group';

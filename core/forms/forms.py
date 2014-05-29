@@ -62,6 +62,7 @@ class EventCreate(ItemForm):
 
     isoFormat = ('%Y-%m-%dT%H:%M:%SZ','%Y-%m-%dT%H:%M:%S.%fZ','%Y-%m-%dT%H:%M:%S.%f',)
     when = django.forms.DateTimeField(
+        required=False,
         input_formats=isoFormat,
         label='When does the event begin?',
         error_messages={
@@ -115,13 +116,12 @@ class EventEdit(EventCreate):
         """
         Populate form from an event instance.
         """
-
         repr = {}
         repr['id'] = event.id
         repr['microcosmId'] = event.microcosm_id
         repr['title'] = event.title
-        repr['when'] = event.when
-        repr['duration'] = event.duration
+        if hasattr(event, 'when'): repr['when'] = event.when
+        if hasattr(event, 'duration'): repr['duration'] = event.duration
 
         # Event location
         if hasattr(event, 'where'): repr['where'] = event.where

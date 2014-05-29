@@ -1414,8 +1414,10 @@ class Event(APIResource):
     def from_api_response(cls, data):
         event = cls.from_summary(data)
         event.comments = PaginatedList(data['comments'], Comment)
-        event.when = parse_timestamp(data['when'])
-        event.duration = data['duration']
+        if data.get('when'):
+            event.when = parse_timestamp(data['when'])
+        if data.get('duration'):
+            event.duration = data['duration']
         event.status = data['status']
 
         return event
