@@ -36,7 +36,7 @@
 		{% if content.comments.page > 1 %}
 			{% include 'event_header_small.html' %}
 		{% else %}
-			{% if content.where %}
+			{% if content.where and content.lat and content.lon %}
 				{% include 'event_header_large.html' %}
 			{% else %}
 				{% include 'event_header_small.html' %}
