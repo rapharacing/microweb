@@ -25,4 +25,4 @@ export NEW_RELIC_CONFIG_FILE
 exec /srv/www/django/microwebenv/bin/newrelic-admin run-program \
   /srv/www/django/microwebenv/bin/gunicorn_django -b $HOST \
   -w $NUM_WORKERS -k gevent --user=$USER --group=$GROUP --log-level=info \
-  --log-file=$LOGFILE 2>>$LOGFILE
+  --max-requests 5000 --log-file=$LOGFILE 2>>$LOGFILE
