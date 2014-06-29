@@ -23,6 +23,7 @@ from core.forms.forms import ProfileEdit
 
 from core.views import exception_handler
 from core.views import build_pagination_links
+from core.views import require_authentication
 
 logger = logging.getLogger('microcosm.views')
 
@@ -178,3 +179,14 @@ class ProfileView(object):
             user_profile = Profile.retrieve(request.get_host(), profile_id, request.access_token)
             view_data['form'] = ProfileView.edit_form(user_profile.as_dict)
             return render(request, ProfileView.form_template, view_data)
+
+    @staticmethod
+    @require_authentication
+    @require_http_methods(['POST',])
+    def mark_read(request):
+        scope = {
+            'itemType': request.POST.get('item_type'),
+            'itemId': int(request.POST.get('item_id')),
+        }
+        Profile.mark_read(request.get_host(), scope, request.access_token)
+        return HttpResponseRedirect(request.POST.get('return_path'))
