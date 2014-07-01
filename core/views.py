@@ -91,10 +91,7 @@ def build_pagination_links(request, paged_list):
     and generates a dictionary of navigation links based on that.
     """
 
-    # trips if paged_list is not paginatedList object.
-    try:
-        paged_list.page
-    except AttributeError:
+    if not hasattr(paged_list, 'page'):
         return {}
 
     page_nav = {
