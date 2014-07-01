@@ -1,0 +1,11 @@
+<form method="POST" action="{% url 'mark-read' %}" id="mark-read-module">
+    {% csrf_token %}
+    <input type="hidden" name="item_type" value="{{ item_type }}" />
+    {% if item_type == 'site' %}
+        <input type="hidden" name="item_id" value="{{ site.site_id }}" />
+    {% else %}
+        <input type="hidden" name="item_id" value="{{ content.id }}" />
+    {% endif %}
+    <input type="hidden" name="return_path" value="{{ request.get_full_path }}" />
+    <a href="#" onclick="document.getElementById('mark-read-module').submit();">Mark everything read</a>
+</form>

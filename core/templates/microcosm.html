@@ -90,11 +90,11 @@
 			</p>
 		</div>
 		<div class="metabar-module-body">
-			<p>
-				{{ content.description | safe }}
-			</p>
-			<p><a href="{% url 'list-memberships' content.id %}">Who has access to this forum?</a></p>
+			<p>{{ content.description | safe }}</p>
 		</div>
+        <div class="metabar-module-body">
+            <p><a href="{% url 'list-memberships' content.id %}">Who has access to this forum?</a></p>
+        </div>
 		{% if content.meta.permissions.admin or content.meta.permissions.super_user %}
 		<div class="metabar-module-primary-buttons">
 			<a id="edit-microcosm" href="{% url 'edit-microcosm' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit Forum</a>
@@ -113,6 +113,9 @@
 				{% include 'forms/subscribe.html' %}
 			</p>
 		</div>
+        <div class="metabar-module-body">
+            {% include 'forms/mark-read.html' %}
+        </div>
 	</div> <!-- / about -->
 
 

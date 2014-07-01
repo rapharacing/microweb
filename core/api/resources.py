@@ -379,6 +379,18 @@ class Profile(object):
         url = build_url(host, ['updates', 'unread'])
         return APIResource.retrieve(url, {}, headers=APIResource.make_request_headers(access_token))
 
+    @staticmethod
+    def mark_read(host, data, access_token):
+        """
+        Mark a site or microcosm read.
+        """
+
+        url = build_url(host, ['profiles', 'read',])
+        payload = json.dumps(data)
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        requests.put(url, payload, headers=headers)
+
 
 class ProfileList(object):
     """

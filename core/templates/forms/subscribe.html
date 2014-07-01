@@ -26,7 +26,6 @@
 
 	</form>
 		<div class="subscribe-meta {% if content.meta.flags.watched %}active{%endif%}">
-
 			<form method="POST" action="" id="email_me_form">
 			{% csrf_token %}
 			<span class="sprite sprite-branch-arrow-right"></span>
@@ -36,5 +35,6 @@
 				</label>
 			</form>
 		</div>
+
 	</div>
 {% endif %}
