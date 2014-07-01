@@ -7,10 +7,8 @@ from functools import wraps
 
 from django.conf import settings
 
-from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 
-from django.http import Http404
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseServerError
@@ -32,6 +30,7 @@ from core.api.exceptions import APIException
 from core.api.resources import FileMetadata
 from core.api.resources import Comment
 from core.api.resources import Profile
+from core.api.resources import WhoAmI
 from core.api.resources import Attachment
 from core.api.resources import response_list_to_dict
 from core.api.resources import Site
@@ -57,11 +56,10 @@ def exception_handler(view_func):
         try:
             return view_func(request, *args, **kwargs)
         except APIException as e:
-            logger.error(str(e))
             if e.status_code == 401 or e.status_code == 403:
-                raise PermissionDenied
+                return ErrorView.forbidden(request)
             elif e.status_code == 404:
-                raise Http404
+                return ErrorView.not_found(request)
             elif e.status_code == 400:
                 # Error code 14 indicates that the requested forum does not exist.
                 if e.detail['errorCode'] == 14:
@@ -81,8 +79,7 @@ def require_authentication(view_func):
         if hasattr(request, 'access_token'):
             return view_func(request, *args, **kwargs)
         else:
-            # TODO: this should redirect to a page where the user can log in.
-            raise PermissionDenied
+            return ErrorView.forbidden(request)
     return decorator
 
 def build_pagination_links(request, paged_list):
@@ -181,44 +178,61 @@ class LegalView(object):
 class ErrorView(object):
     @staticmethod
     def not_found(request):
+        view_data = {}
+        view_requests = []
+
+        if request.COOKIES.has_key('access_token'):
+            request.access_token = request.COOKIES['access_token']
+            whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
+            view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
+
+        site_url, params, headers = Site.build_request(request.get_host())
+        view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+
         responses = response_list_to_dict(grequests.map(request.view_requests))
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-            'site': Site(responses[request.site_url]),
-        }
+        view_data['user'] = Profile(responses[whoami_url], summary=False)
+        view_data['site'] = Site(responses[site_url])
+
         context = RequestContext(request, view_data)
         return HttpResponseNotFound(loader.get_template('404.html').render(context))
 
     @staticmethod
     def forbidden(request):
         view_data = {}
+        view_requests = []
 
-        try:
-            responses = response_list_to_dict(grequests.map(request.view_requests))
-            if request.whoami_url:
-                view_data['user'] = Profile(responses[request.whoami_url], summary=False)
-            view_data['site'] = Site(responses[request.site_url])
-        except APIException as e:
-            # HTTP 401 indicates a not valid access token was supplied.
-            # TODO: use API detailed error codes to provide a useful message.
-            if e.status_code == 401 or e.status_code == 403:
-                # Template uses this in error message.
-                view_data['logout'] = True
-                # Try to fetch site data without access token as it may not have succeeded above.
-                if not view_data.has_key('site'):
-                    view_data['site'] = Site.retrieve(request.get_host())
+        if request.COOKIES.has_key('access_token'):
+            request.access_token = request.COOKIES['access_token']
+            whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
+            view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
+
+        site_url, params, headers = Site.build_request(request.get_host())
+        view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+        view_data['user'] = Profile(responses[whoami_url], summary=False)
+        view_data['site'] = Site(responses[site_url])
 
         context = RequestContext(request, view_data)
-        response = HttpResponseForbidden(loader.get_template('403.html').render(context))
-        return response
+        return HttpResponseForbidden(loader.get_template('403.html').render(context))
 
     @staticmethod
     def server_error(request):
+        view_data = {}
+        view_requests = []
+
+        if request.COOKIES.has_key('access_token'):
+            request.access_token = request.COOKIES['access_token']
+            whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
+            view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
+
+        site_url, params, headers = Site.build_request(request.get_host())
+        view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+
         responses = response_list_to_dict(grequests.map(request.view_requests))
-        view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-            'site': Site(responses[request.site_url]),
-        }
+        view_data['user'] = Profile(responses[whoami_url], summary=False)
+        view_data['site'] = Site(responses[site_url])
+
         context = RequestContext(request, view_data)
         return HttpResponseServerError(loader.get_template('500.html').render(context))
 
