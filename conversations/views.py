@@ -13,7 +13,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from core.views import exception_handler
+from core.views import ErrorView
 from core.views import build_pagination_links
 from core.views import process_attachments
 
@@ -26,6 +26,7 @@ from core.api.resources import Comment
 from core.api.resources import Profile
 from core.api.resources import Attachment
 from core.api.resources import Site
+from core.api.resources import APIException
 from core.api.resources import response_list_to_dict
 
 logger = logging.getLogger('conversations.views')
@@ -38,7 +39,6 @@ class ConversationView(object):
     single_template = 'conversation.html'
 
     @staticmethod
-    @exception_handler
     @require_http_methods(['GET',])
     def single(request, conversation_id):
 
@@ -48,7 +48,17 @@ class ConversationView(object):
         conversation_url, params, headers = Conversation.build_request(request.get_host(), id=conversation_id,
             offset=offset, access_token=request.access_token)
         request.view_requests.append(grequests.get(conversation_url, params=params, headers=headers))
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+
+        try:
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+        except APIException as e:
+            if e.status_code == 404:
+                return ErrorView.not_found(request)
+            elif e.status_code == 403:
+                return ErrorView.forbidden(request)
+            else:
+                return ErrorView.server_error(request)
+
         conversation = Conversation.from_api_response(responses[conversation_url])
         comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
 
@@ -71,28 +81,41 @@ class ConversationView(object):
             'item_type': 'conversation',
             'attachments': attachments
         }
-
         return render(request, ConversationView.single_template, view_data)
 
     @staticmethod
-    @exception_handler
     @require_http_methods(['GET', 'POST',])
     def create(request, microcosm_id):
         """
         Create a conversation and first comment in the conversation.
         """
 
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        try:
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+        except APIException as e:
+            if e.status_code == 404:
+                return ErrorView.not_found(request)
+            elif e.status_code == 403:
+                return ErrorView.forbidden(request)
+            else:
+                return ErrorView.server_error(request)
+
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False),
             'site': Site(responses[request.site_url]),
-            }
+        }
 
         if request.method == 'POST':
             form = ConversationView.create_form(request.POST)
             if form.is_valid():
                 conv_req = Conversation.from_create_form(form.cleaned_data)
-                conv = conv_req.create(request.get_host(), request.access_token)
+                try:
+                    conv = conv_req.create(request.get_host(), request.access_token)
+                except APIException as e:
+                    if e.status_code == 403:
+                        return ErrorView.forbidden(request)
+                    else:
+                        return ErrorView.server_error(request)
 
                 if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
                     payload = {
@@ -102,7 +125,13 @@ class ConversationView(object):
                         'inReplyTo': 0,
                         }
                     comment_req = Comment.from_create_form(payload)
-                    comment = comment_req.create(request.get_host(), request.access_token)
+                    try:
+                        comment = comment_req.create(request.get_host(), request.access_token)
+                    except APIException as e:
+                        if e.status_code == 403:
+                            return ErrorView.forbidden(request)
+                        else:
+                            return ErrorView.server_error(request)
 
                     try:
                         process_attachments(request, comment)
@@ -114,14 +143,15 @@ class ConversationView(object):
                                 'itemType': comment.item_type,
                                 'comment_id': comment.id,
                                 'markdown': request.POST['markdown'],
-                                })
+                                }
+                        )
                         view_data = {
                             'user': Profile(responses[request.whoami_url], summary=False),
                             'site': Site(responses[request.site_url]),
                             'content': comment,
                             'comment_form': comment_form,
                             'error': 'Sorry, one of your files was over 5MB. Please try again.',
-                            }
+                        }
                         return render(request, ConversationView.form_template, view_data)
 
                 return HttpResponseRedirect(reverse('single-conversation', args=(conv.id,)))
@@ -137,26 +167,42 @@ class ConversationView(object):
 
 
     @staticmethod
-    @exception_handler
     @require_http_methods(['GET', 'POST',])
     def edit(request, conversation_id):
         """
         Edit a conversation.
         """
 
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        try:
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+        except APIException as e:
+            if e.status_code == 404:
+                 return ErrorView.not_found(request)
+            elif e.status_code == 403:
+                return ErrorView.forbidden(request)
+            else:
+                return ErrorView.server_error(request)
+
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False),
             'site': Site(responses[request.site_url]),
             'state_edit': True,
-            }
+        }
 
         if request.method == 'POST':
             form = ConversationView.edit_form(request.POST)
 
             if form.is_valid():
                 conv_request = Conversation.from_edit_form(form.cleaned_data)
-                conv_response = conv_request.update(request.get_host(), request.access_token)
+                try:
+                    conv_response = conv_request.update(request.get_host(), request.access_token)
+                except APIException as e:
+                    if e.status_code == 404:
+                        return ErrorView.not_found(request)
+                    elif e.status_code == 403:
+                        return ErrorView.forbidden(request)
+                    else:
+                        return ErrorView.server_error(request)
                 return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
             else:
                 view_data['form'] = form
@@ -170,7 +216,6 @@ class ConversationView(object):
             return render(request, ConversationView.form_template, view_data)
 
     @staticmethod
-    @exception_handler
     @require_http_methods(['POST',])
     def delete(request, conversation_id):
         """
@@ -178,19 +223,34 @@ class ConversationView(object):
         """
 
         conversation = Conversation.retrieve(request.get_host(), conversation_id, access_token=request.access_token)
-        conversation.delete(request.get_host(), request.access_token)
+        try:
+            conversation.delete(request.get_host(), request.access_token)
+        except APIException as e:
+            if e.status_code == 404:
+                return ErrorView.not_found(request)
+            elif e.status_code == 403:
+                return ErrorView.forbidden(request)
+            else:
+                return ErrorView.server_error(request)
         return HttpResponseRedirect(reverse('single-microcosm', args=(conversation.microcosm_id,)))
 
-
     @staticmethod
-    @exception_handler
     @require_http_methods(['GET',])
     def newest(request, conversation_id):
         """
         Get redirected to the first unread post in a conversation
         """
 
-        response = Conversation.newest(request.get_host(), conversation_id, access_token=request.access_token)
+        try:
+            response = Conversation.newest(request.get_host(), conversation_id, access_token=request.access_token)
+        except APIException as e:
+            if e.status_code == 404:
+                return ErrorView.not_found(request)
+            elif e.status_code == 403:
+                return ErrorView.forbidden(request)
+            else:
+                return ErrorView.server_error(request)
+
         # because redirects are always followed, we can't just get the 'location' value
         response = response['comments']['links']
         for link in response:
