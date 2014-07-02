@@ -1910,6 +1910,7 @@ class SearchResult(object):
         searchresult.rank = data['rank']
         searchresult.last_modified = data['lastModified']
         searchresult.highlight = data['highlight']
+        searchresult.unread = data['unread']
         return searchresult
 
     @classmethod
