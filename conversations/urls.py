@@ -1,12 +1,12 @@
 from django.conf.urls import url
 from django.conf.urls import patterns
 
-from conversations.views import ConversationView
+from conversations import views
 
 urlpatterns = patterns('',
-    url(r'^microcosms/(?P<microcosm_id>\d+)/create/conversation/$', ConversationView.create, name='create-conversation'),
-    url(r'^conversations/(?P<conversation_id>\d+)/$' , ConversationView.single, name='single-conversation'),
-    url(r'^conversations/(?P<conversation_id>\d+)/edit/$', ConversationView.edit, name='edit-conversation'),
-    url(r'^conversations/(?P<conversation_id>\d+)/delete/$', ConversationView.delete, name='delete-conversation'),
-    url(r'^conversations/(?P<conversation_id>\d+)/newest/$', ConversationView.newest, name='newest-conversation'),
+    url(r'^microcosms/(?P<microcosm_id>\d+)/create/conversation/$', views.create, name='create-conversation'),
+    url(r'^conversations/(?P<conversation_id>\d+)/$' , views.single, name='single-conversation'),
+    url(r'^conversations/(?P<conversation_id>\d+)/edit/$', views.edit, name='edit-conversation'),
+    url(r'^conversations/(?P<conversation_id>\d+)/delete/$', views.delete, name='delete-conversation'),
+    url(r'^conversations/(?P<conversation_id>\d+)/newest/$', views.newest, name='newest-conversation'),
 )
