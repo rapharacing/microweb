@@ -1,4 +1,6 @@
 import requests
+from requests import RequestException
+
 import grequests
 import datetime
 import logging
@@ -137,22 +139,24 @@ class LegalView(object):
     single_template = 'legal.html'
 
     @staticmethod
-    @exception_handler
     @require_http_methods(['GET',])
     def list(request):
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        try:
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+        except APIException as e:
+            if e.status_code == 404:
+                return ErrorView.not_found(request)
+            else:
+                return ErrorView.server_error(request)
 
         view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': Site(responses[request.site_url]),
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site_section': 'legal'
         }
-
         return render(request, LegalView.list_template, view_data)
 
-
     @staticmethod
-    @exception_handler
     @require_http_methods(['GET',])
     def single(request, doc_name):
         if not doc_name in ['cookies', 'privacy', 'terms']:
@@ -160,18 +164,23 @@ class LegalView(object):
 
         url, params, headers = Legal.build_request(request.get_host(), doc=doc_name)
         request.view_requests.append(grequests.get(url, params=params, headers=headers))
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        try:
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+        except APIException as e:
+            if e.status_code == 404:
+                return ErrorView.not_found(request)
+            else:
+                return ErrorView.server_error(request)
 
         legal = Legal.from_api_response(responses[url])
 
         view_data = {
-            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'site': Site(responses[request.site_url]),
+            'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
             'content': legal,
             'site_section': 'legal',
             'page_section': doc_name
         }
-
         return render(request, LegalView.single_template, view_data)
 
 
@@ -240,7 +249,6 @@ class ErrorView(object):
 class AuthenticationView(object):
 
     @staticmethod
-    @exception_handler
     def login(request):
         """
         Log a user in. Creates an access_token using a persona
@@ -251,11 +259,16 @@ class AuthenticationView(object):
 
         target_url = request.POST.get('target_url')
         assertion = request.POST.get('Assertion')
-
-        data = dict(Assertion=assertion, ClientSecret=settings.CLIENT_SECRET)
+        postdata = {
+            'Assertion': assertion,
+            'ClientSecret':settings.CLIENT_SECRET
+        }
 
         url = build_url(request.get_host(), ['auth'])
-        response = requests.post(url, data=data, headers={})
+        try:
+            response = requests.post(url, data=postdata, headers={})
+        except RequestException:
+            return ErrorView.server_error(request)
         access_token = response.json()['data']
 
         response = HttpResponseRedirect(target_url if target_url != '' else '/')
@@ -264,7 +277,6 @@ class AuthenticationView(object):
         return response
 
     @staticmethod
-    @exception_handler
     @require_http_methods(["POST"])
     def logout(request):
         """
@@ -277,7 +289,10 @@ class AuthenticationView(object):
         if request.COOKIES.has_key('access_token'):
             response.delete_cookie('access_token')
             url = build_url(request.get_host(), ['auth', request.access_token])
-            requests.post(url, params={'method': 'DELETE', 'access_token': request.access_token})
+            try:
+                requests.post(url, params={'method': 'DELETE', 'access_token': request.access_token})
+            except RequestException:
+                return ErrorView.server_error(request)
 
         return response
 
