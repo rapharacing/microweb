@@ -15,6 +15,7 @@ from django.shortcuts import render
 
 from core.views import ErrorView
 from core.views import build_pagination_links
+from core.views import respond_with_error
 from core.views import process_attachments
 
 from core.forms.forms import ConversationCreate
@@ -49,13 +50,8 @@ def single(request, conversation_id):
 
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
 
     conversation = Conversation.from_api_response(responses[conversation_url])
     comment_form = CommentForm(initial=dict(itemId=conversation_id, itemType='conversation'))
@@ -90,14 +86,8 @@ def create(request, microcosm_id):
 
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
-
+    except APIException as exc:
+        return respond_with_error(request, exc)
     view_data = {
         'user': Profile(responses[request.whoami_url], summary=False),
         'site': Site(responses[request.site_url]),
@@ -109,11 +99,8 @@ def create(request, microcosm_id):
             conv_req = Conversation.from_create_form(form.cleaned_data)
             try:
                 conv = conv_req.create(request.get_host(), request.access_token)
-            except APIException as e:
-                if e.status_code == 403:
-                    return ErrorView.forbidden(request)
-                else:
-                    return ErrorView.server_error(request)
+            except APIException as exc:
+                return respond_with_error(request, exc)
 
             if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
                 payload = {
@@ -125,11 +112,8 @@ def create(request, microcosm_id):
                 comment_req = Comment.from_create_form(payload)
                 try:
                     comment = comment_req.create(request.get_host(), request.access_token)
-                except APIException as e:
-                    if e.status_code == 403:
-                        return ErrorView.forbidden(request)
-                    else:
-                        return ErrorView.server_error(request)
+                except APIException as exc:
+                    return respond_with_error(request, exc)
 
                 try:
                     process_attachments(request, comment)
@@ -172,13 +156,8 @@ def edit(request, conversation_id):
 
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
-    except APIException as e:
-        if e.status_code == 404:
-             return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
 
     view_data = {
         'user': Profile(responses[request.whoami_url], summary=False),
@@ -193,13 +172,8 @@ def edit(request, conversation_id):
             conv_request = Conversation.from_edit_form(form.cleaned_data)
             try:
                 conv_response = conv_request.update(request.get_host(), request.access_token)
-            except APIException as e:
-                if e.status_code == 404:
-                    return ErrorView.not_found(request)
-                elif e.status_code == 403:
-                    return ErrorView.forbidden(request)
-                else:
-                    return ErrorView.server_error(request)
+            except APIException as exc:
+                return respond_with_error(request, exc)
             return HttpResponseRedirect(reverse('single-conversation', args=(conv_response.id,)))
         else:
             view_data['form'] = form
@@ -222,13 +196,8 @@ def delete(request, conversation_id):
     conversation = Conversation.retrieve(request.get_host(), conversation_id, access_token=request.access_token)
     try:
         conversation.delete(request.get_host(), request.access_token)
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
     return HttpResponseRedirect(reverse('single-microcosm', args=(conversation.microcosm_id,)))
 
 
@@ -240,13 +209,8 @@ def newest(request, conversation_id):
 
     try:
         response = Conversation.newest(request.get_host(), conversation_id, access_token=request.access_token)
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
 
     # because redirects are always followed, we can't just get the 'location' value
     response = response['comments']['links']

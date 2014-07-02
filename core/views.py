@@ -155,11 +155,8 @@ class LegalView(object):
     def list(request):
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))
-        except APIException as e:
-            if e.status_code == 404:
-                return ErrorView.not_found(request)
-            else:
-                return ErrorView.server_error(request)
+        except APIException as exc:
+            return respond_with_error(request, exc)
 
         view_data = {
             'site': Site(responses[request.site_url]),
@@ -178,11 +175,8 @@ class LegalView(object):
         request.view_requests.append(grequests.get(url, params=params, headers=headers))
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))
-        except APIException as e:
-            if e.status_code == 404:
-                return ErrorView.not_found(request)
-            else:
-                return ErrorView.server_error(request)
+        except APIException as exc:
+            return respond_with_error(request, exc)
 
         legal = Legal.from_api_response(responses[url])
 

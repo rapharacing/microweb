@@ -28,6 +28,7 @@ from core.api.resources import response_list_to_dict
 from core.views import ErrorView
 from core.views import require_authentication
 from core.views import build_pagination_links
+from core.views import respond_with_error
 
 from core.forms.forms import CommentForm
 from core.forms.forms import HuddleCreate
@@ -53,13 +54,8 @@ def single(request, huddle_id):
     request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
 
     huddle = Huddle.from_api_response(responses[huddle_url])
     comment_form = CommentForm(initial=dict(itemId=huddle_id, itemType='huddle'))
@@ -101,13 +97,8 @@ def list(request):
     request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
 
     huddles = HuddleList(responses[huddle_url])
 
@@ -129,13 +120,8 @@ def create(request):
 
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
 
     view_data = {
         'user': Profile(responses[request.whoami_url], summary=False),
@@ -148,11 +134,8 @@ def create(request):
             hud_request = Huddle.from_create_form(form.cleaned_data)
             try:
                 hud_response = hud_request.create(request.get_host(), request.access_token)
-            except APIException as e:
-                if e.status_code == 403:
-                    return ErrorView.forbidden(request)
-                else:
-                    return ErrorView.server_error(request)
+            except APIException as exc:
+                return respond_with_error(request, exc)
 
             if request.POST.get('invite'):
                 ids = [int(x) for x in request.POST.get('invite').split(',')]
@@ -204,13 +187,8 @@ def invite(request, huddle_id):
     ids = [int(x) for x in request.POST.get('invite_profile_id').split()]
     try:
         Huddle.invite(request.get_host(), huddle_id, ids, request.access_token)
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
 
     return HttpResponseRedirect(reverse('single-huddle', args=(huddle_id,)))
 
@@ -225,13 +203,8 @@ def delete(request, huddle_id):
     try:
         huddle = Huddle.retrieve(request.get_host(), huddle_id, access_token=request.access_token)
         huddle.delete(request.get_host(), request.access_token)
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
 
     return HttpResponseRedirect(reverse('list-huddle'))
 
@@ -245,13 +218,8 @@ def newest(request, huddle_id):
 
     try:
         response = Huddle.newest(request.get_host(), huddle_id, access_token=request.access_token)
-    except APIException as e:
-        if e.status_code == 404:
-            return ErrorView.not_found(request)
-        elif e.status_code == 403:
-            return ErrorView.forbidden(request)
-        else:
-            return ErrorView.server_error(request)
+    except APIException as exc:
+        return respond_with_error(request, exc)
 
     #because redirects are always followed, we can't just get the 'location' value
     response = response['comments']['links']

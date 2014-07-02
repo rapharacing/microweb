@@ -33,6 +33,7 @@ from core.forms.forms import MicrocosmEdit
 from core.views import ErrorView
 from core.views import build_pagination_links
 from core.views import require_authentication
+from core.views import respond_with_error
 from core.views import exception_handler
 
 logger = logging.getLogger('microcosms.views')
@@ -57,13 +58,8 @@ class MicrocosmView(object):
         request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))
-        except APIException as e:
-            if e.status_code == 403:
-                return ErrorView.forbidden(request)
-            elif e.status_code == 404:
-                return ErrorView.not_found(request)
-            else:
-                return ErrorView.server_error(request)
+        except APIException as exc:
+            return respond_with_error(request, exc)
 
         microcosm = Microcosm.from_api_response(responses[microcosm_url])
 
@@ -90,13 +86,8 @@ class MicrocosmView(object):
 
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))
-        except APIException as e:
-            if e.status_code == 403:
-                return ErrorView.forbidden(request)
-            elif e.status_code == 404:
-                return ErrorView.not_found(request)
-            else:
-                return ErrorView.server_error(request)
+        except APIException as exc:
+            return respond_with_error(request, exc)
 
         microcosms = MicrocosmList(responses[microcosms_url])
         view_data = {
@@ -115,8 +106,8 @@ class MicrocosmView(object):
     def create(request):
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))
-        except APIException:
-            return ErrorView.server_error(request)
+        except APIException as exc:
+            return respond_with_error(request, exc)
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False),
             'site': Site(responses[request.site_url]),
@@ -128,11 +119,8 @@ class MicrocosmView(object):
                 microcosm_request = Microcosm.from_create_form(form.cleaned_data)
                 try:
                     microcosm_response = microcosm_request.create(request.get_host(), request.access_token)
-                except APIException as e:
-                    if e.status_code == 403:
-                        return ErrorView.forbidden(request)
-                    else:
-                        return ErrorView.server_error(request)
+                except APIException as exc:
+                    return respond_with_error(request, exc)
                 return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_response.id,)))
             else:
                 view_data['form'] = form
@@ -149,13 +137,8 @@ class MicrocosmView(object):
     def edit(request, microcosm_id):
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))
-        except APIException as e:
-            if e.status_code == 403:
-                return ErrorView.forbidden(request)
-            elif e.status_code == 404:
-                return ErrorView.not_found(request)
-            else:
-                return ErrorView.server_error(request)
+        except APIException as exc:
+            return respond_with_error(request, exc)
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False),
             'site': Site(responses[request.site_url]),
@@ -167,13 +150,8 @@ class MicrocosmView(object):
                 microcosm_request = Microcosm.from_edit_form(form.cleaned_data)
                 try:
                     microcosm_response = microcosm_request.update(request.get_host(), request.access_token)
-                except APIException as e:
-                    if e.status_code == 403:
-                        return ErrorView.forbidden(request)
-                    elif e.status_code == 404:
-                        return ErrorView.not_found(request)
-                    else:
-                        return ErrorView.server_error(request)
+                except APIException as exc:
+                    return respond_with_error(request, exc)
                 return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_response.id,)))
             else:
                 view_data['form'] = form
@@ -182,13 +160,8 @@ class MicrocosmView(object):
         if request.method == 'GET':
             try:
                 microcosm = Microcosm.retrieve(request.get_host(), id=microcosm_id, access_token=request.access_token)
-            except APIException as e:
-                if e.status_code == 403:
-                    return ErrorView.forbidden(request)
-                elif e.status_code == 404:
-                    return ErrorView.not_found(request)
-                else:
-                    return ErrorView.server_error(request)
+            except APIException as exc:
+                return respond_with_error(request, exc)
             view_data['form'] = MicrocosmView.edit_form(microcosm.as_dict)
             return render(request, MicrocosmView.form_template, view_data)
 
@@ -199,13 +172,8 @@ class MicrocosmView(object):
         try:
             microcosm = Microcosm.retrieve(request.get_host(), microcosm_id, access_token=request.access_token)
             microcosm.delete(request.get_host(), request.access_token)
-        except APIException as e:
-            if e.status_code == 403:
-                return ErrorView.forbidden(request)
-            elif e.status_code == 404:
-                return ErrorView.not_found(request)
-            else:
-                return ErrorView.server_error(request)
+        except APIException as exc:
+            return respond_with_error(request, exc)
         return HttpResponseRedirect(reverse(MicrocosmView.list))
 
 
