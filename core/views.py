@@ -70,6 +70,18 @@ def exception_handler(view_func):
                 raise
     return decorator
 
+def respond_with_error(request, exception):
+
+    if not isinstance(exception, APIException):
+        logger.error(str(exception))
+        return ErrorView.server_error(request)
+
+    if exception.status_code == 404:
+        return ErrorView.not_found(request)
+    elif exception.status_code == 403:
+        return ErrorView.forbidden(request)
+    else:
+        return ErrorView.server_error(request)
 
 def require_authentication(view_func):
     """
