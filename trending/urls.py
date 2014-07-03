@@ -1,9 +1,9 @@
 from django.conf.urls import url
 from django.conf.urls import patterns
 
-from trending.views import TrendingView
+from trending import views
 
 
 urlpatterns = patterns('',
-     url(r'^trending/$', TrendingView.list, name='list-trending'),
+     url(r'^trending/$', views.list, name='list-trending'),
 )
