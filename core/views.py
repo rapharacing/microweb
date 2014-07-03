@@ -80,6 +80,8 @@ def respond_with_error(request, exception):
         return ErrorView.not_found(request)
     elif exception.status_code == 403:
         return ErrorView.forbidden(request)
+    elif exception.status_code == 401:
+        return ErrorView.requires_login(request)
     else:
         return ErrorView.server_error(request)
 
@@ -204,7 +206,7 @@ class ErrorView(object):
         site_url, params, headers = Site.build_request(request.get_host())
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        responses = response_list_to_dict(grequests.map(view_requests))
         view_data['user'] = Profile(responses[whoami_url], summary=False)
         view_data['site'] = Site(responses[site_url])
 
@@ -224,7 +226,7 @@ class ErrorView(object):
         site_url, params, headers = Site.build_request(request.get_host())
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        responses = response_list_to_dict(grequests.map(view_requests))
         view_data['user'] = Profile(responses[whoami_url], summary=False)
         view_data['site'] = Site(responses[site_url])
 
@@ -244,13 +246,26 @@ class ErrorView(object):
         site_url, params, headers = Site.build_request(request.get_host())
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        responses = response_list_to_dict(grequests.map(view_requests))
         view_data['user'] = Profile(responses[whoami_url], summary=False)
         view_data['site'] = Site(responses[site_url])
 
         context = RequestContext(request, view_data)
         return HttpResponseServerError(loader.get_template('500.html').render(context))
 
+    @staticmethod
+    def requires_login(request):
+        view_data = {}
+        view_requests = []
+
+        site_url, params, headers = Site.build_request(request.get_host())
+        view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+        responses = response_list_to_dict(grequests.map(view_requests))
+        view_data['site'] = Site(responses[site_url])
+        view_data['logout'] = True
+
+        context = RequestContext(request, view_data)
+        return HttpResponseForbidden(loader.get_template('403.html').render(context))
 
 class AuthenticationView(object):
 
