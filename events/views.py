@@ -1,6 +1,7 @@
 import datetime
 import grequests
 import json
+import logging
 
 from urllib import urlencode
 
@@ -21,6 +22,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
 from core.views import exception_handler
+from core.views import respond_with_error
 from core.views import require_authentication
 from core.views import process_attachments
 from core.views import build_pagination_links
@@ -40,6 +42,9 @@ from core.forms.forms import EventEdit
 
 from core.forms.forms import CommentForm
 
+logger = logging.getLogger('events.views')
+
+
 class EventView(object):
     create_form = EventCreate
     edit_form = EventEdit
@@ -48,7 +53,6 @@ class EventView(object):
     comment_form = CommentForm
 
     @staticmethod
-    @exception_handler
     @require_http_methods(['GET',])
     def single(request, event_id):
         """
@@ -69,7 +73,10 @@ class EventView(object):
         request.view_requests.append(grequests.get(att_url, params=att_params, headers=att_headers))
 
         # Perform requests and instantiate view objects.
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        try:
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+        except APIException as exc:
+            return respond_with_error(request, exc)
         event = Event.from_api_response(responses[event_url])
         comment_form = CommentForm(initial=dict(itemId=event_id, itemType='event'))
 
@@ -152,7 +159,6 @@ class EventView(object):
         return render(request, EventView.single_template, view_data)
 
     @staticmethod
-    @exception_handler
     @require_authentication
     @require_http_methods(['GET', 'POST',])
     def create(request, microcosm_id):
@@ -160,18 +166,24 @@ class EventView(object):
         Create an event within a microcosm.
         """
 
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        try:
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+        except APIException as exc:
+            return respond_with_error(request, exc)
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False),
             'site': Site(responses[request.site_url]),
-            }
+        }
         user = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
 
         if request.method == 'POST':
             form = EventView.create_form(request.POST)
             if form.is_valid():
                 event_request = Event.from_create_form(form.cleaned_data)
-                event_response = event_request.create(request.get_host(), request.access_token)
+                try:
+                    event_response = event_request.create(request.get_host(), request.access_token)
+                except APIException as exc:
+                    return respond_with_error(request, exc)
                 # invite attendees
                 invites = request.POST.get('invite')
                 if len(invites.strip()) > 0:
@@ -185,8 +197,11 @@ class EventView(object):
                                     'profileId': int(userid)
                                 })
                         if len(attendees) > 0:
-                            Event.rsvp(request.get_host(), event_response.id, user.id, attendees,
-                                access_token=request.access_token)
+                            try:
+                                Event.rsvp(request.get_host(), event_response.id, user.id, attendees,
+                                    access_token=request.access_token)
+                            except APIException as exc:
+                                return respond_with_error(request, exc)
 
                 # create comment
                 if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
@@ -197,7 +212,10 @@ class EventView(object):
                         'inReplyTo': 0
                     }
                     comment_req = Comment.from_create_form(payload)
-                    comment = comment_req.create(request.get_host(), request.access_token)
+                    try:
+                        comment = comment_req.create(request.get_host(), request.access_token)
+                    except APIException as exc:
+                        return respond_with_error(request, exc)
 
                     try:
                         process_attachments(request, comment)
@@ -234,7 +252,6 @@ class EventView(object):
 
 
     @staticmethod
-    @exception_handler
     @require_authentication
     @require_http_methods(['GET', 'POST',])
     def edit(request, event_id):
@@ -242,7 +259,10 @@ class EventView(object):
         Edit an event.
         """
 
-        responses = response_list_to_dict(grequests.map(request.view_requests))
+        try:
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+        except APIException as exc:
+            return respond_with_error(request, exc)
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False),
             'site': Site(responses[request.site_url]),
@@ -253,7 +273,10 @@ class EventView(object):
             form = EventView.edit_form(request.POST)
             if form.is_valid():
                 event_request = Event.from_edit_form(form.cleaned_data)
-                event_response = event_request.update(request.get_host(), request.access_token)
+                try:
+                    event_response = event_request.update(request.get_host(), request.access_token)
+                except APIException as exc:
+                    return respond_with_error(request, exc)
                 return HttpResponseRedirect(reverse('single-event', args=(event_response.id,)))
             else:
                 view_data['form'] = form
@@ -262,32 +285,37 @@ class EventView(object):
                 return render(request, EventView.form_template, view_data)
 
         if request.method == 'GET':
-            event = Event.retrieve(request.get_host(), id=event_id, access_token=request.access_token)
+            try:
+                event = Event.retrieve(request.get_host(), id=event_id, access_token=request.access_token)
+            except APIException as exc:
+                return respond_with_error(request, exc)
             view_data['form'] = EventView.edit_form.from_event_instance(event)
             view_data['microcosm_id'] = event.microcosm_id
 
-            # fetch attendees
-            view_data['attendees'] = Event.get_attendees(host=request.get_host(), id=event_id,
-                access_token=request.access_token)
+            try:
+                view_data['attendees'] = Event.get_attendees(host=request.get_host(), id=event_id,
+                    access_token=request.access_token)
 
-            attendees_json = []
-            for attendee in view_data['attendees'].items.items:
-                attendees_json.append({
-                    'id': attendee.profile.id,
-                    'profileName': attendee.profile.profile_name,
-                    'avatar': attendee.profile.avatar,
-                    'sticky': 'true'
-                })
+                attendees_json = []
+                for attendee in view_data['attendees'].items.items:
+                    attendees_json.append({
+                        'id': attendee.profile.id,
+                        'profileName': attendee.profile.profile_name,
+                        'avatar': attendee.profile.avatar,
+                        'sticky': 'true'
+                    })
 
-            if len(attendees_json) > 0:
-                view_data['attendees_json'] = json.dumps(attendees_json)
-                print view_data['attendees_json']
+                if len(attendees_json) > 0:
+                    view_data['attendees_json'] = json.dumps(attendees_json)
+            except APIException:
+                # Missing RSVPs is not critical, but we should know if it doesn't work.
+                logger.error(str(APIException))
+                pass
 
             return render(request, EventView.form_template, view_data)
 
 
     @staticmethod
-    @exception_handler
     @require_authentication
     @require_http_methods(['POST',])
     def delete(request, event_id):
@@ -296,19 +324,26 @@ class EventView(object):
         """
 
         event = Event.retrieve(request.get_host(), event_id, access_token=request.access_token)
-        event.delete(request.get_host(), request.access_token)
+        try:
+            event.delete(request.get_host(), request.access_token)
+        except APIException as exc:
+            return respond_with_error(request, exc)
         return HttpResponseRedirect(reverse('single-microcosm', args=(event.microcosm_id,)))
 
 
     @staticmethod
-    @exception_handler
     @require_authentication
     @require_http_methods(['GET', ])
     def newest(request, event_id):
         """
-        Get redirected to the first unread post in a conversation
+        Get redirected to the first unread post in an event.
         """
-        response = Event.newest(request.get_host(), event_id, access_token=request.access_token)
+
+        try:
+            response = Event.newest(request.get_host(), event_id, access_token=request.access_token)
+        except APIException as exc:
+            return respond_with_error(request, exc)
+
         # Because redirects are always followed, we can't just use Location.
         response = response['comments']['links']
         for link in response:
@@ -331,7 +366,6 @@ class EventView(object):
 
 
     @staticmethod
-    @exception_handler
     @require_authentication
     @require_http_methods(['POST',])
     def rsvp(request, event_id):
@@ -345,25 +379,19 @@ class EventView(object):
         attendee = [dict(rsvp=request.POST['rsvp'],profileId=user.id),]
         try:
             Event.rsvp(request.get_host(), event_id, user.id, attendee, access_token=request.access_token)
-        except APIException:
-            # TODO: return forbidden response with error detail
-            raise PermissionDenied
+        except APIException as exc:
+            return respond_with_error(request, exc)
 
         return HttpResponseRedirect(reverse('single-event', args=(event_id,)))
 
 
 class GeoView(object):
     @staticmethod
-    @exception_handler
     def geocode(request):
         if request.access_token is None:
             raise PermissionDenied
         if request.GET.has_key('q'):
-            response = GeoCode.retrieve(
-                request.get_host(),
-                request.GET['q'],
-                request.access_token
-            )
+            response = GeoCode.retrieve(request.get_host(), request.GET['q'], request.access_token)
             return HttpResponse(response, content_type='application/json')
         else:
             return HttpResponseBadRequest()
