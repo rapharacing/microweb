@@ -30,7 +30,6 @@ from core.api.resources import response_list_to_dict
 from core.forms.forms import MicrocosmCreate
 from core.forms.forms import MicrocosmEdit
 
-from core.views import ErrorView
 from core.views import build_pagination_links
 from core.views import require_authentication
 from core.views import respond_with_error
