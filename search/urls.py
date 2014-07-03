@@ -1,10 +1,9 @@
 from django.conf.urls import url
 from django.conf.urls import patterns
 
-from search.views import SearchView
+from search import views
 
 
 urlpatterns = patterns('',
-   # Search
-   url(r'^search/$', SearchView.single, name='single-search'),
+   url(r'^search/$', views.single, name='single-search'),
 )
