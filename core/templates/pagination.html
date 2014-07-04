@@ -33,13 +33,16 @@
 </ul>
 
 <div class="pagination-alt">
-	{% if pagination.next %}
-		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-next" href="{{ pagination.next.href }}">Next</a>
-	{% endif %}
-	{% if pagination.prev %}
-		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-prev" href="{{ pagination.prev.href }}">Prev</a>
+
+	{% if pagination.first %}
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-left" href="{{ pagination.first.href }}">First</a>
 	{% endif %}
 
+	{% if pagination.prev %}
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-left" href="{{ pagination.prev.href }}">Prev</a>
+	{% endif %}
+
+	<span class="center">
 	{% if pagination.total_pages > 1 %}
 		Page
 		<form
@@ -61,8 +64,18 @@
 			{% endif %}
 		</form>
 		of {{ pagination.total_pages }}
-		{% else %}
-			Page 1 of 1
+	{% else %}
+		Page 1 of 1
 	{% endif %}
+	</span>
+
+	{% if pagination.last %}
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-right" href="{{ pagination.last.href }}">Last</a>
+	{% endif %}
+
+	{% if pagination.next %}
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-right" href="{{ pagination.next.href }}">Next</a>
+	{% endif %}
+
 </div>
 {% endif %}
