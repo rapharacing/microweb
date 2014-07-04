@@ -353,6 +353,13 @@ class Profile(object):
         resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
         return Profile(resource, summary=False)
 
+    @staticmethod
+    def build_request(host, id, access_token=None):
+        url = build_url(host, [Profile.api_path_fragment, id])
+        params = {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
     @property
     def as_dict(self):
         repr = {}

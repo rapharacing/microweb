@@ -34,17 +34,21 @@ single_template = 'profile.html'
 list_template = 'profiles.html'
 
 
-@require_http_methods(['GET', ])
+@require_http_methods(['GET',])
 def single(request, profile_id):
     """
     Display a single profile by ID.
     """
 
+    # Fetch profile details.
+    profile_url, params, headers = Profile.build_request(request.get_host(), profile_id)
+    request.view_requests.append(grequests.get(profile_url, params=params, headers=headers))
+
     # Fetch items created by this profile.
     search_q = 'type:microcosm type:conversation type:event type:comment authorId:%s' % profile_id
     search_params = {'limit': 5, 'q': search_q, 'sort': 'date'}
     search_url, params, headers = Search.build_request(request.get_host(), search_params,
-                                                       access_token=request.access_token)
+        access_token=request.access_token)
     request.view_requests.append(grequests.get(search_url, params=params, headers=headers))
 
     try:
@@ -52,21 +56,21 @@ def single(request, profile_id):
     except APIException as exc:
         return respond_with_error(request, exc)
 
-    profile = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+    user = Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None
+    profile = Profile(responses[profile_url], summary=False)
 
     view_data = {
-        'user': profile,
+        'user': user,
         'content': profile,
         'item_type': 'profile',
         'site': Site(responses[request.site_url]),
         'search': Search.from_api_response(responses[search_url]),
         'site_section': 'people'
     }
-
     return render(request, single_template, view_data)
 
 
-@require_http_methods(['GET', ])
+@require_http_methods(['GET',])
 def list(request):
 
     # Record offset for paging of profiles.
