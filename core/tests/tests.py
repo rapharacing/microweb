@@ -9,7 +9,6 @@ from django.test.client import RequestFactory
 
 from mock import patch
 
-from microcosms.views import MicrocosmView
 from core.views import build_pagination_links
 
 from core.api.resources import Conversation
