@@ -207,7 +207,7 @@ class ErrorView(object):
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
         responses = response_list_to_dict(grequests.map(view_requests))
-        view_data['user'] = Profile(responses[whoami_url], summary=False)
+        view_data['user'] = Profile(responses[whoami_url], summary=False) if request.whoami_url else None
         view_data['site'] = Site(responses[site_url])
 
         context = RequestContext(request, view_data)
@@ -227,7 +227,7 @@ class ErrorView(object):
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
         responses = response_list_to_dict(grequests.map(view_requests))
-        view_data['user'] = Profile(responses[whoami_url], summary=False)
+        view_data['user'] = Profile(responses[whoami_url], summary=False) if request.whoami_url else None
         view_data['site'] = Site(responses[site_url])
 
         context = RequestContext(request, view_data)
@@ -247,7 +247,7 @@ class ErrorView(object):
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
         responses = response_list_to_dict(grequests.map(view_requests))
-        view_data['user'] = Profile(responses[whoami_url], summary=False)
+        view_data['user'] = Profile(responses[whoami_url], summary=False) if request.whoami_url else None
         view_data['site'] = Site(responses[site_url])
 
         context = RequestContext(request, view_data)
