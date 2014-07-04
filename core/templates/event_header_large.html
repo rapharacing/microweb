@@ -116,10 +116,10 @@
 											</li>
 										{% endif %}
 									{% endfor %}
-									{% if rsvp_num_attending > 5 %}
+									{% if content.rsvp_attend > 5 %}
 									<li>
 										<a href="#" data-toggle="modal" data-target="#modal-event-attendees"
-											 class="list-people-button">+{{ rsvp_num_attending|add:"-5" }}</a>
+											 class="list-people-button">+{{ content.rsvp_attend|add:"-5" }}</a>
 									</li>
 									{% endif %}
 								{% elif rsvp_num_invited > 0%}
@@ -155,7 +155,7 @@
 								</div>
 							</div>
 							<strong>
-								{{ rsvp_num_attending }}/{{ content.rsvp_limit }}
+								{{ content.rsvp_attend }}/{{ content.rsvp_limit }}
 							</strong>
 						</div>
 						{% endif %}
@@ -169,7 +169,7 @@
 				<ul class="list-stats" data-toggle="modal" data-target="#modal-event-attendees">
 					<li>
 						Going
-						<span>{{ rsvp_num_attending|default:"0" }}</span>
+						<span>{{ content.rsvp_attend|default:"0" }}</span>
 					</li>
 					<li>
 						Invited
@@ -178,7 +178,7 @@
 				</ul>
 				{% if not is_expired %}
 					{% if user %}
-						{% if user_is_attending %}
+						{% if content.attending %}
 							<h3>You are attending this event.</h3>
 							<form method="POST" action="{% url 'rsvp-event' content.id %}">
 								{% csrf_token %}

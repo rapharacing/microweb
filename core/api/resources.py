@@ -1461,6 +1461,12 @@ class Event(APIResource):
         if data.get('west'): event.west = data['west']
 
         if data.get('meta'): event.meta = Meta(data['meta'])
+
+        if event.meta.flags.get('attending'):
+            event.attending = event.meta.flags['attending']
+        else:
+            event.attending = False
+
         return event
 
     @classmethod

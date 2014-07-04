@@ -11,7 +11,7 @@
 
 				<h3 class="row-title {% if item.highlight %}row-title-highlight{% endif %}" itemprop="name">
 					<a href="/events/{{ item.item.id }}/{% if user %}newest/{% endif %}" itemprop="url">{% if item.highlight %}{{ item.highlight | safe }}{% else %}{{ item.item.title | safe }}{% endif %}</a>
-					{% if item.unread or item.item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
+					{% if unread or item.unread or item.item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
 				</h3>
 
 				{% if not item.item.meta.flags.sticky %}
