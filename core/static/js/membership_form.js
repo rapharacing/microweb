@@ -348,6 +348,10 @@ function validateCondition() {
 			restrictPredicates('date');
 			$('input[name=value]').attr('placeholder','2014-02-14').val('');
 			break;
+		case "email":
+			restrictPredicates('string');
+			$('input[name=value]').attr('placeholder','@example.com').val('');
+			break;
 		case "profileName":
 			restrictPredicates('string');
 			$('input[name=value]').attr('placeholder','John Smith').val('');
@@ -387,6 +391,10 @@ function validateValue() {
 			if (!/^(\d(\d(\d(\d(\-(\d(\d(\-(\d(\d)?)?)?)?)?)?)?)?)?)$/.test(valueField.val())) {
 				valueField.val('');
 			}
+			break;
+		case "email":
+			// String, we don't care... it can be anything but we'd like it trimmed
+			valueField.val($.trim(valueField.val()));
 			break;
 		case "profileName":
 			// String, we don't care... it can be anything but we'd like it trimmed
@@ -701,6 +709,7 @@ $(document).ready(function() {
 			switch (c[1]) {
 				case "commentCount":
 				case "created":
+				case "email":
 				case "profileName":
 					crit.profileColumn = c[1];
 					break;
