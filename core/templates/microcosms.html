@@ -142,25 +142,30 @@
 				<a href="/profiles/?online=true">Online now</a>
 			</li>
 			{% endif %}
+		</ul>
+		{% if site.meta.stats.totalConversations or site.meta.stats.totalEvents %}
+		<h5>Content</h5>
+		<ul class="list-group">
 			{% if site.meta.stats.totalConversations %}
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalConversations | default:0 | intcomma }}</span>
-				<a href="/search/?type=conversation">Conversations</a>
+				<a href="/search/?type=conversation" title="Find recently updated conversations">Conversations</a>
 			</li>
 			{% endif %}
 			{% if site.meta.stats.totalEvents %}
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalEvents | default:0 | intcomma }}</span>
-				<a href="/search/?type=event">Events</a>
+				<a href="/search/?type=event" title="Find recently updated events">Events</a>
 			</li>
 			{% endif %}
 			{% if site.meta.stats.totalComments %}
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalComments | default:0 | intcomma }}</span>
-				<a href="/search/?type=comment">Comments</a>
+				Comments
 			</li>
 			{% endif %}
 		</ul>
+		{% endif %}
 	</div> <!-- / population -->
     <div class="metabar-module-body">
         {% include 'forms/mark-read.html' %}
