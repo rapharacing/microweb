@@ -167,9 +167,12 @@
 		</ul>
 		{% endif %}
 	</div> <!-- / population -->
+
+	{% if user %}
     <div class="metabar-module-body">
         {% include 'forms/mark-read.html' %}
     </div>
+	{% endif %}
 
 
 {% endblock%}

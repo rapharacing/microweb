@@ -7,5 +7,5 @@
         <input type="hidden" name="item_id" value="{{ content.id }}" />
     {% endif %}
     <input type="hidden" name="return_path" value="{{ request.get_full_path }}" />
-    <a href="#" onclick="document.getElementById('mark-read-module').submit();">Mark everything read</a>
+    <a href="#" class="btn btn-default btn-block" style="text-align:center;" onclick="document.getElementById('mark-read-module').submit();">Mark everything read</a>
 </form>

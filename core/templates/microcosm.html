@@ -113,9 +113,12 @@
 				{% include 'forms/subscribe.html' %}
 			</p>
 		</div>
+
+		{% if user %}
         <div class="metabar-module-body">
             {% include 'forms/mark-read.html' %}
         </div>
+		{% endif %}
 	</div> <!-- / about -->
 
 
