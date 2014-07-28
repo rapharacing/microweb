@@ -42,7 +42,6 @@
 		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-left" href="{{ pagination.prev.href }}">Prev</a>
 	{% endif %}
 
-	<span class="center">
 	{% if pagination.total_pages > 1 %}
 		Page
 		<form
@@ -67,7 +66,6 @@
 	{% else %}
 		Page 1 of 1
 	{% endif %}
-	</span>
 
 	{% if pagination.last %}
 		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-right" href="{{ pagination.last.href }}">Last</a>
