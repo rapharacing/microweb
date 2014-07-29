@@ -55,7 +55,8 @@
 				type="text"
 				class="form-control"
 				value="{{ pagination.page }}"
-				pattern="[0-9]*"
+				pattern="[0-9]+"
+				title="Enter the page number to jump to"
 			/>
 			<input name="offset" type="hidden" />
 			{% if content.query and content.query.searched %}

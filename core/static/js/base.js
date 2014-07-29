@@ -70,18 +70,24 @@ $('document').ready(function() {
 ////////////////////
 (function(){
 	$('form[name=paginationByOffset]').submit(function(e){
-		var self   = $(e.currentTarget),
-				limit  = self.attr('data-limit'),
-				max    = self.attr('data-max'),
-				value  = self.find('input[type=text]').val(),
-				hidden = self.find('input[name=offset]');
+		console.log("Page jump requested")
 
-		if (isNaN(value) || value < 1 || value > max){
-			e.preventDefault();
-		}else{
+		var self   = $('form[name=paginationByOffset]'),
+			limit  = self.attr('data-limit'),
+			max    = self.attr('data-max'),
+			value  = parseInt(self.find('input[type=text]').val()),
+			hidden = self.find('input[name=offset]');
+
+		console.log("limit = " + limit + " , max = " + max + " , value = " + value);
+
+		if (!isNaN(value) && value >= 1 && value <= max) {
+			console.log("Jump")
 			if (limit && value){
-				hidden.val( limit * (value-1) );
+				hidden.val(limit * (value-1));
 			}
+		} else {
+			console.log("Cancel jump")
+			e.preventDefault();
 		}
 	});
 })();
