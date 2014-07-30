@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 {% load microcosm %}
 {% load profile %}
 {% load conversation %}
@@ -37,7 +38,7 @@
 {% else %}
 	<h1>Search results for: {{ content.query.searched }}</h1>
 	<p class="text-muted">
-		{{ content.results.total }} matches.  Search took {{ content.time_elapsed }} seconds.
+		{{ content.results.total | default:0 | intcomma }} matches.  Search took {{ content.time_elapsed }} seconds.
 	</p>
 </div>
 <div class="content-body">
