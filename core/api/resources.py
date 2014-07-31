@@ -949,7 +949,7 @@ class Watcher(APIResource):
                 self.item_link = '/%s/%s' % (RESOURCE_PLURAL[data.get('itemType')], self.item_id)
 
                 if data['item'].get('mostRecentUpdate'):
-                    self.item.last_comment_created = parse_timestamp(data['item']['mostRecentUpdate']['meta']['created'])
+                    self.item.last_comment_created = parse_timestamp(data['item']['mostRecentUpdate']['item']['meta']['created'])
                 else:
                     self.item.last_comment_created = parse_timestamp(data['item']['meta']['created'])
 
