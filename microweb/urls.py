@@ -19,6 +19,7 @@ urlpatterns = patterns(
     url(r'', include('search.urls')),
     url(r'', include('trending.urls')),
     url(r'', include('moderation.urls')),
+    url(r'', include('redirect.urls')),
 )
 
 # Serve static files with gunicorn if DEBUG is true.

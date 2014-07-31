@@ -1,5 +1,4 @@
 import json
-import datetime
 
 from django.conf import settings
 
@@ -303,6 +302,21 @@ class WhoAmI(object):
         url, params, headers = WhoAmI.build_request(host, access_token)
         resource = APIResource.retrieve(url, params=params, headers=headers)
         return Profile(resource)
+
+
+class Redirect(object):
+    """
+    Proxy a redirect request to the API.
+    """
+
+    api_path_fragment = 'resolve'
+
+    @staticmethod
+    def get(host, redirect_url, access_token=None):
+        request_url = build_url(host, [Redirect.api_path_fragment])
+        params = {'url': redirect_url}
+        headers = APIResource.make_request_headers(access_token)
+        return APIResource.retrieve(request_url, params=params, headers=headers)
 
 
 class Profile(object):
