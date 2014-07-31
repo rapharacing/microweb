@@ -129,7 +129,7 @@
 <script type="text/javascript">
 	var subscribe = new Subscribe({
 		el    : '.subscribe',
-		url   : '{% url 'watchers' %}',
+		url   : '{% url 'single-watcher' %}',
 		id    : {{ content.id }},
 		type  : '{{ item_type }}',
 		token : '{{ csrf_token }}',

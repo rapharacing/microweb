@@ -15,8 +15,6 @@ from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
 from core.api.resources import GlobalOptions
 from core.api.resources import Site
-from core.api.resources import Watcher
-from core.api.resources import WatcherList
 
 from core.api.exceptions import APIException
 
@@ -124,9 +122,10 @@ def settings(request):
         return render(request, settings_template, view_data)
 
 
+"""
 @require_authentication
 @require_http_methods(['GET', 'POST',])
-def watchers(request):
+def list_watchers(request):
 
     if request.method == 'POST':
         if 'watcher_id' in request.POST:
@@ -141,7 +140,7 @@ def watchers(request):
                         'receiveSMS': False,
                         }
                     Watcher.update(request.get_host(), int(w), postdata, request.access_token)
-        return HttpResponseRedirect(reverse('watchers'))
+        return HttpResponseRedirect(reverse('list-watchers'))
 
     if request.method == 'GET':
         # pagination offset
@@ -161,3 +160,31 @@ def watchers(request):
         }
 
         return render(request, watchers_template, view_data)
+
+
+@require_authentication
+@require_http_methods(['POST',])
+def delete_watcher(request):
+    postdata = {
+        'updateTypeId': 1,
+        'itemType': request.POST.get('itemType'),
+        'itemId': int(request.POST.get('itemId')),
+        }
+    if request.POST.get('delete'):
+        Watcher.delete(request.get_host(), postdata, request.access_token)
+        return HttpResponse()
+    elif request.POST.get('patch'):
+        postdata = {
+            'itemType': request.REQUEST.get('itemType'),
+            'itemId': int(request.REQUEST.get('itemId')),
+            'sendEmail': "true" == request.REQUEST.get('emailMe')
+        }
+        response = Watcher.update(request.get_host(), postdata, request.access_token)
+        if response.status_code == requests.codes.ok:
+            return HttpResponse()
+        else:
+            return HttpResponseBadRequest()
+    else:
+        responsedata = Watcher.create(request.get_host(), postdata, request.access_token)
+        return HttpResponse(responsedata, content_type='application/json')
+"""
