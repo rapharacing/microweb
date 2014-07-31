@@ -128,7 +128,11 @@
       var avatar  = document.createElement('img');
 
       link.id          = descriptor.id;
-      avatar.src       = this.static_url + descriptor.avatar;
+      if (descriptor.avatar.indexOf('http') == 0) {
+        avatar.src     = descriptor.avatar;
+      } else {
+        avatar.src     = this.static_url + descriptor.avatar;
+      }
 
       link.appendChild(avatar);
       link.appendChild(document.createTextNode(descriptor.profileName));
