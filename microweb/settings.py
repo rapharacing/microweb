@@ -111,6 +111,7 @@ INSTALLED_APPS = (
     'search',
     'trending',
     'moderation',
+    'redirect',
     'gunicorn',
     'core.templatetags.comments',
     'core.templatetags.conversation',
