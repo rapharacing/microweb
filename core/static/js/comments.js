@@ -181,7 +181,9 @@
           selectedRange = null,
           selectedText  = false;
 
-      if (selection.type.toLowerCase() === 'range'){
+      // TODO (buro9 2014-07-31): This appears to not work in Firefox but does
+      // work in Chrome and Safari.
+      if (selection && selection.type && selection.type.toLowerCase() === 'range'){
         selectedRange = selection.getRangeAt(0);
         // selected text must be within a div.comment-item-body
         if (selectedRange.commonAncestorContainer.className === "comment-item-body" ||
