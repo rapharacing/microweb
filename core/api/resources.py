@@ -1103,6 +1103,29 @@ class Update(APIResource):
         url = build_url(host, [Update.api_path_fragment, update_id])
         return Update.from_api_response(APIResource.retrieve(url, {}, APIResource.make_request_headers(access_token)))
 
+    def update(self, host, access_token):
+        """
+        Update an Update with a 'viewed' time to indicate it has been read by the user.
+        """
+
+        url = build_url(host, [Update.api_path_fragment, self.id])
+        payload = json.dumps(self.as_dict(update=True), cls=DateTimeEncoder)
+        response = APIResource.update(url, payload, headers=APIResource.make_request_headers(access_token))
+        return Update.from_api_response(response)
+
+    @staticmethod
+    def mark_viewed(host, update_id, access_token):
+        url = build_url(host, [Update.api_path_fragment, update_id])
+        payload = json.dumps([{
+            'op': 'replace',
+            'path': '/viewed',
+            # TODO: The rare hack, seen in the wild
+            'value': datetime.datetime.now().isoformat('T') + 'Z'
+        }])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        requests.patch(url, payload, headers=headers)
+
     def as_dict(self):
         repr = {}
         repr['id'] = self.id
