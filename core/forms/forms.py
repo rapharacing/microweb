@@ -6,7 +6,11 @@ longTextInput=django.forms.TextInput(attrs={'size':'80'})
 
 def validate_no_spaces(value):
     if ' ' in value:
-        raise ValidationError('Profile name cannot contain spaces')
+        raise ValidationError('Profile name cannot contain spaces ( )')
+    if '+' in value:
+        raise ValidationError('Profile name cannot contain pluses (+)')
+    if '@' in value:
+        raise ValidationError('Profile name cannot contain ats (@)')
 
 
 class ItemForm(django.forms.Form):
@@ -272,7 +276,7 @@ class ProfileEdit(django.forms.Form):
         error_messages = {
             'required' : 'Please add a profile name',
             'max_length' : 'Profile name may not be longer than 25 characters',
-            'valid_chars' : "Your user name may only contain alphanumeric characters, some special characters (\".\",\"_\",\"+\",\"-\") and spaces."
+            'valid_chars' : "Your user name may not contain spaces or the '+' and '@' characters."
         },
         validators=[validate_no_spaces]
     )
