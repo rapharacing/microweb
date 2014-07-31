@@ -26,6 +26,7 @@ RESOURCE_PLURAL = {
     'site': 'sites',
     'microcosm': 'microcosms',
     'huddle': 'huddles',
+    'update': 'updates',
 }
 
 # Item types that can have comments

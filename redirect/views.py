@@ -35,8 +35,9 @@ def redirect_or_404(request):
     url_parts = urlparse.urlsplit(request.build_absolute_uri())
     path = url_parts.path
     if path.endswith('/'):
-        path = path[:-2]
-    redirect_request = ''.join([path, url_parts.query, url_parts.fragment])
+        redirect_request = path[:-1]
+    if url_parts.query:
+        redirect_request += '?' + url_parts.query
 
     # Handle errors in API request.
     try:
@@ -47,15 +48,23 @@ def redirect_or_404(request):
     # Handle non-successful redirects (e.g. invalid path, forbidden).
     if resource['status'] == 404:
         return  ErrorView.not_found(request)
-    if resource['status'] != 403:
+    if resource['status'] == 403:
         return ErrorView.forbidden(request)
-    if resource['status'] != 200:
+    if resource['status'] != 301:
         return ErrorView.server_error(request)
 
     # Construct the 301 based on the resource.
-    redirect_url = ''.join(['/', RESOURCE_PLURAL[resource['itemType']]])
-    if hasattr(resource, 'itemId'):
-        redirect_url.join(['/', resource['itemId']])
+    redirect_path = '/' + RESOURCE_PLURAL[resource['itemType']]
+    if resource.has_key('itemId'):
+        redirect_path += '/' + str(resource['itemId'])
+
+    # Hack comments to show in context.
+    if resource['itemType'] == 'comment' and resource.has_key('itemId'):
+        redirect_path += '/' + 'incontext'
+
+    # Reconstruct the URL, dropping query parameters and path fragment.
+    parts = (url_parts.scheme, url_parts.netloc, redirect_path, '', '')
+    redirect_url = urlparse.urlunsplit(parts)
 
     print "Redirecting %s to %s" % (request.get_full_path(), redirect_url)
     return HttpResponseRedirect(redirect_url)
