@@ -1,4 +1,4 @@
-{% if user and not (item_type == 'profile' and content.id == user.id) %}
+{% if user and not content.id == user.id %}
 	<div class="subscribe {% if content.meta.flags.watched %}active{% endif %}">
 
 	<form method="POST" action="" id="subscribe_form">
