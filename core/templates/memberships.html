@@ -19,18 +19,6 @@
 
 <div class="content-body">
 
-  <div class="row-meta">
-    <p class="well-sm alert-warning">
-  {% if memberships.default_roles %}
-      These are the <strong>default membership groups</strong> and are applied
-      to all forums that do not have custom permissions.
-  {% else %}
-      These are <strong>custom membership groups</strong> that apply to this
-      forum only.
-  {% endif %}
-    </p>
-  </div>
-
   <div class="list-memberships">
 
     <ul class="list-collection bordered padded">
@@ -112,7 +100,7 @@
               </div>
             </div>
 
-            {% if not memberships.default_roles %}
+            {% if membership.microcosm_id %}
               {% if content.meta.permissions.admin or content.meta.permissions.super_user %}
             <div class="col-sm-4">
               <div class="row-stats">
@@ -126,6 +114,14 @@
             </div>
               {% endif %}
             {% endif %}
+            {% if membership.microcosm_id == 0 %}
+            <div class="col-sm-4">
+              <div class="row-stats">
+                <span class="pull-right">Default Group</span>
+              </div>
+              <div class="row-context">
+              </div>
+            </div>{% endif %}
 
           </div>
         </li>

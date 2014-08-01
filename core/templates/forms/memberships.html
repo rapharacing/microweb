@@ -297,10 +297,18 @@
 		<h3>{% if state_edit %}Edit{% else %}Create{% endif %} Membership Group</h3>
 		<p>A membership group is a group of people that have collectively been granted some permissions.</p>
 		<p>By default a person has no permission to do anything, and permissions are granted through membership of one or more membership groups.</p>
-		<p>To create a semi-private forum (not indexable by Google and not visible to those not signed-in) do not create any membership group that contains guests and has "read" permission. But do create a membership group that contains signed-in users and grants them "read" permission.</p>
-		<p>To create a truly private forum (not indexable by Google, and visible only to some signed-in users), do not add guests or signed-in users, and rely solely on the criteria and named individuals to grant permissions.</p>
 
-		<p class="well well-sm">The creation of a membership group supercedes the built-in defaults. To return to the defaults, simply delete all of your custom membership groups.</p>
+		<h3>Core concepts</h3>
+		<p>The site has default membership groups, all new forums are assigned these. Default groups will be used by forums unless you create new membership groups on the forum that override them.</p>
+		<p>Moderator and banned membership groups are considered special, they will not override the defaults.</p>
+		<p class="well well-sm">The creation of a membership group may supercede the defaults. To return to the defaults, delete all of your custom membership groups.</p>
+
+		<h3>Common Scenarios</h3>
+		<p>To create a <b>semi-private forum</b> (not indexable by Google and not visible to those not signed-in) create at least one membership group that includes signed-in users, but do not create any membership group that contains guests with the "read" permission.</p>
+		<p>To create a <b>truly private forum</b> (not indexable by Google, and visible only to selected signed-in users), create at least one membership group but do not add guests or signed-in users. Add people manually or by criteria.</p>
+		<p>To <b>add moderators</b> add a moderator group and add your moderators to the group.</p>
+		<p>To <b>ban a person from this one forum</b> add a banned membership group and add the person to that group.</p>
+
 	</div>
 </div> <!-- / about -->
 
