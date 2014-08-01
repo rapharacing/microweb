@@ -213,7 +213,7 @@ class ErrorView(object):
             view_data['user'] = profile
             newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
             newrelic.agent.add_custom_parameter('profile_id', profile.id)
-            newrelic.agent.add_custom_parameter('_user_id', profile.user_id)
+            newrelic.agent.add_custom_parameter('user_id', profile.user_id)
 
         site = Site(responses[site_url])
         view_data['site'] = site
@@ -241,7 +241,7 @@ class ErrorView(object):
             view_data['user'] = profile
             newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
             newrelic.agent.add_custom_parameter('profile_id', profile.id)
-            newrelic.agent.add_custom_parameter('_user_id', profile.user_id)
+            newrelic.agent.add_custom_parameter('user_id', profile.user_id)
 
         site = Site(responses[site_url])
         view_data['site'] = site
@@ -269,7 +269,7 @@ class ErrorView(object):
             view_data['user'] = profile
             newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
             newrelic.agent.add_custom_parameter('profile_id', profile.id)
-            newrelic.agent.add_custom_parameter('_user_id', profile.user_id)
+            newrelic.agent.add_custom_parameter('user_id', profile.user_id)
 
         site = Site(responses[site_url])
         view_data['site'] = site
