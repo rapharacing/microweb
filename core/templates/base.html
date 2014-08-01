@@ -283,10 +283,14 @@
 				{% block ga %}{% endblock %}
 			};
 
-			ga('create', 'UA-36931318-3');
+			ga('create', 'UA-36931318-3', 'microco.sm');
+			{% if user %}
+			ga('set', '&uid', {{user.id}});
+			{% endif %}
 			ga('send', 'pageview', gaData);
 
-			{% if site.ga_web_property_id %}ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
+			{% if site.ga_web_property_id %}
+			ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
 			ga('{{ site.subdomain_key }}.send', 'pageview', gaData);{% endif %}
 		</script>
 	</body>
