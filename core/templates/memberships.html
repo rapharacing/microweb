@@ -165,15 +165,19 @@
   <div class="metabar-module">
     <h5>About</h5>
     <div class="metabar-module-title">
-      <h3>
-        Membership groups
-      </h3>
-      <p>Membership groups control access and permissions within a forum.</p>
-      {% if memberships.default_roles %}
+      <h3>Membership groups</h3>
+
+      <p>Membership groups control access and permissions within a forum.
+      People start with no permission to do anything, and are granted
+      permission by being a member of a membership group.</p>
+
       <p>The vast majority of people are either guests (not signed-in) or
-      members, and would usually be granted some permissions that allow them to
-      view the forum and create new content.</p>
-      {% endif %}
+      members.</p>
+
+      <p><b>Default groups</b> are site-wide and all new forums have these
+      permissions. If a forum has it's own custom membership groups, then these
+      may override the defaults and allow for private forums.</p>
+
     </div>
   </div> <!-- / about -->
 
