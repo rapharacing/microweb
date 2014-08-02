@@ -138,8 +138,8 @@ def process_attachments(request, comment):
     if request.FILES.has_key('attachments'):
         for f in request.FILES.getlist('attachments'):
             file_request = FileMetadata.from_create_form(f)
-            # Maximum file size is 5MB.
-            if len(file_request.file[f.name]) >= 5242880:
+            # Maximum file size is 3MB.
+            if len(file_request.file[f.name]) >= 3145728:
                 raise ValidationError
             # Associate attachment with comment using attachments API.
             else:
