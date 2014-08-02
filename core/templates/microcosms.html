@@ -139,7 +139,7 @@
 			{% if site.meta.stats.onlineProfiles %}
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.onlineProfiles | default:0 | intcomma }}</span>
-				<a href="/profiles/?online=true">Online now</a>
+				<a href="/profiles/?top=true&amp;online=true">Online now</a>
 			</li>
 			{% endif %}
 		</ul>
