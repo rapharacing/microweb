@@ -12,6 +12,10 @@ def validate_no_spaces(value):
     if '@' in value:
         raise ValidationError('Profile name cannot contain ats (@)')
 
+def validate_name_too_short(value):
+    if len(value) <= 1:
+        raise ValidationError('Profile name is too short')
+
 
 class ItemForm(django.forms.Form):
     """
@@ -278,7 +282,7 @@ class ProfileEdit(django.forms.Form):
             'max_length' : 'Profile name may not be longer than 25 characters',
             'valid_chars' : "Your user name may not contain spaces or the '+' and '@' characters."
         },
-        validators=[validate_no_spaces]
+        validators=[validate_no_spaces, validate_name_too_short]
     )
     # Comment text in markdown format.
     markdown = django.forms.CharField(required=False, max_length='5000', widget=django.forms.Textarea)
