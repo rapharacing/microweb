@@ -101,7 +101,7 @@
             </div>
 
             {% if membership.microcosm_id %}
-              {% if content.meta.permissions.admin or content.meta.permissions.super_user %}
+              {% if content.meta.permissions.owner or content.meta.permissions.admin or content.meta.permissions.moderator %}
             <div class="col-sm-4">
               <div class="row-stats">
                 <a
@@ -145,7 +145,7 @@
 
 {% block sidebar %}
 
-  {% if content.meta.permissions.admin or content.meta.permissions.super_user %}
+  {% if content.meta.permissions.owner or content.meta.permissions.admin or content.meta.permissions.moderator %}
     <div class="metabar-module">
       <div class="metabar-module-primary-buttons">
       {% if user %}
