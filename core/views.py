@@ -4,6 +4,7 @@ from requests import RequestException
 import grequests
 import datetime
 import logging
+import newrelic
 
 from functools import wraps
 
@@ -207,8 +208,16 @@ class ErrorView(object):
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
         responses = response_list_to_dict(grequests.map(view_requests))
-        view_data['user'] = Profile(responses[whoami_url], summary=False) if request.whoami_url else None
-        view_data['site'] = Site(responses[site_url])
+        if request.whoami_url:
+            profile = Profile(responses[whoami_url], summary=False)
+            view_data['user'] = profile
+            newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
+            newrelic.agent.add_custom_parameter('profile_id', profile.id)
+            newrelic.agent.add_custom_parameter('user_id', profile.user_id)
+
+        site = Site(responses[site_url])
+        view_data['site'] = site
+        newrelic.agent.add_custom_parameter('site_id', site.site_id)
 
         context = RequestContext(request, view_data)
         return HttpResponseNotFound(loader.get_template('404.html').render(context))
@@ -227,8 +236,16 @@ class ErrorView(object):
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
         responses = response_list_to_dict(grequests.map(view_requests))
-        view_data['user'] = Profile(responses[whoami_url], summary=False) if request.whoami_url else None
-        view_data['site'] = Site(responses[site_url])
+        if request.whoami_url:
+            profile = Profile(responses[whoami_url], summary=False)
+            view_data['user'] = profile
+            newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
+            newrelic.agent.add_custom_parameter('profile_id', profile.id)
+            newrelic.agent.add_custom_parameter('user_id', profile.user_id)
+
+        site = Site(responses[site_url])
+        view_data['site'] = site
+        newrelic.agent.add_custom_parameter('site_id', site.site_id)
 
         context = RequestContext(request, view_data)
         return HttpResponseForbidden(loader.get_template('403.html').render(context))
@@ -247,8 +264,16 @@ class ErrorView(object):
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
         responses = response_list_to_dict(grequests.map(view_requests))
-        view_data['user'] = Profile(responses[whoami_url], summary=False) if request.whoami_url else None
-        view_data['site'] = Site(responses[site_url])
+        if request.whoami_url:
+            profile = Profile(responses[whoami_url], summary=False)
+            view_data['user'] = profile
+            newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
+            newrelic.agent.add_custom_parameter('profile_id', profile.id)
+            newrelic.agent.add_custom_parameter('user_id', profile.user_id)
+
+        site = Site(responses[site_url])
+        view_data['site'] = site
+        newrelic.agent.add_custom_parameter('site_id', site.site_id)
 
         context = RequestContext(request, view_data)
         return HttpResponseServerError(loader.get_template('500.html').render(context))

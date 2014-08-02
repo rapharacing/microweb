@@ -1,4 +1,5 @@
 import logging
+import urllib
 import urlparse
 
 from django.views.decorators.http import require_http_methods
@@ -62,8 +63,22 @@ def redirect_or_404(request):
     if resource['itemType'] == 'comment' and resource.has_key('itemId'):
         redirect_path += '/' + 'incontext'
 
+    # Build query parameters.
+    query_dict = {}
+
+    # Query parameter actions.
+    if resource.has_key('action'):
+        if resource.has_key('search'):
+            query_dict['q'] = resource['search']
+        if resource.has_key('online'):
+            query_dict['online'] = 'true'
+
+    # Record offset.
+    if resource.has_key('offset'):
+        query_dict['offset'] = str(resource['offset'])
+
     # Reconstruct the URL, dropping query parameters and path fragment.
-    parts = (url_parts.scheme, url_parts.netloc, redirect_path, '', '')
+    parts = (url_parts.scheme, url_parts.netloc, redirect_path, urllib.urlencode(query_dict), '')
     redirect_url = urlparse.urlunsplit(parts)
 
     print "Redirecting %s to %s" % (request.get_full_path(), redirect_url)

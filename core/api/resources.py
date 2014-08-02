@@ -606,9 +606,6 @@ class Role(APIResource):
         role.open_own = data['openOwn']
         role.read_others = data['readOthers']
 
-        if data.get('meta'):
-            role.meta = Meta(data['meta'])
-
         if data.get('microcosmId'):
             role.microcosm_id = data['microcosmId']
         else:
@@ -616,6 +613,9 @@ class Role(APIResource):
 
         if data.get('members'):
             role.members = PaginatedList(data['members'], Profile)
+
+        if data.get('meta'):
+            role.meta = Meta(data['meta'])
 
         return role
 
