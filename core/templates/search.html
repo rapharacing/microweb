@@ -125,6 +125,7 @@
 
 		</ul>
 	</div>
+	{% if content.query.q or user %}
 	<div class="metabar-module-title">
 		<h3>
 			Options
@@ -132,6 +133,7 @@
 	</div>
 	<div class="metabar-module-body">
 		<ul class="list-group">
+			{% if content.query.q %}
 			<li class="list-group-item">
 				<div class="checkbox">
 					<label for="filter-intitle">
@@ -140,8 +142,20 @@
 					</label>
 				</div>
 			</li>
+			{% endif %}
+			{% if user %}
+			<li class="list-group-item">
+				<div class="checkbox">
+					<label for="filter-following">
+						<input id="filter-following" type="checkbox" name="following" value="true" {% if content.query.following %}checked="checked"{% endif %}/>
+						Following
+					</label>
+				</div>
+			</li>
+			{% endif %}
 		</ul>
 	</div>
+	{% endif %}
 </div> <!-- / filters -->
 
 {% endblock %}
