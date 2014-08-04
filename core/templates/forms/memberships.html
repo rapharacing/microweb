@@ -346,6 +346,7 @@
 		static_url : subdomain
 	});
 
+	// This renders the existing list
 	participating.render([
 		{% for p in profiles.profiles.items %}
 			{"id": {{p.id}}, "profileName": "{{p.profile_name}}", "sticky": "true", "avatar": "{{p.avatar}}" },
@@ -357,7 +358,12 @@
 		el         : '#invite',
 		is_textbox : true,
 		static_url : subdomain,
-		dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q='
+		dataSource : subdomain + '/api/v1/profiles?disableBoiler&top=true&q=',
+		invited    : [ // This preserves the existing list
+		{% for p in profiles.profiles.items %}
+			{"id": {{p.id}}, "profileName": "{{p.profile_name}}", "sticky": "true", "avatar": "{{p.avatar}}" },
+		{% endfor %}
+		],
 	});
 
 	// update the hidden input box
