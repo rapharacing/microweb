@@ -172,8 +172,7 @@
 					var $field = $(field),
 							name   = $field.val();
 
-					return name.match(/[^a-z0-9\.\_\-\+]+/i) === null;
-
+					return (name.match(/^[^@+\s]+$/i));
 				 },
 				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
 			},
