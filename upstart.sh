@@ -6,7 +6,7 @@ LOGFILE=/var/log/django/microweb.log
 LOGDIR=$(dirname $LOGFILE)
 
 # number of gunicorn workers
-NUM_WORKERS=17
+NUM_WORKERS=9
 HOST='127.0.0.1:8000'
 
 # user/group to run as
