@@ -80,13 +80,13 @@ def first_deploy():
     rsync()
     install_requirements()
     collectstatic()
-    restart_memcached()
     start_service()
+    restart_memcached()
 
 def redeploy():
 
     rsync()
     install_requirements()
     collectstatic()
-    restart_memcached()
     restart_service()
+    restart_memcached()
