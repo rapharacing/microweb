@@ -262,7 +262,6 @@ class Site(object):
         response = requests.get(url)
         if response.status_code != 200:
             raise APIException('Error resolving CNAME %s' % host, response.status_code)
-        print(response.content)
         return response.content
 
 
