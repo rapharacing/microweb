@@ -72,7 +72,7 @@ $('document').ready(function() {
 	$('form[name=paginationByOffset]').submit(function(e){
 		console.log("Page jump requested")
 
-		var self   = $('form[name=paginationByOffset]'),
+		var self   = $(this),
 			limit  = self.attr('data-limit'),
 			max    = self.attr('data-max'),
 			value  = parseInt(self.find('input[type=text]').val()),
