@@ -333,7 +333,7 @@ class AuthenticationView(object):
 
         response = redirect('/')
         if request.COOKIES.has_key('access_token'):
-            response.delete_cookie('access_token')
+            response.set_cookie('access_token', '', expires="Thu, 01 Jan 1970 00:00:00 GMT")
             url = build_url(request.get_host(), ['auth', request.access_token])
             try:
                 requests.post(url, params={'method': 'DELETE', 'access_token': request.access_token})
