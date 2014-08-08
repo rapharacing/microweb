@@ -122,6 +122,7 @@
 				</li>
 			</ul> <!-- /item-event-inner -->
 
+		{% if not is_expired or rsvp_num_attending > 0 or rsvp_num_invited > 0 %}
 			<div class="item-event-actions {% if is_expired %}item-event-actions-expired{% endif %}">
 				<ul class="list-stats" data-toggle="modal" data-target="#modal-event-attendees">
 					<li>
@@ -158,10 +159,12 @@
 						</p>
 					{% endif %}
 				{% else %}
-					<h3>Sorry, this event has expired...</h3>
-					<p>..but don't miss the next one! Follow this forum to be notified whenever a new event is added.</p>
+					<p>Follow this forum to be notified whenever a new event is added.</p>
 				{% endif %}
 			</div>
+		{% else %}
+			<div class="item-event-actions" style="height:1px;padding:0px;border-top: none;"></div>
+		{% endif %}
 
 		</div> <!-- /col-xs-12 -->
 	</div> <!-- /row -->

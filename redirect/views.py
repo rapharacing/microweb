@@ -81,5 +81,5 @@ def redirect_or_404(request):
     parts = (url_parts.scheme, url_parts.netloc, redirect_path, urllib.urlencode(query_dict), '')
     redirect_url = urlparse.urlunsplit(parts)
 
-    print "Redirecting %s to %s" % (request.get_full_path(), redirect_url)
+    #print "Redirecting %s to %s" % (request.get_full_path(), redirect_url)
     return HttpResponseRedirect(redirect_url)
