@@ -5,6 +5,8 @@ import pylibmc as memcache
 
 from django.conf import settings
 
+from django.http import HttpResponseRedirect
+
 from core.api.resources import Site
 from core.api.resources import WhoAmI
 
@@ -31,6 +33,11 @@ class ContextMiddleware():
         request.view_requests = []
 
         if request.COOKIES.has_key('access_token'):
+            # Clean up empty access token.
+            if request.COOKIES['access_token'] == '':
+                response = HttpResponseRedirect('/')
+                response.set_cookie('access_token', '', expires="Thu, 01 Jan 1970 00:00:00 GMT")
+                return response
             request.access_token = request.COOKIES['access_token']
             request.whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
             request.view_requests.append(grequests.get(request.whoami_url, params=params, headers=headers))
