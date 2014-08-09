@@ -72,15 +72,16 @@ $('document').ready(function() {
 	$('form[name=paginationByOffset]').submit(function(e){
 		console.log("Page jump requested")
 
-		var self   = $(this),
-			limit  = self.attr('data-limit'),
-			max    = self.attr('data-max'),
-			value  = parseInt(self.find('input[type=text]').val()),
-			hidden = self.find('input[name=offset]');
+		var self    = $(this),
+			initial = self.attr('data-initial'),
+			limit   = self.attr('data-limit'),
+			max     = self.attr('data-max'),
+			value   = parseInt(self.find('input[type=number]').val()),
+			hidden  = self.find('input[name=offset]');
 
 		console.log("limit = " + limit + " , max = " + max + " , value = " + value);
 
-		if (!isNaN(value) && value >= 1 && value <= max) {
+		if (!isNaN(value) && value >= 1 && value <= max && value != initial) {
 			console.log("Jump")
 			if (limit && value){
 				hidden.val(limit * (value-1));
@@ -89,6 +90,9 @@ $('document').ready(function() {
 			console.log("Cancel jump")
 			e.preventDefault();
 		}
+	});
+	$('form[name=paginationByOffset] > input[type=number]').blur(function() {
+		$(this).parent().submit();
 	});
 })();
 

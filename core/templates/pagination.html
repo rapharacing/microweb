@@ -48,15 +48,20 @@
 			name="paginationByOffset"
 			method="GET"
 			action=""
+			data-initial="{{ pagination.page }}"
 			data-limit="{{ pagination.limit }}"
 			data-max="{{ pagination.total_pages }}"
 		>
 			<input
-				type="text"
-				class="form-control"
+				type="number"
+				min="1"
 				value="{{ pagination.page }}"
-				pattern="[0-9]+"
+				max="{{ pagination.total_pages }}"
+				step="1"
+				pattern="\d*"
 				title="Enter the page number to jump to"
+				class="form-control"
+				style="height:27px;padding:2px 10px;line-height:1;"
 			/>
 			<input name="offset" type="hidden" />
 			{% if content.query and content.query.searched %}

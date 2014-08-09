@@ -32,6 +32,10 @@
 				{% endif %}
 			{% endif %}
 		}
+		input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
 		</style>
 		{% block css %}{% endblock %}
 	</head>
@@ -284,6 +288,7 @@
 			};
 
 			ga('create', 'UA-36931318-3', 'microco.sm');
+			ga('require', 'displayfeatures');
 			{% if user %}
 			ga('set', '&uid', {{user.id}});
 			{% endif %}
