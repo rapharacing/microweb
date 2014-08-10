@@ -8,6 +8,8 @@
 
 {% block title %}@{{ content.profile_name | safe }} | {{ site.title | safe }}{% endblock title %}
 
+{% block description %}Profile page for {{content.profile_name | striptags}},  {% if content.profile_comment %}{{ content.profile_comment.html | striptags }}{% endif %}{% endblock description %}
+
 {% block content %}
 					<div class="content-header padded">
 						<div class="row">

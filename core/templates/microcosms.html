@@ -4,6 +4,8 @@
 
 {% block title %}{{ site.title | safe }} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock title %}
 
+{% block description %}{{ site.description }} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock description %}
+
 {% block content %}
 
 <div class="content-header padded">

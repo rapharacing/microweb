@@ -5,6 +5,8 @@
 
 {% block title %}{% if page_section == 'terms' %}Terms of Use{% elif page_section == 'cookies' %}Cookie Policy{% elif page_section == 'privacy' %}Privacy Policy{% endif %} | About{% endblock title %}
 
+{% block description %}{% if page_section == 'terms' %}This document describes the general terms of use of the forum.{% elif page_section == 'cookies' %}This document describes what data we store on your computer in the form of browser cookies, and how they are used by us to provide the forum service.{% elif page_section == 'privacy' %}This document outlines the data that we hold on you that identifies you or is confidential, and how we use that data to provide the forum service to you. It further describes how we store and secure your data, as well as your rights regarding this data.{% endif %}{% endblock description %}
+
 {% block content %}
 
 <div class="content-header padded">

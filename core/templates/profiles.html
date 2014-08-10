@@ -2,6 +2,8 @@
 {% load profile %}
 {% block title %}People{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
+{% block description %}List of site profiles{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock description %}
+
 {% block content %}
 <div class="content-header padded">
 	<div class="row">

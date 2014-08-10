@@ -4,6 +4,8 @@
 
 {% block title %}{{ content.title | safe }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
+{% block description %}Where: {{ content.where }}, When: {{ content.when|date:"j F Y" }}, {{ content.comments.items.0.html | striptags }} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock description %}
+
 {% block ga %},'dimension2': '{{ content.meta.created_by.id }}','dimension3': '{{ content.microcosm_id }}'{% endblock%}
 
 {% block css %}

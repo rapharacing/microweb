@@ -8,6 +8,8 @@
 {% load huddle %}
 {% block title %}Search for {{ content.query.searched }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
 
+{% block description %}Search results for {{content.query.searched | striptags}} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock description %}
+
 {% block content %}
 
 <div class="content-header padded">
