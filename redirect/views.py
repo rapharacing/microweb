@@ -48,11 +48,15 @@ def redirect_or_404(request):
 
     # Handle non-successful redirects (e.g. invalid path, forbidden).
     if resource['status'] == 404:
-        return  ErrorView.not_found(request)
+        return ErrorView.not_found(request)
     if resource['status'] == 403:
         return ErrorView.forbidden(request)
     if resource['status'] != 301:
         return ErrorView.server_error(request)
+
+    # Attachments just go to the URL
+    if resource['itemType'] == 'attachment':
+        return HttpResponseRedirect(resource['redirect']['href'])
 
     # Construct the 301 based on the resource.
     redirect_path = '/' + RESOURCE_PLURAL[resource['itemType']]
