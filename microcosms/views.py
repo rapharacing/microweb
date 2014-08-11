@@ -48,7 +48,10 @@ members_form_template = 'forms/memberships.html'
 def single_microcosm(request, microcosm_id):
 
     # Pagination offset of items within the microcosm.
-    offset = int(request.GET.get('offset', 0))
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
 
     microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
                                                              offset=offset, access_token=request.access_token)
@@ -75,7 +78,10 @@ def single_microcosm(request, microcosm_id):
 def list_microcosms(request):
 
     # Pagination offset of microcosms.
-    offset = int(request.GET.get('offset', 0))
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
 
     microcosms_url, params, headers = MicrocosmList.build_request(request.get_host(), offset=offset,
                                                                   access_token=request.access_token)
@@ -177,7 +183,10 @@ def delete_microcosm(request, microcosm_id):
 @exception_handler
 @require_http_methods(['GET',])
 def list_members(request, microcosm_id):
-    offset = int(request.GET.get('offset', 0))
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
 
     microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
         offset=offset, access_token=request.access_token)
@@ -325,7 +334,10 @@ def create_members(request, microcosm_id):
     if request.method == 'POST':
         pass
     elif request.method == 'GET':
-        offset = int(request.GET.get('offset', 0))
+        try:
+            offset = int(request.GET.get('offset', 0))
+        except ValueError:
+            offset = 0
 
         microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
             offset=offset, access_token=request.access_token)
@@ -356,7 +368,10 @@ def edit_members(request, microcosm_id, group_id):
     if request.method == 'POST':
         pass
     elif request.method == 'GET':
-        offset = int(request.GET.get('offset', 0))
+        try:
+            offset = int(request.GET.get('offset', 0))
+        except ValueError:
+            offset = 0
 
         microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
             offset=offset, access_token=request.access_token)

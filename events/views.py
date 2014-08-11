@@ -58,7 +58,10 @@ def single(request, event_id):
     """
 
     # Comment offset.
-    offset = int(request.GET.get('offset', 0))
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
 
     # Create request for event resource.
     event_url, event_params, event_headers = Event.build_request(request.get_host(), id=event_id,

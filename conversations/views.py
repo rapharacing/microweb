@@ -42,7 +42,10 @@ single_template = 'conversation.html'
 def single(request, conversation_id):
 
     # Offset of comments.
-    offset = int(request.GET.get('offset', 0))
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
 
     conversation_url, params, headers = Conversation.build_request(request.get_host(), id=conversation_id,
         offset=offset, access_token=request.access_token)

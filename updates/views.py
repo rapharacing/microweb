@@ -47,7 +47,10 @@ class UpdateView(object):
                 }
         else:
             # pagination offset
-            offset = int(request.GET.get('offset', 0))
+            try:
+                offset = int(request.GET.get('offset', 0))
+            except ValueError:
+                offset = 0
 
             url, params, headers = UpdateList.build_request(request.get_host(), offset=offset,
                                                             access_token=request.access_token)
@@ -105,7 +108,10 @@ class WatcherView(object):
 
         if request.method == 'GET':
             # pagination offset
-            offset = int(request.GET.get('offset', 0))
+            try:
+                offset = int(request.GET.get('offset', 0))
+            except ValueError:
+                offset = 0
 
             url, params, headers = WatcherList.build_request(request.get_host(), offset=offset,
                                                              access_token=request.access_token)

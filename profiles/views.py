@@ -74,7 +74,10 @@ def single(request, profile_id):
 def list(request):
 
     # Record offset for paging of profiles.
-    offset = int(request.GET.get('offset', 0))
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
     top = bool(request.GET.get('top', False))
     q = request.GET.get('q', "")
     following = bool(request.GET.get('following', False))

@@ -47,7 +47,10 @@ list_template = 'huddles.html'
 def single(request, huddle_id):
 
     # Comment offset.
-    offset = int(request.GET.get('offset', 0))
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
 
     huddle_url, params, headers = Huddle.build_request(request.get_host(), id=huddle_id, offset=offset,
         access_token=request.access_token)
@@ -88,8 +91,11 @@ def single(request, huddle_id):
 
 @require_http_methods(['GET',])
 def list(request):
-    # record offset for paging of huddles
-    offset = int(request.GET.get('offset', 0))
+    # Offset for paging of huddles
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
 
     huddle_url, params, headers = HuddleList.build_request(request.get_host(), offset=offset,
         access_token=request.access_token)
