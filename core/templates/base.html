@@ -278,6 +278,7 @@ onlogin: function(assertion) {
 	document.getElementById("signin-form").submit();
 },
 onlogout: function() {
+	{% if user.email %}return false;{% endif %}
 	document.getElementById("signout-form").submit();
 },
 });
