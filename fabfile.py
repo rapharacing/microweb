@@ -81,7 +81,6 @@ def first_deploy():
     install_requirements()
     collectstatic()
     start_service()
-    restart_memcached()
 
 def redeploy():
 
@@ -89,4 +88,3 @@ def redeploy():
     install_requirements()
     collectstatic()
     restart_service()
-    restart_memcached()
