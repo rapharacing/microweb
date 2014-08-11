@@ -271,10 +271,15 @@ function personaSignout() {
 	document.getElementById("signout-form").submit();
 }
 navigator.id.watch({
+loggedInUser: {% if user.email %}'{{user.email}}'{% else %}null{% endif %},
 onlogin: function(assertion) {
+	{% if user.email %}return false;{% endif %}
 	document.getElementById("Assertion").value = assertion;
 	document.getElementById("signin-form").submit();
-}
+},
+onlogout: function() {
+	document.getElementById("signout-form").submit();
+},
 });
 </script>
 {% block js %}{% endblock js%}
