@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 
 from django.conf import settings
 from core.api.exceptions import APIException
+from core.views import respond_with_error
 from core.views import ErrorView
 
 from core.api.resources import Site
@@ -44,7 +45,7 @@ def redirect_or_404(request):
     try:
         resource = Redirect.get(host, redirect_request, request.access_token)
     except APIException as exc:
-        return ErrorView.respond_with_error(request, exc)
+        return respond_with_error(request, exc)
 
     # Handle non-successful redirects (e.g. invalid path, forbidden).
     if resource['status'] == 404:
