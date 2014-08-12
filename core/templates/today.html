@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load microcosm %}
+{% load profile %}
+{% load conversation %}
+{% load event %}
+{% load list_comment %}
+{% load huddle %}
+{% block title %}Search for {{ content.query.searched }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
+
+{% block description %}Search results for {{content.query.searched | striptags}} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock description %}
+
+{% block content %}
+
+<div class="content-header padded">
+	<div class="row">
+		<div class="col-sm-7">
+			{% include 'breadcrumbs.html' %}
+		</div>
+		<div class="col-sm-5">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+{% if content.results.items|length == 0 %}
+	<h1>The forum has been quiet today.</h1>
+</div>
+<div class="content-body">
+	<p>Be the first to make a post today.</p>
+{% else %}
+	<h1>Today on {{ site.title }}</h1>
+</div>
+<div class="content-body">
+	<div class="list-search">
+		<ul class="list-collection bordered padded">
+			{% for result in content.results.items %}
+				{% if result.item_type == 'conversation' %}
+					{% conversation result %}
+				{% elif result.item_type == 'event' %}
+					{% event result %}
+				{% elif result.item_type == "profile" %}
+					{% profile result %}
+				{% elif result.item_type == "huddle" %}
+					{% huddle result %}
+				{% else %}
+				{% endif %}
+			{% endfor %}
+		</ul>
+	</div>
+{% endif %}
+</div> <!-- /content-body -->
+
+<div class="content-footer padded">
+	<div class="row">
+		<div class="col-sm-7">
+		</div>
+		<div class="col-sm-5">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block sidebar %}
+
+<div class="metabar-module metabar-filters">
+	{% if content.query.q or user %}
+	<h5>Filters</h5>
+	<div class="metabar-module-body">
+		<ul class="list-group">
+			{% if user %}
+			<li class="list-group-item">
+				<div class="checkbox">
+					<label for="filter-following">
+						<input id="filter-following" type="checkbox" name="following" value="true" {% if content.query.following %}checked="checked"{% endif %}/>
+						Following
+					</label>
+				</div>
+			</li>
+			{% endif %}
+		</ul>
+	</div>
+	{% endif %}
+</div> <!-- / filters -->
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/filters.js"></script>
+<script type="text/javascript">
+(function(){
+	window.search_filters = new Filters({
+		el     : '.metabar-filters',
+		query  : '',
+		url    : '/today/?q=$1'
+	});
+})();
+</script>
+{% endblock %}

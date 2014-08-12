@@ -118,13 +118,22 @@
 			</li>
 			<li class="list-group-item">
 				<div class="checkbox">
-					<label for="filter-huddles">
-						<input id="filter-huddles" type="checkbox" name="type" value="profile" {% if "profile" in content.type %}checked="checked"{% endif %}/>
+					<label for="filter-profiles">
+						<input id="filter-profiles" type="checkbox" name="type" value="profile" {% if "profile" in content.type %}checked="checked"{% endif %}/>
 						Profile
 					</label>
 				</div>
 			</li>
-
+			{% if user %}
+			<li class="list-group-item">
+				<div class="checkbox">
+					<label for="filter-huddles">
+						<input id="filter-huddles" type="checkbox" name="type" value="huddle" {% if "huddle" in content.type %}checked="checked"{% endif %}/>
+						Messages
+					</label>
+				</div>
+			</li>
+			{% endif %}
 		</ul>
 	</div>
 	{% if content.query.q or user %}
@@ -141,6 +150,14 @@
 					<label for="filter-intitle">
 						<input id="filter-intitle" type="checkbox" name="inTitle" value="true" {% if content.query.inTitle %}checked="checked"{% endif %}/>
 						Only search titles
+					</label>
+				</div>
+			</li>
+			<li class="list-group-item">
+				<div class="checkbox">
+					<label for="filter-date">
+						<input id="filter-date" type="checkbox" name="sort" value="date" {% if content.query.sort == "date" %}checked="checked"{% endif %}/>
+						Order by date
 					</label>
 				</div>
 			</li>

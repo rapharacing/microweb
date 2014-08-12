@@ -140,7 +140,7 @@
 												class="form-control"
 												name="q"
 												placeholder="Search"
-												{% if content.query.searched %}value="{{content.query.searched|escape}}"{% endif %}
+												{% if content.query.searched and not site_section == 'today' %}value="{{content.query.searched|escape}}"{% endif %}
 												tabindex="1"
 											/>
 											<span class="input-group-btn">
@@ -153,8 +153,8 @@
 								<li class="first {% if not site_section or site_section == "microcosm"%}active{% endif %}">
 									<a href="{% url 'index' %}">Forums</a>
 								</li>
-								<li {% if site_section == "trending"%}class="active"{% endif %}>
-									<a href="{% url 'list-trending'%}">Trending</a>
+								<li {% if site_section == "today"%}class="active"{% endif %}>
+									<a href="{% url 'single-today'%}">Today</a>
 								</li>
 								<li {% if site_section == "updates"%}class="active"{% endif %}>
 									<a href="{% url 'list-updates' %}">Following</a>
@@ -292,4 +292,4 @@ ga('create', 'UA-36931318-3', 'microco.sm');ga('require', 'displayfeatures');{% 
 {% if site.ga_web_property_id %}ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});ga('{{ site.subdomain_key }}.send', 'pageview', gaData);{% endif %}
 </script>
 	</body>
-<html>
+</html>

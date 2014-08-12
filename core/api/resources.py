@@ -1975,7 +1975,6 @@ class Trending(APIResource):
         resource = APIResource.retrieve(url, params, headers)
         return Trending.from_api_response(resource)
 
-
 class Legal(APIResource):
     """
     Represents /legal/document

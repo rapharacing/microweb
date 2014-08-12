@@ -6,7 +6,6 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
 from core.api.resources import Profile
-
 from core.api.resources import response_list_to_dict
 from core.api.resources import Search
 from core.api.resources import Site

@@ -17,6 +17,7 @@ urlpatterns = patterns(
     url(r'', include('profiles.urls')),
     url(r'', include('updates.urls')),
     url(r'', include('search.urls')),
+    url(r'', include('today.urls')),
     url(r'', include('trending.urls')),
     url(r'', include('moderation.urls')),
     url(r'', include('redirect.urls')),
