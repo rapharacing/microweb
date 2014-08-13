@@ -316,6 +316,8 @@ class AuthenticationView(object):
         except RequestException:
             return ErrorView.server_error(request)
         access_token = response.json()['data']
+        if access_token is None:
+            return ErrorView.server_error(request)
 
         response = HttpResponseRedirect(target_url if target_url != '' else '/')
         expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)
