@@ -40,6 +40,8 @@ function Role (opts, criterion) {
 		'isBanned'     : {el: 'input[name=is_banned]',            value: "0" },
 		'canRead'      : {el: 'input[name=can_read]',             value: "0" },
 		'canCreate'    : {el: 'input[name=can_create]',           value: "0" },
+		'canClose'     : {el: 'input[name=can_close_own]',        value: "0" },
+		'canOpen'      : {el: 'input[name=can_open_own]',         value: "0" },
 		'canEdit'      : {el: 'input[name=can_edit_others]',      value: "0" },
 		'canDelete'    : {el: 'input[name=can_delete_others]',    value: "0" }
 	};
@@ -580,6 +582,8 @@ $(document).ready(function() {
 					pushRadioButton('can_create', '0');
 					pushRadioButton('can_edit_others', '0');
 					pushRadioButton('can_delete_others', '0');
+					pushRadioButton('can_close_own', '0');
+					pushRadioButton('can_open_own', '0');
 				}
 				break;
 			case 'is_moderator':
@@ -591,6 +595,8 @@ $(document).ready(function() {
 					pushRadioButton('can_create', '1');
 					pushRadioButton('can_edit_others', '1');
 					pushRadioButton('can_delete_others', '1');
+					pushRadioButton('can_close_own', '1');
+					pushRadioButton('can_open_own', '1');
 				}
 			case 'is_banned':
 				// If you are banned, you cannot be a moderator
@@ -600,6 +606,8 @@ $(document).ready(function() {
 					pushRadioButton('can_create', '0');
 					pushRadioButton('can_edit_others', '0');
 					pushRadioButton('can_delete_others', '0');
+					pushRadioButton('can_close_own', '0');
+					pushRadioButton('can_open_own', '0');
 				}
 				break;
 			case 'can_read':
@@ -612,6 +620,8 @@ $(document).ready(function() {
 					pushRadioButton('can_create', '0');
 					pushRadioButton('can_edit_others', '0');
 					pushRadioButton('can_delete_others', '0');
+					pushRadioButton('can_close_own', '0');
+					pushRadioButton('can_open_own', '0');
 				}
 				break;
 			case 'can_create':
@@ -634,6 +644,24 @@ $(document).ready(function() {
 				break;
 			case 'can_delete_others':
 				if ($('input[name=can_delete_others]:checked').val() == '1') {
+					pushRadioButton('include_unregistered', '0');
+					pushRadioButton('is_banned', '0');
+					pushRadioButton('can_read', '1');
+				} else {
+					pushRadioButton('is_moderator', '0');
+				}
+				break;
+			case 'can_close_own':
+				if ($('input[name=can_close_own]:checked').val() == '1') {
+					pushRadioButton('include_unregistered', '0');
+					pushRadioButton('is_banned', '0');
+					pushRadioButton('can_read', '1');
+				} else {
+					pushRadioButton('is_moderator', '0');
+				}
+				break;
+			case 'can_open_own':
+				if ($('input[name=can_open_own]:checked').val() == '1') {
 					pushRadioButton('include_unregistered', '0');
 					pushRadioButton('is_banned', '0');
 					pushRadioButton('can_read', '1');
@@ -678,8 +706,8 @@ $(document).ready(function() {
 			"create": (role.mappings.canCreate.value == "1"),
 			"update": (role.mappings.canEdit.value == "1"),
 			"delete": (role.mappings.canDelete.value == "1"),
-			"closeOwn": (role.mappings.canDelete.value == "1"),
-			"openOwn": (role.mappings.canDelete.value == "1"),
+			"closeOwn": (role.mappings.canClose.value == "1"),
+			"openOwn": (role.mappings.canOpen.value == "1"),
 			"readOthers": (role.mappings.canRead.value == "1")
 		}
 

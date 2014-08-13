@@ -1,22 +1,37 @@
-{% if content.meta.permissions.moderator %}
+{% if content.meta.permissions.moderator or content.meta.permissions.owner and content.meta.permissions.open and not content.meta.flags.open or content.meta.permissions.owner and content.meta.permissions.close and content.meta.flags.open %}
 <div class="metabar-module">
-	<h5>Moderation actions</h5>
+	<h5>Actions</h5>
 	<div class="metabar-admin">
 		<form class="metabar-admin-actions" action="{% url 'moderate-item' %}" method="GET">
 			<input type="hidden" name="item_id" value="{{ content.id }}" />
 			<input type="hidden" name="item_type" value="{{ item_type }}" />
 			<select id="metabar-admin-actions" class="cselect cselect-xs" name="action">
-				<option value="move">Move this item</option>
-				<option value="delete">Delete this item</option>
-				<!--<option>Delete</option>-->
-				<!--<option>Undelete</option>-->
-				<!--<option>Approve</option>-->
-				<!--<option>Unapprove</option>-->
-				<!--<option>Pin</option>-->
-				<!--<option>Unpin</option>-->
+				{% if content.meta.permissions.moderator %}
+					{% if content.meta.flags.sticky %}
+						<option value="unpin">Unpin</option>
+					{% else %}
+						<option value="pin"> Pin</option>
+					{% endif %}
+				{% endif %}
+				{% if content.meta.flags.open %}
+					<option value="close">Close</option>
+				{% else %}
+					<option value="open">Open</option>
+				{% endif %}
+				{% if content.meta.permissions.moderator %}
+					{% if content.meta.flags.moderated %}
+						<option value="approve">Approve</option>
+					{% endif %}
+					<option value="move">Move</option>
+					{% if content.meta.flags.deleted %}
+						<option value="undelete">Undelete</option>
+					{% else %}
+						<option value="delete">Delete</option>
+					{% endif %}
+				{% endif %}
 			</select>
 			<input type="submit" value="Go" class="btn btn-primary btn-xs"/>
 		</form>
-	</div> <!-- /metabar-admin -->
+	</div>
 </div>
 {% endif %}

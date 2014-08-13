@@ -13,6 +13,18 @@
                 Move {{ content.title }} to:
             {% elif action == 'delete' %}
                 Do you wish to delete "{{ content.title }}"?
+            {% elif action == 'undelete' %}
+                Do you wish to undelete "{{ content.title }}"?
+            {% elif action == 'approve' %}
+                Do you wish to approve "{{ content.title }}"?
+            {% elif action == 'open' %}
+                Do you wish to open "{{ content.title }}"?
+            {% elif action == 'close' %}
+                Do you wish to close "{{ content.title }}"?
+            {% elif action == 'pin' %}
+                Do you wish to pin "{{ content.title }}"?
+            {% elif action == 'unpin' %}
+                Do you wish to unpin "{{ content.title }}"?
             {% endif %}
         </h1>
     </div>
@@ -35,20 +47,35 @@
                     </form>
                 </div>
             </div>
-        {% elif action == 'delete' %}
-            <div class="row form-container">
-                <div class="col-xs-12">
-                    <form role="form" action="" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="{{ action }}" />
-                        <input type="hidden" name="item_type" value="{{ item_type }}"/>
-                        <input type="hidden" name="item_id" value="{{ content.id }}"/>
-                        <input type="hidden" name="microcosm_id" value="{{content.microcosm_id}}" />
-                        <input type="submit" value="Delete" class="btn btn-primary"/>
-                    </form>
+        {% else %}
+                <div class="row form-container">
+                    <div class="col-xs-12">
+                        <form role="form" action="" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="{{ action }}" />
+                            <input type="hidden" name="item_type" value="{{ item_type }}"/>
+                            <input type="hidden" name="item_id" value="{{ content.id }}"/>
+                            <input type="hidden" name="microcosm_id" value="{{content.microcosm_id}}" />
+                            {% if action == 'delete' %}
+                                <input type="submit" value="Delete" class="btn btn-primary"/>
+                            {% elif action == 'undelete' %}
+                                <input type="submit" value="Undelete" class="btn btn-primary"/>
+                            {% elif action == 'approve' %}
+                                <input type="submit" value="Approve" class="btn btn-primary"/>
+                            {% elif action == 'open' %}
+                                <input type="submit" value="Open" class="btn btn-primary"/>
+                            {% elif action == 'close' %}
+                                <input type="submit" value="Close" class="btn btn-primary"/>
+                            {% elif action == 'pin' %}
+                                <input type="submit" value="Pin" class="btn btn-primary"/>
+                            {% elif action == 'unpin' %}
+                                <input type="submit" value="Unpin" class="btn btn-primary"/>
+                            {% endif %}
+                        </form>
+                    </div>
                 </div>
-            </div>
         {% endif %}
+
         <p>Or, <a href={% url 'single-microcosm' content.microcosm_id %}>cancel and go back</a>.</p>
     </div>
 {% endblock %}

@@ -602,8 +602,8 @@ class Role(APIResource):
         role.read = data['read']
         role.update = data['update']
         role.delete = data['delete']
-        role.close_own = data['closeOwn']
-        role.open_own = data['openOwn']
+        role.close = data['closeOwn']
+        role.open = data['openOwn']
         role.read_others = data['readOthers']
 
         if data.get('microcosmId'):
@@ -632,8 +632,8 @@ class Role(APIResource):
             'read': self.read,
             'update': self.update,
             'delete': self.delete,
-            'closeOwn': self.close_own,
-            'openOwn': self.open_own,
+            'closeOwn': self.close,
+            'openOwn': self.open,
             'readOthers': self.read_others
         }
 
@@ -919,14 +919,21 @@ class PermissionSet(object):
     """
 
     def __init__(self, data):
-        self.create = data['create']
-        self.read = data['read']
-        self.update = data['update']
-        self.delete = data['delete']
-        self.guest = data['guest']
+        self.create    = data['create']
+        self.read      = data['read']
+        self.update    = data['update']
+        self.delete    = data['delete']
+        self.guest     = data['guest']
         self.moderator = data['moderator']
-        self.owner = data['owner']
-        self.admin = data['siteOwner']
+        self.owner     = data['owner']
+        self.admin     = data['siteOwner']
+
+        if data.get('banned'):
+            self.banned = data['banned']
+        if data.get('closeOwn'):
+            self.close = data['closeOwn']
+        if data.get('openOwn'):
+            self.open = data['openOwn']
 
 
 class Watcher(APIResource):

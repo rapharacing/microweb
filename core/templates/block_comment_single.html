@@ -4,9 +4,7 @@
 	<a name="{{ comment.id }}"></a>
 	<div class="comment-item-inner">
 		<div class="comment-item-header">
-
 			<div class="comment-item-permalink">
-
 				<time datetime="{{ comment.meta.created|date:"c" }}" itemprop="dateCreated"></time>
 				<span style="color:#eee">&bull;</span>
 				{% if hide_permalink %}
@@ -15,7 +13,6 @@
 				<a href="{% url 'single-comment' comment.id %}" itemprop="discussionUrl">#{{ forloop.counter|add:pagination.offset }}</a>
 				{% endif %}
 			</div>
-
 			<div class="comment-item-author" itemprop="author" itemscope itemtype="http://schema.org/Person">
 			{% if comment.meta.created_by %}
 				<a href="{% url 'single-profile' comment.meta.created_by.id %}" itemprop="url"><img src="{% if 'gravatar' in comment.meta.created_by.avatar %}{{comment.meta.created_by.avatar}}{% elif 'files' in comment.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{comment.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ comment.meta.created_by.profile_name | safe }}" align="left" class="gravatar" itemprop="image" /> <strong class="comment-item-author-name" itemprop="name">{{ comment.meta.created_by.profile_name | safe | truncatechars:25 }}</strong></a>
@@ -29,7 +26,6 @@
 				</span>
 				{% endif %}
 			</div>
-
 		</div>
 		<div class="comment-item-body" itemprop="text">
 			{{ comment.html|safe }}
@@ -83,15 +79,12 @@
 			{% endif %}
 
 			{% if not comment.meta.created_by.id == user.id %}
-				<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first comment-item-footer-btn-last comment-reply-button"
-					data-action="{% url 'create-comment' %}"
-					data-ref="{{ comment.id }}" href="javascript:void 0"
-				><span class="sprite sprite-arrow-left"></span> Reply</a>
+				{% if content.meta.flags.open and item_type = 'conversation' or content.meta.flags.open and item_type = 'event' or item_type = 'huddle' %}
+					<a class="insertReplyBox comment-item-footer-btn comment-item-footer-btn-first comment-item-footer-btn-last comment-reply-button" data-action="{% url 'create-comment' %}" data-ref="{{ comment.id }}" href="javascript:void 0" ><span class="sprite sprite-arrow-left"></span> Reply</a>
+				{% endif %}
 			{% endif %}
-
 
 		{% endif %}
 		</div>
-
 	</div>
 </li>

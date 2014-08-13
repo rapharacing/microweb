@@ -80,6 +80,18 @@
                       {% endif %}
                       their own conversations, events and comments.<br>
 
+                      {% if membership.close or membership.open %}
+                        They
+                        {% if membership.close and membership.open %}
+                        <span class="green bold">can open and close</span>
+                        {% elif membership.close %}
+                        <span class="green bold">can close</span>
+                        {% else %}
+                        <span class="green bold">can open</span>
+                        {% endif %}
+                        their own conversations and events.<br>
+                      {% endif %}
+
                       They
                       {% if membership.update %}
                       <span class="green bold">can update</span>
@@ -94,7 +106,7 @@
                       {%else%}
                       <span class="red bold">cannot delete</span>
                       {% endif %}
-                      items created by others.
+                      items created by others.<br>
 
                     {% endif %}
                   </p>

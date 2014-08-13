@@ -50,6 +50,7 @@
 	</div>
 </div>
 
+{% if content.meta.flags.open %}
 <a name="reply"></a>
 <div class="reply-container">
 	<ul class="list-comments">
@@ -72,6 +73,7 @@
 		</li>
 	</ul>
 </div> <!-- /reply-container -->
+{% endif %}
 
 {% endblock content %}
 
