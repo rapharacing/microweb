@@ -48,17 +48,17 @@
 		<ul class="list-collection bordered padded">
 			{% for result in content.results.items %}
 				{% if result.item_type == 'conversation' %}
-					{% conversation result %}
+					{% conversation result unread=result.unread %}
 				{% elif result.item_type == 'event' %}
-					{% event result %}
+					{% event result unread=result.unread %}
 				{% elif result.item_type == "microcosm" %}
-					{% microcosm result %}
+					{% microcosm result unread=result.unread %}
 				{% elif result.item_type == "profile" %}
 					{% profile result send_message=True %}
 				{% elif result.item_type == "comment" %}
 					{% list_comment result %}
 				{% elif result.item_type == "huddle" %}
-					{% huddle result %}
+					{% huddle result unread=result.unread %}
 				{% else %}
 				{% endif %}
 			{% endfor %}

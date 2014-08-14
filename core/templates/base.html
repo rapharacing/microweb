@@ -143,6 +143,9 @@
 												{% if content.query.searched and not site_section == 'today' %}value="{{content.query.searched|escape}}"{% endif %}
 												tabindex="1"
 											/>
+											{% if not content.query %}
+											<input type="hidden" name="defaults" value="true" />
+											{% endif %}
 											<span class="input-group-btn">
 												<button class="btn btn-default"><span class="sprite sprite-search-small"></span></button>
 											</span>

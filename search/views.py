@@ -22,7 +22,12 @@ single_template = 'search.html'
 @require_http_methods(['GET',])
 def single(request):
 
-    url, params, headers = Search.build_request(request.get_host(), params=request.GET.dict(),
+    searchParams = request.GET.dict()
+    if searchParams.get('defaults'):
+        searchParams['inTitle'] = 'true'
+        searchParams['sort'] = 'date'
+
+    url, params, headers = Search.build_request(request.get_host(), params=searchParams,
         access_token=request.access_token)
     request.view_requests.append(grequests.get(url, params=params, headers=headers))
 
