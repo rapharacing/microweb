@@ -54,7 +54,7 @@
 
                 <div class="row-excerpt">
                     <a href="{% url 'single-profile' result.item.meta.created_by.id %}"><img src="{% if 'gravatar' in result.item.meta.created_by.avatar %}{{result.item.meta.created_by.avatar}}{% elif 'files' in result.item.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{result.item.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{result.item.meta.created_by.profile_name | safe }}" align="left" class="img-badge"/></a>
-                    <div class="comment-item-body">
+                    <div class="comment-item-body row-excerpt-text">
                         {% if result.highlight %}
                             {{ result.highlight|safe }}
                         {% else %}
