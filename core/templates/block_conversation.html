@@ -1,60 +1,56 @@
 {% load humanize %}
-<li class="list-collection-row{% if item.meta.flags.sticky %} row-pinned{% endif %} {% if item.is_deleted %} row-deleted{% endif %}" id="{{ item.item_type }}{{ item.item.id }}" itemscope itemtype="http://schema.org/Article">
+<li class="list-collection-row{% if item.meta.flags.sticky %} row-pinned{% endif %} {% if item.is_deleted %} row-deleted{% endif %}" id="{{ item_type }}{{ item.id }}" itemscope itemtype="http://schema.org/Article">
 	<div class="row">
 		<div class="col-sm-8 col-md-8 col-lg-8">
-
 			<div class="list-collection-row-icon">
+				{% if item.meta.flags.sticky %}
+				<a class="sprite sprite-pushpin" title="Pinned conversation"></a>
+				{% elif not item.meta.flags.open %}
+				<a class="sprite sprite-lock" title="Closed conversation"></a>
+				{% else %}
 				<a class="sprite sprite-speech-bubble" title="Conversation"></a>
+				{% endif %}
 			</div>
-
 			<div class="list-collection-row-offset">
-
 				<div class="row-title-wrapper">
 					<h3 class="row-title {% if item.highlight %}row-title-highlight{% endif %}" itemprop="name">
-						<a href="/conversations/{{ item.item.id }}/{% if user %}newest/{% endif %}" itemprop="url">{% if item.highlight %}{{ item.highlight | safe }}{% else %}{{ item.item.title | safe }}{% endif %}</a>
-						{% if unread or item.unread or item.item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
+						<a href="/conversations/{{ item.id }}/{% if user %}newest/{% endif %}" itemprop="url">{% if item.highlight %}{{ item.highlight | safe }}{% else %}{{ item.title | safe }}{% endif %}</a>
+						{% if unread or item.unread or item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
 					</h3>
 				</div>
-
-				{% if not item.item.meta.flags.sticky %}
+				{% if not item.meta.flags.sticky %}
 				<div class="row-meta">
-
-				{% if item.item.meta.created_by %}
-					<span itemprop="author" itemscope itemtype="http://schema.org/Person"><a href="{% url 'single-profile' item.item.meta.created_by.id %}" itemprop="url">@<span itemprop="name">{{ item.item.meta.created_by.profile_name | safe | truncatechars:25 }}</span></a></span> started <time datetime="{{ item.item.meta.created|date:"c" }}" itemprop="dateCreated"></time>
+				{% if item.meta.created_by %}
+					<span itemprop="author" itemscope itemtype="http://schema.org/Person"><a href="{% url 'single-profile' item.meta.created_by.id %}" itemprop="url">@<span itemprop="name">{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</span></a></span> started <time datetime="{{ item.meta.created|date:"c" }}" itemprop="dateCreated"></time>
 				{% endif %}
-
 				</div>
 				{% endif %}
 			</div>
 		</div>
-
 		<div class="col-sm-4 col-md-4 col-lg-4">
-
 			<div class="row-stats">
 				<ul class="list-stats list-stats-sm">
-					{% if item.item.total_comments >= 0 %}
+					{% if item.total_comments >= 0 %}
 					<li>
-						<span>{{ item.item.total_comments | default:0 | intcomma }}</span>
-						comment{{ item.item.total_comments | pluralize:",s" }}
+						<span>{{ item.total_comments | default:0 | intcomma }}</span>
+						comment{{ item.total_comments | pluralize:",s" }}
 					</li>
 					{% endif %}
-					{% if item.item.total_views >= 0 %}
+					{% if item.total_views >= 0 %}
 					<li>
-						<span>{{ item.item.total_views | default:0 | intcomma }}</span>
-						view{{ item.item.total_views | pluralize:",s" }}
+						<span>{{ item.total_views | default:0 | intcomma }}</span>
+						view{{ item.total_views | pluralize:",s" }}
 					</li>
 					{% endif %}
 				</ul>
 			</div>
-
-			{% if not item.item.flags.sticky %}
+			{% if not item.meta.flags.sticky %}
 				<div class="row-context">
-					{% if item.item.last_comment_created %}
-						<a href="{% url 'single-profile' item.item.last_comment_created_by.id %}">@{{item.item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.item.last_comment_created|date:"c" }}"></time>
+					{% if item.last_comment_created %}
+						<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
 					{% endif %}
 				</div>
 			{% endif %}
-
 		</div>
 	</div>
 </li>

@@ -5,9 +5,9 @@ register = template.Library()
 def conversation(context, item, **kwargs):
 
     if hasattr(item,'item'):
-        context['item'] = item
+        context['item'] = item.item
     else:
-        context['item'] = { 'item' : item }
+        context['item'] = item
 
     if 'unread' in kwargs:
         context['unread'] = kwargs['unread']

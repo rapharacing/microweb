@@ -7,7 +7,7 @@ def profile(context, profile, **kwargs):
     if hasattr(profile,'item'):
         context['profile'] = profile
     else:
-        context['profile'] = { 'item' : profile }
+        context['profile'] = {'item': profile}
 
     if 'no_icon' in kwargs:
         context['no_icon'] = True

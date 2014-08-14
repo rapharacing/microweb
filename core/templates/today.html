@@ -38,7 +38,7 @@
 				{% elif result.item_type == 'event' %}
 					{% event result %}
 				{% elif result.item_type == "profile" %}
-					{% profile result %}
+					{% profile result send_message=True %}
 				{% elif result.item_type == "huddle" %}
 					{% huddle result %}
 				{% else %}
