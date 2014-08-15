@@ -122,11 +122,10 @@ def build_pagination_links(request, paged_list):
     return page_nav
 
 def process_attachments(request, comment):
-
     """
     For the provided request, check if files are to be attached or deleted
     from the provided comment. Raises a ValidationError if any files are larger
-    than 5MB.
+    than 3MB.
     """
 
     # Check if any existing comment attachments are to be deleted.
