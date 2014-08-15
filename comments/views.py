@@ -15,6 +15,8 @@ from django.http import HttpResponseRedirect
 
 from django.shortcuts import render
 
+from django.views.decorators.cache import cache_control
+
 from django.views.decorators.http import require_http_methods
 
 from core.api.resources import Comment
@@ -303,6 +305,7 @@ def incontext(request, comment_id):
 
 @require_authentication
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def source(request, comment_id):
     """
     Retrieve the markdown source for a comment.
