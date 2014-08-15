@@ -154,7 +154,7 @@
 
           _this.$.comment_box.find('textarea').attr('placeholder','Loading... Please wait...');
 
-          this.fetchSource(_this.$.attr('data-source')+"source")
+          this.fetchSource(_this.$.attr('data-source')+"source/")
               .success($.proxy(function(response){
                 this.$.comment_box
                       .find('textarea')
