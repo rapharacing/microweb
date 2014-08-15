@@ -2,12 +2,6 @@ import grequests
 import json
 import logging
 
-from urllib import urlencode
-
-from urlparse import parse_qs
-from urlparse import urlparse
-from urlparse import urlunparse
-
 from django.core.urlresolvers import reverse
 
 from django.http import HttpResponseRedirect
@@ -16,7 +10,6 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from core.api.resources import api_url_to_gui_url
 from core.api.resources import APIException
 from core.api.resources import Attachment
 from core.api.resources import Comment
@@ -26,10 +19,10 @@ from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
 from core.api.resources import Site
 
-from core.views import ErrorView
 from core.views import require_authentication
 from core.views import build_pagination_links
 from core.views import respond_with_error
+from core.views import build_newest_comment_link
 
 from core.forms.forms import CommentForm
 from core.forms.forms import HuddleCreate
@@ -228,22 +221,5 @@ def newest(request, huddle_id):
     except APIException as exc:
         return respond_with_error(request, exc)
 
-    #because redirects are always followed, we can't just get the 'location' value
-    response = response['comments']['links']
-    for link in response:
-        if link['rel'] == 'self':
-            response = link['href']
-    response = api_url_to_gui_url(response)
-    pr = urlparse(response)
-    queries = parse_qs(pr[4])
-    frag = ""
-    if queries.get('comment_id'):
-        frag = 'comment' + queries['comment_id'][0]
-        del queries['comment_id']
-        # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
-    # urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
-    for (key, value) in queries.items():
-        queries[key] = value[0]
-    queries = urlencode(queries)
-    response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
-    return HttpResponseRedirect(response)
+    redirect = build_newest_comment_link(response)
+    return HttpResponseRedirect(redirect)

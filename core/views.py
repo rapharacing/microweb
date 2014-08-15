@@ -1,10 +1,14 @@
-import requests
-from requests import RequestException
-
 import grequests
 import datetime
 import logging
 import newrelic
+import requests
+from requests import RequestException
+
+from urllib import urlencode
+from urlparse import urlparse
+from urlparse import parse_qs
+from urlparse import urlunparse
 
 from functools import wraps
 
@@ -147,6 +151,28 @@ def process_attachments(request, comment):
                 file_metadata = file_request.create(request.get_host(), request.access_token)
                 Attachment.create(request.get_host(), file_metadata.file_hash,
                                   comment_id=comment.id, access_token=request.access_token, file_name=f.name)
+
+
+def build_newest_comment_link(response):
+
+    response = response['comments']['links']
+    for link in response:
+        if link['rel'] == 'self':
+            response = link['href']
+    response = api_url_to_gui_url(response)
+    pr = urlparse(response)
+    queries = parse_qs(pr[4])
+    frag = ""
+    if queries.get('comment_id'):
+        frag = 'comment' + queries['comment_id'][0]
+        del queries['comment_id']
+        # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
+    # urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
+    for (key, value) in queries.items():
+        queries[key] = value[0]
+    queries = urlencode(queries)
+    response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
+    return response
 
 
 class LegalView(object):
