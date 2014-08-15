@@ -10,6 +10,7 @@ from django.test.client import RequestFactory
 from mock import patch
 
 from core.views import build_pagination_links
+from core.views import build_newest_comment_link
 
 from core.api.resources import Conversation
 from core.api.resources import Microcosm
@@ -108,6 +109,32 @@ class PaginationTests(unittest.TestCase):
         assert pagination_nav['offset'] == 0
         assert pagination_nav['total_pages'] == 2
         assert pagination_nav['limit'] == 25
+
+    def testBuildNewestLink(self):
+        """
+        Assert that build_newest_comment_link parses comment links and builds
+        the new location correctly.
+        """
+
+        links = [{
+                    "rel": "self",
+                    "href": "/api/v1/conversations/161991?comment_id=7050281",
+                    "title": "1"
+                    },
+                {
+                    "rel": "next",
+                    "href": "/api/v1/conversations/161991?comment_id=7050281&offset=25",
+                    "title": "2"
+                    },
+                {
+                    "rel": "last",
+                    "href": "/api/v1/conversations/161991?comment_id=7050281&offset=875",
+                    "title": "36"
+                }]
+        response = {"comments": {"links": links}}
+
+        location = build_newest_comment_link(response)
+        assert location == '/conversations/161991/#comment7050281'
 
 
 class ResourceTests(unittest.TestCase):
