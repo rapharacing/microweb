@@ -13,6 +13,7 @@ from django.http import HttpResponse
 
 from django.shortcuts import render
 
+from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
 
 from core.views import respond_with_error
@@ -47,6 +48,7 @@ comment_form = CommentForm
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def single(request, event_id):
     """
     Display a single event with comments and attendees.
@@ -157,6 +159,7 @@ def single(request, event_id):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def create(request, microcosm_id):
     """
     Create an event within a microcosm.
@@ -249,6 +252,7 @@ def create(request, microcosm_id):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def edit(request, event_id):
     """
     Edit an event.
@@ -327,6 +331,7 @@ def delete(request, event_id):
 
 @require_authentication
 @require_http_methods(['GET', ])
+@cache_control(must_revalidate=True, max_age=0)
 def newest(request, event_id):
     """
     Get redirected to the first unread post in an event.

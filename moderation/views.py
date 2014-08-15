@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 
 from django.shortcuts import render
 
+from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
 
 from core.api.resources import MicrocosmList
@@ -21,6 +22,7 @@ from core.views import require_authentication
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def item(request):
     """
     View for moderation actions on a single item.

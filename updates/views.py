@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 
 from django.shortcuts import render
 
+from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
 
 from core.api.resources import UpdateList
@@ -35,6 +36,7 @@ class UpdateView(object):
     @staticmethod
     @exception_handler
     @require_http_methods(['GET',])
+    @cache_control(must_revalidate=True, max_age=0)
     def list(request):
         # TODO: need a user friendly error page for unregistered users
         # TODO: remove 'site_section'
@@ -88,6 +90,7 @@ class WatcherView(object):
     @exception_handler
     @require_authentication
     @require_http_methods(['GET', 'POST',])
+    @cache_control(must_revalidate=True, max_age=0)
     def list(request):
 
         if request.method == 'POST':
@@ -164,6 +167,7 @@ class UpdatePreferenceView(object):
     @exception_handler
     @require_authentication
     @require_http_methods(['GET', 'POST',])
+    @cache_control(must_revalidate=True, max_age=0)
     def settings(request):
 
         if request.method == 'POST':

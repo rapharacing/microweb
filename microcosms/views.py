@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect
 
 from django.shortcuts import render
 
+from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
 
 from core.api.resources import Microcosm
@@ -45,6 +46,7 @@ members_form_template = 'forms/memberships.html'
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def single_microcosm(request, microcosm_id):
 
     # Pagination offset of items within the microcosm.
@@ -75,6 +77,7 @@ def single_microcosm(request, microcosm_id):
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def list_microcosms(request):
 
     # Pagination offset of microcosms.
@@ -106,6 +109,7 @@ def list_microcosms(request):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def create_microcosm(request):
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
@@ -136,6 +140,7 @@ def create_microcosm(request):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def edit_microcosm(request, microcosm_id):
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
@@ -182,6 +187,7 @@ def delete_microcosm(request, microcosm_id):
 
 @exception_handler
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def list_members(request, microcosm_id):
     try:
         offset = int(request.GET.get('offset', 0))
@@ -329,6 +335,7 @@ def members_api(request, microcosm_id):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def create_members(request, microcosm_id):
 
     if request.method == 'POST':
@@ -363,6 +370,7 @@ def create_members(request, microcosm_id):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def edit_members(request, microcosm_id, group_id):
 
     if request.method == 'POST':

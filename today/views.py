@@ -3,6 +3,7 @@ import logging
 
 from django.shortcuts import render
 
+from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
 
 from core.api.resources import api_url_to_gui_url
@@ -20,6 +21,7 @@ single_template = 'today.html'
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def single(request):
 
     searchParams = request.GET.dict()

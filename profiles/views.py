@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 
 from django.shortcuts import render
 
+from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
 
 from core.api.resources import FileMetadata
@@ -35,6 +36,7 @@ list_template = 'profiles.html'
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def single(request, profile_id):
     """
     Display a single profile by ID.
@@ -71,6 +73,7 @@ def single(request, profile_id):
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def list(request):
 
     # Record offset for paging of profiles.
@@ -132,6 +135,7 @@ def list(request):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def edit(request, profile_id):
     """
     Edit a user profile (profile name or avatar).

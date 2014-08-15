@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 
 from django.shortcuts import render
 
+from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
 
 from core.api.resources import APIException
@@ -38,6 +39,7 @@ list_template = 'huddles.html'
 
 @require_authentication
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def single(request, huddle_id):
 
     # Comment offset.
@@ -84,6 +86,7 @@ def single(request, huddle_id):
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def list(request):
     # Offset for paging of huddles
     try:
@@ -113,6 +116,7 @@ def list(request):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def create(request):
     """
     Create a huddle.
@@ -211,6 +215,7 @@ def delete(request, huddle_id):
 
 @require_authentication
 @require_http_methods(['GET', ])
+@cache_control(must_revalidate=True, max_age=0)
 def newest(request, huddle_id):
     """
     Get redirected to the first unread post in a huddle

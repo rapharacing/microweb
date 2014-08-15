@@ -78,6 +78,7 @@ def build_comment_location(comment):
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def single(request, comment_id):
     """
     Display a single comment.
@@ -182,6 +183,7 @@ def create(request):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def edit(request, comment_id):
     """
     Edit a comment.
@@ -267,6 +269,7 @@ def delete(request, comment_id):
 
 @require_authentication
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def incontext(request, comment_id):
     """
     Redirect to the user's first unread comment in a list of comments.
@@ -298,6 +301,7 @@ def source(request, comment_id):
 
 @require_authentication
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def attachments(request, comment_id):
     """
     Retrieve a comment's attachments.

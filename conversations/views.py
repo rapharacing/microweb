@@ -1,11 +1,15 @@
 import logging
 import grequests
 
-from django.views.decorators.http import require_http_methods
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+
 from django.http import HttpResponseRedirect
+
 from django.shortcuts import render
+
+from django.views.decorators.cache import cache_control
+from django.views.decorators.http import require_http_methods
 
 from core.views import build_pagination_links
 from core.views import build_newest_comment_link
@@ -33,6 +37,7 @@ single_template = 'conversation.html'
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def single(request, conversation_id):
 
     # Offset of comments.
@@ -76,6 +81,7 @@ def single(request, conversation_id):
 
 
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def create(request, microcosm_id):
     """
     Create a conversation and first comment in the conversation.
@@ -146,6 +152,7 @@ def create(request, microcosm_id):
 
 
 @require_http_methods(['GET', 'POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def edit(request, conversation_id):
     """
     Edit a conversation.
@@ -199,6 +206,7 @@ def delete(request, conversation_id):
 
 
 @require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
 def newest(request, conversation_id):
     """
     Redirect to the user's first unread post in the conversation.
