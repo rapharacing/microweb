@@ -5,6 +5,7 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
+from core.api.resources import api_url_to_gui_url
 from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
 from core.api.resources import Search
@@ -67,10 +68,10 @@ def build_pagination_links(request, paged_list):
     }
 
     for item in request:
-        url = str.replace(str(item['href']), '/api/v1/search', '/today')
+        url = str.replace(str(item['href']), '/search', '/today')
         url = str.replace(url, '?since=1&type=conversation&type=event&type=profile&type=huddle', '')
         url = str.replace(url, '&since=1&type=conversation&type=event&type=profile&type=huddle', '')
-        item['href'] = url
+        item['href'] = api_url_to_gui_url(url)
         page_nav[item['rel']] = item
 
     return page_nav

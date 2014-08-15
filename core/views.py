@@ -30,14 +30,15 @@ from django.views.generic.base import RedirectView
 from django.views.generic.base import TemplateView
 
 from core.api.exceptions import APIException
-from core.api.resources import FileMetadata
-from core.api.resources import Comment
-from core.api.resources import Profile
-from core.api.resources import WhoAmI
+from core.api.resources import api_url_to_gui_url
 from core.api.resources import Attachment
+from core.api.resources import Comment
+from core.api.resources import FileMetadata
+from core.api.resources import Legal
+from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
 from core.api.resources import Site
-from core.api.resources import Legal
+from core.api.resources import WhoAmI
 
 from core.api.resources import build_url
 
@@ -116,7 +117,7 @@ def build_pagination_links(request, paged_list):
     }
 
     for item in request:
-        item['href'] = str.replace(str(item['href']), '/api/v1', '')
+        item['href'] = api_url_to_gui_url(item['href'])
         page_nav[item['rel']] = item
 
     return page_nav

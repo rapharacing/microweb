@@ -22,13 +22,14 @@ from core.forms.forms import ConversationCreate
 from core.forms.forms import ConversationEdit
 from core.forms.forms import CommentForm
 
-from core.api.resources import Conversation
-from core.api.resources import Comment
-from core.api.resources import Profile
-from core.api.resources import Attachment
-from core.api.resources import Site
+from core.api.resources import api_url_to_gui_url
 from core.api.resources import APIException
+from core.api.resources import Attachment
+from core.api.resources import Comment
+from core.api.resources import Conversation
+from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
+from core.api.resources import Site
 
 
 logger = logging.getLogger('conversations.views')
@@ -220,7 +221,7 @@ def newest(request, conversation_id):
     for link in response:
         if link['rel'] == 'self':
             response = link['href']
-    response = str.replace(str(response), '/api/v1', '')
+    response = api_url_to_gui_url(response)
     pr = urlparse(response)
     queries = parse_qs(pr[4])
     frag = ""

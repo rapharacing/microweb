@@ -27,14 +27,15 @@ from core.views import process_attachments
 from core.views import build_pagination_links
 
 from core.api.exceptions import APIException
-from core.api.resources import Event
+from core.api.resources import api_url_to_gui_url
+from core.api.resources import Attachment
 from core.api.resources import AttendeeList
 from core.api.resources import Comment
+from core.api.resources import Event
+from core.api.resources import GeoCode
 from core.api.resources import Profile
-from core.api.resources import Attachment
 from core.api.resources import response_list_to_dict
 from core.api.resources import Site
-from core.api.resources import GeoCode
 
 from core.forms.forms import EventCreate
 from core.forms.forms import EventEdit
@@ -347,7 +348,7 @@ def newest(request, event_id):
     for link in response:
         if link['rel'] == 'self':
             response = link['href']
-    response = str.replace(str(response), '/api/v1', '')
+    response = api_url_to_gui_url(response)
     pr = urlparse(response)
     queries = parse_qs(pr[4])
     frag = ""
