@@ -217,7 +217,7 @@ class ErrorView(object):
 
         site = Site(responses[site_url])
         view_data['site'] = site
-        newrelic.agent.add_custom_parameter('site_id', site.site_id)
+        newrelic.agent.add_custom_parameter('site', site.subdomain_key)
 
         context = RequestContext(request, view_data)
         return HttpResponseNotFound(loader.get_template('404.html').render(context))
@@ -245,7 +245,7 @@ class ErrorView(object):
 
         site = Site(responses[site_url])
         view_data['site'] = site
-        newrelic.agent.add_custom_parameter('site_id', site.site_id)
+        newrelic.agent.add_custom_parameter('site', site.subdomain_key)
 
         context = RequestContext(request, view_data)
         return HttpResponseForbidden(loader.get_template('403.html').render(context))
@@ -273,7 +273,7 @@ class ErrorView(object):
 
         site = Site(responses[site_url])
         view_data['site'] = site
-        newrelic.agent.add_custom_parameter('site_id', site.site_id)
+        newrelic.agent.add_custom_parameter('site', site.subdomain_key)
 
         context = RequestContext(request, view_data)
         return HttpResponseServerError(loader.get_template('500.html').render(context))
