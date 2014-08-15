@@ -1785,9 +1785,9 @@ class Comment(APIResource):
 
     @staticmethod
     def incontext(host, id, access_token=None):
-        url = build_url(host, [Comment.api_path_fragment, id, "incontext"])
-        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
-        return response.json()['data']
+        url = build_url(host, [Comment.api_path_fragment, id, 'incontext'])
+        resource = APIResource.retrieve(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return resource
 
     @staticmethod
     def source(host, id, access_token=None):
