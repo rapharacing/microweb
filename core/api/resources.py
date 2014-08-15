@@ -4,6 +4,9 @@ from django.conf import settings
 
 import requests
 
+from urlparse import urlparse
+from urlparse import urlunparse
+
 from dateutil.parser import parse as parse_timestamp
 
 from core.api.exceptions import APIException
@@ -133,6 +136,17 @@ def populate_item(itemtype, itemdata):
     else:
         item = None
     return item
+
+
+def api_url_to_gui_url(api_url):
+    gui_url = urlparse(api_url.replace('/api/v1', ''))
+
+    # API paths are resources, GUI paths are directories
+    # Add trailing slash if missing
+    if gui_url.path[-1:] != '/':
+        return urlunparse((gui_url[0],gui_url[1],gui_url[2] + u'/',gui_url[3],gui_url[4],gui_url[5]))
+
+    return urlunparse(gui_url)
 
 
 class APIResource(object):
@@ -903,9 +917,9 @@ class Meta(object):
             self.links = {}
             for item in data['links']:
                 if 'title' in item:
-                    self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1',''), 'title': item['title']}
+                    self.links[item['rel']] = {'href': api_url_to_gui_url(item['href']), 'title': item['title']}
                 else:
-                    self.links[item['rel']] = {'href': str.replace(str(item['href']),'/api/v1','')}
+                    self.links[item['rel']] = {'href': api_url_to_gui_url(item['href'])}
         if data.get('stats'):
             self.stats = {}
             for stat in data['stats']:

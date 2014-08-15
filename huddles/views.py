@@ -16,14 +16,15 @@ from django.shortcuts import render
 
 from django.views.decorators.http import require_http_methods
 
-from core.api.resources import Comment
-from core.api.resources import Profile
+from core.api.resources import api_url_to_gui_url
+from core.api.resources import APIException
 from core.api.resources import Attachment
-from core.api.resources import Site
+from core.api.resources import Comment
 from core.api.resources import Huddle
 from core.api.resources import HuddleList
-from core.api.resources import APIException
+from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
+from core.api.resources import Site
 
 from core.views import ErrorView
 from core.views import require_authentication
@@ -232,7 +233,7 @@ def newest(request, huddle_id):
     for link in response:
         if link['rel'] == 'self':
             response = link['href']
-    response = str.replace(str(response), '/api/v1', '')
+    response = api_url_to_gui_url(response)
     pr = urlparse(response)
     queries = parse_qs(pr[4])
     frag = ""

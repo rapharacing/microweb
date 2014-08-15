@@ -35,7 +35,7 @@
 						<a href="{% url 'single-profile' result.item.meta.created_by.id %}"><h3 class="row-title">@{{ result.parent_item.profile_name | safe }}</h3></a>
 
 						{% else %}
-						<a href="{{ result.item.meta.links.self.href }}/incontext/"><h3 class="row-title">{{ result.parent_item.title | safe }}</h3></a>
+						<a href="{{ result.item.meta.links.self.href }}incontext/"><h3 class="row-title">{{ result.parent_item.title | safe }}</h3></a>
 						{% endif %}
 				</div>
 
