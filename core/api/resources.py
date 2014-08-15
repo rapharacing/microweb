@@ -1324,9 +1324,9 @@ class Conversation(APIResource):
 
     @staticmethod
     def newest(host, id, access_token=None):
-        url = build_url(host, [Conversation.api_path_fragment, id, "newcomment"])
-        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
-        return response.json()['data']
+        url = build_url(host, [Conversation.api_path_fragment, id, 'newcomment'])
+        resource = APIResource.retrieve(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return resource
 
     def as_dict(self, update=False):
         repr = {}
@@ -1411,9 +1411,9 @@ class Huddle(APIResource):
 
     @staticmethod
     def newest(host, id, access_token=None):
-        url = build_url(host, [Huddle.api_path_fragment, id, "newcomment"])
-        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
-        return response.json()['data']
+        url = build_url(host, [Huddle.api_path_fragment, id, 'newcomment'])
+        resource = APIResource.retrieve(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return resource
 
     def as_dict(self, update=False):
         repr = {}
@@ -1626,9 +1626,9 @@ class Event(APIResource):
 
     @staticmethod
     def newest(host, id, access_token=None):
-        url = build_url(host, [Event.api_path_fragment, id, "newcomment"])
-        response = requests.get(url, params={}, headers=APIResource.make_request_headers(access_token))
-        return response.json()['data']
+        url = build_url(host, [Event.api_path_fragment, id, 'newcomment'])
+        resource = APIResource.retrieve(url, params={}, headers=APIResource.make_request_headers(access_token))
+        return resource
 
     @staticmethod
     def build_attendees_request(host, id, access_token=None):
