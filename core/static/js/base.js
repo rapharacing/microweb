@@ -76,7 +76,7 @@ $('document').ready(function() {
 			initial = self.attr('data-initial'),
 			limit   = self.attr('data-limit'),
 			max     = self.attr('data-max'),
-			value   = parseInt(self.find('input[type=number]').val()),
+			value   = parseInt(self.find('input[type=text]').val()),
 			hidden  = self.find('input[name=offset]');
 
 		console.log("limit = " + limit + " , max = " + max + " , value = " + value);
@@ -91,7 +91,7 @@ $('document').ready(function() {
 			e.preventDefault();
 		}
 	});
-	$('form[name=paginationByOffset] > input[type=number]').blur(function() {
+	$('form[name=paginationByOffset] > input[type=text]').blur(function() {
 		$(this).parent().submit();
 	});
 })();
