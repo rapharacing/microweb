@@ -47,8 +47,8 @@ def single(request, profile_id):
     request.view_requests.append(grequests.get(profile_url, params=params, headers=headers))
 
     # Fetch items created by this profile.
-    search_q = 'type:microcosm type:conversation type:event type:comment authorId:%s' % profile_id
-    search_params = {'limit': 5, 'q': search_q, 'sort': 'date'}
+    search_q = 'type:conversation type:event type:huddle type:comment authorId:%s' % profile_id
+    search_params = {'limit': 10, 'q': search_q, 'sort': 'date'}
     search_url, params, headers = Search.build_request(request.get_host(), search_params,
         access_token=request.access_token)
     request.view_requests.append(grequests.get(search_url, params=params, headers=headers))
