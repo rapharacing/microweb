@@ -3,10 +3,10 @@
 	<div class="row">
 		<div class="col-sm-8 col-md-8 col-lg-8">
 			<div class="list-collection-row-icon">
-				{% if item.meta.flags.sticky %}
-				<a class="sprite sprite-pushpin" title="Pinned event"></a>
-				{% elif not item.meta.flags.open %}
+				{% if not item.meta.flags.open %}
 				<a class="sprite sprite-lock" title="Closed event"></a>
+				{% elif item.meta.flags.sticky %}
+				<a class="sprite sprite-pushpin" title="Pinned event"></a>
 				{% else %}
 				<a class="sprite sprite-calendar" title="Event"></a>
 				{% endif %}
