@@ -18,7 +18,7 @@
 			<div class="col-lg-12">
 				<div class="form-container-inner padded">
 
-					<form role="form" action="" method="POST">
+					<form role="form" action="" method="POST" id="huddleForm">
 						{% csrf_token %}
 						{{ form.id }}
 						<input type="hidden" name="{{ form.is_confidential.name }}" value="0" />
@@ -195,6 +195,22 @@
 		participating.render(peopleWidget.people_invited).show();
 		updateInvitedField();
 	}
+
+    var form = new FormValidator(
+        document.getElementById('huddleForm'),
+        {
+            rules : {
+                '{{ form.title.name }}'      : ['not_empty','maxlength']
+            },
+            tests : {
+                'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
+            },
+            error_messages : {
+                '{{ form.title.name }}:not_empty' : "* {{ form.fields.title.error_messages.required }}",
+                '{{ form.title.name }}:maxlength' : "* {{ form.fields.title.error_messages.max_length }}"
+            }
+        }
+    );
 
 })();
 </script>
