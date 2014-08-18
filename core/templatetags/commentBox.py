@@ -5,7 +5,7 @@ register = template.Library()
 def commentBox(context, **kwargs):
 
     # as_component - removes <form> element and submit buttons in block_comment_box.html
-    context['as_component']   = True if 'as_component' in kwargs else False
+    context['as_component'] = True if 'as_component' in kwargs else False
 
     # no_attachments - removes the attachment section of the comment box
     context['no_attachments'] = True if 'no_attachments' in kwargs else False
