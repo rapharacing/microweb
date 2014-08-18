@@ -2,6 +2,7 @@ import grequests
 import json
 import logging
 
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
 from django.http import HttpResponseRedirect
@@ -20,10 +21,11 @@ from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
 from core.api.resources import Site
 
-from core.views import require_authentication
-from core.views import build_pagination_links
-from core.views import respond_with_error
 from core.views import build_newest_comment_link
+from core.views import build_pagination_links
+from core.views import process_attachments
+from core.views import respond_with_error
+from core.views import require_authentication
 
 from core.forms.forms import CommentForm
 from core.forms.forms import HuddleCreate
@@ -152,8 +154,33 @@ def create(request):
                     'markdown': request.POST.get('firstcomment'),
                     'inReplyTo': 0
                 }
-                comment = Comment.from_create_form(payload)
-                comment.create(request.get_host(), request.access_token)
+                comment_req = Comment.from_create_form(payload)
+                try:
+                    comment = comment_req.create(request.get_host(), request.access_token)
+                except APIException as exc:
+                    return respond_with_error(request, exc)
+
+                try:
+                    process_attachments(request, comment)
+                except ValidationError:
+                    responses = response_list_to_dict(grequests.map(request.view_requests))
+                    comment_form = CommentForm(
+                        initial={
+                            'itemId': comment.item_id,
+                            'itemType': comment.item_type,
+                            'comment_id': comment.id,
+                            'markdown': request.POST['markdown'],
+                        }
+                    )
+                    view_data = {
+                        'user': Profile(responses[request.whoami_url], summary=False),
+                        'site': Site(responses[request.site_url]),
+                        'content': comment,
+                        'comment_form': comment_form,
+                        'error': 'Sorry, one of your files was over 3MB. Please try again.',
+                    }
+                    return render(request, form_template, view_data)
+
             return HttpResponseRedirect(reverse('single-huddle', args=(hud_response.id,)))
         else:
             view_data['form'] = form

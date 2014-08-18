@@ -18,7 +18,7 @@
 			<div class="col-lg-12">
 				<div class="form-container-inner padded">
 
-					<form role="form" action="" method="POST" id="huddleForm">
+					<form role="form" action="" method="POST" id="huddleForm" enctype="multipart/form-data">
 						{% csrf_token %}
 						{{ form.id }}
 						<input type="hidden" name="{{ form.is_confidential.name }}" value="0" />
