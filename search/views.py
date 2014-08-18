@@ -24,7 +24,7 @@ single_template = 'search.html'
 @cache_control(must_revalidate=True, max_age=0)
 def single(request):
 
-    searchParams = request.GET.dict()
+    searchParams = dict(request.GET._iterlists())
     if searchParams.get('defaults'):
         searchParams['inTitle'] = 'true'
         searchParams['sort'] = 'date'

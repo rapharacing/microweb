@@ -175,6 +175,15 @@
 		</ul>
 	</div>
 	{% endif %}
+	{% if content.query.forumId %}
+		<input type="hidden" name="forumId" value="{{content.query.forumId}}" />
+	{% endif %}
+	{% for itemid in content.query.id %}
+		<input type="hidden" name="id" value="{{itemid}}" />
+	{% endfor %}
+	{% if "comment" in content.type %}
+		<input type="hidden" name="type" value="comment" />
+	{% endif %}
 </div> <!-- / filters -->
 
 {% endblock %}

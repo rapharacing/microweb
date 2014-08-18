@@ -100,18 +100,41 @@
 				{{ content.title | safe }}
 			</h3>
 			<p class="metabar-module-author">
-				<a href="{% url 'single-profile' content.meta.created_by.id %}">
+				Created by <a href="{% url 'single-profile' content.meta.created_by.id %}">
 					<img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{ content.meta.created_by.avatar }}{% elif 'files' in  content.meta.created_by.avatar  %}https://{{site.subdomain_key}}.microco.sm{{ content.meta.created_by.avatar }}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ content.meta.created_by.profile_name | safe }}" />
 					@{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}
-				</a> started <time datetime="{{ content.meta.created|date:"c" }}"></time>
+				</a> <time datetime="{{ content.meta.created|date:"c" }}"></time>
 			</p>
 		</div>
-		<div class="metabar-module-body">
-			{% include 'forms/subscribe.html' %}
-		</div>
 	</div> <!-- / about -->
+	<div class="metabar-module">
+		<h5>Actions</h5>
+		<form class="metabar-search-form" role="search" action="{% url 'single-search' %}">
+			<div class="input-group">
+				<input
+					type="text"
+					id="navbar-search-input"
+					class="form-control metabar-search-input"
+					name="q"
+					placeholder="Search this conversation"
+					tabindex="1"
+				/>
+				<input type="hidden" name="type" value="conversation" />
+				<input type="hidden" name="type" value="comment" />
+				<input type="hidden" name="id" value="{{ content.id }}" />
+				<input type="hidden" name="sort" value="date" />
+				<span class="input-group-btn">
+					<button class="btn btn-default metabar-search-icon"><span class="sprite sprite-search-small"></span></button>
+				</span>
+			</div>
+		</form>
 
-	{% include 'forms/metabar-moderation.html' %}
+		<div class="metabar-module-body">
+			<p>{% include 'forms/subscribe.html' %}</p>
+		</div>
+
+		{% include 'forms/metabar-moderation.html' %}
+	</div> <!-- / actions -->
 
 {% endblock %}
 

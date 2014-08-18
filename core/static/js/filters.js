@@ -51,7 +51,12 @@
           checked = this.filters.filter('select:not(:disabled), :checked');
 
       for(var i=0,j=checked.length;i<j;i++){
-        params.push( [checked[i].name,checked[i].value].join(this.param_char) );
+        params.push( [checked[i].name,checked[i].value].join(this.param_char));
+      }
+
+      var hidden = this.filters.filter(':hidden');
+      for(var i=0,j=hidden.length;i<j;i++){
+        params.push( [hidden[i].name,hidden[i].value].join(this.param_char));
       }
 
       return params.join(this.concat_char);
@@ -60,7 +65,7 @@
     filters.prototype.changeHandler = function(){
 
       var params          = this.parse(),
-          new_query       = (this.query.length > 0 ? this.query + "+" : this.query) + (params.length>0 ? params : ''),
+          new_query       = (this.query.length > 0 ? $.trim(this.query) + "+" : $.trim(this.query)) + (params.length>0 ? params : ''),
           formatted_query = this.url.replace(/\$1/g, new_query);
 
      window.location.href = formatted_query;
