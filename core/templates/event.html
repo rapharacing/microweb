@@ -17,11 +17,8 @@
 {% block content %}
 <div class="content-header padded">
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-sm-12">
 			{% include 'breadcrumbs.html' with skipself=True %}
-		</div>
-		<div class="col-sm-6">
-			{% include 'pagination.html' %}
 		</div>
 	</div>
 </div>
@@ -30,8 +27,14 @@
 	<div class="item" itemscope itemtype="event">
 		<div class="item-header padded">
 			<h1 itemprop="name"><a id="title" href="{{ content.meta.links.self.href }}">{{ content.title | safe }}</a></h1>
-			<div class="item-meta">
-				Posted on <strong>{{ content.meta.created|date:"D jS, F Y"}}</strong>
+			<div class="row">
+				<div class="item-meta col-sm-6">
+					Posted on <strong><time class="plain" itemprop="dateCreated" datetime="{{content.meta.created|date:"c"}}">{{ content.meta.created|date:"D jS, F Y"}}</time></strong>
+					{# {% include "forms/content-moderation.html" %} #}
+				</div>
+				<div class="col-sm-6">
+					{% include 'pagination.html' %}
+				</div>
 			</div>
 		</div>
 
@@ -59,9 +62,7 @@
 
 <div class="content-footer padded">
 	<div class="row">
-		<div class="col-sm-6">
-		</div>
-		<div class="col-sm-6">
+		<div class="col-sm-6 pull-right">
 			{% include 'pagination.html' %}
 		</div>
 	</div>

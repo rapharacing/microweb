@@ -13,14 +13,18 @@
 
 <div class="content-header padded">
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-sm-12">
 			{% include 'breadcrumbs.html' %}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-6">
+			<h1><a href="{{ content.meta.links.self.href }}">Following</a></h1>
 		</div>
 		<div class="col-sm-6">
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1><a href="{{ content.meta.links.self.href }}">Following</a></h1>
 </div>
 
 <div class="content-body">
@@ -81,9 +85,7 @@
 
 <div class="content-footer">
 	<div class="row">
-		<div class="col-sm-6">
-		</div>
-		<div class="col-sm-6">
+		<div class="col-sm-6 pull-right">
 			{% include 'pagination.html' %}
 		</div>
 

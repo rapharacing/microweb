@@ -14,11 +14,8 @@
 
 <div class="content-header padded">
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-sm-12">
 			{% include 'breadcrumbs.html' %}
-		</div>
-		<div class="col-sm-6">
-			{% include 'pagination.html' %}
 		</div>
 	</div>
 {% if content.results.items|length == 0 %}
@@ -27,7 +24,14 @@
 <div class="content-body">
 	<p>Be the first to make a post today.</p>
 {% else %}
-	<h1>Today on {{ site.title }}</h1>
+	<div class="row">
+		<div class="col-sm-6">
+			<h1>Today on {{ site.title }}</h1>
+		</div>
+		<div class="col-sm-6">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div>
 <div class="content-body">
 	<div class="list-search">
@@ -51,9 +55,7 @@
 
 <div class="content-footer padded">
 	<div class="row">
-		<div class="col-sm-6">
-		</div>
-		<div class="col-sm-6">
+		<div class="col-sm-6 pull-right">
 			{% include 'pagination.html' %}
 		</div>
 	</div>

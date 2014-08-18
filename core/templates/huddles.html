@@ -8,14 +8,18 @@
 
 <div class="content-header padded">
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-sm-12">
 			{% include 'breadcrumbs.html' with skipself=True %}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-6">
+			<h1><a href="{{ content.meta.links.self.href }}">Messages</a></h1>
 		</div>
 		<div class="col-sm-6">
 			{% include 'pagination.html' %}
 		</div>
 	</div>
-	<h1><a href="{{ content.meta.links.self.href }}">Messages</a></h1>
 </div>
 
 <div class="content-body">
@@ -37,6 +41,15 @@
 	<p class="row-meta">Sign-in to read your messages.</p>
 {% endif %}
 
+</div>
+
+
+<div class="content-footer padded">
+	<div class="row">
+		<div class="col-sm-6 pull-right">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div>
 
 {% endblock %}

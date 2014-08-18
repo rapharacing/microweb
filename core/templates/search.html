@@ -14,11 +14,8 @@
 
 <div class="content-header padded">
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-sm-12">
 			{% include 'breadcrumbs.html' %}
-		</div>
-		<div class="col-sm-6">
-			{% include 'pagination.html' %}
 		</div>
 	</div>
 {% if not content.results %}
@@ -39,9 +36,14 @@
 	</p>
 {% else %}
 	<h1>Search results for: {{ content.query.searched }}</h1>
-	<p class="text-muted">
-		{{ content.results.total | default:0 | intcomma }} matches.  Search took {{ content.time_elapsed }} seconds.
-	</p>
+	<div class="row">
+		<div class="text-muted col-sm-6">
+			{{ content.results.total | default:0 | intcomma }} matches.  Search took {{ content.time_elapsed }} seconds.
+		</div>
+		<div class="col-sm-6">
+			{% include 'pagination.html' %}
+		</div>
+	</div>
 </div>
 <div class="content-body">
 	<div class="list-search">
@@ -69,9 +71,7 @@
 
 <div class="content-footer padded">
 	<div class="row">
-		<div class="col-sm-6">
-		</div>
-		<div class="col-sm-6">
+		<div class="col-sm-6 pull-right">
 			{% include 'pagination.html' %}
 		</div>
 	</div>
