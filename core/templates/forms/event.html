@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load commentBox %}
-{% block title %}{% if form.id > 0 %}Edit event{% else %}Start an event{% endif %} | {{ site.title | safe }}{% endblock title %}
+{% block title %}{% if form.id > 0 %}Edit event{% else %}Post an event{% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block css %}
 <!-- Leaflet -->
@@ -15,7 +15,7 @@
 			{% include 'breadcrumbs.html' %}
 		</div>
 	</div>
-	<h1>{% if form.id > 0 %}Edit event{% else %}Start an event{% endif %}</h1>
+	<h1>{% if form.id > 0 %}Edit event{% else %}Post an event{% endif %}</h1>
 </div>
 
 <div class="content-body">
@@ -384,7 +384,7 @@
 								{% if state_edit %}
 									<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Edit event" tabindex="1" />
 								{% else %}
-									<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Create event" tabindex="1" />
+									<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Post event" tabindex="1" />
 								{% endif %}
 								<input type="reset" class="btn btn-lg btn-default" value="Cancel" onclick="history.back(-1)" />
 

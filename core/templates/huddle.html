@@ -109,8 +109,6 @@
 {% endblock %}
 
 {% block sidebar %}
-
-
 <div class="metabar-module">
 	<h5>About</h5>
 	<div class="metabar-module-title">
@@ -119,12 +117,37 @@
 		</h3>
 
 		<p class="metabar-module-author">
-			<a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name | safe }}" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> Started <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
+			Started by <a href="{% url 'single-profile' content.meta.created_by.id %}" id="created_by"><img src="{% if 'gravatar' in content.meta.created_by.avatar %}{{content.meta.created_by.avatar}}{% elif 'files' in content.meta.created_by.avatar %}https://{{site.subdomain_key}}.microco.sm{{content.meta.created_by.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{content.meta.created_by.profile_name | safe }}" /> @{{ content.meta.created_by.profile_name | safe | truncatechars:25 }}</a> <time datetime="{{ content.meta.created|date:"c" }}">{{ content.meta.creates|timesince }}</time>
 		</p>
-
-		{% include 'forms/subscribe.html' %}
 	</div>
 </div> <!-- / about -->
+
+<div class="metabar-module">
+	<h5>Actions</h5>
+	<form class="metabar-search-form" role="search" action="{% url 'single-search' %}">
+		<div class="input-group">
+			<input
+				type="text"
+				id="navbar-search-input"
+				class="form-control metabar-search-input"
+				name="q"
+				placeholder="Search this message"
+				tabindex="1"
+			/>
+			<input type="hidden" name="type" value="huddle" />
+			<input type="hidden" name="type" value="comment" />
+			<input type="hidden" name="id" value="{{ content.id }}" />
+			<input type="hidden" name="sort" value="date" />
+			<span class="input-group-btn">
+				<button class="btn btn-default metabar-search-icon"><span class="sprite sprite-search-small"></span></button>
+			</span>
+		</div>
+	</form>
+
+	<div class="metabar-module-body">
+		<p>{% include 'forms/subscribe.html' %}</p>
+	</div>
+</div>
 
 {% endblock %}
 

@@ -108,13 +108,6 @@
 
 {% block sidebar %}
 
-	{% if content.meta.permissions.create %}
-	<div class="metabar-module">
-		<h5>Got something to add?</h5>
-		<a id="create_microcosm" href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-folder-open"></span> Create a forum</a>
-	</div> <!-- primary actions -->
-	{% endif %}
-
 	<div class="metabar-module">
 		<h5>About</h5>
 		<div class="metabar-module-title">
@@ -126,8 +119,6 @@
 			</p>
 		</div>
 	</div> <!-- / about -->
-
-
 	<div class="metabar-module">
 		<h5>Population</h5>
 		<ul class="list-group">
@@ -142,6 +133,8 @@
 			</li>
 			{% endif %}
 		</ul>
+	</div> <!-- Population -->
+	<div class="metabar-module">
 		{% if site.meta.stats.totalConversations or site.meta.stats.totalEvents %}
 		<h5>Content</h5>
 		<ul class="list-group">
@@ -165,12 +158,20 @@
 			{% endif %}
 		</ul>
 		{% endif %}
-	</div> <!-- / population -->
+	</div> <!-- Content -->
 
 	{% if user %}
-    <div class="metabar-module-body">
-        {% include 'forms/mark-read.html' %}
-    </div>
+	<div class="metabar-module">
+		<h5>Actions</h5>
+	    <div class="metabar-module-body">
+	        {% include 'forms/mark-read.html' %}
+	    </div>
+	    {% if content.meta.permissions.create %}
+		<div class="metabar-module">
+			<a id="create_microcosm" href="{% url 'create-microcosm' %}" class="btn btn-large btn-block btn-primary"><span class="glyphicon glyphicon-folder-open"></span> Create a forum</a>
+		</div> <!-- primary actions -->
+		{% endif %}
+	</div>
 	{% endif %}
 
 

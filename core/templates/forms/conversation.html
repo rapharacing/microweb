@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load commentBox %}
-{% block title %}{% if state_edit %}Edit conversation{% else %}Start a conversation{% endif %} | {{ site.title | safe }}{% endblock title %}
+{% block title %}{% if state_edit %}Edit conversation{% else %}Post a conversation{% endif %} | {{ site.title | safe }}{% endblock title %}
 
 {% block content %}
 
@@ -8,7 +8,7 @@
 		<div class="row">
 			<div class="col-sm-12"></div>
 		</div>
-		<h1>{% if state_edit %}Edit conversation{% else %}Start a conversation{% endif %}</h1>
+		<h1>{% if state_edit %}Edit conversation{% else %}Post a conversation{% endif %}</h1>
 	</div>
 
 	<div class="content-body">
@@ -100,7 +100,7 @@
 								<div class="col-sm-12">
 									<div class="form-footer-buttons">
 										{% if not state_edit %}
-											<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Start conversation" tabindex="1">
+											<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Post conversation" tabindex="1">
 										{% else %}
 											<input id="submit" type="submit" class="btn btn-lg btn-primary" value="Edit conversation" tabindex="1">
 										{% endif %}
