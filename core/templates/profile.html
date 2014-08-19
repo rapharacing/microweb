@@ -114,7 +114,6 @@
 			<a id="edit_profile" href="{% url 'edit-profile' user.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit your Profile</a>
 		</div>
 	{% else %}
-		<h5>Got something to add?</h5>
 		<div class="metabar-module-primary-buttons">
 			{% if user %}
 			<a href="{% url 'create-huddle' %}?to={{ content.id }}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-envelope-small"></span> Send Message</a>
