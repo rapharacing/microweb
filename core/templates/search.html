@@ -92,6 +92,7 @@
 	</div>
 	<div class="metabar-module-body">
 		<ul class="list-group">
+			{% if not content.query.forumId %}
 			<li class="list-group-item">
 				<div class="checkbox">
 					<label for="filter-microcosm">
@@ -100,6 +101,7 @@
 					</label>
 				</div>
 			</li>
+			{% endif %}
 			<li class="list-group-item">
 				<div class="checkbox">
 					<label for="filter-conversation">
@@ -116,6 +118,7 @@
 						</label>
 				</div>
 			</li>
+			{% if not content.query.forumId %}
 			<li class="list-group-item">
 				<div class="checkbox">
 					<label for="filter-profiles">
@@ -124,7 +127,8 @@
 					</label>
 				</div>
 			</li>
-			{% if user %}
+			{% endif %}
+			{% if user and not content.query.forumId %}
 			<li class="list-group-item">
 				<div class="checkbox">
 					<label for="filter-huddles">
