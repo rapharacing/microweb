@@ -181,13 +181,10 @@
           selectedRange = null,
           selectedText  = false;
 
-      // TODO (buro9 2014-07-31): This appears to not work in Firefox but does
-      // work in Chrome and Safari.
-      if (selection && selection.type && selection.type.toLowerCase() === 'range'){
+      if (selection && (selection.rangeCount > 0 || (selection.type && selection.type.toLowerCase() === 'range'))) {
         selectedRange = selection.getRangeAt(0);
         // selected text must be within a div.comment-item-body
-        if (selectedRange.commonAncestorContainer.className === "comment-item-body" ||
-            selectedRange.commonAncestorContainer.nodeName === "#text"){
+        if ($(selectedRange.commonAncestorContainer.parentElement).parents('.comment-item-body').length) {
           selectedText = selection.getRangeAt(0).cloneContents().textContent;
         }
       }
