@@ -247,6 +247,8 @@ class Site(object):
         self.theme_id = data['themeId']
         self.link_color = data['linkColor']
         self.background_color = data['backgroundColor']
+        if data.get('faviconUrl'):
+            self.favicon_url = data['faviconUrl']
         if data.get('backgroundUrl'):
             self.background_url = data['backgroundUrl']
         if data.get('backgroundPosition'):

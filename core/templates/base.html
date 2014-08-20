@@ -24,7 +24,11 @@
 		<![endif]-->
 		<link href="{{ STATIC_URL }}themes/{{ site.theme_id|default:"1" }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
-		<link rel="shortcut icon" href="/static/img/favico.png" />
+		{% if site.favicon_url %}
+			<link rel="shortcut icon" href="{{ site.favicon_url }}" />
+		{% else %}
+			<link rel="shortcut icon" href="/static/img/favico.png" />
+		{% endif %}
 		<meta name="subdomain" content="https://{{ site.subdomain_key }}.microco.sm" />
 
 		<style type="text/css" id='site-style'>
