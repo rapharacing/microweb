@@ -3,7 +3,7 @@
 
 {% block title %}{{ content.meta.links.up.title | safe }} (Comment {{ content.id }}){% endblock title%}
 
-{% block description %}{{ content.html | striptags }} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock description %}
+{% block description %}{{ content.html | striptags }}{% endblock description %}
 
 {% load comments %}
 {% block content %}

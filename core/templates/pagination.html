@@ -29,20 +29,6 @@
 	{% endif %}
 </ul>
 <div class="pagination-alt">
-	{% if pagination.first %}
-		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-left" href="{{ pagination.first.href }}">First</a>
-	{% endif %}
-	{% if pagination.prev %}
-		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-left" href="{{ pagination.prev.href }}">Prev</a>
-	{% endif %}
-	{% if pagination.last %}
-		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-right" href="{{ pagination.last.href }}">Last</a>
-	{% endif %}
-	{% if pagination.next %}
-		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-right" href="{{ pagination.next.href }}">Next</a>
-	{% endif %}
-</div>
-<div class="pagination-alt">
 	{% if pagination.total_pages > 1 %}
 		Page
 		<form
@@ -71,6 +57,46 @@
 		of {{ pagination.total_pages | default:1 | intcomma }}
 	{% else %}
 		Page 1 of 1
+	{% endif %}
+</div>
+<div class="pagination-alt-xs">
+	{% if pagination.first %}
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-left" href="{{ pagination.first.href }}">First</a>
+	{% endif %}
+	{% if pagination.prev %}
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-left" href="{{ pagination.prev.href }}">Prev</a>
+	{% endif %}
+		{% if pagination.total_pages > 1 %}
+		<form
+			name="paginationByOffset"
+			method="GET"
+			action=""
+			data-initial="{{ pagination.page }}"
+			data-limit="{{ pagination.limit }}"
+			data-max="{{ pagination.total_pages }}"
+		>
+			Page
+			<input
+				type="text"
+				min="1"
+				value="{{ pagination.page }}"
+				max="{{ pagination.total_pages }}"
+				step="1"
+				pattern="\d*"
+				title="Enter the page number to jump to"
+				class="form-control"
+			/>
+			<input name="offset" type="hidden" />
+			{% if content.query and content.query.searched %}
+			<input name="q" type="hidden" value="{{ content.query.searched }}" />
+			{% endif %}
+		</form>
+	{% endif %}
+	{% if pagination.last %}
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-right" href="{{ pagination.last.href }}">Last</a>
+	{% endif %}
+	{% if pagination.next %}
+		<a class="btn btn-primary btn-xs pagination-alt-btn pagination-alt-right" href="{{ pagination.next.href }}">Next</a>
 	{% endif %}
 </div>
 {% endif %}
