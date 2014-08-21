@@ -1651,18 +1651,11 @@ class Event(APIResource):
         return AttendeeList(resource)
 
     @classmethod
-    def rsvp(cls, host, event_id, profile_id, attendance_data, access_token):
-        """
-        Create or update attendance to an event.
-        """
-
-        collection_url = build_url(host, [cls.api_path_fragment, event_id, 'attendees'])
-        try:
-            resource = APIResource.update(collection_url, json.dumps(attendance_data), {'access_token': access_token}, {})
-            print json.dumps(attendance_data)
-        except requests.RequestException:
-            raise
-        return Event.from_api_response(resource)
+    def rsvp_api(cls, host, event_id, profile_id, attendance_data, access_token):
+        url = build_url(host, [cls.api_path_fragment, event_id, 'attendees'])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.put(url, data=json.JSONEncoder().encode(attendance_data), headers=headers, allow_redirects=False)
 
 
 class AttendeeList(object):

@@ -1,5 +1,6 @@
 import datetime
 import grequests
+import requests
 import json
 import logging
 
@@ -197,10 +198,11 @@ def create(request, microcosm_id):
                             })
                     if len(attendees) > 0:
                         try:
-                            Event.rsvp(request.get_host(), event_response.id, user.id, attendees,
-                                access_token=request.access_token)
+                            response = Event.rsvp_api(request.get_host(), event_response.id, user.id, attendees, access_token=request.access_token)
                         except APIException as exc:
                             return respond_with_error(request, exc)
+                        if response.status_code != requests.codes.ok:
+                            return HttpResponseBadRequest()
 
             # create comment
             if request.POST.get('firstcomment') and len(request.POST.get('firstcomment')) > 0:
@@ -357,10 +359,13 @@ def rsvp(request, event_id):
     user = Profile(responses[request.whoami_url], summary=False)
 
     attendee = [dict(rsvp=request.POST['rsvp'],profileId=user.id),]
+
     try:
-        Event.rsvp(request.get_host(), event_id, user.id, attendee, access_token=request.access_token)
+        response = Event.rsvp_api(request.get_host(), event_id, user.id, attendee, access_token=request.access_token)
     except APIException as exc:
         return respond_with_error(request, exc)
+    if response.status_code != requests.codes.ok:
+        return HttpResponseBadRequest() 
 
     return HttpResponseRedirect(reverse('single-event', args=(event_id,)))
 
