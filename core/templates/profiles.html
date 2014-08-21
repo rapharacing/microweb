@@ -64,9 +64,11 @@
 			<li class="list-group-item">
 				<div class="checkbox">
 					<label for="filter-name">
-					<input id="filter-name" type="checkbox" {% if q %}checked="checked"{% endif %}/>
-					Starts with
-					<select {% if not q %}disabled{% endif %} name="q">
+					<input id="filter-name" type="checkbox" name="q" value="{{ q }}" {% if q %}checked="checked"{% endif %}/>
+					Name starts with:
+					</label>
+					<!-- <select {% if not q %}disabled{% endif %} name="q"> -->
+					<select id="select-name-prefix">
 						<option></option>
 						{% for letter in alphabet %}
 						<option value="{{ letter }}" {% if q|lower == letter|lower %}selected="selected"{% endif %}>
@@ -74,7 +76,6 @@
 						</option>
 						{% endfor %}
 					</select>
-					</label>
 				</div>
 			</li>
 			<li class="list-group-item">
@@ -136,24 +137,32 @@
 		param_char : '='
 	});
 
-	var dont_jump_on_unselect = {% if q %}false{%else%}true{%endif%};
+	$('input#filter-name').on('change',function(e){
+		var filter = $('input#filter-name');
+		if (filter.is(':checked') && "{{q}}" === filter.val()) {
+			e.stopPropagation();
+		} else if (!filter.is(':checked') && "" === filter.val()) {
+			e.stopPropagation();
+		}
+	});
 
-	$('#filter-name').on('change',function(e){
+	$('#select-name-prefix').on('change',function(e){
+		var select = $('#select-name-prefix'),
+		    filter = $('input#filter-name'),
+		    original = "{{ q }}";
 
-		var self = $(e.currentTarget),
-				select = $('select[name=q]');
-
-		if (self.is(':checked')){
-			select.attr('disabled',false);
-		}else{
-			select.attr('disabled',true);
-			if (!dont_jump_on_unselect && select.val().trim()!==""){
+		if (select.val() !== "") {
+			filter.val(select.val()).prop('checked', true);
+			if (select.val() != original) {
+				search_filters.changeHandler();
+			}
+		} else {
+			filter.val("").prop('checked', false);
+			if (select.val() != original) {
 				search_filters.changeHandler();
 			}
 		}
-
 	});
-
 })();
 </script>
 {% endblock %}
