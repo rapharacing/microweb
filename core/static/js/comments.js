@@ -177,19 +177,13 @@
 
     comments.prototype.getWindowSelectedText = function(){
 
-      var selection     = window.getSelection(),
-          selectedRange = null,
-          selectedText  = false;
+      var selection     = window.getSelection();
 
-      if (selection && (selection.rangeCount > 0 || (selection.type && selection.type.toLowerCase() === 'range'))) {
-        selectedRange = selection.getRangeAt(0);
-        // selected text must be within a div.comment-item-body
-        if ($(selectedRange.commonAncestorContainer.parentElement).parents('.comment-item-body').length) {
-          selectedText = selection.getRangeAt(0).cloneContents().textContent;
-        }
+      if (selection && typeof selection.toString == 'function') {
+        return selection.toString().replace(/\n/g, "\n> ");
       }
 
-      return selectedText;
+      return false;
     };
 
     comments.prototype.reset = function(){
