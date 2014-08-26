@@ -18,9 +18,6 @@
 	<div class="item">
 		<div class="item-header">
 			<h1><a href="{{ content.meta.links.up.href }}">{{ content.meta.links.up.title | safe }}</a></h1>
-			<div class="item-meta">
-				{% include "forms/content-moderation.html" %}
-			</div>
 		</div>
 		<div class="alert alert-warning">
 			You are reading a single comment by <a href="{% url 'single-profile' content.meta.created_by.id %}">@{{ content.meta.created_by.profile_name | safe }}</a> and its replies.
