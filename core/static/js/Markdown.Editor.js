@@ -1539,7 +1539,7 @@
 			});
 
 		chunk.selection = chunk.selection.replace(/^(\s|>)+$/, "");
-		chunk.selection = chunk.selection || "Blockquote";
+		chunk.selection = chunk.selection || "lines starting with a 'greater than' denote quoted text";
 
 		// The original code uses a regular expression to find out how much of the
 		// text *directly before* the selection already was a blockquote:
