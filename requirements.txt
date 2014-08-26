@@ -1,12 +1,12 @@
-Django==1.5.4
+Django==1.5.9
 requests==1.1.0
-python-dateutil==2.1
+python-dateutil==1.4
 
 # Production server
 gunicorn==0.17.2
 
 # Riemann client
-bernhard==0.0.3
+bernhard==0.1.1
 
 # Mock python objects for testing
 mock==1.0.1

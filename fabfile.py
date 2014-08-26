@@ -44,7 +44,7 @@ def create_virtualenv():
 def install_requirements():
 
     with activate_virtualenv():
-        sudo('pip install -q -r %s' % env.requirements_path, user='django')
+        sudo('pip install -r %s' % env.requirements_path, user='django')
 
 def collectstatic():
 
