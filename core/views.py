@@ -89,7 +89,7 @@ def respond_with_error(request, exception):
     elif exception.status_code == 401:
         return ErrorView.requires_login(request)
     else:
-        return ErrorView.server_error(request)
+        return ErrorView.server_error(request, exception)
 
 def require_authentication(view_func):
     """
@@ -277,7 +277,7 @@ class ErrorView(object):
         return HttpResponseForbidden(loader.get_template('403.html').render(context))
 
     @staticmethod
-    def server_error(request):
+    def server_error(request, exception=None):
         view_data = {}
         view_requests = []
 
@@ -300,6 +300,11 @@ class ErrorView(object):
         site = Site(responses[site_url])
         view_data['site'] = site
         newrelic.agent.add_custom_parameter('site', site.subdomain_key)
+
+        # Provide detailed error if returned in the response.
+        if hasattr(exception, 'detail'):
+            if exception.detail.has_key('errorDetail'):
+                view_data['detail'] = exception.detail['errorDetail']
 
         context = RequestContext(request, view_data)
         return HttpResponseServerError(loader.get_template('500.html').render(context))
