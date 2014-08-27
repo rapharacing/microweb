@@ -75,7 +75,6 @@
 			data-limit="{{ pagination.limit }}"
 			data-max="{{ pagination.total_pages }}"
 		>
-			Page
 			<input
 				type="text"
 				min="1"
@@ -90,6 +89,7 @@
 			{% if content.query and content.query.searched %}
 			<input name="q" type="hidden" value="{{ content.query.searched }}" />
 			{% endif %}
+			/ {{ pagination.total_pages | default:1 | intcomma }}
 		</form>
 	{% endif %}
 	{% if pagination.last %}
