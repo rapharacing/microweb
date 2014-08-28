@@ -1,8 +1,8 @@
 {% load humanize %}
 <li class="list-collection-row{% if item.meta.flags.sticky %} row-pinned{% endif %} {% if item.is_deleted %} row-deleted{% endif %}" id="{{ item_type }}{{ item.id }}" itemscope itemtype="http://schema.org/Event">
-	<div class="row">
-		<div class="col-sm-8 col-md-8 col-lg-8">
-			<div class="list-collection-row-icon">
+	<div class="row block">
+		<div class="col-sm-8">
+			<div class="cell-icon">
 				{% if not item.meta.flags.open %}
 				<a class="sprite sprite-lock" title="Closed event"></a>
 				{% elif item.meta.flags.sticky %}
@@ -11,42 +11,45 @@
 				<a class="sprite sprite-calendar" title="Event"></a>
 				{% endif %}
 			</div>
-			<div class="list-collection-row-offset">
-				<h3 class="row-title {% if item.highlight %}row-title-highlight{% endif %}" itemprop="name">
+			<div class="cell-icon-offset">
+				<h3 class="cell-title" itemprop="name">
 					<a href="/events/{{ item.id }}/{% if user %}newest/{% endif %}" itemprop="url">{% if item.highlight %}{{ item.highlight | safe }}{% else %}{{ item.title | safe }}{% endif %}</a>
 					{% if unread or item.unread or item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
 				</h3>
-				{% if not item.meta.flags.sticky %}
-				<div class="row-meta">
-					{% if item.meta.created_by %}
+				{% if item.meta.created_by %}
+				<div class="cell-started">
 					<span itemprop="attendee" itemscope itemtype="http://schema.org/Person"><a href="{% url 'single-profile' item.meta.created_by.id %}" itemprop="url">@<span itemprop="name">{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</span></a></span> started <time datetime="{{ item.meta.created|date:"c" }}"></time>
+				</div>
+				{% endif %}
+				<div class="cell-meta-event">
+					{% if item.when %}
+					<span>
+						<time class="plain" datetime="{{item.when|date:"c"}}" itemprop="startDate">{{ item.when|date:"N jS" }}</time>
+					</span>
+					{% else %}
+					<span>
+						<time class="plain" title="Date to be determined">TBD</time>
+					</span>
 					{% endif %}
-					<div class="pills-event">
-						{% if item.when %}
-						<span>
-							<time class="plain" datetime="{{item.when|date:"c"}}" itemprop="startDate">{{ item.when|date:"N jS" }}</time>
-						</span>
-						{% else %}
-						<span>
-							<time class="plain" title="Date to be determined">TBD</time>
-						</span>
-						{% endif %}
-						{% if item.where %}
-						<span class="pills-event-where" itemprop="location" itemscope itemtype="http://schema.org/Place">
-							<span itemprop="name" title="{{ item.where | safe }}">{{ item.where | safe }}</span>
-						</span>
-						{% else %}
-						<span class="pills-event-where">
-							<span title="Location to be determined">TBD</span>
-						</span>
-						{% endif %}
-					</div>
+					{% if item.where %}
+					<span class="cell-meta-event-where" itemprop="location" itemscope itemtype="http://schema.org/Place">
+						<span itemprop="name" title="{{ item.where | safe }}">{{ item.where | safe }}</span>
+					</span>
+					{% else %}
+					<span class="cell-meta-event-where">
+						<span title="Location to be determined">TBD</span>
+					</span>
+					{% endif %}
+				</div>
+				{% if showForum %}
+				<div class="cell-forum">
+					in <a href="{{ item.meta.links.microcosm.href }}">{{ item.meta.links.microcosm.title | safe }}</a>
 				</div>
 				{% endif %}
 			</div>
 		</div>
-		<div class="col-sm-4 col-md-4 col-lg-4">
-			<div class="row-stats">
+		<div class="col-sm-4">
+			<div class="cell-stats">
 				<ul class="list-stats list-stats-sm">
 					{% if item.total_comments >= 0%}
 					<li>
@@ -62,13 +65,11 @@
 					{% endif %}
 				</ul>
 			</div>
-			{% if not item.meta.flags.sticky %}
-				<div class="row-context">
-					{% if item.last_comment_created %}
-						<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
-					{% endif %}
-				</div>
-			{% endif %}
+			<div class="cell-recent">
+				{% if item.last_comment_created %}
+					<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
+				{% endif %}
+			</div>
 		</div>
 	</div>
 </li>

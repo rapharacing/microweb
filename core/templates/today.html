@@ -38,9 +38,9 @@
 		<ul class="list-collection bordered padded">
 			{% for result in content.results.items %}
 				{% if result.item_type == 'conversation' %}
-					{% conversation result unread=result.unread %}
+					{% conversation result unread=result.unread showForum=True %}
 				{% elif result.item_type == 'event' %}
-					{% event result unread=result.unread%}
+					{% event result unread=result.unread showForum=True %}
 				{% elif result.item_type == 'profile' %}
 					{% profile result send_message=True %}
 				{% elif result.item_type == 'huddle' %}
