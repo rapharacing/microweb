@@ -42,9 +42,9 @@
 				{% for update in content.updates.items %}
 					<!-- Start item -->
 					{% if update.item_type == 'conversation' %}
-						{% conversation update unread=update.meta.flags.unread %}
+						{% conversation update unread=update.meta.flags.unread showForum=True %}
 					{% elif update.item_type == 'event' %}
-						{% event update unread=update.meta.flags.unread %}
+						{% event update unread=update.meta.flags.unread showForum=True %}
 					{% elif update.item_type == 'microcosm' %}
 						{% microcosm update unread=update.meta.flags.unread %}
 					{% elif update.item_type == 'profile' %}
@@ -54,9 +54,9 @@
 					{% elif update.item_type == 'comment' %}
 						{% if update.update_type == 'new_comment' or update.update_type == 'new_comment_in_huddle'  %}
 							{% if update.parent_item_type == 'conversation' %}
-								{% conversation update.parent_item unread=update.meta.flags.unread %}
+								{% conversation update.parent_item unread=update.meta.flags.unread showForum=True %}
 							{% elif update.parent_item_type == 'event' %}
-								{% event update.parent_item unread=update.meta.flags.unread %}
+								{% event update.parent_item unread=update.meta.flags.unread showForum=True %}
 							{% elif update.parent_item_type == 'profile' %}
 								{% profile update.parent_item %}
 							{% elif update.parent_item_type == 'huddle' %}

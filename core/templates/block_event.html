@@ -16,31 +16,34 @@
 					<a href="/events/{{ item.id }}/{% if user %}newest/{% endif %}" itemprop="url">{% if item.highlight %}{{ item.highlight | safe }}{% else %}{{ item.title | safe }}{% endif %}</a>
 					{% if unread or item.unread or item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
 				</h3>
-				{% if not item.meta.flags.sticky %}
+				{% if item.meta.created_by %}
 				<div class="cell-started">
-					{% if item.meta.created_by %}
 					<span itemprop="attendee" itemscope itemtype="http://schema.org/Person"><a href="{% url 'single-profile' item.meta.created_by.id %}" itemprop="url">@<span itemprop="name">{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</span></a></span> started <time datetime="{{ item.meta.created|date:"c" }}"></time>
+				</div>
+				{% endif %}
+				<div class="cell-meta-event">
+					{% if item.when %}
+					<span>
+						<time class="plain" datetime="{{item.when|date:"c"}}" itemprop="startDate">{{ item.when|date:"N jS" }}</time>
+					</span>
+					{% else %}
+					<span>
+						<time class="plain" title="Date to be determined">TBD</time>
+					</span>
 					{% endif %}
-					<div class="cell-meta-event">
-						{% if item.when %}
-						<span>
-							<time class="plain" datetime="{{item.when|date:"c"}}" itemprop="startDate">{{ item.when|date:"N jS" }}</time>
-						</span>
-						{% else %}
-						<span>
-							<time class="plain" title="Date to be determined">TBD</time>
-						</span>
-						{% endif %}
-						{% if item.where %}
-						<span class="cell-meta-event-where" itemprop="location" itemscope itemtype="http://schema.org/Place">
-							<span itemprop="name" title="{{ item.where | safe }}">{{ item.where | safe }}</span>
-						</span>
-						{% else %}
-						<span class="cell-meta-event-where">
-							<span title="Location to be determined">TBD</span>
-						</span>
-						{% endif %}
-					</div>
+					{% if item.where %}
+					<span class="cell-meta-event-where" itemprop="location" itemscope itemtype="http://schema.org/Place">
+						<span itemprop="name" title="{{ item.where | safe }}">{{ item.where | safe }}</span>
+					</span>
+					{% else %}
+					<span class="cell-meta-event-where">
+						<span title="Location to be determined">TBD</span>
+					</span>
+					{% endif %}
+				</div>
+				{% if showForum %}
+				<div class="cell-forum">
+					in <a href="{{ item.meta.links.microcosm.href }}">{{ item.meta.links.microcosm.title | safe }}</a>
 				</div>
 				{% endif %}
 			</div>
@@ -62,13 +65,11 @@
 					{% endif %}
 				</ul>
 			</div>
-			{% if not item.meta.flags.sticky %}
-				<div class="cell-recent">
-					{% if item.last_comment_created %}
-						<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
-					{% endif %}
-				</div>
-			{% endif %}
+			<div class="cell-recent">
+				{% if item.last_comment_created %}
+					<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
+				{% endif %}
+			</div>
 		</div>
 	</div>
 </li>

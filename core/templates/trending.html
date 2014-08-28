@@ -40,10 +40,10 @@
       <ul class="list-collection bordered padded">
       {% for item in content.items.items %}
         {% if item.item_type == "conversation" %}
-          {% conversation item %}
+          {% conversation item showForum=True %}
         {% endif %}
         {% if item.item_type == "event" %}
-          {% event item %}
+          {% event item showForum=True %}
         {% endif %}
       {% endfor %}
       </ul>

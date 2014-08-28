@@ -16,11 +16,14 @@
 					<a href="/conversations/{{ item.id }}/{% if user %}newest/{% endif %}" itemprop="url">{% if item.highlight %}{{ item.highlight | safe }}{% else %}{{ item.title | safe }}{% endif %}</a>
 					{% if unread or item.unread or item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
 				</h3>
-				{% if not item.meta.flags.sticky %}
+				{% if item.meta.created_by%}
 				<div class="cell-started">
-				{% if item.meta.created_by %}
 					<span itemprop="author" itemscope itemtype="http://schema.org/Person"><a href="{% url 'single-profile' item.meta.created_by.id %}" itemprop="url">@<span itemprop="name">{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</span></a></span> started <time datetime="{{ item.meta.created|date:"c" }}" itemprop="dateCreated"></time>
+				</div>
 				{% endif %}
+				{% if showForum %}
+				<div class="cell-forum">
+					in <a href="{{ item.meta.links.microcosm.href }}">{{ item.meta.links.microcosm.title | safe }}</a>
 				</div>
 				{% endif %}
 			</div>
@@ -42,13 +45,11 @@
 					{% endif %}
 				</ul>
 			</div>
-			{% if not item.meta.flags.sticky %}
-				<div class="cell-recent">
-					{% if item.last_comment_created %}
-						<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
-					{% endif %}
-				</div>
-			{% endif %}
+			<div class="cell-recent">
+				{% if item.last_comment_created %}
+					<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
+				{% endif %}
+			</div>
 		</div>
 	</div>
 </li>

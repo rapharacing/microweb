@@ -12,11 +12,13 @@
 					<span class="label label-warning">NEW</span>
 					{% endif %}
 				</h3>
+				{% if item.meta.created_by %}
 				<div class="cell-started">
-					{% if item.meta.created_by %}
 					<a href="{% url 'single-profile' item.meta.created_by.id %}">@{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ item.meta.created|date:"c" }}"></time>
-					{% endif %}
 					&bull;
+				</div>
+				{% endif %}
+				<div class="cell-meta-huddle">
 					<ul class="list-people list-people-sm">
 						{% for participant in item.participants|slice:":6" %}
 							<li>

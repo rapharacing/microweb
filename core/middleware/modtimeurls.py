@@ -51,7 +51,7 @@ import pylibmc as memcache
 url_attributes = ['src', 'href']
 
 # stop matching when we hit <, > or " to guard against erratic markup
-link_matcher = re.compile(u'((?:%s)="(?:%s|%s)[^<>"]*")' % ("|".join(url_attributes), re.escape(settings.STATIC_URL), re.escape(settings.MEDIA_URL)))
+link_matcher = re.compile(u'((?:%s)="(?:%s)[^<>"]*")' % ("|".join(url_attributes), re.escape(settings.STATIC_URL)))
 
 class ModTimeUrlsMiddleware:
     """Middleware for adding modtime GET parameter to each media URL in responses."""
@@ -62,21 +62,17 @@ class ModTimeUrlsMiddleware:
 
     def append_modtime_to_url(self, url):
         """Append the file modification time to URL if the URL is in
-        STATIC_URL/MEDIA_URL and corresponds to a file in
-        STATIC_ROOT/MEDIA_ROOT. This function can be used standalone in
+        STATIC_URL and corresponds to a file in
+        STATIC_ROOT. This function can be used standalone in
         case there are links not catched by the middleware."""
         static = url.startswith(settings.STATIC_URL)
-        media = url.startswith(settings.MEDIA_URL)
-        if not (static or media):
+        if not (static):
             return url
 
         if url == '/':
             return url
 
-        if static:
-            filename = os.path.join(settings.STATIC_ROOT, url[len(settings.STATIC_URL):])
-        else:
-            filename = os.path.join(settings.MEDIA_ROOT, url[len(settings.MEDIA_URL):])
+        filename = os.path.join(settings.STATIC_ROOT, url[len(settings.STATIC_URL):])
 
         index = filename.rfind('?')
         contains_question_mark = index != -1
