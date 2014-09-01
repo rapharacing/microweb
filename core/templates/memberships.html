@@ -45,7 +45,7 @@
 
                     <ul class="list-people list-people-sm">
                       {% for member in membership.members.items %}
-                      <li><a href="{% url 'single-profile' member.id  %}"><img src="{% if 'gravatar' in member.avatar %}{{member.avatar}}{% elif 'files' in member.avatar %}https://{{site.subdomain_key}}.microco.sm{{member.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{member.profile_name | safe }}" align="left" class="img-badge" /></a></li>
+                      <li><a href="{% url 'single-profile' member.id  %}" title="@{{ member.profile_name | safe }}"><img src="{% if 'gravatar' in member.avatar %}{{member.avatar}}{% elif 'files' in member.avatar %}https://{{site.subdomain_key}}.microco.sm{{member.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{member.profile_name | safe }}" align="left" class="img-badge" /></a></li>
                       {% endfor %}
                     </ul>
                   {% endif %}
