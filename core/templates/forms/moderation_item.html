@@ -55,7 +55,9 @@
                             <input type="hidden" name="action" value="{{ action }}" />
                             <input type="hidden" name="item_type" value="{{ item_type }}"/>
                             <input type="hidden" name="item_id" value="{{ content.id }}"/>
+                            {% if content.microcosm_id %}
                             <input type="hidden" name="microcosm_id" value="{{content.microcosm_id}}" />
+                            {% endif %}
                             {% if action == 'delete' %}
                                 <input type="submit" value="Delete" class="btn btn-primary"/>
                             {% elif action == 'undelete' %}
@@ -76,6 +78,10 @@
                 </div>
         {% endif %}
 
+        {% if content.microcosm_id %}
         <p>Or, <a href={% url 'single-microcosm' content.microcosm_id %}>cancel and go back</a>.</p>
+        {% else %}
+        <p>Or, <a href={% url 'single-microcosm' content.id %}>cancel and go back</a>.</p>
+        {% endif %}
     </div>
 {% endblock %}

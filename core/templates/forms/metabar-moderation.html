@@ -1,34 +1,72 @@
-{% if content.meta.permissions.moderator or content.meta.permissions.owner and content.meta.permissions.open and not content.meta.flags.open or content.meta.permissions.owner and content.meta.permissions.close and content.meta.flags.open %}
-<div class="metabar-admin">
-	<form class="metabar-admin-actions" action="{% url 'moderate-item' %}" method="GET">
-		<input type="hidden" name="item_id" value="{{ content.id }}" />
-		<input type="hidden" name="item_type" value="{{ item_type }}" />
-		<select id="metabar-admin-actions" class="cselect cselect-xs" name="action">
-			{% if content.meta.permissions.moderator %}
-				{% if content.meta.flags.sticky %}
-					<option value="unpin">Unpin</option>
+{% if item_type == "microcosm" %}
+	{# forums #}
+	{% if content.meta.permissions.admin or content.meta.permissions.moderator %}
+	<div class="metabar-admin">
+		<form class="metabar-admin-actions" action="{% url 'moderate-item' %}" method="GET">
+			<input type="hidden" name="item_id" value="{{ content.id }}" />
+			<input type="hidden" name="item_type" value="{{ item_type }}" />
+			<select id="metabar-admin-actions" class="cselect cselect-xs" name="action">
+				{% if content.meta.permissions.admin %}
+					{% if content.meta.flags.sticky %}
+						<option value="unpin">Unpin</option>
+					{% else %}
+						<option value="pin"> Pin</option>
+					{% endif %}
+				{% endif %}
+				{% if content.meta.flags.open %}
+					<option value="close">Close</option>
 				{% else %}
-					<option value="pin"> Pin</option>
+					<option value="open">Open</option>
 				{% endif %}
-			{% endif %}
-			{% if content.meta.flags.open %}
-				<option value="close">Close</option>
-			{% else %}
-				<option value="open">Open</option>
-			{% endif %}
-			{% if content.meta.permissions.moderator %}
-				{% if content.meta.flags.moderated %}
-					<option value="approve">Approve</option>
+				{% if content.meta.permissions.admin %}
+					{% if content.meta.flags.moderated %}
+						<option value="approve">Approve</option>
+					{% endif %}
+					{% if content.meta.flags.deleted %}
+						<option value="undelete">Undelete</option>
+					{% else %}
+						<option value="delete">Delete</option>
+					{% endif %}
 				{% endif %}
-				<option value="move">Move</option>
-				{% if content.meta.flags.deleted %}
-					<option value="undelete">Undelete</option>
+			</select>
+			<input type="submit" value="Go" class="btn btn-primary btn-xs"/>
+		</form>
+	</div>
+	{% endif %}
+{% else %}
+	{# conversations, events, etc #}
+	{% if content.meta.permissions.moderator or content.meta.permissions.owner and content.meta.permissions.open and not content.meta.flags.open or content.meta.permissions.owner and content.meta.permissions.close and content.meta.flags.open %}
+	<div class="metabar-admin">
+		<form class="metabar-admin-actions" action="{% url 'moderate-item' %}" method="GET">
+			<input type="hidden" name="item_id" value="{{ content.id }}" />
+			<input type="hidden" name="item_type" value="{{ item_type }}" />
+			<select id="metabar-admin-actions" class="cselect cselect-xs" name="action">
+				{% if content.meta.permissions.moderator %}
+					{% if content.meta.flags.sticky %}
+						<option value="unpin">Unpin</option>
+					{% else %}
+						<option value="pin"> Pin</option>
+					{% endif %}
+				{% endif %}
+				{% if content.meta.flags.open %}
+					<option value="close">Close</option>
 				{% else %}
-					<option value="delete">Delete</option>
+					<option value="open">Open</option>
 				{% endif %}
-			{% endif %}
-		</select>
-		<input type="submit" value="Go" class="btn btn-primary btn-xs"/>
-	</form>
-</div>
+				{% if content.meta.permissions.moderator %}
+					{% if content.meta.flags.moderated %}
+						<option value="approve">Approve</option>
+					{% endif %}
+					<option value="move">Move</option>
+					{% if content.meta.flags.deleted %}
+						<option value="undelete">Undelete</option>
+					{% else %}
+						<option value="delete">Delete</option>
+					{% endif %}
+				{% endif %}
+			</select>
+			<input type="submit" value="Go" class="btn btn-primary btn-xs"/>
+		</form>
+	</div>
+	{% endif %}
 {% endif %}

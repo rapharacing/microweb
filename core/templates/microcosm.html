@@ -64,8 +64,7 @@
 {% endblock %}
 
 {% block sidebar%}
-
-	{# if content.meta.permissions.create #}
+	{% if content.meta.flags.open %}
 		<div class="metabar-module">
 			<div class="metabar-module-primary-buttons">
 			{% if user %}
@@ -76,8 +75,13 @@
 				<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin"><span class="sprite sprite-calendar-small"></span> Post an event</a>
 			{% endif %}
 			</div>
-		</div> <!-- primary actions -->
-	{# endif #}
+		</div>
+	{% else %}
+		<div class="metabar-module">
+			This forum is closed and is not accepting new posts.
+		</div>
+	{% endif %}
+
 	<div class="metabar-module">
 		<h5>About</h5>
 		<div class="metabar-module-title">
@@ -116,27 +120,24 @@
 		<div class="metabar-module-body">
 			<p>{% include 'forms/subscribe.html' %}</p>
 		</div>
+
+		{% include "forms/metabar-moderation.html" %}
+
+		{% comment %}
+		<!-- This deals with moderation of multiple items within a forum -->
+		{% include "forms/content-moderation.html" %}
+		{% endcomment %}
+
 		{% if user %}
-		<div class="metabar-module-body">
-			{% include 'forms/mark-read.html' %}
-		</div>
+			<div class="metabar-module-body">
+				{% include 'forms/mark-read.html' %}
+			</div>
 		{% endif %}
-		{% if content.meta.permissions.admin or content.meta.permissions.super_user %}
-		<div class="metabar-module-primary-buttons">
-			<a id="edit-microcosm" href="{% url 'edit-microcosm' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit Forum</a>
-			{% comment %}
-			{% if content.meta.permissions.delete %}
-			<form method="POST" action="{% url 'delete-microcosm' content.id %}" id="microcosm_delete_form" class="hidden-xs">
-				{% csrf_token %}
-				<a id="delete-microcosm" href="#" onClick="if (confirm('Delete is a one-way action, are you sure?')) {$('#microcosm_delete_form').submit()}" class="text-danger">Delete Forum</a>
-			</form>
-			{% endif %}
-			{% endcomment %}
 
-
-		</div>
-		{# % include "forms/content-moderation.html" % #}
-
+		{% if content.meta.permissions.admin %}
+			<div class="metabar-module-primary-buttons">
+				<a id="edit-microcosm" href="{% url 'edit-microcosm' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit Forum</a>
+			</div>
 		{% endif %}
 	</div>
 {% endblock %}

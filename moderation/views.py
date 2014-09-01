@@ -11,9 +11,10 @@ from django.shortcuts import render
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
 
-from core.api.resources import MicrocosmList
-from core.api.resources import Event
 from core.api.resources import Conversation
+from core.api.resources import Event
+from core.api.resources import Microcosm
+from core.api.resources import MicrocosmList
 from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
 from core.api.resources import Site
@@ -46,11 +47,26 @@ def item(request):
         else:
             # These are all PATCH requests and we need the item in question first
             if request.POST.get('item_type') == 'conversation':
-                url, params, headers = Conversation.build_request(request.get_host(), request.POST.get('item_id'),
-                    access_token=request.access_token)
+                url, params, headers = Conversation.build_request(
+                    request.get_host(),
+                    request.POST.get('item_id'),
+                    access_token=request.access_token
+                )
+                microcosm_id = request.POST.get('microcosm_id')
             if request.POST.get('item_type') == 'event':
-                url, params, headers = Event.build_request(request.get_host(), request.POST.get('item_id'),
-                    access_token=request.access_token)
+                url, params, headers = Event.build_request(
+                    request.get_host(),
+                    request.POST.get('item_id'),
+                    access_token=request.access_token
+                )
+                microcosm_id = request.POST.get('microcosm_id')
+            if request.POST.get('item_type') == 'microcosm':
+                url, params, headers = Microcosm.build_request(
+                    request.get_host(),
+                    request.POST.get('item_id'),
+                    access_token=request.access_token
+                )
+                microcosm_id = request.POST.get('item_id')
 
             # And then to execute the PATCH against the item
             if request.POST.get('action') == 'delete':
@@ -88,22 +104,38 @@ def item(request):
                 headers['Content-Type'] = 'application/json'
                 requests.patch(url, payload, headers=headers)
 
-        return HttpResponseRedirect(reverse('single-microcosm', args=(request.POST.get('microcosm_id'),)))
+        return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_id,)))
 
     if request.method == 'GET':
         if request.GET.get('item_type') == 'conversation':
-            url, params, headers = Conversation.build_request(request.get_host(), request.GET.get('item_id'),
-                access_token=request.access_token)
+            url, params, headers = Conversation.build_request(
+                request.get_host(),
+                request.GET.get('item_id'),
+                access_token=request.access_token
+            )
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             content = Conversation.from_api_response(responses[url])
 
         elif request.GET.get('item_type') == 'event':
-            url, params, headers = Event.build_request(request.get_host(), request.GET.get('item_id'),
-                access_token=request.access_token)
+            url, params, headers = Event.build_request(
+                request.get_host(),
+                request.GET.get('item_id'),
+                access_token=request.access_token
+            )
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             content = Event.from_api_response(responses[url])
+
+        elif request.GET.get('item_type') == 'microcosm':
+            url, params, headers = Microcosm.build_request(
+                request.get_host(),
+                request.GET.get('item_id'),
+                access_token=request.access_token
+            )
+            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            responses = response_list_to_dict(grequests.map(request.view_requests))
+            content = Microcosm.from_api_response(responses[url])
 
         view_data = {
             'user': Profile(responses[request.whoami_url], summary=False),
@@ -115,6 +147,9 @@ def item(request):
 
         if request.GET.get('action') == 'move':
             # Fetch list of microcosms to supply in form.
-            view_data['microcosms'] = MicrocosmList.retrieve(request.get_host(), access_token=request.access_token)
+            view_data['microcosms'] = MicrocosmList.retrieve(
+                request.get_host(),
+                access_token=request.access_token
+            )
 
         return render(request, 'forms/moderation_item.html', view_data)
