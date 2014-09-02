@@ -23,7 +23,11 @@
 
 	{% if not content.microcosms.items %}
 		<div class="row-meta">
-			<p>This is such a new site that there are no forums.</p>
+		{% if user %}
+			<p>No forums exist.</p>
+		{% else %}
+			<p>There are no public forums, you may need to sign in or register.</p>
+		{% endif %}
 		{% if content.meta.permissions.create %}
 			<p><a href="{% url 'create-microcosm' %}">Create your first forum.</a></p>
 		{% endif %}
