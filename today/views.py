@@ -26,7 +26,7 @@ def single(request):
 
     searchParams = request.GET.dict()
     searchParams['type'] = ['conversation','event','profile','huddle']
-    searchParams['since'] = 1
+    searchParams['since'] = -1
 
     url, params, headers = Search.build_request(request.get_host(), params=searchParams,
         access_token=request.access_token)
@@ -71,8 +71,8 @@ def build_pagination_links(request, paged_list):
 
     for item in request:
         url = str.replace(str(item['href']), '/search', '/today')
-        url = str.replace(url, '?since=1&type=conversation&type=event&type=profile&type=huddle', '')
-        url = str.replace(url, '&since=1&type=conversation&type=event&type=profile&type=huddle', '')
+        url = str.replace(url, '?since=-1&type=conversation&type=event&type=profile&type=huddle', '')
+        url = str.replace(url, '&since=-1&type=conversation&type=event&type=profile&type=huddle', '')
         item['href'] = api_url_to_gui_url(url)
         page_nav[item['rel']] = item
 
