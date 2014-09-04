@@ -168,28 +168,30 @@ def edit(request, profile_id):
             profile_request = Profile(form.cleaned_data)
             profile_response = profile_request.update(request.get_host(), request.access_token)
 
-            # Update or create comment on profile (single comment acts as a bio) if submitted.
-            if request.POST.get('markdown'):
-                payload = {
+            # Create, update or delete comment on profile (single comment acts as a bio).
+            if request.POST.has_key('markdown'):
+                profile_comment = {
                     'itemType': 'profile',
                     'itemId': profile_response.id,
-                    'markdown': request.POST.get('markdown'),
+                    'markdown': request.POST['markdown'],
                     'inReplyTo': 0
                 }
 
                 # If profile already has an attached comment update it, otherwise create a new one.
                 if hasattr(profile_response, 'profile_comment'):
-                    payload['id'] = profile_response.profile_comment.id
-                    if len(request.POST.get('markdown')) < 1:
-                        payload['markdown'] = ""
-                    comment_request = Comment.from_edit_form(payload)
+                    profile_comment['id'] = profile_response.profile_comment.id
+                    comment_request = Comment.from_edit_form(profile_comment)
                     try:
-                        comment_request.update(request.get_host(), access_token=request.access_token)
+                        if profile_comment['markdown']:
+                            comment_request.update(request.get_host(), access_token=request.access_token)
+                        else:
+                            # If the comment body is empty, assume the user wants to delete it.
+                            comment_request.delete(request.get_host(), request.access_token)
                     except APIException as exc:
                         return respond_with_error(request, exc)
                 else:
-                    if len(request.POST.get('markdown')) > 0:
-                        comment = Comment.from_create_form(payload)
+                    if profile_comment['markdown']:
+                        comment = Comment.from_create_form(profile_comment)
                         try:
                             comment.create(request.get_host(), request.access_token)
                         except APIException as exc:
