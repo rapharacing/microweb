@@ -83,6 +83,16 @@
 {% block sidebar %}
 
 <div class="metabar-module metabar-filters">
+	{% if "event" in content.type and content.type|length_is:"1" %}
+	<h5>Quick Search</h5>
+	<div class="metabar-module">
+		<div class="metabar-module-primary-buttons">
+			<a href="/search?type=event&amp;eventAfter=0&amp;sort=oldest" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-calendar-small"></span> All Future Events</a>
+			<a href="/search?type=event&amp;eventBefore=0&amp;sort=newest" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-calendar-small"></span> All Past Events</a>
+		</div>
+	</div>
+	{% endif %}
+
 	<h5>Search Options</h5>
 	<div class="metabar-module-title">
 		<h3>Types to Display</h3>
@@ -185,13 +195,13 @@
 			<div class="radio">
 				<label for="filter-oldest">
 					<input id="filter-oldest" type="radio" name="sort" value="oldest" {% if content.query.sort == "oldest" %}checked="checked"{% endif %}/>
-					Oldest events first
+					Event date ascending (A-Z)
 				</label>
 			</div>
 			<div class="radio">
 				<label for="filter-newest">
 					<input id="filter-newest" type="radio" name="sort" value="newest" {% if content.query.sort == "newest" %}checked="checked"{% endif %}/>
-					Newest events first
+					Event date descending (Z-A)
 				</label>
 			</div>
 		{% endif %}
