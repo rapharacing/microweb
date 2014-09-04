@@ -83,11 +83,9 @@
 {% block sidebar %}
 
 <div class="metabar-module metabar-filters">
-	<h5>Filters</h5>
+	<h5>Search Options</h5>
 	<div class="metabar-module-title">
-		<h3>
-			Show me ...
-		</h3>
+		<h3>Types to Display</h3>
 	</div>
 	<div class="metabar-module-body">
 		<ul class="list-group">
@@ -111,10 +109,10 @@
 			</li>
 			<li class="list-group-item">
 				<div class="checkbox">
-						<label for="filter-events">
-							<input id="filter-events" type="checkbox"  name="type" value="event" {% if "event" in content.type %}checked="checked"{% endif %}/>
-							Events
-						</label>
+					<label for="filter-events">
+						<input id="filter-events" type="checkbox"  name="type" value="event" {% if "event" in content.type %}checked="checked"{% endif %}/>
+						Events
+					</label>
 				</div>
 			</li>
 			{% if not content.query.forumId %}
@@ -141,30 +139,29 @@
 	</div>
 	{% if content.query.q or user %}
 	<div class="metabar-module-title">
-		<h3>
-			Options
-		</h3>
+		<h3>Filters</h3>
 	</div>
 	<div class="metabar-module-body">
 		<ul class="list-group">
+			{% comment  %}
+			When ordering options, the most specific and specialised should be first and the most general should be last.
+			{% endcomment %}
+			
+			{% if "event" in content.type and content.type|length_is:"1" %}
+
+			{% endif %}
+
 			{% if content.query.q %}
 			<li class="list-group-item">
 				<div class="checkbox">
 					<label for="filter-intitle">
 						<input id="filter-intitle" type="checkbox" name="inTitle" value="true" {% if content.query.inTitle %}checked="checked"{% endif %}/>
-						Only search titles
-					</label>
-				</div>
-			</li>
-			<li class="list-group-item">
-				<div class="checkbox">
-					<label for="filter-date">
-						<input id="filter-date" type="checkbox" name="sort" value="date" {% if content.query.sort == "date" %}checked="checked"{% endif %}/>
-						Order by date
+						Title matched search terms
 					</label>
 				</div>
 			</li>
 			{% endif %}
+
 			{% if user %}
 			<li class="list-group-item">
 				<div class="checkbox">
@@ -178,12 +175,53 @@
 		</ul>
 	</div>
 	{% endif %}
+	{% if content.query.q or "event" in content.type and content.type|length_is:"1" %}
+	<div class="metabar-module-title">
+		<h3>Order By</h3>
+	</div>
+	<div class="metabar-module-body">
+
+		{% if "event" in content.type and content.type|length_is:"1" %}
+			<div class="radio">
+				<label for="filter-oldest">
+					<input id="filter-oldest" type="radio" name="sort" value="oldest" {% if content.query.sort == "oldest" %}checked="checked"{% endif %}/>
+					Oldest events first
+				</label>
+			</div>
+			<div class="radio">
+				<label for="filter-newest">
+					<input id="filter-newest" type="radio" name="sort" value="newest" {% if content.query.sort == "newest" %}checked="checked"{% endif %}/>
+					Newest events first
+				</label>
+			</div>
+		{% endif %}
+
+		{% if content.query.q %}
+			<div class="radio">
+				<label for="filter-relevancy">
+					<input id="filter-relevancy" type="radio" name="sort" value="" {% if not content.query.sort %}checked="checked"{% endif %}/>
+					Relevancy
+				</label>
+			</div>
+		{% endif %}
+
+		<div class="radio">
+			<label for="filter-date">
+				<input id="filter-date" type="radio" name="sort" value="date" {% if content.query.sort == "date" %}checked="checked"{% endif %}/>
+				Recent updates
+			</label>
+		</div>
+	</div>
+	{% endif %}
+
 	{% if content.query.forumId %}
 		<input type="hidden" name="forumId" value="{{content.query.forumId}}" />
 	{% endif %}
+
 	{% for itemid in content.query.id %}
 		<input type="hidden" name="id" value="{{itemid}}" />
 	{% endfor %}
+
 	{% if "comment" in content.type %}
 		<input type="hidden" name="type" value="comment" />
 	{% endif %}

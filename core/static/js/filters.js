@@ -51,7 +51,13 @@
           checked = this.filters.filter('select:not(:disabled), :checked');
 
       for(var i=0,j=checked.length;i<j;i++){
-        params.push( [checked[i].name,checked[i].value].join(this.param_char));
+        if (checked[i].name == "sort") {
+          if (checked[i].value != "") {
+            params.push( [checked[i].name,checked[i].value].join(this.param_char));
+          }
+        } else {
+          params.push( [checked[i].name,checked[i].value].join(this.param_char));
+        }
       }
 
       var hidden = this.filters.filter(':hidden');
