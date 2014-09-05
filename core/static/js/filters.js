@@ -68,7 +68,13 @@
       return params.join(this.concat_char);
     };
 
-    filters.prototype.changeHandler = function(){
+    filters.prototype.formSubmit = function(event) {
+      event.preventDefault();
+      this.query = $('#navbar-search-input').val();
+      this.changeHandler();
+    }
+
+    filters.prototype.changeHandler = function(event) {
 
       var params          = this.parse(),
           new_query       = (this.query.length > 0 ? $.trim(this.query) + "+" : $.trim(this.query)) + (params.length>0 ? params : ''),
@@ -79,7 +85,7 @@
 
     filters.prototype.bind = function(){
       var events = [
-        ['change',    '[name]', 'changeHandler']
+        ['change', '[name]', 'changeHandler'],
       ];
       for(var i in events){
         this.$el.on(events[i][0], events[i][1], $.proxy(this[events[i][2]], this) );
@@ -90,5 +96,4 @@
 
   })();
   window.Filters = Filters;
-
 })();

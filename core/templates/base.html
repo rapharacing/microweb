@@ -148,7 +148,7 @@
 												class="form-control"
 												name="q"
 												placeholder="Search"
-												{% if content.query.searched and not site_section == 'today' %}value="{{content.query.searched|escape}}"{% endif %}
+												{% if content.query.q and not site_section == 'today' %}value="{{content.query.q | escape}}"{% endif %}
 												tabindex="1"
 											/>
 											{% if not content.query or site_section == 'today' %}

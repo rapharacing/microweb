@@ -35,7 +35,7 @@
 		</ul>
 	</p>
 {% else %}
-	<h1>Search results for: {{ content.query.searched }}</h1>
+	<h1>Search results for: {{ content.query.q }}</h1>
 	<div class="row">
 		<div class="text-muted col-sm-6">
 			{{ content.results.total | default:0 | intcomma }} matches.  Search took {{ content.time_elapsed }} seconds.
@@ -145,6 +145,16 @@
 				</div>
 			</li>
 			{% endif %}
+			{% if not content.query.forumId %}
+			<li class="list-group-item">
+				<div class="checkbox">
+					<label for="filter-comments">
+						<input id="filter-comments" type="checkbox" name="type" value="comment" {% if "comment" in content.type %}checked="checked"{% endif %}/>
+						Comments
+					</label>
+				</div>
+			</li>
+			{% endif %}
 		</ul>
 	</div>
 	{% if content.query.q or user %}
@@ -159,30 +169,108 @@
 			
 			{% if "event" in content.type and content.type|length_is:"1" %}
 
+				{% if content.query.eventAfter %}
+					<li class="list-group-item">
+						<div class="checkbox">
+							<label for="filter-eventAfter">
+								<input id="filter-eventAfter" type="checkbox" name="eventAfter" value="{{content.query.eventAfter}}" checked="checked" />
+								eventAfter = {{content.query.eventAfter}}
+							</label>
+						</div>
+					</li>
+				{% endif %}
+
+				{% if content.query.eventBefore %}
+					<li class="list-group-item">
+						<div class="checkbox">
+							<label for="filter-eventBefore">
+								<input id="filter-eventBefore" type="checkbox" name="eventBefore" value="{{content.query.eventBefore}}" checked="checked" />
+								eventBefore = {{content.query.eventBefore}}
+							</label>
+						</div>
+					</li>
+				{% endif %}
+
 			{% endif %}
 
-			{% if content.query.q %}
-			<li class="list-group-item">
-				<div class="checkbox">
-					<label for="filter-intitle">
-						<input id="filter-intitle" type="checkbox" name="inTitle" value="true" {% if content.query.inTitle %}checked="checked"{% endif %}/>
-						Title matched search terms
-					</label>
-				</div>
-			</li>
+			{% if content.query.authorId %}
+				<li class="list-group-item">
+					<div class="checkbox">
+						<label for="filter-authorId">
+							<input id="filter-authorId" type="checkbox" name="authorId" value="{{content.query.authorId}}" checked="checked" />
+							authorId = {{content.query.authorId}}
+						</label>
+					</div>
+				</li>
+			{% endif %}
+
+			{% for itemid in content.query.id %}
+				<li class="list-group-item">
+					<div class="checkbox">
+						<label for="filter-id{{itemid}}">
+							<input id="filter-id{{itemid}}" type="checkbox" name="id" value="{{itemid}}" checked="checked" />
+							id = {{itemid}}
+						</label>
+					</div>
+				</li>
+			{% endfor %}
+
+			{% if content.query.forumId %}
+				<li class="list-group-item">
+					<div class="checkbox">
+						<label for="filter-forumId">
+							<input id="filter-forumId" type="checkbox" name="forumId" value="{{content.query.forumId}}" checked="checked" />
+							forumId = {{content.query.forumId}}
+						</label>
+					</div>
+				</li>
+			{% endif %}
+
+			{% if content.query.since %}
+				<li class="list-group-item">
+					<div class="checkbox">
+						<label for="filter-since">
+							<input id="filter-since" type="checkbox" name="since" value="{{content.query.since}}" checked="checked" />
+							since = {{content.query.since}}
+						</label>
+					</div>
+				</li>
+			{% endif %}
+
+			{% if content.query.until %}
+				<li class="list-group-item">
+					<div class="checkbox">
+						<label for="filter-until">
+							<input id="filter-until" type="checkbox" name="until" value="{{content.query.until}}" checked="checked" />
+							until = {{content.query.until}}
+						</label>
+					</div>
+				</li>
 			{% endif %}
 
 			{% if user %}
-			<li class="list-group-item">
-				<div class="checkbox">
-					<label for="filter-following">
-						<input id="filter-following" type="checkbox" name="following" value="true" {% if content.query.following %}checked="checked"{% endif %}/>
-						Following
-					</label>
-				</div>
-			</li>
+				<li class="list-group-item">
+					<div class="checkbox">
+						<label for="filter-following">
+							<input id="filter-following" type="checkbox" name="following" value="true" {% if content.query.following %}checked="checked"{% endif %}/>
+							Following
+						</label>
+					</div>
+				</li>
+			{% endif %}
+
+			{% if content.query.q %}
+				<li class="list-group-item">
+					<div class="checkbox">
+						<label for="filter-intitle">
+							<input id="filter-intitle" type="checkbox" name="inTitle" value="true" {% if content.query.inTitle %}checked="checked"{% endif %}/>
+							Title matched search terms
+						</label>
+					</div>
+				</li>
 			{% endif %}
 		</ul>
+		
 	</div>
 	{% endif %}
 	{% if content.query.q or "event" in content.type and content.type|length_is:"1" %}
@@ -224,17 +312,6 @@
 	</div>
 	{% endif %}
 
-	{% if content.query.forumId %}
-		<input type="hidden" name="forumId" value="{{content.query.forumId}}" />
-	{% endif %}
-
-	{% for itemid in content.query.id %}
-		<input type="hidden" name="id" value="{{itemid}}" />
-	{% endfor %}
-
-	{% if "comment" in content.type %}
-		<input type="hidden" name="type" value="comment" />
-	{% endif %}
 </div> <!-- / filters -->
 
 {% endblock %}
@@ -245,9 +322,14 @@
 (function(){
 	window.search_filters = new Filters({
 		el     : '.metabar-filters',
-		query  : '{{ content.query.searched | urlencode }}',
+		query  : '{{ content.query.q | urlencode }}',
 		url    : '?q=$1'
 	});
+
+	$('form[role=search]').on(
+		'submit',
+		$.proxy(window.search_filters.formSubmit, window.search_filters)
+	);
 })();
 </script>
 {% endblock %}
