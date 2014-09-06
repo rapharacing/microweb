@@ -281,15 +281,15 @@
 
 		{% if "event" in content.type and content.type|length_is:"1" %}
 			<div class="radio">
-				<label for="filter-oldest">
+				<label for="filter-oldest" title="ascending">
 					<input id="filter-oldest" type="radio" name="sort" value="oldest" {% if content.query.sort == "oldest" %}checked="checked"{% endif %}/>
-					Event date ascending (A-Z)
+					Event date &#x25B4; (Jan &gt; Dec)
 				</label>
 			</div>
 			<div class="radio">
-				<label for="filter-newest">
+				<label for="filter-newest" title="descending">
 					<input id="filter-newest" type="radio" name="sort" value="newest" {% if content.query.sort == "newest" %}checked="checked"{% endif %}/>
-					Event date descending (Z-A)
+					Event date &#x25BE; (Dec &gt; Jan)
 				</label>
 			</div>
 		{% endif %}
