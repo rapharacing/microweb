@@ -456,9 +456,9 @@
 	{% else %}
 	formMap.map.fitBounds(
 		[
-			// london
-			[51.47860327187397,-0.16805648803710938],
-			[51.5177162373547,-0.0926971435546875]
+			// World
+			['75.8451685402704', '-121.640625'],
+			['-48.9224992637582', '153.984375']
 		]
 	);
 	{% endif %}
@@ -516,6 +516,7 @@
 		{
 			rules : {
 				'{{ form.title.name }}'      : ['not_empty','maxlength']
+				{% if form.id > 0 %},'editReason':['not_empty']{% endif %}
 			},
 			tests : {
 				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
@@ -523,6 +524,7 @@
 			error_messages : {
 				'{{ form.title.name }}:not_empty' : "* {{ form.fields.title.error_messages.required }}",
 				'{{ form.title.name }}:maxlength' : "* {{ form.fields.title.error_messages.max_length }}"
+				{% if form.id > 0 %},'editReason:not_empty' : "* This is a required field"{% endif %}
 			}
 		}
 	);

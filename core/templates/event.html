@@ -163,18 +163,19 @@
 <script src="{{ STATIC_URL }}js/event.js"></script>
 
 <script type="text/javascript">
-var eventMap = new EventMap({
-	map : 'map-canvas'
-});
+var lat = {{ content.lat   | default:"null" }},
+    lon = {{ content.lon   | default:"null" }},
+    n   = {{ content.north | default:"null" }},
+    w   = {{ content.west  | default:"null" }},
+    s   = {{ content.south | default:"null" }},
+    e   = {{ content.east  | default:"null" }};
 
-eventMap.restore(
-	{{ content.lat|default:"null" }},
-	{{ content.lon|default:"null" }},
-	[
-		[ {{ content.north|default:"null" }}, {{ content.west|default:"null" }} ],
-		[ {{ content.south|default:"null" }}, {{ content.east|default:"null" }} ]
-	]
-);
+if (lat && lon) {
+	var eventMap = new EventMap({
+		map : 'map-canvas'
+	});
+	eventMap.restore(lat,lon,[[n,w],[s,e]]);
+}
 {% endif %}
 </script>
 
