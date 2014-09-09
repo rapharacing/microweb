@@ -77,7 +77,7 @@
     filters.prototype.changeHandler = function(event) {
 
       var params          = this.parse(),
-          new_query       = (this.query.length > 0 ? $.trim(this.query) + "+" : $.trim(this.query)) + (params.length>0 ? params : ''),
+          new_query       = (this.query.length > 0 ? encodeURIComponent($.trim(this.query)) + "+" : encodeURIComponent($.trim(this.query))) + (params.length>0 ? params : ''),
           formatted_query = this.url.replace(/\$1/g, new_query);
 
      window.location.href = formatted_query;
