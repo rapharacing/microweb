@@ -273,6 +273,7 @@
 			{% csrf_token %}
 		</form>
 
+{% if not user.meta.permissions.banned %}
 <script type="text/javascript">
 function personaSignin() {
 	navigator.id.request({"siteLogo": "{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}"});
@@ -294,6 +295,8 @@ onlogout: function() {
 },
 });
 </script>
+{% endif %}
+
 {% block js %}{% endblock js%}
 <script type="text/javascript">
 {% if site.subdomain_key == 'dev1' or site.subdomain_key == 'dev2' %}window['ga-disable-UA-36931318-3'] = true;{% endif %}

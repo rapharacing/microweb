@@ -13,8 +13,14 @@
 <div class="content-header padded">
     <h1>Not permitted</h1>
 </div>
-<p class="row-meta">It looks like you don't have permission to do that.</p>
-<p class="row-meta">This might happen if you're trying to view a private subforum.</p>
-<p class="row-meta"><a href="/">Click here to return to the home page</a>.</p>
+
+{% if user.meta.permissions.banned %}
+	<p class="row-meta">You have been banned from this site.</p>
+{% else %}
+	<p class="row-meta">It looks like you don't have permission to do that.</p>
+	<p class="row-meta">This might happen if you're trying to view a private subforum.</p>
+	<p class="row-meta"><a href="/">Click here to return to the home page</a>.</p>
+{% endif %}
+
 {% endif %}
 {% endblock %}
