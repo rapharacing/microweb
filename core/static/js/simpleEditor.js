@@ -301,6 +301,12 @@
       }
     }
 
+    simpleEditor.prototype.handleCtrlEnter = function(e){
+      if ((e.ctrlKey || e.metaKey) && (e.keyCode == 13)) {
+        this.form.find('input[type=submit]').click();
+      }
+    };
+
     simpleEditor.prototype.bind = function(){
 
       // create a new instance of markdown.editor.js
@@ -434,7 +440,7 @@
       var events = [
         ['reset', 'form',        'clearAttachmentGallery'],
         ['click', '.reply-box-attachments-gallery li span.remove', 'removeAttachmentFile'],
-
+        ['keydown', 'textarea', 'handleCtrlEnter'],
         ['click', '.wmd-preview-button', 'toggleMarkdownPreview']
       ];
 
