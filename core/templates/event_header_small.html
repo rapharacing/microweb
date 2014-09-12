@@ -144,11 +144,15 @@
 								<input id="rsvp_no" type="submit" value="Can't make it" class="btn btn-default">
 							</form>
 						{% else %}
+							{% if content.rsvp_limit and not content.rsvp_spaces %}
+								<p>This event is full.</p>
+							{% else %}
 								<form method="POST" action="{% url 'rsvp-event' content.id %}">
 									{% csrf_token %}
 									<input type="hidden" name="rsvp" value="yes" />
 									<input type="submit" class="btn btn-lg btn-primary" value="Yes, I'm attending!" />
 								</form>
+							{% endif %}
 						{% endif %}
 					{% else %}
 						<h3>Sign in to reserve your place in this event!</h3>
