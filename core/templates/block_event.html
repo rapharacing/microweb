@@ -18,7 +18,7 @@
 				</h3>
 				{% if item.meta.created_by %}
 				<div class="cell-started">
-					<span itemprop="attendee" itemscope itemtype="http://schema.org/Person"><a href="{% url 'single-profile' item.meta.created_by.id %}" itemprop="url">@<span itemprop="name">{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</span></a></span> started <time datetime="{{ item.meta.created|date:"c" }}"></time>
+					<span itemprop="attendee" itemscope itemtype="http://schema.org/Person"><a href="{% url 'single-profile' item.meta.created_by.id %}" itemprop="url">@<span itemprop="name">{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</span></a></span> {% if user %}<a href="/events/{{ item.id }}/" >{% endif %}started{% if user %}</a>{% endif %} <time datetime="{{ item.meta.created|date:"c" }}"></time>
 				</div>
 				{% endif %}
 				<div class="cell-meta-event">
@@ -67,7 +67,7 @@
 			</div>
 			<div class="cell-recent">
 				{% if item.last_comment_created %}
-					<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{item.last_comment_created_by.profile_name | safe }}</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
+					<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{item.last_comment_created_by.profile_name | safe }}</a> <a href="{% url 'incontext-comment' item.last_comment_id %}">replied</a> <time datetime="{{ item.last_comment_created|date:"c" }}"></time>
 				{% endif %}
 			</div>
 		</div>

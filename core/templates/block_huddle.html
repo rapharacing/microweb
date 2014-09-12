@@ -14,7 +14,7 @@
 				</h3>
 				{% if item.meta.created_by %}
 				<div class="cell-started">
-					<a href="{% url 'single-profile' item.meta.created_by.id %}">@{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</a> started <time datetime="{{ item.meta.created|date:"c" }}"></time>
+					<a href="{% url 'single-profile' item.meta.created_by.id %}">@{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</a> <a href="/huddles/{{ item.id }}/" >started</a> <time datetime="{{ item.meta.created|date:"c" }}"></time>
 					&bull;
 				</div>
 				{% endif %}
@@ -45,7 +45,7 @@
 			</div>
 			<div class="cell-recent">
 				{% if item.last_comment_created %}
-					<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{ item.last_comment_created_by.profile_name | safe | truncatechars:25 }}</a> replied <time datetime="{{ item.last_comment_created|date:"c" }}">{{ item.last_comment_created|timesince }}</time>
+					<a href="{% url 'single-profile' item.last_comment_created_by.id %}">@{{ item.last_comment_created_by.profile_name | safe | truncatechars:25 }}</a> <a href="{% url 'incontext-comment' item.last_comment_id %}">replied</a> <time datetime="{{ item.last_comment_created|date:"c" }}">{{ item.last_comment_created|timesince }}</time>
 				{% else %}
 					<a href="{% url 'single-profile' item.meta.created_by.id %}">@{{ item.meta.created_by.profile_name | safe | truncatechars:25 }}</a> replied <time datetime="{{ item.meta.created|date:"c" }}">{{ item.meta.created|timesince }}</time>
 				{% endif %}
