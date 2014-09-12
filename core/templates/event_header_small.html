@@ -145,7 +145,8 @@
 							</form>
 						{% else %}
 							{% if content.rsvp_limit and not content.rsvp_spaces %}
-								<p>This event is full.</p>
+								<h3>This event is full.</h3>
+								<p>Follow the event to be notified when people leave a comment.</p>
 							{% else %}
 								<form method="POST" action="{% url 'rsvp-event' content.id %}">
 									{% csrf_token %}
