@@ -216,6 +216,14 @@
 		</div>
 		<div class="footer">
 			<div class="container">
+				<ul class="clearfix footnav">
+					<li><a href="{% url 'index' %}">Forums</a></li>
+					<li><a href="{% url 'single-today'%}">Today</a></li>
+					<li><a href="{% url 'list-updates' %}">Following</a></li>
+					<li><a href="{% url 'list-profiles' %}?top=true">People</a></li>
+					<li><a href="#" onClick="$('html, body').animate({ scrollTop: 0 }, 'fast'); return false;">Top</a></li>
+				</ul>
+				<hr />
 				<p>&copy; {{ site.title }}, powered by <a href="http://microco.sm/">microcosm</a>.</p>
 				<p class="links">
 					<a href="{% url 'list-legal' %}">About</a>
