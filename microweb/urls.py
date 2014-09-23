@@ -8,19 +8,20 @@ from microweb import settings
 
 urlpatterns = patterns(
     '',
-	url(r'', include('microcosms.urls')),
-    url(r'', include('core.urls')),
+    url(r'', include('microcosms.urls')),
+    url(r'', include('comments.urls')),
     url(r'', include('conversations.urls')),
+    url(r'', include('core.urls')),
     url(r'', include('events.urls')),
     url(r'', include('huddles.urls')),
-    url(r'', include('comments.urls')),
+    url(r'', include('ignored.urls')),
+    url(r'', include('moderation.urls')),
     url(r'', include('profiles.urls')),
-    url(r'', include('updates.urls')),
+    url(r'', include('redirect.urls')),
     url(r'', include('search.urls')),
     url(r'', include('today.urls')),
     url(r'', include('trending.urls')),
-    url(r'', include('moderation.urls')),
-    url(r'', include('redirect.urls')),
+    url(r'', include('updates.urls')),
 )
 
 # Serve static files with gunicorn if DEBUG is true.

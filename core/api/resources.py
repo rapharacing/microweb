@@ -1906,6 +1906,45 @@ class Attachment(object):
         url = build_url(host, [ type, id, Attachment.api_path_fragment, fileHash ])
         APIResource.delete(url, {}, APIResource.make_request_headers(access_token))
 
+class Ignored(object):
+    """
+    List of items that a person has ignored (is hiding).
+    """
+
+    api_path_fragment = "ignored"
+
+    @classmethod
+    def from_api_response(cls, data):
+        ignored = cls()
+        
+        if data.get('ignored'):
+            ignored = PaginatedList(data['ignored'], IgnoredItem)
+        
+        return ignored
+
+    @staticmethod
+    def build_request(host, offset=None, access_token=None):
+        url = build_url(host, [Ignored.api_path_fragment])
+        params = {'offset': offset} if offset else {}
+        headers = APIResource.make_request_headers(access_token)
+        return url, params, headers
+
+class IgnoredItem(object):
+    """
+    The search result object
+    """
+
+    @classmethod
+    def from_api_response(cls, data):
+        ignoredItem = cls()
+        ignoredItem.item_type = data['itemType']
+        ignoredItem.item = populate_item(ignoredItem.item_type, data['item'])
+        return ignoredItem
+
+    @classmethod
+    def from_summary(cls, data):
+        return IgnoredItem.from_api_response(data)
+
 class Search(object):
     """
     Used for searching and search results
