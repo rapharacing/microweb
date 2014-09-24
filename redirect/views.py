@@ -36,6 +36,7 @@ def redirect_or_404(request):
     # Reverse the effect of APPEND_SLASH on the path.
     url_parts = urlparse.urlsplit(request.build_absolute_uri())
     path = url_parts.path
+    redirect_request = ''
     if path.endswith('/'):
         redirect_request = path[:-1]
     if url_parts.query:
