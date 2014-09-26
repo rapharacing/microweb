@@ -6,7 +6,7 @@ LOGFILE=/var/log/django/microweb.log
 LOGDIR=$(dirname $LOGFILE)
 
 # number of gunicorn workers
-NUM_WORKERS=9
+NUM_WORKERS=5
 HOST='127.0.0.1:8000'
 
 # user/group to run as
@@ -25,4 +25,4 @@ export NEW_RELIC_CONFIG_FILE
 exec /srv/www/django/microwebenv/bin/newrelic-admin run-program \
   /srv/www/django/microwebenv/bin/gunicorn_django -b $HOST \
   -w $NUM_WORKERS -k gevent --user=$USER --group=$GROUP --log-level=info \
-  --max-requests 5000 --log-file=$LOGFILE 2>>$LOGFILE
+  --max-requests 1000 --log-file=$LOGFILE 2>>$LOGFILE
