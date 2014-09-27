@@ -30,7 +30,7 @@ def single(request):
 
     url, params, headers = Search.build_request(request.get_host(), params=searchParams,
         access_token=request.access_token)
-    request.view_requests.append(grequests.get(url, params=params, headers=headers))
+    request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
 
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))

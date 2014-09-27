@@ -37,7 +37,7 @@ def ignored(request):
         access_token=request.access_token
     )
     request.view_requests.append(
-        grequests.get(url, params=params, headers=headers)
+        grequests.get(url, params=params, headers=headers, timeout=5)
     )
 
     try:

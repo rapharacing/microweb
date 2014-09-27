@@ -44,14 +44,14 @@ def single(request, profile_id):
 
     # Fetch profile details.
     profile_url, params, headers = Profile.build_request(request.get_host(), profile_id)
-    request.view_requests.append(grequests.get(profile_url, params=params, headers=headers))
+    request.view_requests.append(grequests.get(profile_url, params=params, headers=headers, timeout=5))
 
     # Fetch items created by this profile.
     search_q = 'type:conversation type:event type:huddle type:comment authorId:%s' % profile_id
     search_params = {'limit': 10, 'q': search_q, 'sort': 'date'}
     search_url, params, headers = Search.build_request(request.get_host(), search_params,
         access_token=request.access_token)
-    request.view_requests.append(grequests.get(search_url, params=params, headers=headers))
+    request.view_requests.append(grequests.get(search_url, params=params, headers=headers, timeout=5))
 
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
@@ -89,7 +89,7 @@ def list(request):
     profiles_url, params, headers = ProfileList.build_request(request.get_host(), offset=offset, top=top,
         q=q, following=following, online=online, access_token=request.access_token)
 
-    request.view_requests.append(grequests.get(profiles_url, params=params, headers=headers))
+    request.view_requests.append(grequests.get(profiles_url, params=params, headers=headers, timeout=5))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:

@@ -40,9 +40,9 @@ class ContextMiddleware():
                 return response
             request.access_token = request.COOKIES['access_token']
             request.whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
-            request.view_requests.append(grequests.get(request.whoami_url, params=params, headers=headers))
+            request.view_requests.append(grequests.get(request.whoami_url, params=params, headers=headers, timeout=5))
             newrelic.agent.add_custom_parameter('access_token', request.access_token[:6])
 
         request.site_url, params, headers = Site.build_request(request.get_host())
-        request.view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+        request.view_requests.append(grequests.get(request.site_url, params=params, headers=headers, timeout=5))
 

@@ -201,7 +201,7 @@ class LegalView(object):
             return HttpResponseNotFound()
 
         url, params, headers = Legal.build_request(request.get_host(), doc=doc_name)
-        request.view_requests.append(grequests.get(url, params=params, headers=headers))
+        request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))
         except APIException as exc:
@@ -228,10 +228,10 @@ class ErrorView(object):
         if request.COOKIES.has_key('access_token'):
             request.access_token = request.COOKIES['access_token']
             whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
-            view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
+            view_requests.append(grequests.get(whoami_url, params=params, headers=headers, timeout=5))
 
         site_url, params, headers = Site.build_request(request.get_host())
-        view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+        view_requests.append(grequests.get(request.site_url, params=params, headers=headers, timeout=5))
 
         responses = response_list_to_dict(grequests.map(view_requests))
         if request.whoami_url:
@@ -256,10 +256,10 @@ class ErrorView(object):
         if request.COOKIES.has_key('access_token'):
             request.access_token = request.COOKIES['access_token']
             whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
-            view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
+            view_requests.append(grequests.get(whoami_url, params=params, headers=headers, timeout=5))
 
         site_url, params, headers = Site.build_request(request.get_host())
-        view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+        view_requests.append(grequests.get(request.site_url, params=params, headers=headers, timeout=5))
 
         responses = response_list_to_dict(grequests.map(view_requests))
         if request.whoami_url:
@@ -284,10 +284,10 @@ class ErrorView(object):
         if request.COOKIES.has_key('access_token'):
             request.access_token = request.COOKIES['access_token']
             whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
-            view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
+            view_requests.append(grequests.get(whoami_url, params=params, headers=headers, timeout=5))
 
         site_url, params, headers = Site.build_request(request.get_host())
-        view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+        view_requests.append(grequests.get(request.site_url, params=params, headers=headers, timeout=5))
 
         responses = response_list_to_dict(grequests.map(view_requests))
         if request.whoami_url:
@@ -315,7 +315,7 @@ class ErrorView(object):
         view_requests = []
 
         site_url, params, headers = Site.build_request(request.get_host())
-        view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
+        view_requests.append(grequests.get(request.site_url, params=params, headers=headers, timeout=5))
         responses = response_list_to_dict(grequests.map(view_requests))
         view_data['site'] = Site(responses[site_url])
         view_data['logout'] = True

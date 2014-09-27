@@ -56,7 +56,7 @@ class UpdateView(object):
 
             url, params, headers = UpdateList.build_request(request.get_host(), offset=offset,
                                                             access_token=request.access_token)
-            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             updates_list = UpdateList(responses[url])
 
@@ -118,7 +118,7 @@ class WatcherView(object):
 
             url, params, headers = WatcherList.build_request(request.get_host(), offset=offset,
                                                              access_token=request.access_token)
-            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             watchers_list = WatcherList(responses[url])
 
@@ -194,10 +194,10 @@ class UpdatePreferenceView(object):
 
         if request.method == 'GET':
             url, params, headers = UpdatePreference.build_request(request.get_host(), request.access_token)
-            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
 
             url2, params2, headers2 = GlobalOptions.build_request(request.get_host(), request.access_token)
-            request.view_requests.append(grequests.get(url2, params=params2, headers=headers2))
+            request.view_requests.append(grequests.get(url2, params=params2, headers=headers2, timeout=5))
 
             responses = response_list_to_dict(grequests.map(request.view_requests))
             preference_list = UpdatePreference.from_list(responses[url])

@@ -113,7 +113,7 @@ def item(request):
                 request.GET.get('item_id'),
                 access_token=request.access_token
             )
-            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             content = Conversation.from_api_response(responses[url])
 
@@ -123,7 +123,7 @@ def item(request):
                 request.GET.get('item_id'),
                 access_token=request.access_token
             )
-            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             content = Event.from_api_response(responses[url])
 
@@ -133,7 +133,7 @@ def item(request):
                 request.GET.get('item_id'),
                 access_token=request.access_token
             )
-            request.view_requests.append(grequests.get(url, params=params, headers=headers))
+            request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             content = Microcosm.from_api_response(responses[url])
 

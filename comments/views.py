@@ -86,7 +86,7 @@ def single(request, comment_id):
 
     url, params, headers = Comment.build_request(request.get_host(), id=comment_id,
                                                  access_token=request.access_token)
-    request.view_requests.append(grequests.get(url, params=params, headers=headers))
+    request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:
