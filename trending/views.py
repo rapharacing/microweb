@@ -24,7 +24,7 @@ list_template = 'trending.html'
 @cache_control(must_revalidate=True, max_age=0)
 def list(request):
     url, params, headers = Trending.build_request(request.get_host(), access_token=request.access_token)
-    request.view_requests.append(grequests.get(url, params=params, headers=headers, timeout=5))
+    request.view_requests.append(grequests.get(url, params=params, headers=headers))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:

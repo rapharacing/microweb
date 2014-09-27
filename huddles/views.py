@@ -52,7 +52,7 @@ def single(request, huddle_id):
 
     huddle_url, params, headers = Huddle.build_request(request.get_host(), id=huddle_id, offset=offset,
         access_token=request.access_token)
-    request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers, timeout=5))
+    request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:
@@ -99,7 +99,7 @@ def list(request):
     huddle_url, params, headers = HuddleList.build_request(request.get_host(), offset=offset,
         access_token=request.access_token)
 
-    request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers, timeout=5))
+    request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:

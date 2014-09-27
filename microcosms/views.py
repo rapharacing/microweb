@@ -57,7 +57,7 @@ def single_microcosm(request, microcosm_id):
 
     microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
                                                              offset=offset, access_token=request.access_token)
-    request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers, timeout=5))
+    request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:
@@ -88,7 +88,7 @@ def list_microcosms(request):
 
     microcosms_url, params, headers = MicrocosmList.build_request(request.get_host(), offset=offset,
                                                                   access_token=request.access_token)
-    request.view_requests.append(grequests.get(microcosms_url, params=params, headers=headers, timeout=5))
+    request.view_requests.append(grequests.get(microcosms_url, params=params, headers=headers))
 
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
@@ -196,7 +196,7 @@ def list_members(request, microcosm_id):
 
     microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
         offset=offset, access_token=request.access_token)
-    request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers, timeout=5))
+    request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:
@@ -205,7 +205,7 @@ def list_members(request, microcosm_id):
 
     roles_url, params, headers = RoleList.build_request(request.META['HTTP_HOST'], id=microcosm_id,
         offset=offset, access_token=request.access_token)
-    request.view_requests.append(grequests.get(roles_url, params=params, headers=headers, timeout=5))
+    request.view_requests.append(grequests.get(roles_url, params=params, headers=headers))
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:
@@ -348,7 +348,7 @@ def create_members(request, microcosm_id):
 
         microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
             offset=offset, access_token=request.access_token)
-        request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers, timeout=5))
+        request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
 
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))
@@ -383,19 +383,19 @@ def edit_members(request, microcosm_id, group_id):
 
         microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
             offset=offset, access_token=request.access_token)
-        request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers, timeout=5))
+        request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
 
         role_url, params, headers = Role.build_request(request.get_host(), microcosm_id=microcosm_id,
             id=group_id, offset=offset, access_token=request.access_token)
-        request.view_requests.append(grequests.get(role_url, params=params, headers=headers, timeout=5))
+        request.view_requests.append(grequests.get(role_url, params=params, headers=headers))
 
         criteria_url, params, headers = RoleCriteriaList.build_request(request.get_host(),
             microcosm_id=microcosm_id, id=group_id, offset=offset, access_token=request.access_token)
-        request.view_requests.append(grequests.get(criteria_url, params=params, headers=headers, timeout=5))
+        request.view_requests.append(grequests.get(criteria_url, params=params, headers=headers))
 
         profiles_url, params, headers = RoleProfileList.build_request(request.get_host(),
             microcosm_id=microcosm_id, id=group_id, offset=offset, access_token=request.access_token)
-        request.view_requests.append(grequests.get(profiles_url, params=params, headers=headers, timeout=5))
+        request.view_requests.append(grequests.get(profiles_url, params=params, headers=headers))
 
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))

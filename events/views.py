@@ -64,12 +64,12 @@ def single(request, event_id):
     # Create request for event resource.
     event_url, event_params, event_headers = Event.build_request(request.get_host(), id=event_id,
         offset=offset, access_token=request.access_token)
-    request.view_requests.append(grequests.get(event_url, params=event_params, headers=event_headers, timeout=5))
+    request.view_requests.append(grequests.get(event_url, params=event_params, headers=event_headers))
 
     # Create request for event attendees.
     att_url, att_params, att_headers = Event.build_attendees_request(request.get_host(), event_id,
         request.access_token)
-    request.view_requests.append(grequests.get(att_url, params=att_params, headers=att_headers, timeout=5))
+    request.view_requests.append(grequests.get(att_url, params=att_params, headers=att_headers))
 
     # Perform requests and instantiate view objects.
     try:

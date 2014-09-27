@@ -48,7 +48,7 @@ def single(request, conversation_id):
 
     conversation_url, params, headers = Conversation.build_request(request.get_host(), id=conversation_id,
         offset=offset, access_token=request.access_token)
-    request.view_requests.append(grequests.get(conversation_url, params=params, headers=headers, timeout=5))
+    request.view_requests.append(grequests.get(conversation_url, params=params, headers=headers))
 
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
