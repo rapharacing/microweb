@@ -1,5 +1,5 @@
 Django==1.5.9
-requests==1.1.0
+requests==2.4.1
 python-dateutil==1.4
 
 # Production server
@@ -15,6 +15,7 @@ mock==1.0.1
 pylibmc==1.2.3
 
 # Gevent requests
-grequests==0.2.0
+# grequests==0.2.0
+git+https://github.com/microcosm-cc/grequests.git@85884230bff825063e2f05e7b5de1d31c8e9cfd2
 
 newrelic==2.16.0.12
