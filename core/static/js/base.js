@@ -26,10 +26,36 @@ if (jQuery && moment) {
 	updateTimes();
 }
 
+function ordinalSuffix(i) {
+	var j = i % 10, k = i % 100;
+	if (j == 1 && k != 11) {
+		return i + "st";
+	}
+	if (j == 2 && k != 12) {
+		return i + "nd";
+	}
+	if (j == 3 && k != 13) {
+		return i + "rd";
+	}
+	return i + "th";
+}
+
 $('document').ready(function() {
 	// Updates <time> to use relative times
 	updateTimes();
 	setInterval(updateTimes, 60000); // Update every minute
+
+	// Localise event start times
+	$('.cell-meta-event span time').each(function () {
+		var t = $(this);
+		var d = new Date(t.attr('datetime'));
+
+		var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+		
+		t.text(
+			months[d.getMonth()] + '. ' + ordinalSuffix(d.getDate())
+		);
+	});
 
 
 	// Make code look pretty
