@@ -274,10 +274,7 @@
       // and show "multiple" state if endDate is not on the same day as startDate
       if (typeof opts.duration !== "undefined"){
 
-        var copy_start_date = new Date(this.startDate.getTime());
-        copy_start_date.setMinutes(copy_start_date.getMinutes()+parseInt(opts.duration,10));
-
-        this.endDate = new Date(copy_start_date.getTime());
+        this.endDate = new Date(this.startDate.getTime() + parseInt(opts.duration,10) * 60000);
 
         if( this.endDate.getDate()+""+this.endDate.getMonth()+""+this.endDate.getYear() !==
             this.startDate.getDate()+""+this.startDate.getMonth()+""+this.startDate.getYear()
@@ -312,8 +309,8 @@
 
     // Given a date object, return the time formatted as "03:45 PM"
     function getTimeStringFromDate(d) {
-      var hh = d.getUTCHours();
-      var mi = d.getUTCMinutes();
+      var hh = d.getHours();
+      var mi = d.getMinutes();
       var pm = (hh > 11);
 
       // round minutes to nearest 15min block
@@ -321,12 +318,14 @@
         hh = hh+1;
         mi = 0;
         pm = (hh > 11);
-      }else if (mi > 30){
+      } else if (mi > 30) {
         mi = 45;
-      }else if (mi > 15){
+      } else if (mi > 15) {
         mi = 30;
-      }else{
+      } else if (mi > 0) {
         mi = 15;
+      } else {
+        mi = 0;
       }
 
       return '' + (hh <= 9 ? '0' + hh : (hh > 12 ? hh - 12: hh)) + ':' +

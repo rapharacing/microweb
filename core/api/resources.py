@@ -1472,7 +1472,7 @@ class Event(APIResource):
         event = cls.from_summary(data)
         event.comments = PaginatedList(data['comments'], Comment)
         if data.get('when'):
-            event.when = parse_timestamp(data['when'])
+            event.when = parse_timestamp(data['when'], ignoretz=True)
         if data.get('duration'):
             event.duration = data['duration']
         event.status = data['status']
@@ -1512,7 +1512,7 @@ class Event(APIResource):
             if data.get('rsvpAttend'):
                 event.rsvp_percentage = (event.rsvp_attend/float(event.rsvp_limit))*100
 
-        if data.get('when'): event.when = parse_timestamp(data['when'])
+        if data.get('when'): event.when = parse_timestamp(data['when'], ignoretz=True)
         if data.get('where'): event.where = data['where']
         if data.get('lat'): event.lat = data['lat']
         if data.get('lon'): event.lon = data['lon']
