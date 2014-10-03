@@ -33,7 +33,7 @@
         {% if action == 'move' %}
             <div class="row form-container">
                 <div class="col-xs-12">
-                    <form role="form" action="" method="POST">
+                    <form role="form" action="do/" method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="{{ action }}" />
                         <input type="hidden" name="item_type" value="{{ item_type }}"/>
@@ -50,7 +50,7 @@
         {% else %}
                 <div class="row form-container">
                     <div class="col-xs-12">
-                        <form role="form" action="" method="POST">
+                        <form role="form" action="do/" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="{{ action }}" />
                             <input type="hidden" name="item_type" value="{{ item_type }}"/>
