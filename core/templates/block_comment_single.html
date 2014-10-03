@@ -30,25 +30,30 @@
 			{{ comment.html|safe }}
 
 			{% if attachments %}
+				<hr />
 				{% get_attachment comment.id as comment_attachments %}
 				{% if comment_attachments %}
-					<ul class="comment-item-body-attachments">
+					<p><b>{{ comment_attachments|length }} Attachment{{ comment_attachments|length|default:0|pluralize }}</b></p>
+					<ul class="comment-item-body-attachments clearfix">
 					{% for attachment in comment_attachments.items %}
-						{# template_tags/is_image.py #}
-							{% if attachment.file_ext|is_image %}
-							<li class="attachment-image">
-								<img src="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}"
-									 alt="{{ attachment.file_name }}"
-									 title="{{ attachment.file_name }}" />
-							</li>
-							{% else %}
-							<li class="attachment-link">
-								<a href="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}"
-								 title="{{ attachment.file_name }}">
-								{{ attachment.file_name }}
-								</a>
-							</li>
-							{% endif %}
+						{# template_tags/is_image.py non-images first #}
+						{% if not attachment.file_ext|is_image %}
+						<li class="attachment-link">
+							<a href="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}"
+							 title="{{ attachment.file_name }}">
+							{{ attachment.file_name }}
+							</a>
+						</li>
+						{% endif %}
+					{% endfor %}
+					{% for attachment in comment_attachments.items %}
+						{# template_tags/is_image.py images second #}
+						{% if attachment.file_ext|is_image %}
+						<li class="attachment-image"{% if comment_attachments|length > 5 %} style="width: 80px; height: 80px; float:left; margin:2px;"{% endif %}>
+							{% if comment_attachments|length > 5 %}
+							<a href="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}">{% endif %}<img src="https://{{site.subdomain_key}}.microco.sm{{ attachment.meta.links.0.href }}" alt="{{ attachment.file_name }}" title="{{ attachment.file_name }}"{% if comment_attachments|length > 5 %} style="width: auto; height: 100%;"{% endif %} />{% if comment_attachments|length > 5 %}</a>{% endif %}
+						</li>
+						{% endif %}
 					{% endfor %}
 					</ul>
 				{% endif %}
