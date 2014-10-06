@@ -112,6 +112,7 @@
 	{% if content.id == user.id %}
 		<div class="metabar-module-primary-buttons">
 			<a id="edit_profile" href="{% url 'edit-profile' user.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-pencil-small"></span> Edit your Profile</a>
+			<a href="/ignored/" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-format-list"></span> View Ignored</a>
 		</div>
 	{% else %}
 		<div class="metabar-module-primary-buttons">
@@ -125,10 +126,20 @@
 	</div> <!-- primary actions -->
 
 	<div class="metabar-module">
-		<h5>Profile</h5>
+		<h5>Actions</h5>
 		<div class="metabar-module-body">
 			{% include 'forms/subscribe.html' %}
 		</div>
+		{% if user and content.id != user.id %}
+		<div class="metabar-module-body">
+			<form action="/ignore/" method="POST" id="ignore_form">
+				{% csrf_token %}
+				<input type="hidden" name="item_type" value="profile" />
+				<input type="hidden" name="item_id" value="{{ content.id }}" />
+				<input type="submit" value="Ignore" class="btn btn-default btn-xs" />
+			</form>
+		</div>
+		{% endif %}
 	</div> <!-- / about -->
 
 {% endblock %}

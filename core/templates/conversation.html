@@ -132,6 +132,17 @@
 		</div>
 
 		{% include 'forms/metabar-moderation.html' %}
+
+		{% if user and not content.meta.permissions.owner %}
+		<div class="metabar-module-body">
+			<form action="/ignore/" method="POST" id="ignore_form">
+				{% csrf_token %}
+				<input type="hidden" name="item_type" value="conversation" />
+				<input type="hidden" name="item_id" value="{{ content.id }}" />
+				<input type="submit" value="Ignore" class="btn btn-default btn-xs" />
+			</form>
+		</div>
+		{% endif %}
 	</div> <!-- / actions -->
 
 {% endblock %}

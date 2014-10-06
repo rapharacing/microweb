@@ -1929,6 +1929,21 @@ class Ignored(object):
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
+    @staticmethod
+    def add_api(host, data, access_token):
+        url = build_url(host, [Ignored.api_path_fragment])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.put(url, data=json.dumps(data), headers=headers)
+
+    @staticmethod
+    def delete_api(host, data, access_token):
+        url = build_url(host, [Ignored.api_path_fragment])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        return requests.delete(url, data=json.dumps(data), headers=headers)
+
+
 class IgnoredItem(object):
     """
     The search result object
