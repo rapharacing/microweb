@@ -33,6 +33,9 @@ def dev_env():
 def prod_env():
     env.hosts.append('wpy01.microcosm.cc:2020')
 
+def test_env():
+    env.hosts.append('deployment@dev.microco.sm')
+
 def destroy_virtualenv():
 
     sudo('rm -rf %s' % env.virtualenv_root, user='django')
