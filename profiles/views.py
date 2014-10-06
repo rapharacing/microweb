@@ -43,7 +43,7 @@ def single(request, profile_id):
     """
 
     # Fetch profile details.
-    profile_url, params, headers = Profile.build_request(request.get_host(), profile_id)
+    profile_url, params, headers = Profile.build_request(request.get_host(), profile_id, access_token=request.access_token)
     request.view_requests.append(grequests.get(profile_url, params=params, headers=headers))
 
     # Fetch items created by this profile.

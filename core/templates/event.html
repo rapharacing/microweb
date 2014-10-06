@@ -156,7 +156,12 @@
 				{% csrf_token %}
 				<input type="hidden" name="item_type" value="event" />
 				<input type="hidden" name="item_id" value="{{ content.id }}" />
+				{% if content.meta.flags.ignored %}
+				<input type="hidden" name="delete" value="true" />
+				<input type="submit" value="Unignore" class="btn btn-default btn-xs" />
+				{% else %}
 				<input type="submit" value="Ignore" class="btn btn-default btn-xs" />
+				{% endif %}
 			</form>
 		</div>
 		{% endif %}
