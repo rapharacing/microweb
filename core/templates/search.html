@@ -224,16 +224,16 @@
 				</li>
 			{% endfor %}
 
-			{% if content.query.forumId %}
+			{% for forumid in content.query.forumId %}
 				<li class="list-group-item">
 					<div class="checkbox">
 						<label for="filter-forumId">
-							<input id="filter-forumId" type="checkbox" name="forumId" value="{{content.query.forumId}}" checked="checked" />
-							forumId = {{content.query.forumId}}
+							<input id="filter-forumId" type="checkbox" name="forumId" value="{{forumid}}" checked="checked" />
+							forumId = {{forumid}}
 						</label>
 					</div>
 				</li>
-			{% endif %}
+			{% endfor %}
 
 			{% if content.query.since %}
 				<li class="list-group-item">
