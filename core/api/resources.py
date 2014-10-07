@@ -58,8 +58,10 @@ def build_url(host, path_fragments):
     on CPython and we are not going to change interpreter.
     """
 
-    if host.endswith(settings.API_DOMAIN_NAME):
-        url = settings.API_SCHEME + host
+    # Determine if CNAME resolution is necessary.
+    # The API_DOMAIN_NAME may specify a port, so is split before comparison.
+    if host.endswith(settings.API_DOMAIN_NAME.split(':')[0]):
+        url = settings.API_SCHEME + settings.API_DOMAIN_NAME
     else:
         mc_key = host + '_cname'
         resolved_name = None
