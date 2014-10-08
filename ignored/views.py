@@ -59,11 +59,9 @@ def ignored(request):
         ) if request.whoami_url else None,
         'site': Site(responses[request.site_url]),
         'content': ignoredItems,
+        'pagination': build_pagination_links(responses[url]['ignored']['links'], ignoredItems),
         'site_section': 'ignored',
     }
-
-    if responses[url].get('items'):
-        view_data.pagination = build_pagination_links(responses[url]['items']['links'], ignoredItems.items)
 
     return render(request, template_name, view_data)
 
