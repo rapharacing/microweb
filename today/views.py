@@ -70,7 +70,7 @@ def build_pagination_links(request, paged_list):
     }
 
     for item in request:
-        url = str.replace(str(item['href']), '/search', '/today')
+        url = str.replace(str(item['href']), '/search', '/today/')
         url = str.replace(url, '?since=-1&type=conversation&type=event&type=profile&type=huddle', '')
         url = str.replace(url, '&since=-1&type=conversation&type=event&type=profile&type=huddle', '')
         item['href'] = api_url_to_gui_url(url)
