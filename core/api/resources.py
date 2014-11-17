@@ -273,8 +273,9 @@ class Site(object):
     @staticmethod
     def resolve_cname(host):
         # TODO: separation of root site API and others
-        # TODO: get rid of this string
-        url = 'https://microco.sm/api/v1/hosts/' + host
+        url = settings.API_SCHEME + settings.API_DOMAIN_NAME
+        path_fragments = [settings.API_PATH, settings.API_VERSION, 'hosts', host]
+        url += join_path_fragments(path_fragments)
         response = requests.get(url)
         if response.status_code != 200:
             raise APIException('Error resolving CNAME %s' % host, response.status_code)
