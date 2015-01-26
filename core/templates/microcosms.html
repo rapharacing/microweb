@@ -33,23 +33,35 @@
 		{% endif %}
 		</div>
 	{% else %}
-
 		<div class="list-microcosms">
 			<ul class="list-collection bordered padded">
+			{% if site.site_id == 234 %}
+				<li class="list-collection-row row-pinned">
+					<div class="row">
+						<div class="col-sm-12 col-md-12">
+							<div class="list-collection-row-offset">
+								<h2 class="row-title">
+									<a href="/conversations/260918/">LFGSS Jerseys now available</a>
+								</h2>
+								<div class="row-meta">
+									<p class="microcosm-item-description">
+										<a href="/conversations/260918/">LFGSS cycling jerseys</a> now <a href="http://shop.lfgss.cc/">available for pre-order until Feb 6th</a>. 
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+			{% endif %}
 			{% for item in content.microcosms.items %}
 					<li class="list-collection-row">
 						<div class="row">
-
 							<div class="col-sm-7 col-md-7">
-								<!--<div class="list-collection-row-icon">
-
-								</div> /list-collection-row-icon -->
 								<div class="list-collection-row-offset">
 									<h2 class="row-title">
 										<a href="{% url 'single-microcosm' item.id %}">{{ item.title | safe }}</a>
 										{% if item.meta.flags.unread %}<span class="label label-warning">NEW</span>{% endif %}
 									</h2>
-
 									<div class="row-meta">
 										<p class="microcosm-item-description">
 											{{ item.description | safe }}
@@ -57,9 +69,7 @@
 									</div>
 								</div>
 							</div>
-
 							<div class="col-sm-5 col-md-5">
-
 								<div class="row-stats">
 									<ul class="list-stats">
 										<li>
@@ -75,7 +85,6 @@
 								<div class="row-context">
 									{#<input type="checkbox" class="row-admin-checkbox" /> #}
 									{% if item.most_recent_update %}
-
 										<a href="/{{item.most_recent_update.item_type}}s/{{item.most_recent_update.id}}/{% if user %}newest/{% endif %}" title="{{ item.most_recent_update.title | safe }}">{{ item.most_recent_update.title | safe | truncatechars:30 }}</a>
 										{% if item.most_recent_update.total_comments %}
 											<time datetime="{{ item.most_recent_update.last_comment_created|date:"c" }}"></time>
@@ -90,7 +99,6 @@
 										{% endif %}
 									{% endif %}
 								</div>
-
 							</div>
 						</div>
 					</li>
@@ -176,6 +184,4 @@
 		{% endif %}
 	</div>
 	{% endif %}
-
-
 {% endblock%}

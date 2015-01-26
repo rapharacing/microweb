@@ -28,29 +28,21 @@
 </div>
 
 <div class="content-body">
-
-{# {% include "forms/content-moderation.html" %} #}
-
+	{# {% include "forms/content-moderation.html" %} #}
 	<div class="list-items">
-
 		<ul class="list-collection bordered padded">
 		{% for item in content.items.items %}
-
 			{% if item.item_type == "conversation" %}
 				{% conversation item %}
 			{% endif %}
-
 			{% if item.item_type == "event" %}
 				{% event item %}
 			{% endif %}
-
 		{% endfor %}
 		</ul>
 	</div>
-
+	{# {% include "forms/content-moderation.html" %} #}
 </div>
-
-{# {% include "forms/content-moderation.html" %} #}
 
 
 <div class="content-footer padded">
