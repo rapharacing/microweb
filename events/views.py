@@ -13,6 +13,7 @@ from django.http import HttpResponseBadRequest
 from django.http import HttpResponse
 
 from django.shortcuts import render
+from django.shortcuts import redirect
 
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
@@ -24,6 +25,7 @@ from core.views import build_pagination_links
 from core.views import build_newest_comment_link
 
 from core.api.exceptions import APIException
+from core.api.resources import build_url
 from core.api.resources import Attachment
 from core.api.resources import AttendeeList
 from core.api.resources import Comment
@@ -156,6 +158,22 @@ def single(request, event_id):
     }
 
     return render(request, single_template, view_data)
+
+
+@require_http_methods(['GET',])
+@cache_control(must_revalidate=True, max_age=0)
+def csv(request, event_id):
+    """
+    Downloads a CSV file containing event attendees.
+    """
+    return redirect(
+        build_url(
+            request.get_host(),
+            ["events", "%s", "attendeescsv"]
+        ) % (
+            event_id,
+        ) + "?access_token=" + request.access_token,
+    )
 
 
 @require_authentication

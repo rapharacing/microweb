@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     # Events
     url(r'^microcosms/(?P<microcosm_id>\d+)/create/event/$', views.create, name='create-event'),
     url(r'^events/(?P<event_id>\d+)/$', views.single, name='single-event'),
+    url(r'^events/(?P<event_id>\d+)/csv/$', views.csv, name='csv-event'),
     url(r'^events/(?P<event_id>\d+)/edit/$', views.edit, name='edit-event'),
     url(r'^events/(?P<event_id>\d+)/delete/$', views.delete, name='delete-event'),
     url(r'^events/(?P<event_id>\d+)/newest/$', views.newest, name='newest-event'),

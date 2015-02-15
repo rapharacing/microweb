@@ -168,6 +168,10 @@
 			</form>
 		</div>
 		{% endif %}
+
+		{% if content.meta.permissions.owner or content.meta.permissions.admin or content.meta.permissions.moderator %}
+			<div><a id="csv-event" href="{% url 'csv-event' content.id %}">Download Attendees CSV</a></div>
+		{% endif %}
 	</div> <!-- / controls -->
 	{% endif %}
 
