@@ -130,10 +130,13 @@
 		<div class="metabar-module-body">
 			<p>{% include 'forms/subscribe.html' %}</p>
 		</div>
-
+	</div> <!-- / actions -->
+	{% if user %}
+	<div class="metabar-module">
+	<h5>Controls</h5>
 		{% include 'forms/metabar-moderation.html' %}
 
-		{% if user and not content.meta.permissions.owner %}
+		{% if not content.meta.permissions.owner %}
 		<div class="metabar-module-body">
 			<form action="/ignore/" method="POST" id="ignore_form">
 				{% csrf_token %}
@@ -148,7 +151,8 @@
 			</form>
 		</div>
 		{% endif %}
-	</div> <!-- / actions -->
+	</div> <!-- / controls -->
+	{% endif %}
 
 {% endblock %}
 
