@@ -4,7 +4,7 @@ import logging
 from django.shortcuts import render
 
 from django.views.decorators.cache import cache_control
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
@@ -20,8 +20,7 @@ logger = logging.getLogger('search.views')
 single_template = 'search.html'
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def single(request):
 
     searchParams = dict(request.GET._iterlists())

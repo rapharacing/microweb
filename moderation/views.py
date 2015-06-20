@@ -10,6 +10,7 @@ from django.shortcuts import render
 
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from core.api.resources import Conversation
 from core.api.resources import Event
@@ -22,8 +23,7 @@ from core.api.resources import Site
 from core.views import require_authentication
 
 @require_authentication
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def confirm(request):
     """
     View for moderation actions on a single item.

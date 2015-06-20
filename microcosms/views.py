@@ -13,6 +13,7 @@ from django.shortcuts import render
 
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from core.api.resources import Microcosm
 from core.api.resources import MicrocosmList
@@ -45,8 +46,7 @@ members_list_template = 'memberships.html'
 members_form_template = 'forms/memberships.html'
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def single_microcosm(request, microcosm_id):
 
     # Pagination offset of items within the microcosm.
@@ -76,8 +76,7 @@ def single_microcosm(request, microcosm_id):
     return render(request, microcosm_single_template, view_data)
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def list_microcosms(request):
 
     # Pagination offset of microcosms.
@@ -186,8 +185,7 @@ def delete_microcosm(request, microcosm_id):
 
 
 @exception_handler
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def list_members(request, microcosm_id):
     try:
         offset = int(request.GET.get('offset', 0))

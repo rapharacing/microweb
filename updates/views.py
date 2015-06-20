@@ -12,6 +12,7 @@ from django.shortcuts import render
 
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from core.api.resources import UpdateList
 from core.api.resources import Update
@@ -35,8 +36,7 @@ class UpdateView(object):
 
     @staticmethod
     @exception_handler
-    @require_http_methods(['GET',])
-    @cache_control(must_revalidate=True, max_age=0)
+    @require_safe
     def list(request):
         # TODO: need a user friendly error page for unregistered users
         # TODO: remove 'site_section'

@@ -4,7 +4,7 @@ import logging
 from django.shortcuts import render
 
 from django.views.decorators.cache import cache_control
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from core.api.resources import Profile
 from core.api.resources import response_list_to_dict
@@ -20,8 +20,7 @@ logger = logging.getLogger('trending.views')
 list_template = 'trending.html'
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def list(request):
     url, params, headers = Trending.build_request(request.get_host(), access_token=request.access_token)
     request.view_requests.append(grequests.get(url, params=params, headers=headers))
