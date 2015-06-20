@@ -82,7 +82,7 @@ MIDDLEWARE_CLASSES = (
     'core.middleware.redirect.DomainRedirectMiddleware',
 
     # cache busting for static files
-    'core.middleware.modtimeurls.ModTimeUrlsMiddleware',
+#    'core.middleware.modtimeurls.ModTimeUrlsMiddleware',
 
     # time all requests and report to riemann
     'core.middleware.timing.TimingMiddleware',
