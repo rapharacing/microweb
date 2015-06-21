@@ -170,7 +170,7 @@ class APIResource(object):
 
     @staticmethod
     def make_request_headers(access_token=None):
-        headers = {'Accept-Encoding': 'application/json'}
+        headers = {'Accept': 'application/json','Accept-Encoding': 'gzip'}
         if access_token:
             headers['Authorization'] = 'Bearer %s' % access_token
         return headers
