@@ -84,6 +84,9 @@ MIDDLEWARE_CLASSES = (
     # cache busting for static files
 #    'core.middleware.modtimeurls.ModTimeUrlsMiddleware',
 
+    # preconnect for 3rd party assets
+    'core.middleware.preconnect.PreconnectMiddleware',
+
     # time all requests and report to riemann
     'core.middleware.timing.TimingMiddleware',
 
