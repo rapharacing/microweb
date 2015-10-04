@@ -15,13 +15,21 @@
 		<link rel="dns-prefetch" href="//fonts.gstatic.com">
 		<link rel="dns-prefetch" href="//www.google-analytics.com">
 
+		<link rel="preconnect" href="https://{{ site.subdomain_key }}.microco.sm">
+		<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+		<link rel="preconnect" href="https://login.persona.org">
+		<link rel="preconnect" href="https://static.login.persona.org">
+		<link rel="preconnect" href="https://fonts.googleapis">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link rel="preconnect" href="//www.google-analytics.com">
+
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<!-- Ensure IE doesn't run in compatibility mode -->
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!--[if lt IE 9]>
-		  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
-		  <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+		  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+		  <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
 		<link href="{{ STATIC_URL }}themes/{{ site.theme_id|default:"1" }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
@@ -263,9 +271,9 @@
 
 		<script src="https://login.persona.org/include.js"></script>
 		<!-- <script src="{{ STATIC_URL }}js/persona.js"></script> -->
-		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
 		<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 		<script src="{{ STATIC_URL }}js/base.js"></script>
 		<script src="{{ STATIC_URL }}js/metabar.js"></script>
