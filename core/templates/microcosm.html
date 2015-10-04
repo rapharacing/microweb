@@ -2,6 +2,7 @@
 
 {% load conversation %}
 {% load event %}
+{% load microcosm %}
 
 {% block title %}{{ content.title | safe }}{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title | safe }}{% endblock title %}
 
@@ -32,11 +33,13 @@
 	<div class="list-items">
 		<ul class="list-collection bordered padded">
 		{% for item in content.items.items %}
-			{% if item.item_type == "conversation" %}
+			{% if item.item_type == "microcosm" %}
+				{% microcosm item %}
+			{% elif item.item_type == "conversation" %}
 				{% conversation item %}
-			{% endif %}
-			{% if item.item_type == "event" %}
+			{% elif item.item_type == "event" %}
 				{% event item %}
+			{% else %}
 			{% endif %}
 		{% endfor %}
 		</ul>

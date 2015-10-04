@@ -471,6 +471,7 @@ class Microcosm(APIResource):
     def from_api_response(cls, data):
         microcosm = Microcosm()
         if data.get('id'): microcosm.id = data['id']
+        if data.get('microcosmId'): microcosm.id = data['parentId']
         if data.get('siteId'): microcosm.site_id = data['siteId']
         if data.get('visibility'): microcosm.visibility = data['visibility']
         if data.get('title'): microcosm.title = data['title']
@@ -848,10 +849,14 @@ class Item(object):
         item = cls()
         item.id = data['item']['id']
         item.item_type = data['itemType']
-        item.microcosm_id = data['item']['microcosmId']
+        if data['item'].get('microcosmId'):
+            item.microcosm_id = data['item']['microcosmId']
+        if data['item'].get('parentId'):
+            item.microcosm_id = data['item']['parentId']
         item.title = data['item']['title']
         item.total_comments = data['item']['totalComments']
-        item.total_views = data['item']['totalViews']
+        if data['item'].get('totalViews'):
+            item.total_views = data['item']['totalViews']
 
         if data['item'].get('lastComment'):
             if data['item']['lastComment'].get('id'):
