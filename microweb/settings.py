@@ -78,8 +78,8 @@ MIDDLEWARE_CLASSES = (
     # Convenience for request context like site, user account, etc.
     'core.middleware.context.ContextMiddleware',
 
-    # # Redirect to custom domain, if one exists for the site
-    # 'core.middleware.redirect.DomainRedirectMiddleware',
+    # Redirect to custom domain, if one exists for the site
+    'core.middleware.redirect.DomainRedirectMiddleware',
 
     # # cache busting for static files
     # 'core.middleware.modtimeurls.ModTimeUrlsMiddleware',
@@ -165,3 +165,4 @@ from microweb.local_settings import SECRET_KEY
 
 # Allows shadowing of DEBUG for development.
 from microweb.local_settings import DEBUG
+from microweb.local_settings import TEMPLATE_DEBUG
