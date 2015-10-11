@@ -108,12 +108,13 @@ def list_microcosms(request):
 
 @require_authentication
 @require_http_methods(['GET', 'POST',])
-@cache_control(must_revalidate=True, max_age=0)
-def create_microcosm(request):
+#@cache_control(must_revalidate=True, max_age=0)
+def create_microcosm(request, parent_id=0):
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:
         return respond_with_error(request, exc)
+
     view_data = {
         'user': Profile(responses[request.whoami_url], summary=False),
         'site': Site(responses[request.site_url]),
@@ -133,7 +134,9 @@ def create_microcosm(request):
             return render(request, microcosm_form_template, view_data)
 
     if request.method == 'GET':
-        view_data['form'] = microcosm_create_form()
+        view_data['form'] = microcosm_create_form(initial=dict(parentId=parent_id))
+        view_data['parentId'] = parent_id
+
         return render(request, microcosm_form_template, view_data)
 
 
@@ -170,6 +173,7 @@ def edit_microcosm(request, microcosm_id):
         except APIException as exc:
             return respond_with_error(request, exc)
         view_data['form'] = microcosm_edit_form(microcosm.as_dict)
+
         return render(request, microcosm_form_template, view_data)
 
 

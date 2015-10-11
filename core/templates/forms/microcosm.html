@@ -2,6 +2,18 @@
 
 {% block title %}{% if form.id > 0 %}Edit this forum{% else %}Create a forum{% endif %} | {{ site.title | safe }}{% endblock title %}
 
+{% block css %}
+<style type="text/css">
+.has-choices ul {
+	list-style: none;
+}
+.has-choices ul li label {
+	font-weight: normal;
+	margin-bottom: 0px;
+}
+</style>
+{% endblock css %}
+
 {% block content %}
 
 	<div class="content-header padded">
@@ -27,6 +39,7 @@
 						{% csrf_token %}
 						{{ form.siteId.value }}
 						{{ form.id }}
+						{{ form.parentId }}
 
 						{# title #}
 						<div class="form-group">
@@ -76,6 +89,24 @@
 
 							</div>
 						</div> <!-- /form-group -->
+						
+						{# item types #}
+						<div class="form-group">
+							<div class="row">
+
+								<label class="col-sm-12" for="title">
+									{{ form.itemTypes.label }}
+								</label>
+								<div class="col-sm-12 has-choices {% if form.errors.description %}has-error{%endif%}">
+									{% if form.errors.itemTypes %}
+										<label class="control-label">{{ form.errors.itemTypes.as_text }}</label>
+									{% endif %}
+									
+									{{ form.itemTypes }}
+								</div>
+							</div>
+						</div> <!-- /form-group -->
+
 
 						{{ form.visibility }}
 

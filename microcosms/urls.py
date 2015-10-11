@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     url(r'^microcosms/$', views.list_microcosms, name='list-microcosms'),
     url(r'^microcosms/create/$', views.create_microcosm, name='create-microcosm'),
     url(r'^microcosms/(?P<microcosm_id>\d+)/$', views.single_microcosm, name='single-microcosm'),
+    url(r'^microcosms/(?P<parent_id>\d+)/create/microcosm/$', views.create_microcosm, name='create-child-microcosm'),
     url(r'^microcosms/(?P<microcosm_id>\d+)/edit/$', views.edit_microcosm, name='edit-microcosm'),
     url(r'^microcosms/(?P<microcosm_id>\d+)/delete/$', views.delete_microcosm, name='delete-microcosm'),
 

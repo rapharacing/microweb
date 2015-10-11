@@ -61,15 +61,32 @@
 {% block sidebar%}
 	{% if content.meta.flags.open %}
 		<div class="metabar-module">
-			<div class="metabar-module-primary-buttons">
 			{% if user %}
-				<a id="create_conversation" href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-speech-bubble-small"></span> Post a conversation</a>
-				<a id="create_event" href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-calendar-small"></span> Post an event</a>
+				<div class="metabar-module-primary-buttons">
+					{% for item_type in content.item_types %}{%if item_type == "conversation" %}
+						<a id="create_conversation" href="{% url 'create-conversation' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-speech-bubble"></span> Post a conversation</a>
+					{%endif%}{% endfor %}
+					{% for item_type in content.item_types %}{%if item_type == "event" %}
+						<a id="create_event" href="{% url 'create-event' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-calendar"></span> Post an event</a>
+					{%endif%}{% endfor %}
+				</div>
+				{% if content.meta.permissions.admin or content.meta.permissions.owner or content.meta.permissions.moderator %}
+					<div class="metabar-module-primary-buttons" style="margin-top: 10px;">
+						{% for item_type in content.item_types %}{%if item_type == "microcosm" %}
+							<a id="create_conversation" href="{% url 'create-child-microcosm' content.id %}" class="btn btn-large btn-block btn-primary"><span class="sprite sprite-microcosm"></span> Create a forum</a>
+						{%endif%}{% endfor %}
+					</div>
+				{% endif %}
 			{% else %}
-				<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin"><span class="sprite sprite-speech-bubble-small"></span> Post a conversation</a>
-				<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin"><span class="sprite sprite-calendar-small"></span> Post an event</a>
+				<div class="metabar-module-primary-buttons">
+					{% for item_type in content.item_types %}{%if item_type == "conversation" %}
+						<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin"><span class="sprite sprite-speech-bubble"></span> Post a conversation</a>
+					{%endif%}{% endfor %}
+					{% for item_type in content.item_types %}{%if item_type == "event" %}
+						<a href="#" class="btn btn-large btn-block btn-primary" data-toggle="modal" data-target="#modal-signin"><span class="sprite sprite-calendar"></span> Post an event</a>
+					{%endif%}{% endfor %}
+				</div>
 			{% endif %}
-			</div>
 		</div>
 	{% else %}
 		<div class="metabar-module">

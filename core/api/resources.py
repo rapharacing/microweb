@@ -471,7 +471,10 @@ class Microcosm(APIResource):
     def from_api_response(cls, data):
         microcosm = Microcosm()
         if data.get('id'): microcosm.id = data['id']
-        if data.get('microcosmId'): microcosm.id = data['parentId']
+        if data.get('parentId'):
+            microcosm.parent_id = data['parentId']
+        else:
+            microcosm.parent_id = 0
         if data.get('siteId'): microcosm.site_id = data['siteId']
         if data.get('visibility'): microcosm.visibility = data['visibility']
         if data.get('title'): microcosm.title = data['title']
@@ -480,6 +483,7 @@ class Microcosm(APIResource):
         if data.get('editReason'): microcosm.edit_reason = data['editReason']
         if data.get('meta'): microcosm.meta = Meta(data['meta'])
         if data.get('items'): microcosm.items = PaginatedList(data['items'], Item)
+        if data.get('itemTypes'): microcosm.item_types = data['itemTypes']
         return microcosm
 
     @classmethod
@@ -532,6 +536,7 @@ class Microcosm(APIResource):
     def as_dict(self):
         repr = {}
         if hasattr(self, 'id'): repr['id'] = self.id
+        if hasattr(self, 'parent_id'): repr['parentId'] = self.parent_id
         if hasattr(self, 'site_id'): repr['siteId'] = self.site_id
         if hasattr(self, 'visibility'): repr['visibility'] = self.visibility
         if hasattr(self, 'title'): repr['title'] = self.title
@@ -542,6 +547,7 @@ class Microcosm(APIResource):
         if hasattr(self, 'total_items'): repr['totalItems'] = self.total_items
         if hasattr(self, 'total_comments'): repr['totalComments'] = self.total_comments
         if hasattr(self, 'items'): repr['items'] = self.items
+        if hasattr(self, 'item_types'): repr['itemTypes'] = self.item_types
         if hasattr(self, 'edit_reason'): repr['meta'] = dict(editReason=self.edit_reason)
         return repr
 
