@@ -54,7 +54,7 @@
 				{% elif result.item_type == 'event' %}
 					{% event result unread=result.unread showForum=True %}
 				{% elif result.item_type == "microcosm" %}
-					{% microcosm result unread=result.unread %}
+					{% microcosm result unread=result.unread showForum=True %}
 				{% elif result.item_type == "profile" %}
 					{% profile result send_message=True %}
 				{% elif result.item_type == "comment" %}
