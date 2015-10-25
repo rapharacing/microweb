@@ -4,6 +4,12 @@
 	</li>
 
 	{% if not skipparents %}
+		{% for key,value in content.parents.iteritems%}
+	<li>
+		<a href="{{ value.href }}">{{ value.title | safe }}</a>
+	</li>
+		{% endfor %}
+
 		{% for key,value in content.meta.links.iteritems reversed%}
 			{% if value.title and key != "up"%}
 	<li>

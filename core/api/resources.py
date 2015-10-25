@@ -484,6 +484,14 @@ class Microcosm(APIResource):
         if data.get('meta'): microcosm.meta = Meta(data['meta'])
         if data.get('items'): microcosm.items = PaginatedList(data['items'], Item)
         if data.get('itemTypes'): microcosm.item_types = data['itemTypes']
+        if data.get('parents'):
+            microcosm.parents = {}
+            for item in data['parents']:
+                if 'title' in item:
+                    microcosm.parents[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href']), 'title': item['title']}
+                else:
+                    microcosm.parents[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href'])}
+
         return microcosm
 
     @classmethod
