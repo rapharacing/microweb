@@ -130,9 +130,14 @@
 	{% if user %}
 	<div class="metabar-module">
 		<h5>Actions</h5>
-	    <div class="metabar-module-body">
-	        {% include 'forms/mark-read.html' %}
-	    </div>
+		<div class="metabar-module-body">
+			{% include 'forms/mark-read.html' %}
+		</div>
+		{% if content.meta.permissions.admin or content.meta.permissions.owner or content.meta.permissions.moderator %}
+			<div class="metabar-module-body">
+				<a href="{% url 'list-memberships' content.id %}">Manage site permissions</a>
+			</div>
+		{% endif %}
 	</div>
 	{% endif %}
 {% endblock%}
