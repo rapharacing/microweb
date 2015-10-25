@@ -16,7 +16,6 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_safe
 
 from core.api.resources import Microcosm
-from core.api.resources import MicrocosmList
 from core.api.resources import Role
 from core.api.resources import RoleCriteria
 from core.api.resources import RoleCriteriaList

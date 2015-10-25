@@ -514,9 +514,9 @@ class Microcosm(APIResource):
     @staticmethod
     def build_request(host, id, offset=None, access_token=None):
         if id == 0:
-            url = build_url(host, [MicrocosmList.api_path_fragment])
+            url = build_url(host, [Microcosm.api_path_fragment])
         else:
-            url = build_url(host, [MicrocosmList.api_path_fragment, id])
+            url = build_url(host, [Microcosm.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
@@ -568,16 +568,25 @@ class MicrocosmList(object):
     Represents a list of microcosms for a given site.
     """
 
-    api_path_fragment = 'microcosms'
-
     def __init__(self, data):
-        self.microcosms = PaginatedList(data['microcosms'], Microcosm)
-        self.meta = Meta(data['meta'])
+        self.microcosms = []
+
+        for item in data:
+            m = {
+                    'href': api_url_to_gui_url(item['href']),
+                    'title': ''.join('&nbsp;' * (item['level']-1) * 4) + item['title'],
+                    'depth': int(item['level']),
+                    'id': int(item['id'])
+                }
+
+            if item.get('parentId'):
+                m['parent_id'] = int(item['parentId'])
+            self.microcosms.append(m)
 
     @staticmethod
     def build_request(host, offset=None, access_token=None):
-        url = build_url(host, [MicrocosmList.api_path_fragment])
-        params = {'offset': offset} if offset else {}
+        url = build_url(host, ['microcosms', 'tree'])
+        params = {}
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
@@ -1358,8 +1367,8 @@ class Conversation(APIResource):
         if update:
             repr['id'] = self.id
             repr['meta'] = self.meta
-        repr['microcosmId'] = self.microcosm_id
-        repr['title'] = self.title
+        if hasattr(self, 'microcosm_id'): repr['microcosmId'] = self.microcosm_id
+        if hasattr(self, 'title'): repr['title'] = self.title
         return repr
 
 
@@ -1597,14 +1606,14 @@ class Event(APIResource):
         if update:
             repr['id'] = self.id
             repr['meta'] = self.meta
-        repr['microcosmId'] = self.microcosm_id
-        repr['title'] = self.title
-        repr['when'] = self.when
-        repr['duration'] = self.duration
+        if hasattr(self, 'microcosm_id'): repr['microcosmId'] = self.microcosm_id
+        if hasattr(self, 'title'): repr['title'] = self.title
+        if hasattr(self, 'when'): repr['when'] = self.when
+        if hasattr(self, 'duration'): repr['duration'] = self.duration
 
         # Event location is optional
-        if hasattr(self, 'where'):
-            repr['where'] = self.where
+        if hasattr(self, 'where'): repr['where'] = self.where
+        
         # Geo coordinates are optional, even if 'where' is specified
         if hasattr(self, 'lat'): repr['lat'] = self.lat
         if hasattr(self, 'lon'): repr['lon'] = self.lon
