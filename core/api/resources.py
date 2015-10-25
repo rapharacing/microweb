@@ -505,7 +505,10 @@ class Microcosm(APIResource):
 
     @staticmethod
     def build_request(host, id, offset=None, access_token=None):
-        url = build_url(host, [MicrocosmList.api_path_fragment, id])
+        if id == 0:
+            url = build_url(host, [MicrocosmList.api_path_fragment])
+        else:
+            url = build_url(host, [MicrocosmList.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers

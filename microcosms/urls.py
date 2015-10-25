@@ -6,8 +6,8 @@ from microcosms import views
 
 urlpatterns = patterns('',
 
-    url(r'^$', views.list_microcosms, name='index'),
-    url(r'^microcosms/$', views.list_microcosms, name='list-microcosms'),
+    url(r'^$', views.root_microcosm, name='index'),
+    url(r'^microcosms/$', views.root_microcosm, name='list-microcosms'),
     url(r'^microcosms/create/$', views.create_microcosm, name='create-microcosm'),
     url(r'^microcosms/(?P<microcosm_id>\d+)/$', views.single_microcosm, name='single-microcosm'),
     url(r'^microcosms/(?P<parent_id>\d+)/create/microcosm/$', views.create_microcosm, name='create-child-microcosm'),
