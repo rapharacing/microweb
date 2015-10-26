@@ -125,6 +125,15 @@
 	{% endif %}
 	</div> <!-- primary actions -->
 
+	{% if content.email %}
+	<div class="metabar-module">
+		<h5>About</h5>
+		<div class="metabar-module-body">
+			<a href="mailto:{{ content.email | safe }}">{{ content.email | safe }}</a>
+		</div>
+	</div>
+	{% endif %}
+
 	<div class="metabar-module">
 		<h5>Actions</h5>
 		<div class="metabar-module-body">
@@ -145,7 +154,7 @@
 			</form>
 		</div>
 		{% endif %}
-	</div> <!-- / about -->
+	</div>
 
 {% endblock %}
 {% block js %}
