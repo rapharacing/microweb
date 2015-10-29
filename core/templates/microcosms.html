@@ -25,20 +25,38 @@
 
 <div class="content-body">
 	{# {% include "forms/content-moderation.html" %} #}
-	<div class="list-items">
-		<ul class="list-collection bordered padded">
-		{% for item in content.items.items %}
-			{% if item.item_type == "microcosm" %}
-				{% microcosm item %}
-			{% elif item.item_type == "conversation" %}
-				{% conversation item %}
-			{% elif item.item_type == "event" %}
-				{% event item %}
-			{% else %}
-			{% endif %}
-		{% endfor %}
-		</ul>
-	</div>
+	{% if not content.items.items %}
+		<div class="row-meta">
+		{% if user %}
+			<h2>Problems logging in?</h2>
+			<p>The Rapha Cycling Club Forum uses the <a href="https://login.persona.org/about">Mozilla Persona</a> sign-in system.</p>
+			<p>You are signed in with <strong>{{user.email}}</strong>, please make sure this matches your Rapha.cc account email.</p>
+			<p>If you still can&rsquo;t see this message please make sure you are allowing third party cookies on this domain, without the Persona cookie your cannot login at all. <a href="https://login.persona.org/about">Learn more about Mozilla Persona and privacy here</a>.</p>
+			<p>Thank you</p>
+			<p><a href="mailto:rcc@rapha.cc">rcc@rapha.cc</a></p>
+		{% else %}
+			<p>There are no public forums, please create an account using the email address that you use to login to rapha.cc</p>
+		{% endif %}
+		{% if content.meta.permissions.create %}
+			<p><a href="{% url 'create-microcosm' %}">Create your first forum.</a></p>
+		{% endif %}
+		</div>
+	{% else %}
+		<div class="list-items">
+			<ul class="list-collection bordered padded">
+			{% for item in content.items.items %}
+				{% if item.item_type == "microcosm" %}
+					{% microcosm item %}
+				{% elif item.item_type == "conversation" %}
+					{% conversation item %}
+				{% elif item.item_type == "event" %}
+					{% event item %}
+				{% else %}
+				{% endif %}
+			{% endfor %}
+			</ul>
+		</div>
+	{% endif %}
 	{# {% include "forms/content-moderation.html" %} #}
 </div>
 
