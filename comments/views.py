@@ -13,6 +13,7 @@ from django.shortcuts import render
 
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from core.api.resources import APIException
 from core.api.resources import Attachment
@@ -77,8 +78,7 @@ def build_comment_location(comment):
     return location
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def single(request, comment_id):
     """
     Display a single comment.
@@ -268,8 +268,7 @@ def delete(request, comment_id):
 
 
 @require_authentication
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def incontext(request, comment_id):
     """
     Redirect to the user's first unread comment in a list of comments.
@@ -285,8 +284,7 @@ def incontext(request, comment_id):
 
 
 @require_authentication
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def source(request, comment_id):
     """
     Retrieve the markdown source for a comment.
@@ -300,8 +298,7 @@ def source(request, comment_id):
 
 
 @require_authentication
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def attachments(request, comment_id):
     """
     Retrieve a comment's attachments.

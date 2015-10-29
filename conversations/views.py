@@ -10,6 +10,7 @@ from django.shortcuts import render
 
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from core.views import build_pagination_links
 from core.views import build_newest_comment_link
@@ -36,8 +37,7 @@ form_template = 'forms/conversation.html'
 single_template = 'conversation.html'
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def single(request, conversation_id):
 
     # Offset of comments.
@@ -205,8 +205,7 @@ def delete(request, conversation_id):
     return HttpResponseRedirect(reverse('single-microcosm', args=(conversation.microcosm_id,)))
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def newest(request, conversation_id):
     """
     Redirect to the user's first unread post in the conversation.

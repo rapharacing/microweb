@@ -146,6 +146,10 @@
 			<li class="list-group-item">
 				<span class="badge-alt">{{ site.meta.stats.totalEvents | default:0 | intcomma }}</span>
 				<a href="/search/?type=event" title="Find recently updated events">Events</a>
+				<ul>
+					<li style="list-style:none;"><a href="/search?type=event&amp;eventAfter=0&amp;sort=oldest">upcoming events</a></li>
+					<li style="list-style:none;"><a href="/search?type=event&amp;eventBefore=0&amp;sort=newest">past events</a></li>
+				</ul>
 			</li>
 			{% endif %}
 			{% if site.meta.stats.totalComments %}

@@ -2,7 +2,8 @@ import logging
 import urllib
 import urlparse
 
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
+
 from django.http import HttpResponseRedirect
 
 from django.conf import settings
@@ -17,7 +18,7 @@ from core.api.resources import RESOURCE_PLURAL
 logger = logging.getLogger('redirect.views')
 
 
-@require_http_methods(['GET',])
+@require_safe
 def redirect_or_404(request):
 
     host = request.get_host()

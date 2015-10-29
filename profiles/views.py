@@ -10,6 +10,7 @@ from django.shortcuts import render
 
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from core.api.resources import FileMetadata
 from core.api.resources import Comment
@@ -35,8 +36,7 @@ single_template = 'profile.html'
 list_template = 'profiles.html'
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def single(request, profile_id):
     """
     Display a single profile by ID.
@@ -72,8 +72,7 @@ def single(request, profile_id):
     return render(request, single_template, view_data)
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def list(request):
 
     # Record offset for paging of profiles.

@@ -29,6 +29,7 @@ from django.template import RequestContext
 from django.template import loader
 
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from django.views.generic.base import RedirectView
 from django.views.generic.base import TemplateView
@@ -180,7 +181,7 @@ class LegalView(object):
     single_template = 'legal.html'
 
     @staticmethod
-    @require_http_methods(['GET',])
+    @require_safe
     def list(request):
         try:
             responses = response_list_to_dict(grequests.map(request.view_requests))
@@ -195,7 +196,7 @@ class LegalView(object):
         return render(request, LegalView.list_template, view_data)
 
     @staticmethod
-    @require_http_methods(['GET',])
+    @require_safe
     def single(request, doc_name):
         if not doc_name in ['cookies', 'privacy', 'terms']:
             return HttpResponseNotFound()

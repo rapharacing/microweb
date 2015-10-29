@@ -17,6 +17,7 @@ from django.shortcuts import redirect
 
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_safe
 
 from core.views import respond_with_error
 from core.views import require_authentication
@@ -50,8 +51,7 @@ single_template = 'event.html'
 comment_form = CommentForm
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def single(request, event_id):
     """
     Display a single event with comments and attendees.
@@ -160,8 +160,8 @@ def single(request, event_id):
     return render(request, single_template, view_data)
 
 
-@require_http_methods(['GET',])
-@cache_control(must_revalidate=True, max_age=0)
+@require_authentication
+@require_safe
 def csv(request, event_id):
     """
     Downloads a CSV file containing event attendees.
@@ -350,8 +350,7 @@ def delete(request, event_id):
 
 
 @require_authentication
-@require_http_methods(['GET', ])
-@cache_control(must_revalidate=True, max_age=0)
+@require_safe
 def newest(request, event_id):
     """
     Get redirected to the first unread post in an event.

@@ -81,14 +81,17 @@ MIDDLEWARE_CLASSES = (
     # Redirect to custom domain, if one exists for the site
     'core.middleware.redirect.DomainRedirectMiddleware',
 
-    # cache busting for static files
-    'core.middleware.modtimeurls.ModTimeUrlsMiddleware',
+    # # cache busting for static files
+    # 'core.middleware.modtimeurls.ModTimeUrlsMiddleware',
 
-    # time all requests and report to riemann
-    'core.middleware.timing.TimingMiddleware',
+    # # preconnect for 3rd party assets
+    # 'core.middleware.preconnect.PreconnectMiddleware',
 
-    # push exceptions to riemann
-    'core.middleware.exception.ExceptionMiddleware',
+    # # time all requests and report to riemann
+    # 'core.middleware.timing.TimingMiddleware',
+
+    # # push exceptions to riemann
+    # 'core.middleware.exception.ExceptionMiddleware',
 )
 
 ROOT_URLCONF = 'microweb.urls'
@@ -162,3 +165,4 @@ from microweb.local_settings import SECRET_KEY
 
 # Allows shadowing of DEBUG for development.
 from microweb.local_settings import DEBUG
+from microweb.local_settings import TEMPLATE_DEBUG
