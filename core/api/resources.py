@@ -272,6 +272,7 @@ class Site(object):
 
     @staticmethod
     def resolve_cname(host):
+        return 'rcc.microco.sm'
         # TODO: separation of root site API and others
         url = settings.API_SCHEME + settings.API_DOMAIN_NAME
         path_fragments = [settings.API_PATH, settings.API_VERSION, 'hosts', host]
