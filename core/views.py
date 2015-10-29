@@ -265,13 +265,13 @@ class ErrorView(object):
         if request.whoami_url:
             profile = Profile(responses[whoami_url], summary=False)
             view_data['user'] = profile
-            newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
-            newrelic.agent.add_custom_parameter('profile_id', profile.id)
-            newrelic.agent.add_custom_parameter('user_id', profile.user_id)
+            # newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
+            # newrelic.agent.add_custom_parameter('profile_id', profile.id)
+            # newrelic.agent.add_custom_parameter('user_id', profile.user_id)
 
         site = Site(responses[site_url])
         view_data['site'] = site
-        newrelic.agent.add_custom_parameter('site', site.subdomain_key)
+        # newrelic.agent.add_custom_parameter('site', site.subdomain_key)
 
         context = RequestContext(request, view_data)
         return HttpResponseForbidden(loader.get_template('403.html').render(context))

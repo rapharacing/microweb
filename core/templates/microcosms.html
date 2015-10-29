@@ -24,9 +24,14 @@
 	{% if not content.microcosms.items %}
 		<div class="row-meta">
 		{% if user %}
-			<p>No forums exist.</p>
+			<h2>Problems logging in?</h2>
+			<p>The Rapha Cycling Club Forum uses the <a href="https://login.persona.org/about">Mozilla Persona</a> sign-in system.</p>
+			<p>You are signed in with <strong>{{user.email}}</strong>, please make sure this matches your Rapha.cc account email.</p>
+			<p>If you still can&rsquo;t see this message please make sure you are allowing third party cookies on this domain, without the Persona cookie your cannot login at all. <a href="https://login.persona.org/about">Learn more about Mozilla Persona and privacy here</a>.</p>
+			<p>Thank you</p>
+			<p><a href="mailto:rcc@rapha.cc">rcc@rapha.cc</a></p>
 		{% else %}
-			<p>There are no public forums, you may need to sign in or register.</p>
+			<p>There are no public forums, please create an account using the email address that you use to login to rapha.cc</p>
 		{% endif %}
 		{% if content.meta.permissions.create %}
 			<p><a href="{% url 'create-microcosm' %}">Create your first forum.</a></p>

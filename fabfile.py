@@ -34,7 +34,7 @@ def dev2_env():
     env.hosts.append('wpyrapha.dev.microcosm.cc')
 
 def prod_env():
-    env.hosts.append('wpy01.microcosm.cc:2020')
+    env.hosts.append('wpyrapha.microcosm.cc:2020')
 
 def test_env():
     env.hosts.append('deployment@dev.microco.sm')
