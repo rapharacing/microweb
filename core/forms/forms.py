@@ -297,3 +297,10 @@ class ProfileEdit(django.forms.Form):
     )
     # Comment text in markdown format.
     markdown = django.forms.CharField(required=False, max_length='5000', widget=django.forms.Textarea)
+
+class ProfilePatch(django.forms.Form):
+    """
+    Form for patching a profile.
+    """
+
+    member = django.forms.CharField(initial=False, max_length='10', widget=django.forms.HiddenInput, required=True)

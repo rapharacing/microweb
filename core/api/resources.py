@@ -357,6 +357,7 @@ class Profile(object):
         if data.get('profileName'): self.profile_name = data['profileName']
         if data.get('visible'): self.visible = data['visible']
         if data.get('avatar'): self.avatar = data['avatar']
+        if data.get('member'): self.is_member = data['member']
         if data.get('meta'): self.meta = Meta(data['meta'])
         if data.get('profileComment'):
                 self.profile_comment = Comment.from_summary(data['profileComment'])
@@ -385,6 +386,19 @@ class Profile(object):
         resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
         return Profile(resource, summary=False)
 
+    def patch(self, host, access_token):
+        url = build_url(host, [Profile.api_path_fragment, self.id])
+
+        member = False
+        if hasattr(self, 'is_member'): 
+            member = self.is_member
+
+        payload = json.dumps([{'op': 'replace', 'path': '/member', 'value': member}])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        requests.patch(url, payload, headers=headers)
+        return self
+
     @staticmethod
     def build_request(host, id, access_token=None):
         url = build_url(host, [Profile.api_path_fragment, id])
@@ -408,6 +422,7 @@ class Profile(object):
         if hasattr(self, 'last_active'): repr['lastActive'] = self.last_active
         if hasattr(self, 'banned'): repr['banned'] = self.banned
         if hasattr(self, 'admin'): repr['admin'] = self.admin
+        if hasattr(self, 'is_member'): repr['member'] = self.is_member
 
         if hasattr(self, 'profile_comment'): repr['markdown'] = self.profile_comment.markdown
 
