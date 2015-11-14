@@ -892,6 +892,8 @@ class Item(object):
         item.item_type = data['itemType']
         if data['item'].get('microcosmId'):
             item.microcosm_id = data['item']['microcosmId']
+        if data.get('breadcrumb'):
+            item.breadcrumb = Breadcrumb(data['breadcrumb'])
         if data['item'].get('parentId'):
             item.microcosm_id = data['item']['parentId']
         item.title = data['item']['title']
@@ -941,6 +943,19 @@ class PaginatedList(object):
                 else:
                     self.links[item['rel']] = {'href': item['href']}
 
+
+class Breadcrumb(object):
+    """
+    List of links that describe the ancestor microcosms
+    """
+
+    def __init__(self, crumbs):
+        self.breadcrumb = {}
+        for item in crumbs:
+            if 'title' in item:
+                self.breadcrumb[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href']), 'title': item['title']}
+            else:
+                self.breadcrumb[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href'])}
 
 class Meta(object):
     """
@@ -1312,6 +1327,9 @@ class Conversation(APIResource):
         conversation.microcosm_id = data['microcosmId']
         conversation.title = data['title']
 
+        if data.get('breadcrumb'):
+            conversation.breadcrumb = Breadcrumb(data['breadcrumb'])
+
         conversation.total_comments = 0
         if data.get('totalComments'):
             conversation.total_comments = data['totalComments']
@@ -1532,6 +1550,9 @@ class Event(APIResource):
         event.id = data['id']
         event.microcosm_id = data['microcosmId']
         event.title = data['title']
+
+        if data.get('breadcrumb'):
+            event.breadcrumb = Breadcrumb(data['breadcrumb'])
 
         event.total_comments = 0
         if data.get('totalComments'):
