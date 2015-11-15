@@ -23,6 +23,7 @@ from core.api.resources import Site
 from core.api.exceptions import APIException
 
 from core.forms.forms import ProfileEdit
+from core.forms.forms import ProfilePatch
 
 from core.views import build_pagination_links
 from core.views import require_authentication
@@ -31,6 +32,7 @@ from core.views import respond_with_error
 
 logger = logging.getLogger('profiles.views')
 edit_form = ProfileEdit
+patch_form = ProfilePatch
 form_template = 'forms/profile.html'
 single_template = 'profile.html'
 list_template = 'profiles.html'
@@ -208,6 +210,27 @@ def edit(request, profile_id):
             return respond_with_error(request, exc)
         view_data['form'] = edit_form(user_profile.as_dict)
         return render(request, form_template, view_data)
+
+
+@require_authentication
+@require_http_methods(['POST',])
+@cache_control(must_revalidate=True, max_age=0)
+def patch(request, profile_id):
+    """
+    Patch a user profile (member status).
+    """
+
+    if request.method == 'POST':
+        form = patch_form(request.POST)
+        if form.is_valid():
+            # Update the actual profile resource.
+            data = {
+                'id': profile_id,
+                'member': (form.cleaned_data['member'] == 'true'),
+            }
+            profile = Profile(data)
+            profile.patch(request.get_host(), request.access_token)
+        return HttpResponseRedirect(reverse('single-profile', args=(profile_id,)))
 
 
 @require_authentication

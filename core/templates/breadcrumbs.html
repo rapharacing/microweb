@@ -1,31 +1,24 @@
 <ol class="breadcrumb">
-	<li>
-		<a href="{% url 'index' %}">Home</a>
-	</li>
-
+	<li><a href="{% url 'index' %}">Home</a></li>
 	{% if not skipparents %}
-		{% for key,value in content.meta.links.iteritems reversed%}
-			{% if value.title and key != "up"%}
-	<li>
-		<a href="{{ value.href }}">{{ value.title | safe }}</a>
-	</li>
-			{% endif %}
-		{% endfor %}
+		{% if content.breadcrumb %}
+			{% for key,value in content.breadcrumb.breadcrumb.iteritems %}
+	<li><a href="{{ value.href }}">{{ value.title | safe }}</a></li>
+			{% endfor %}
+		{% else %}
+			{% for key,value in content.meta.links.iteritems reversed%}
+				{% if value.title and key != "up"%}
+	<li><a href="{{ value.href }}">{{ value.title | safe }}</a></li>
+				{% endif %}
+			{% endfor %}
+		{% endif %}
 	{% endif %}
-
-
 	{% if content.isConfidential == True or content.isConfidential == False %}
-	<li>
-		<a href="{% url 'list-huddle' %}">Messages</a>
-	</li>
+	<li><a href="{% url 'list-huddle' %}">Messages</a></li>
 	{% endif %}
-
 	{% if content.user_id %}
-	<li>
-		<a href="{% url 'list-profiles' %}">People</a>
-	</li>
+	<li><a href="{% url 'list-profiles' %}">People</a></li>
 	{% endif %}
-
 	{% if not skipself %}
 		{% if content.profile_name %}
 	<li><a href="{{ content.meta.links.self.href }}">{{ content.profile_name|safe }}</a></li>
@@ -37,7 +30,6 @@
 	<li><a href="{{ content.meta.links.self.href }}">{{ content.title|safe }}</a></li>
 		{% endif %}
 	{% endif %}
-
 	{% if site_section == 'memberships' %}
 		<li><a id="groupslink" href="{% url 'list-memberships' content.id %}">Membership Groups</a></li>
 	{% endif %}

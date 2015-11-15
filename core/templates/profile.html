@@ -125,27 +125,51 @@
 	{% endif %}
 	</div> <!-- primary actions -->
 
+	{% if content.email %}
+	<div class="metabar-module">
+		<h5>About</h5>
+		<div class="metabar-module-body">
+			<a href="mailto:{{ content.email | safe }}">{{ content.email | safe }}</a>
+		</div>
+	</div>
+	{% endif %}
+
 	<div class="metabar-module">
 		<h5>Actions</h5>
 		<div class="metabar-module-body">
 			{% include 'forms/subscribe.html' %}
 		</div>
 		{% if user and content.id != user.id %}
-		<div class="metabar-module-body">
-			<form action="/ignore/" method="POST" id="ignore_form">
-				{% csrf_token %}
-				<input type="hidden" name="item_type" value="profile" />
-				<input type="hidden" name="item_id" value="{{ content.id }}" />
-				{% if content.meta.flags.ignored %}
-				<input type="hidden" name="delete" value="true" />
-				<input type="submit" value="Unignore" class="btn btn-default btn-xs" />
+			<div class="metabar-module-body">
+				<form action="/ignore/" method="POST" id="ignore_form">
+					{% csrf_token %}
+					<input type="hidden" name="item_type" value="profile" />
+					<input type="hidden" name="item_id" value="{{ content.id }}" />
+					{% if content.meta.flags.ignored %}
+					<input type="hidden" name="delete" value="true" />
+					<input type="submit" value="Unignore" class="btn btn-default btn-xs" />
+					{% else %}
+					<input type="submit" value="Ignore" class="btn btn-default btn-xs" />
+					{% endif %}
+				</form>
+			</div>
+			{% if content.meta.permissions.admin %}
+				<div class="metabar-module-body">
+					<form action="/profiles/{{content.id}}/patch/" method="POST" id="patch_form">
+						{% csrf_token %}
+						{% if content.is_member %}
+							<button type="submit" name="member" value="false" class="btn btn-default btn-xs">Revoke membership</button>
+						{% else %}
+							<button type="submit" name="member" value="true" class="btn btn-default btn-xs">Grant membership</button>
+						{% endif %}
+					</form>
+				</div>
+				{% if content.member %}
 				{% else %}
-				<input type="submit" value="Ignore" class="btn btn-default btn-xs" />
 				{% endif %}
-			</form>
-		</div>
+			{% endif %}
 		{% endif %}
-	</div> <!-- / about -->
+	</div>
 
 {% endblock %}
 {% block js %}

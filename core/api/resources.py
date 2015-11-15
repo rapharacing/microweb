@@ -357,6 +357,7 @@ class Profile(object):
         if data.get('profileName'): self.profile_name = data['profileName']
         if data.get('visible'): self.visible = data['visible']
         if data.get('avatar'): self.avatar = data['avatar']
+        if data.get('member'): self.is_member = data['member']
         if data.get('meta'): self.meta = Meta(data['meta'])
         if data.get('profileComment'):
                 self.profile_comment = Comment.from_summary(data['profileComment'])
@@ -385,6 +386,19 @@ class Profile(object):
         resource = APIResource.update(url, payload, {}, APIResource.make_request_headers(access_token))
         return Profile(resource, summary=False)
 
+    def patch(self, host, access_token):
+        url = build_url(host, [Profile.api_path_fragment, self.id])
+
+        member = False
+        if hasattr(self, 'is_member'): 
+            member = self.is_member
+
+        payload = json.dumps([{'op': 'replace', 'path': '/member', 'value': member}])
+        headers = APIResource.make_request_headers(access_token)
+        headers['Content-Type'] = 'application/json'
+        requests.patch(url, payload, headers=headers)
+        return self
+
     @staticmethod
     def build_request(host, id, access_token=None):
         url = build_url(host, [Profile.api_path_fragment, id])
@@ -408,6 +422,7 @@ class Profile(object):
         if hasattr(self, 'last_active'): repr['lastActive'] = self.last_active
         if hasattr(self, 'banned'): repr['banned'] = self.banned
         if hasattr(self, 'admin'): repr['admin'] = self.admin
+        if hasattr(self, 'is_member'): repr['member'] = self.is_member
 
         if hasattr(self, 'profile_comment'): repr['markdown'] = self.profile_comment.markdown
 
@@ -471,6 +486,12 @@ class Microcosm(APIResource):
     def from_api_response(cls, data):
         microcosm = Microcosm()
         if data.get('id'): microcosm.id = data['id']
+        if data.get('parentId'):
+            microcosm.parent_id = data['parentId']
+        else:
+            microcosm.parent_id = 0
+        if data.get('parents'):
+            microcosm.breadcrumb = Breadcrumb(data['parents'])
         if data.get('siteId'): microcosm.site_id = data['siteId']
         if data.get('visibility'): microcosm.visibility = data['visibility']
         if data.get('title'): microcosm.title = data['title']
@@ -479,6 +500,8 @@ class Microcosm(APIResource):
         if data.get('editReason'): microcosm.edit_reason = data['editReason']
         if data.get('meta'): microcosm.meta = Meta(data['meta'])
         if data.get('items'): microcosm.items = PaginatedList(data['items'], Item)
+        if data.get('itemTypes'): microcosm.item_types = data['itemTypes']
+
         return microcosm
 
     @classmethod
@@ -500,7 +523,10 @@ class Microcosm(APIResource):
 
     @staticmethod
     def build_request(host, id, offset=None, access_token=None):
-        url = build_url(host, [MicrocosmList.api_path_fragment, id])
+        if id == 0:
+            url = build_url(host, [Microcosm.api_path_fragment])
+        else:
+            url = build_url(host, [Microcosm.api_path_fragment, id])
         params = {'offset': offset} if offset else {}
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
@@ -531,6 +557,7 @@ class Microcosm(APIResource):
     def as_dict(self):
         repr = {}
         if hasattr(self, 'id'): repr['id'] = self.id
+        if hasattr(self, 'parent_id'): repr['parentId'] = self.parent_id
         if hasattr(self, 'site_id'): repr['siteId'] = self.site_id
         if hasattr(self, 'visibility'): repr['visibility'] = self.visibility
         if hasattr(self, 'title'): repr['title'] = self.title
@@ -541,6 +568,7 @@ class Microcosm(APIResource):
         if hasattr(self, 'total_items'): repr['totalItems'] = self.total_items
         if hasattr(self, 'total_comments'): repr['totalComments'] = self.total_comments
         if hasattr(self, 'items'): repr['items'] = self.items
+        if hasattr(self, 'item_types'): repr['itemTypes'] = self.item_types
         if hasattr(self, 'edit_reason'): repr['meta'] = dict(editReason=self.edit_reason)
         return repr
 
@@ -550,16 +578,25 @@ class MicrocosmList(object):
     Represents a list of microcosms for a given site.
     """
 
-    api_path_fragment = 'microcosms'
-
     def __init__(self, data):
-        self.microcosms = PaginatedList(data['microcosms'], Microcosm)
-        self.meta = Meta(data['meta'])
+        self.microcosms = []
+
+        for item in data:
+            m = {
+                    'href': api_url_to_gui_url(item['href']),
+                    'title': ''.join('&nbsp;' * (item['level']-1) * 4) + item['title'],
+                    'depth': int(item['level']),
+                    'id': int(item['id'])
+                }
+
+            if item.get('parentId'):
+                m['parent_id'] = int(item['parentId'])
+            self.microcosms.append(m)
 
     @staticmethod
     def build_request(host, offset=None, access_token=None):
-        url = build_url(host, [MicrocosmList.api_path_fragment])
-        params = {'offset': offset} if offset else {}
+        url = build_url(host, ['microcosms', 'tree'])
+        params = {}
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
@@ -848,10 +885,16 @@ class Item(object):
         item = cls()
         item.id = data['item']['id']
         item.item_type = data['itemType']
-        item.microcosm_id = data['item']['microcosmId']
+        if data['item'].get('microcosmId'):
+            item.microcosm_id = data['item']['microcosmId']
+        if data.get('breadcrumb'):
+            item.breadcrumb = Breadcrumb(data['breadcrumb'])
+        if data['item'].get('parentId'):
+            item.microcosm_id = data['item']['parentId']
         item.title = data['item']['title']
         item.total_comments = data['item']['totalComments']
-        item.total_views = data['item']['totalViews']
+        if data['item'].get('totalViews'):
+            item.total_views = data['item']['totalViews']
 
         if data['item'].get('lastComment'):
             if data['item']['lastComment'].get('id'):
@@ -895,6 +938,19 @@ class PaginatedList(object):
                 else:
                     self.links[item['rel']] = {'href': item['href']}
 
+
+class Breadcrumb(object):
+    """
+    List of links that describe the ancestor microcosms
+    """
+
+    def __init__(self, crumbs):
+        self.breadcrumb = {}
+        for item in crumbs:
+            if 'title' in item:
+                self.breadcrumb[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href']), 'title': item['title']}
+            else:
+                self.breadcrumb[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href'])}
 
 class Meta(object):
     """
@@ -1266,6 +1322,9 @@ class Conversation(APIResource):
         conversation.microcosm_id = data['microcosmId']
         conversation.title = data['title']
 
+        if data.get('breadcrumb'):
+            conversation.breadcrumb = Breadcrumb(data['breadcrumb'])
+
         conversation.total_comments = 0
         if data.get('totalComments'):
             conversation.total_comments = data['totalComments']
@@ -1336,8 +1395,8 @@ class Conversation(APIResource):
         if update:
             repr['id'] = self.id
             repr['meta'] = self.meta
-        repr['microcosmId'] = self.microcosm_id
-        repr['title'] = self.title
+        if hasattr(self, 'microcosm_id'): repr['microcosmId'] = self.microcosm_id
+        if hasattr(self, 'title'): repr['title'] = self.title
         return repr
 
 
@@ -1487,6 +1546,9 @@ class Event(APIResource):
         event.microcosm_id = data['microcosmId']
         event.title = data['title']
 
+        if data.get('breadcrumb'):
+            event.breadcrumb = Breadcrumb(data['breadcrumb'])
+
         event.total_comments = 0
         if data.get('totalComments'):
             event.total_comments = data['totalComments']
@@ -1575,14 +1637,14 @@ class Event(APIResource):
         if update:
             repr['id'] = self.id
             repr['meta'] = self.meta
-        repr['microcosmId'] = self.microcosm_id
-        repr['title'] = self.title
-        repr['when'] = self.when
-        repr['duration'] = self.duration
+        if hasattr(self, 'microcosm_id'): repr['microcosmId'] = self.microcosm_id
+        if hasattr(self, 'title'): repr['title'] = self.title
+        if hasattr(self, 'when'): repr['when'] = self.when
+        if hasattr(self, 'duration'): repr['duration'] = self.duration
 
         # Event location is optional
-        if hasattr(self, 'where'):
-            repr['where'] = self.where
+        if hasattr(self, 'where'): repr['where'] = self.where
+        
         # Geo coordinates are optional, even if 'where' is specified
         if hasattr(self, 'lat'): repr['lat'] = self.lat
         if hasattr(self, 'lon'): repr['lon'] = self.lon

@@ -16,7 +16,6 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_safe
 
 from core.api.resources import Microcosm
-from core.api.resources import MicrocosmList
 from core.api.resources import Role
 from core.api.resources import RoleCriteria
 from core.api.resources import RoleCriteriaList
@@ -40,10 +39,41 @@ logger = logging.getLogger('microcosms.views')
 microcosm_create_form = MicrocosmCreate
 microcosm_edit_form = MicrocosmEdit
 microcosm_form_template = 'forms/microcosm.html'
+microcosm_root_template = 'microcosms.html'
 microcosm_single_template = 'microcosm.html'
-microcosm_list_template = 'microcosms.html'
 members_list_template = 'memberships.html'
 members_form_template = 'forms/memberships.html'
+
+
+@require_safe
+def root_microcosm(request):
+
+    # Pagination offset of items within the microcosm.
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
+
+    microcosm_id = 0
+    microcosm_url, params, headers = Microcosm.build_request(request.get_host(), id=microcosm_id,
+                                                             offset=offset, access_token=request.access_token)
+    request.view_requests.append(grequests.get(microcosm_url, params=params, headers=headers))
+    try:
+        responses = response_list_to_dict(grequests.map(request.view_requests))
+    except APIException as exc:
+        return respond_with_error(request, exc)
+
+    microcosm = Microcosm.from_api_response(responses[microcosm_url])
+
+    view_data = {
+        'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
+        'site': Site(responses[request.site_url]),
+        'content': microcosm,
+        'item_type': 'microcosm',
+        'pagination': build_pagination_links(responses[microcosm_url]['items']['links'], microcosm.items)
+    }
+
+    return render(request, microcosm_root_template, view_data)
 
 
 @require_safe
@@ -76,44 +106,15 @@ def single_microcosm(request, microcosm_id):
     return render(request, microcosm_single_template, view_data)
 
 
-@require_safe
-def list_microcosms(request):
-
-    # Pagination offset of microcosms.
-    try:
-        offset = int(request.GET.get('offset', 0))
-    except ValueError:
-        offset = 0
-
-    microcosms_url, params, headers = MicrocosmList.build_request(request.get_host(), offset=offset,
-                                                                  access_token=request.access_token)
-    request.view_requests.append(grequests.get(microcosms_url, params=params, headers=headers))
-
-    try:
-        responses = response_list_to_dict(grequests.map(request.view_requests))
-    except APIException as exc:
-        return respond_with_error(request, exc)
-
-    microcosms = MicrocosmList(responses[microcosms_url])
-    view_data = {
-        'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
-        'site': Site(responses[request.site_url]),
-        'content': microcosms,
-        'item_type': 'site',
-        'pagination': build_pagination_links(responses[microcosms_url]['microcosms']['links'], microcosms.microcosms)
-    }
-
-    return render(request, microcosm_list_template, view_data)
-
-
 @require_authentication
 @require_http_methods(['GET', 'POST',])
-@cache_control(must_revalidate=True, max_age=0)
-def create_microcosm(request):
+#@cache_control(must_revalidate=True, max_age=0)
+def create_microcosm(request, parent_id=0):
     try:
         responses = response_list_to_dict(grequests.map(request.view_requests))
     except APIException as exc:
         return respond_with_error(request, exc)
+
     view_data = {
         'user': Profile(responses[request.whoami_url], summary=False),
         'site': Site(responses[request.site_url]),
@@ -133,7 +134,9 @@ def create_microcosm(request):
             return render(request, microcosm_form_template, view_data)
 
     if request.method == 'GET':
-        view_data['form'] = microcosm_create_form()
+        view_data['form'] = microcosm_create_form(initial=dict(parentId=parent_id))
+        view_data['parentId'] = parent_id
+
         return render(request, microcosm_form_template, view_data)
 
 
@@ -170,6 +173,7 @@ def edit_microcosm(request, microcosm_id):
         except APIException as exc:
             return respond_with_error(request, exc)
         view_data['form'] = microcosm_edit_form(microcosm.as_dict)
+
         return render(request, microcosm_form_template, view_data)
 
 

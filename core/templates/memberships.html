@@ -118,7 +118,7 @@
               </div>
             </div>
 
-            {% if membership.microcosm_id %}
+            {% if membership.microcosm_id == content.id %}
               {% if content.meta.permissions.owner or content.meta.permissions.admin or content.meta.permissions.moderator %}
             <div class="col-sm-4">
               <div class="row-stats">
@@ -132,10 +132,10 @@
             </div>
               {% endif %}
             {% endif %}
-            {% if membership.microcosm_id == 0 %}
+            {% if membership.microcosm_id != content.id %}
             <div class="col-sm-4">
               <div class="row-stats">
-                <span class="pull-right">Default Group</span>
+                <span class="pull-right">Inherited Group</span>
               </div>
               <div class="row-context">
               </div>

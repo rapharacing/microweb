@@ -70,10 +70,30 @@ def confirm(request):
 
         if request.GET.get('action') == 'move':
             # Fetch list of microcosms to supply in form.
-            view_data['microcosms'] = MicrocosmList.retrieve(
+            microcosms = MicrocosmList.retrieve(
                 request.get_host(),
                 access_token=request.access_token
             )
+
+            if request.GET.get('item_type') == 'microcosm':
+                newlist = []
+                nuke = content.id
+                found = False
+                for m in microcosms.microcosms:
+                    if m['id'] == nuke:
+                        found = True
+                        nuke = m['id']
+                    elif m.get('parent_id') and m['parent_id'] == nuke:
+                        found = True
+                        nuke = m['id']
+                    else:
+                        if found:
+                            nuke = 0
+                        newlist.append(m)
+                microcosms.microcosms = newlist
+
+
+            view_data['microcosms'] = microcosms
 
         return render(request, 'forms/moderation_item.html', view_data)
 
@@ -87,19 +107,32 @@ def moderate(request):
     microcosm_id = request.POST.get('microcosm_id')
 
     if request.method == 'POST':
+
         if request.POST.get('action') == 'move':
+
             if request.POST.get('item_type') == 'event':
-                event = Event.retrieve(request.get_host(), request.POST.get('item_id'),
-                    access_token=request.access_token)
+
+                event = Event()
+                event.id = int(request.POST.get('item_id'))
                 event.microcosm_id = int(microcosm_id)
                 event.meta = {'editReason': 'Moderator moved item'}
                 event.update(request.get_host(), request.access_token)
+
             elif request.POST.get('item_type') == 'conversation':
-                conversation = Conversation.retrieve(request.get_host(), request.POST.get('item_id'),
-                    access_token=request.access_token)
+
+                conversation = Conversation()
+                conversation.id = int(request.POST.get('item_id'))
                 conversation.microcosm_id = int(microcosm_id)
                 conversation.meta = {'editReason': 'Moderator moved item'}
                 conversation.update(request.get_host(), request.access_token)
+
+            elif request.POST.get('item_type') == 'microcosm':
+
+                microcosm = Microcosm()
+                microcosm.id = int(request.POST.get('item_id'))
+                microcosm.parent_id = int(microcosm_id)
+                microcosm.meta = {'editReason': 'Moderator moved item'}
+                microcosm.update(request.get_host(), request.access_token)
 
         else:
             # These are all PATCH requests and we need the item in question first

@@ -3,7 +3,6 @@ from django.core.exceptions import ValidationError
 
 longTextInput=django.forms.TextInput(attrs={'size':'80'})
 
-
 def validate_no_spaces(value):
     if ' ' in value:
         raise ValidationError('Profile name cannot contain spaces ( )')
@@ -251,6 +250,19 @@ class MicrocosmCreate(django.forms.Form):
             'max_length' : 'The description may not be longer than 255 characters'
         }
     )
+    parentId = django.forms.IntegerField(
+        widget=django.forms.HiddenInput,
+    )
+
+    itemTypes = django.forms.MultipleChoiceField(
+        widget=django.forms.CheckboxSelectMultiple,
+        label='What content can the forum contain?',
+        choices=(
+            ("microcosm", "Forums"),
+            ("conversation", "Conversations"),
+            ("event", "Events"),
+        )
+    )
 
     visibility = django.forms.CharField(
         initial='public',
@@ -265,7 +277,6 @@ class MicrocosmEdit(MicrocosmCreate):
 
     id = django.forms.IntegerField(widget=django.forms.HiddenInput)
     editReason = django.forms.CharField(label='Reason for editing')
-
 
 class ProfileEdit(django.forms.Form):
     """
@@ -286,3 +297,10 @@ class ProfileEdit(django.forms.Form):
     )
     # Comment text in markdown format.
     markdown = django.forms.CharField(required=False, max_length='5000', widget=django.forms.Textarea)
+
+class ProfilePatch(django.forms.Form):
+    """
+    Form for patching a profile.
+    """
+
+    member = django.forms.CharField(initial=False, max_length='10', widget=django.forms.HiddenInput, required=True)
