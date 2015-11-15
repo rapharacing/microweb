@@ -11,4 +11,9 @@ def microcosm(context, microcosm, **kwargs):
     else:
         context['unread'] = False
 
+    if 'showForum' in kwargs:
+        context['showForum'] = kwargs['showForum']
+    else:
+        context['showForum'] = False
+
     return context

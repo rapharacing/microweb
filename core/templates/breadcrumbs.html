@@ -1,9 +1,6 @@
 <ol class="breadcrumb">
 	<li><a href="{% url 'index' %}">Home</a></li>
 	{% if not skipparents %}
-		{% for key,value in content.parents.iteritems%}
-	<li><a href="{{ value.href }}">{{ value.title | safe }}</a></li>
-		{% endfor %}
 		{% if content.breadcrumb %}
 			{% for key,value in content.breadcrumb.breadcrumb.iteritems %}
 	<li><a href="{{ value.href }}">{{ value.title | safe }}</a></li>

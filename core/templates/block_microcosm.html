@@ -19,16 +19,12 @@
 					</span>
 				</div>
 			</div>
-			{% if showForum %}
+			{% if showForum and item.breadcrumb %}
 			<div class="cell-forum">
 				in 
-				{% if item.breadcrumb %}
-					{% for key,value in item.breadcrumb.breadcrumb.iteritems %}
-						<a href="{{ value.href }}">{{ value.title | safe }}</a> {% if not forloop.last %}/{% endif %}
-					{% endfor %}
-				{% else %}
-					<a href="{{ item.meta.links.microcosm.href }}">{{ item.meta.links.microcosm.title | safe }}</a>
-				{% endif %}
+				{% for key,value in item.breadcrumb.breadcrumb.iteritems %}
+					<a href="{{ value.href }}">{{ value.title | safe }}</a> {% if not forloop.last %}/{% endif %}
+				{% endfor %}
 			</div>
 			{% endif %}
 		</div>
