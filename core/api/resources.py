@@ -490,8 +490,8 @@ class Microcosm(APIResource):
             microcosm.parent_id = data['parentId']
         else:
             microcosm.parent_id = 0
-        if data.get('parents'):
-            microcosm.breadcrumb = Breadcrumb(data['parents'])
+        if data.get('breadcrumb'):
+            microcosm.breadcrumb = Breadcrumb(data['breadcrumb'])
         if data.get('siteId'): microcosm.site_id = data['siteId']
         if data.get('visibility'): microcosm.visibility = data['visibility']
         if data.get('title'): microcosm.title = data['title']
