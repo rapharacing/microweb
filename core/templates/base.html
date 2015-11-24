@@ -8,7 +8,6 @@
 
 		<meta http-equiv="x-dns-prefetch-control" content="on">
 		<link rel="dns-prefetch" href="//{{ site.subdomain_key }}.microco.sm">
-		<link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
 		<link rel="dns-prefetch" href="//login.persona.org">
 		<link rel="dns-prefetch" href="//static.login.persona.org">
 		<link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -16,7 +15,6 @@
 		<link rel="dns-prefetch" href="//www.google-analytics.com">
 
 		<link rel="preconnect" href="https://{{ site.subdomain_key }}.microco.sm">
-		<link rel="preconnect" href="https://cdnjs.cloudflare.com">
 		<link rel="preconnect" href="https://login.persona.org">
 		<link rel="preconnect" href="https://static.login.persona.org">
 		<link rel="preconnect" href="https://fonts.googleapis">
@@ -28,8 +26,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!--[if lt IE 9]>
-		  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
-		  <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+		  <script src="{{ STATIC_URL }}3rd/html5shiv/3.7.3/html5shiv.min.js"></script>
+		  <script src="{{ STATIC_URL }}3rd/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
 		<link href="{{ STATIC_URL }}themes/{{ site.theme_id|default:"1" }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
@@ -271,9 +269,9 @@
 
 		<!-- <script src="https://login.persona.org/include.js"></script> -->
 		<script src="{{ STATIC_URL }}js/mozpersona.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
+		<script src="{{ STATIC_URL }}3rd/jquery/1.10.2/jquery.min.js"></script>
+		<script src="{{ STATIC_URL }}3rd/moment.js/2.0.0/moment.min.js"></script>
+		<script src="{{ STATIC_URL }}3rd/prettify/r298/prettify.js"></script>
 		<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 		<script src="{{ STATIC_URL }}js/base.js"></script>
 		<script src="{{ STATIC_URL }}js/metabar.js"></script>
