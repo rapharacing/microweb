@@ -268,9 +268,9 @@
 		{% endif %}
 
 		<!-- <script src="https://login.persona.org/include.js"></script> -->
-		<script src="{{ STATIC_URL }}js/mozpersona.js"></script>
+		<!-- <script src="{{ STATIC_URL }}js/mozpersona.js"></script>-->
 		<script src="{{ STATIC_URL }}3rd/jquery/1.10.2/jquery.min.js"></script>
-		<script src="{{ STATIC_URL }}3rd/moment.js/2.0.0/moment.min.js"></script>
+		<script src="{{ STATIC_URL }}3rd/moment.js/2.10.6/moment.min.js"></script>
 		<script src="{{ STATIC_URL }}3rd/prettify/r298/prettify.js"></script>
 		<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 		<script src="{{ STATIC_URL }}js/base.js"></script>
@@ -291,24 +291,38 @@
 {% if not user.meta.permissions.banned %}
 <script type="text/javascript">
 function personaSignin() {
-	navigator.id.request({"siteLogo": "{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}"});
+	loadPersona(function(){
+		navigator.id.request({"siteLogo": "{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}"});
+	});
 }
+
 function personaSignout() {
-	navigator.id.logout();
-	document.getElementById("signout-form").submit();
+	loadPersona(function(){
+		navigator.id.logout();
+		document.getElementById("signout-form").submit();
+	});
 }
-navigator.id.watch({
-loggedInUser: {% if user.email %}'{{user.email}}'{% else %}null{% endif %},
-onlogin: function(assertion) {
-	{% if user.email %}return false;{% endif %}
-	document.getElementById("Assertion").value = assertion;
-	document.getElementById("signin-form").submit();
-},
-onlogout: function() {
-	{% if user.email %}return false;{% endif %}
-	document.getElementById("signout-form").submit();
-},
-});
+
+function loadPersona(fn) {
+	$.getScript( "{{ STATIC_URL }}js/mozpersona.js", function() {
+		// Watch for sign-in event
+		navigator.id.watch({
+			loggedInUser: {% if user.email %}'{{user.email}}'{% else %}null{% endif %},
+			onlogin: function(assertion) {
+				{% if user.email %}return false;{% endif %}
+				document.getElementById("Assertion").value = assertion;
+				document.getElementById("signin-form").submit();
+			},
+			onlogout: function() {
+				{% if user.email %}return false;{% endif %}
+				document.getElementById("signout-form").submit();
+			},
+		});
+
+		// Execute the action that we want to perform
+		fn();
+	});
+}
 </script>
 {% endif %}
 
