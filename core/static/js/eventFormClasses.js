@@ -215,13 +215,11 @@
 (function(){
   'use strict';
 
-
   var EventDateForm = (function(){
 
     var EVENT_DATE_TYPE_TBA      = 0,
         EVENT_DATE_TYPE_SINGLE   = 1,
         EVENT_DATE_TYPE_MULTIPLE = 2;
-
 
     var eventDateForm = function(opts){
 
@@ -267,7 +265,11 @@
       this.event_date_type = EVENT_DATE_TYPE_SINGLE;
 
       if (typeof opts.startDate !== "undefined"){
-        this.startDate = new Date(opts.startDate);
+        // Force UTC values to be displayed by negating current offset as we
+        // received a UTC value
+        var _date = new Date(opts.startDate);
+        var userOffset = _date.getTimezoneOffset()*60000;
+        this.startDate = new Date(_date.getTime()+userOffset);
       }
 
       // with duration, we just work out the end date
@@ -291,7 +293,6 @@
 
       this.updateDatePickerUI(this.controls.start_calendar);
       this.updateDatePickerUI(this.controls.end_calendar);
-
 
       this.toggleCalendars();
 
@@ -435,8 +436,13 @@
 
       eventDate = this.calculateEventDuration();
 
+      // Force saving of UTC by removing local offset
+      var _date = new Date(eventDate.startDateTime);
+      var userOffset = _date.getTimezoneOffset()*60000;
+      var startDate = new Date(_date.getTime()-userOffset);
+
       eventDateFields = [
-        [ this.form.when,     dateToUtcString(eventDate.startDateTime) ],
+        [ this.form.when,     dateToUtcString(startDate) ],
         [ this.form.duration, eventDate.duration ]
       ];
 
@@ -507,7 +513,6 @@
     // |____________|  |____________|
     //
     // [ x ] to [ y ]  [ z ]
-
     eventDateForm.prototype.toggleCalendars = function(){
 
           // cache references to the calendar elements we are interested in
@@ -551,8 +556,6 @@
     };
 
     eventDateForm.prototype.bind = function(){
-
-
       var events = [
         [ 'change', '#event-date-type-options input[type=radio]', 'onEventDateTypeToggle' ],
         [ 'change', '.event-time',                                'updateEventFormWhenDuration' ]
@@ -571,8 +574,6 @@
       this.controls.end_calendar
         .datepicker()
         .on('changeDate',   $.proxy(this.updateEventEndDate,this));
-
-
     };
 
     return eventDateForm;

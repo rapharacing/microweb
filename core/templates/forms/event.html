@@ -115,9 +115,9 @@
 							</div>
 						</div> <!-- /form-group -->
 
-						{# event date start #}
 						<div class="form-group form-datepicker">
 							<div class="row">
+								{# event date start #}
 								<div class="col-sm-6">
 									<div class="row">
 										<div class="col-sm-12">
@@ -128,17 +128,9 @@
 										</div>
 										<div class="col-sm-12">
 											<select id="event-start-calendar-start-time" class="event-time" tabindex="1">
-												{# hacky way to do it. Please improve as and when time is available. - jim #}
 												{% for hour in '123456789012345678901234'%}
 													{% for minute in '1234'%}
-														<option>
-															{% if forloop.parentloop.counter0 <= 9 %}0{% endif %}{% if forloop.parentloop.counter0 > 12 %}{{ forloop.parentloop.counter0|add:"-12" }}{% else %}{{ forloop.parentloop.counter0 }}{% endif %}:{% cycle '00' '15' '30' '45' %}
-															{% if forloop.parentloop.counter0 > 11 %}
-															PM
-															{%else%}
-															AM
-															{% endif %}
-														</option>
+														<option>{% if forloop.parentloop.counter0 <= 9 %}0{% endif %}{% if forloop.parentloop.counter0 > 12 %}{{ forloop.parentloop.counter0|add:"-12" }}{% else %}{{ forloop.parentloop.counter0 }}{% endif %}:{% cycle '00' '15' '30' '45' %} {% if forloop.parentloop.counter0 > 11 %}PM{%else%}AM{% endif %}</option>
 													{% endfor %}
 												{% endfor %}
 											</select>
@@ -146,14 +138,7 @@
 											<select class="form-datepicker-single event-time" id="event-start-calendar-end-time" tabindex="1">
 												{% for hour in '123456789012345678901234'%}
 													{% for minute in '1234'%}
-														<option>
-															{% if forloop.parentloop.counter0 <= 9 %}0{% endif %}{% if forloop.parentloop.counter0 > 12 %}{{ forloop.parentloop.counter0|add:"-12" }}{% else %}{{ forloop.parentloop.counter0 }}{% endif %}:{% cycle '00' '15' '30' '45' %}
-															{% if forloop.parentloop.counter0 > 11 %}
-															PM
-															{%else%}
-															AM
-															{% endif %}
-														</option>
+														<option>{% if forloop.parentloop.counter0 <= 9 %}0{% endif %}{% if forloop.parentloop.counter0 > 12 %}{{ forloop.parentloop.counter0|add:"-12" }}{% else %}{{ forloop.parentloop.counter0 }}{% endif %}:{% cycle '00' '15' '30' '45' %} {% if forloop.parentloop.counter0 > 11 %}PM{%else%}AM{% endif %}</option>
 													{% endfor %}
 												{% endfor %}
 											</select>
@@ -192,6 +177,26 @@
 						</div>
 						<!-- /form-group -->
 
+						<div class="clearfix"></div>
+
+						<div class="form-group form-datepicker">
+							<div class="row">
+								<div class="col-sm-6">
+									<div class="row">
+										<div class="col-sm-12">
+											<div id="event-start-calendar">
+												<div class="event-start-calendar-label">Timezone</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<select id="tz" name="{{ form.tz.name }}" class="form-control"></select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 
 					<div class="clearfix"></div>
@@ -409,31 +414,37 @@
 {% block js %}
 
 
-<script src="{{ STATIC_URL }}3rd/leaflet/0.7.7/leaflet.js"></script>
-<script src="https://maps.google.com/maps/api/js?v=3.2&amp;key=AIzaSyAQiDoalPm41b4e-tuIecK39xoaPPV5k3E&amp;sensor=false"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}3rd/leaflet/0.7.7/leaflet.js"></script>
+<script type="text/javascript" src="https://maps.google.com/maps/api/js?v=3.2&amp;key=AIzaSyAQiDoalPm41b4e-tuIecK39xoaPPV5k3E&amp;sensor=false"></script>
 
-<script src="{{ STATIC_URL }}js/leaflet.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}3rd/jsTimezoneDetect/1.0.6/jstz.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}3rd/moment-timezone/0.4.1/moment-timezone-with-data.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}3rd/timezones/0.1.0/timezones.min.js"></script>
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/leaflet.js"></script>
+
 <script type="text/javascript" src="{{ STATIC_URL }}js/eventFormClasses.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}3rd/jsTimezoneDetect/1.0.6/jstz.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}3rd/moment-timezone/0.4.1/moment-timezone-with-data.min.js"></script>
+
 {% if not state_edit %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
 {% endif %}
+
 <script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
 <script type="text/javascript">
 (function(){
 
 	{% if state_edit %}
-	window.is_edit_form = true;
+		window.is_edit_form = true;
 	{% endif %}
-	////////////////////
-	//  event map   //
-	///////////////////
+
+	/////////////////
+	//  event map  //
+	/////////////////
 	var formMap = new EventFormMap({
 		el : '.event-form-map',
 		mappings : {
@@ -467,9 +478,25 @@
 
 	window.formMap = formMap; // make accessible to other scripts
 
-	////////////////////
-	//  event dates   //
 	///////////////////
+	//  event dates  //
+	///////////////////
+
+	// Populate the timezone select list
+	$('#tz').timezones();
+
+	// Select either the existing timezone or wherever the user is
+	{% if state_edit %}
+		if ('{{ form.tz.value | default:"" }}' != '') {
+			$('#tz').val('{{ form.tz.value | default:"" }}');
+		} else {
+			$('#tz').val(jstz.determine().name());
+		}
+	{% else %}
+		$('#tz').val(jstz.determine().name());
+	{% endif %}
+
+	// Set up the time and date fields
 	var formDates = new EventDateForm({
 		el       : '.event-form-dates',
 

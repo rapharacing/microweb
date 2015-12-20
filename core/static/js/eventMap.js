@@ -1,3 +1,5 @@
+// This file handles displaying an event page, rather than the create/edit of an event
+
 /////////
 // MAP //
 /////////

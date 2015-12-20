@@ -59,8 +59,6 @@
       return;
     }
 
-    console.log(data);
-
     // Zoom to where it is
     // data.boundingbox = ["52.381053","52.6087058","-2.0336486","-1.7288578"]
     formMap.map.fitBounds(
@@ -189,5 +187,4 @@
       el : '.reply-box'
     });
   }
-
 })();

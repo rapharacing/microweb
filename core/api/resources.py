@@ -1576,6 +1576,8 @@ class Event(APIResource):
                 event.rsvp_percentage = (event.rsvp_attend/float(event.rsvp_limit))*100
 
         if data.get('when'): event.when = parse_timestamp(data['when'], ignoretz=True)
+        if data.get('tz'): event.tz = data['tz']
+        if data.get('whentz'): event.whentz = parse_timestamp(data['whentz'], ignoretz=True)
         if data.get('where'): event.where = data['where']
         if data.get('lat'): event.lat = data['lat']
         if data.get('lon'): event.lon = data['lon']
@@ -1601,6 +1603,7 @@ class Event(APIResource):
         event.title = data['title']
         # This is already type(datetime.datetime) so need not be parsed
         event.when = data['when']
+        event.tz = data['tz']
         event.duration = data['duration']
         event.rsvp_limit = data['rsvpLimit']
 
@@ -1640,6 +1643,7 @@ class Event(APIResource):
         if hasattr(self, 'microcosm_id'): repr['microcosmId'] = self.microcosm_id
         if hasattr(self, 'title'): repr['title'] = self.title
         if hasattr(self, 'when'): repr['when'] = self.when
+        if hasattr(self, 'tz'): repr['tz'] = self.tz
         if hasattr(self, 'duration'): repr['duration'] = self.duration
 
         # Event location is optional

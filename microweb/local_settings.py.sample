@@ -6,11 +6,14 @@ API_PATH = 'api'
 API_VERSION = 'v1'
 RIEMANN_ENABLED = False
 RIEMANN_HOST = ''
+GA_ENABLED = False
+GA_KEY = ''
 MEMCACHE_HOST = '127.0.0.1'
 MEMCACHE_PORT = 11211
 PAGE_SIZE = 25
 SECRET_KEY = 'changeme'
 DEBUG = True
+TEMPLATE_DEBUG = False
 
 LOGGING = {
     'version': 1,

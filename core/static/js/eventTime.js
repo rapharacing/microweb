@@ -1,3 +1,6 @@
+// This file is used to display event times correctly. It is not used on the
+// create or edit pages
+
 ////////////////
 // LOCAL TIME //
 ////////////////

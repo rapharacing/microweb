@@ -78,6 +78,14 @@ class EventCreate(ItemForm):
         }
     )
 
+    tz = django.forms.CharField(
+        max_length='150',
+        label='What timezone does the event occur in?',
+        error_messages={
+            'required' : 'Please select a timezone',
+        }
+    )
+
     duration = django.forms.IntegerField(
         required=False,
         label='How long (in minutes) does the event go on for?',
@@ -128,6 +136,7 @@ class EventEdit(EventCreate):
         repr['microcosmId'] = event.microcosm_id
         repr['title'] = event.title
         if hasattr(event, 'when'): repr['when'] = event.when
+        if hasattr(event, 'tz'): repr['tz'] = event.tz
         if hasattr(event, 'duration'): repr['duration'] = event.duration
 
         # Event location
