@@ -2,6 +2,9 @@ Django==1.5.9
 requests==1.1.0
 python-dateutil==1.4
 
+# Google Analytics
+pyga==2.5.0
+
 # Production server
 gunicorn==0.17.2
 

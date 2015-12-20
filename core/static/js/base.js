@@ -50,6 +50,10 @@ $('document').ready(function() {
 		var t = $(this);
 		var d = new Date(t.attr('datetime'));
 
+		// remove timezones
+		var userOffset = d.getTimezoneOffset()*60000;
+	    d = new Date(d.getTime()+userOffset);
+
 		var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 		
 		t.text(

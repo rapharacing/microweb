@@ -81,6 +81,9 @@ MIDDLEWARE_CLASSES = (
     # Redirect to custom domain, if one exists for the site
     'core.middleware.redirect.DomainRedirectMiddleware',
 
+    # Google Analytics from the server.
+    'core.middleware.ga.GAMiddleware',
+
     # # cache busting for static files
     # 'core.middleware.modtimeurls.ModTimeUrlsMiddleware',
 
@@ -148,6 +151,11 @@ if API_SCHEME == '' or API_DOMAIN_NAME == '' or API_PATH == '' or API_VERSION ==
 # values in local_settings for local development.
 from microweb.local_settings import RIEMANN_ENABLED
 from microweb.local_settings import RIEMANN_HOST
+
+# Google Analytics, server-side driven. Can be assigned empty values in
+# local_settings for local development.
+from microweb.local_settings import GA_ENABLED
+from microweb.local_settings import GA_KEY
 
 # Mostly used for site information cache. Compulsory.
 from microweb.local_settings import MEMCACHE_HOST
