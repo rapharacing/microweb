@@ -490,17 +490,18 @@ class Microcosm(APIResource):
             microcosm.parent_id = data['parentId']
         else:
             microcosm.parent_id = 0
-        if data.get('breadcrumb'):
-            microcosm.breadcrumb = Breadcrumb(data['breadcrumb'])
-        if data.get('siteId'): microcosm.site_id = data['siteId']
-        if data.get('visibility'): microcosm.visibility = data['visibility']
-        if data.get('title'): microcosm.title = data['title']
+        if data.get('breadcrumb'):  microcosm.breadcrumb = Breadcrumb(data['breadcrumb'])
+        if data.get('siteId'):      microcosm.site_id = data['siteId']
+        if data.get('visibility'):  microcosm.visibility = data['visibility']
+        if data.get('title'):       microcosm.title = data['title']
         if data.get('description'): microcosm.description = data['description']
-        if data.get('moderators'): microcosm.moderators = data['moderators']
-        if data.get('editReason'): microcosm.edit_reason = data['editReason']
-        if data.get('meta'): microcosm.meta = Meta(data['meta'])
-        if data.get('items'): microcosm.items = PaginatedList(data['items'], Item)
-        if data.get('itemTypes'): microcosm.item_types = data['itemTypes']
+        if data.get('logoUrl'):     microcosm.logoUrl = data['logoUrl']
+        if data.get('removeLogo'):  microcosm.removeLogo = data['removeLogo']
+        if data.get('moderators'):  microcosm.moderators = data['moderators']
+        if data.get('editReason'):  microcosm.edit_reason = data['editReason']
+        if data.get('meta'):        microcosm.meta = Meta(data['meta'])
+        if data.get('items'):       microcosm.items = PaginatedList(data['items'], Item)
+        if data.get('itemTypes'):   microcosm.item_types = data['itemTypes']
 
         return microcosm
 
@@ -562,6 +563,8 @@ class Microcosm(APIResource):
         if hasattr(self, 'visibility'): repr['visibility'] = self.visibility
         if hasattr(self, 'title'): repr['title'] = self.title
         if hasattr(self, 'description'): repr['description'] = self.description
+        if hasattr(self, 'logoUrl'): repr['logoUrl'] = self.logoUrl
+        if hasattr(self, 'removeLogo'): repr['removeLogo'] = self.removeLogo
         if hasattr(self, 'moderators'): repr['moderators'] = self.moderators
         if hasattr(self, 'meta'): repr['meta'] = self.meta
         if hasattr(self, 'most_recent_update'): repr['mostRecentUpdate'] = self.most_recent_update
@@ -1894,6 +1897,7 @@ class FileMetadata(object):
         file_metadata.created = parse_timestamp(data[0]['created'])
         file_metadata.file_size = data[0]['fileSize']
         file_metadata.file_hash = data[0]['fileHash']
+        file_metadata.file_ext  = data[0]['fileExt']
         file_metadata.mime_type = data[0]['mimeType']
         return file_metadata
 
