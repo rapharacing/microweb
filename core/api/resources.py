@@ -963,7 +963,7 @@ class ChildLinks(object):
 
     def __init__(self, children):
         self.children = {}
-        seq = 0
+        seq = 1000
         for item in children:
             link = {'href': api_url_to_gui_url(item['href'])}
             if 'title' in item: link['title'] = item['title']
