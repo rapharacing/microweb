@@ -27,6 +27,7 @@ from core.api.resources import Profile
 from core.api.resources import Site
 from core.api.resources import APIException
 from core.api.resources import response_list_to_dict
+from core.api.resources import get_subdomain_url
 
 from core.forms.forms import MicrocosmCreate
 from core.forms.forms import MicrocosmEdit
@@ -179,7 +180,7 @@ def edit_microcosm(request, microcosm_id):
             except APIException as exc:
                 return respond_with_error(request, exc)
 
-            logo_url = 'https://' + request.get_host() + '/api/v1/files/' + metadata.file_hash
+            logo_url = get_subdomain_url(request.get_host()) + '/api/v1/files/' + metadata.file_hash
             if hasattr(metadata, 'file_ext'):
                 logo_url = logo_url + '.' + metadata.file_ext
             payload['logoUrl'] = logo_url

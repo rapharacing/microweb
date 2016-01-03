@@ -43,6 +43,11 @@ COMMENTABLE_ITEM_TYPES = [
 
 
 def build_url(host, path_fragments):
+    path_fragments = [settings.API_PATH, settings.API_VERSION] + path_fragments
+    return get_subdomain_url(host) + join_path_fragments(path_fragments)
+
+
+def get_subdomain_url(host):
     """
     urljoin and os.path.join don't behave exactly as we want, so
     here's a different wheel.
@@ -57,9 +62,8 @@ def build_url(host, path_fragments):
     The use of + for string concat is deemed acceptable because it is 'fast enough'
     on CPython and we are not going to change interpreter.
     """
-
     if host.endswith(settings.API_DOMAIN_NAME):
-        url = settings.API_SCHEME + host
+        return settings.API_SCHEME + host
     else:
         mc_key = host + '_cname'
         resolved_name = None
@@ -71,10 +75,7 @@ def build_url(host, path_fragments):
         if resolved_name is None:
             resolved_name = Site.resolve_cname(host)
             mc.set(mc_key, resolved_name)
-        url = settings.API_SCHEME + resolved_name
-    path_fragments = [settings.API_PATH, settings.API_VERSION] + path_fragments
-    url += join_path_fragments(path_fragments)
-    return url
+        return settings.API_SCHEME + resolved_name
 
 
 def join_path_fragments(path_fragments):
