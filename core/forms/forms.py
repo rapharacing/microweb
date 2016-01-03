@@ -278,6 +278,10 @@ class MicrocosmCreate(django.forms.Form):
         widget=django.forms.HiddenInput
     )
 
+    logoUrl = django.forms.CharField(
+        widget=django.forms.HiddenInput,
+        required=False,
+    )
 
 class MicrocosmEdit(MicrocosmCreate):
     """

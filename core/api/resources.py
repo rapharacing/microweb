@@ -491,17 +491,19 @@ class Microcosm(APIResource):
             microcosm.parent_id = data['parentId']
         else:
             microcosm.parent_id = 0
-        if data.get('breadcrumb'):
-            microcosm.breadcrumb = Breadcrumb(data['breadcrumb'])
-        if data.get('siteId'): microcosm.site_id = data['siteId']
-        if data.get('visibility'): microcosm.visibility = data['visibility']
-        if data.get('title'): microcosm.title = data['title']
+        if data.get('breadcrumb'):  microcosm.breadcrumb = Breadcrumb(data['breadcrumb'])
+        if data.get('siteId'):      microcosm.site_id = data['siteId']
+        if data.get('visibility'):  microcosm.visibility = data['visibility']
+        if data.get('title'):       microcosm.title = data['title']
         if data.get('description'): microcosm.description = data['description']
-        if data.get('moderators'): microcosm.moderators = data['moderators']
-        if data.get('editReason'): microcosm.edit_reason = data['editReason']
-        if data.get('meta'): microcosm.meta = Meta(data['meta'])
-        if data.get('items'): microcosm.items = PaginatedList(data['items'], Item)
-        if data.get('itemTypes'): microcosm.item_types = data['itemTypes']
+        if data.get('logoUrl'):     microcosm.logoUrl = data['logoUrl']
+        if data.get('removeLogo'):  microcosm.removeLogo = data['removeLogo']
+        if data.get('moderators'):  microcosm.moderators = data['moderators']
+        if data.get('editReason'):  microcosm.edit_reason = data['editReason']
+        if data.get('meta'):        microcosm.meta = Meta(data['meta'])
+        if data.get('items'):       microcosm.items = PaginatedList(data['items'], Item)
+        if data.get('itemTypes'):   microcosm.item_types = data['itemTypes']
+        if data.get('children'):    microcosm.children = ChildLinks(data['children'])
 
         return microcosm
 
@@ -563,6 +565,8 @@ class Microcosm(APIResource):
         if hasattr(self, 'visibility'): repr['visibility'] = self.visibility
         if hasattr(self, 'title'): repr['title'] = self.title
         if hasattr(self, 'description'): repr['description'] = self.description
+        if hasattr(self, 'logoUrl'): repr['logoUrl'] = self.logoUrl
+        if hasattr(self, 'removeLogo'): repr['removeLogo'] = self.removeLogo
         if hasattr(self, 'moderators'): repr['moderators'] = self.moderators
         if hasattr(self, 'meta'): repr['meta'] = self.meta
         if hasattr(self, 'most_recent_update'): repr['mostRecentUpdate'] = self.most_recent_update
@@ -948,10 +952,24 @@ class Breadcrumb(object):
     def __init__(self, crumbs):
         self.breadcrumb = {}
         for item in crumbs:
-            if 'title' in item:
-                self.breadcrumb[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href']), 'title': item['title']}
-            else:
-                self.breadcrumb[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href'])}
+            crumb = {'href': api_url_to_gui_url(item['href'])}
+            if 'title' in item: crumb['title'] = item['title']
+            self.breadcrumb[item['rel'] + str(item['level'])] = crumb
+
+class ChildLinks(object):
+    """
+    List of links that describe children microcosms (or other items in the future)
+    """
+
+    def __init__(self, children):
+        self.children = {}
+        seq = 0
+        for item in children:
+            link = {'href': api_url_to_gui_url(item['href'])}
+            if 'title' in item: link['title'] = item['title']
+            if 'logoUrl' in item: link['logoUrl'] = item['logoUrl']
+            self.children[item['rel'] + str(seq)] = link
+            seq = seq + 1
 
 class Meta(object):
     """
@@ -1895,6 +1913,7 @@ class FileMetadata(object):
         file_metadata.created = parse_timestamp(data[0]['created'])
         file_metadata.file_size = data[0]['fileSize']
         file_metadata.file_hash = data[0]['fileHash']
+        file_metadata.file_ext  = data[0]['fileExt']
         file_metadata.mime_type = data[0]['mimeType']
         return file_metadata
 

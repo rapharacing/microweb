@@ -16,6 +16,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_safe
 
 from core.api.resources import Microcosm
+from core.api.resources import FileMetadata
 from core.api.resources import Role
 from core.api.resources import RoleCriteria
 from core.api.resources import RoleCriteriaList
@@ -35,7 +36,7 @@ from core.views import require_authentication
 from core.views import respond_with_error
 from core.views import exception_handler
 
-logger = logging.getLogger('microcosms.views')
+logger = logging.getLogger('microcosm.views')
 microcosm_create_form = MicrocosmCreate
 microcosm_edit_form = MicrocosmEdit
 microcosm_form_template = 'forms/microcosm.html'
@@ -155,16 +156,40 @@ def edit_microcosm(request, microcosm_id):
 
     if request.method == 'POST':
         form = microcosm_edit_form(request.POST)
-        if form.is_valid():
-            microcosm_request = Microcosm.from_edit_form(form.cleaned_data)
-            try:
-                microcosm_response = microcosm_request.update(request.get_host(), request.access_token)
-            except APIException as exc:
-                return respond_with_error(request, exc)
-            return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_response.id,)))
-        else:
+        if not form.is_valid():
             view_data['form'] = form
             return render(request, microcosm_form_template, view_data)
+
+        payload = form.cleaned_data
+
+        if request.POST.get('remove_logo'):
+            payload['logoUrl'] = ''
+            payload['removeLogo'] = True
+        elif request.FILES.has_key('logo'):
+            file_request = FileMetadata.from_create_form(
+                request.FILES['logo'],
+            )
+            try:
+                metadata = file_request.create(
+                    request.get_host(),
+                    request.access_token,
+                    width=64,
+                    height=64,
+                )
+            except APIException as exc:
+                return respond_with_error(request, exc)
+
+            logo_url = 'https://' + request.get_host() + '/api/v1/files/' + metadata.file_hash
+            if hasattr(metadata, 'file_ext'):
+                logo_url = logo_url + '.' + metadata.file_ext
+            payload['logoUrl'] = logo_url
+
+        microcosm_request = Microcosm.from_edit_form(payload)
+        try:
+            microcosm_response = microcosm_request.update(request.get_host(), request.access_token)
+        except APIException as exc:
+            return respond_with_error(request, exc)
+        return HttpResponseRedirect(reverse('single-microcosm', args=(microcosm_response.id,)))
 
     if request.method == 'GET':
         try:

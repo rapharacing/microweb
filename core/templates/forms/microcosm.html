@@ -35,7 +35,7 @@
 		<div class="row form-container">
 			<div class="col-lg-12">
 				<div class="form-container-inner padded">
-					<form role="form" action="" method="POST" id="microcosmForm">
+					<form role="form" action="" method="POST" id="microcosmForm" enctype="multipart/form-data">
 						{% csrf_token %}
 						{{ form.siteId.value }}
 						{{ form.id }}
@@ -44,7 +44,6 @@
 						{# title #}
 						<div class="form-group">
 							<div class="row">
-
 								<label class="col-sm-12" for="title">
 									{{ form.title.label }}
 								</label>
@@ -61,15 +60,12 @@
 										value="{{ form.title.value|default:"" }}"
 									/>
 								</div>
-
 							</div>
 						</div> <!-- /form-group -->
-
 
 						{# description #}
 						<div class="form-group">
 							<div class="row">
-
 								<label class="col-sm-12" for="title">
 									{{ form.description.label }}
 								</label>
@@ -86,14 +82,47 @@
 										value="{{ form.description.value|default:"" }}"
 									/>
 								</div>
-
 							</div>
 						</div> <!-- /form-group -->
-						
+
+						{# logo #}
+						{{ form.logoUrl }}
+						{% if form.id > 0 %}
+							<div class="form-group">
+								<div class="row">
+									<label class="col-sm-12">Display a logo for the forum?</label>
+									<div class="col-sm-12 form-file-upload">
+										<label for="input_logo" class="active"{% if form.logoUrl.value %} style="background-image:url('{{ form.logoUrl.value|default:"" }}'){% endif %}">{% if form.logoUrl.value == "" %}Click here{% endif %}</label>
+										<input type="file" name="logo" id="input_logo" accept="image/*" capture="camera">
+										<div class="form-file-upload-text">
+											<p>The logo will be displayed as a square no larger than 64px x 64px.</p>
+											<p>Your file should be an .svg, .jpg, .png, or .gif file.</p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							{% if form.errors.logoUrl %}
+								<label class="control-label">{{ form.errors.logoUrl.as_text }}</label>
+							{% endif %}
+
+							{% if form.logoUrl.value %}
+							<div class="form-group">
+								<div class="row">
+									<label for="input_remove_logo" class="col-sm-12">Remove existing logo?</label>
+									<div class="col-sm-12 has-choices">
+										<ul><li>
+											<label for="input_remove_logo"><input type="checkbox" id="input_remove_logo" name="remove_logo" value="true" /> Remove logo</label>
+										</li></ul>
+									</div>
+								</div>
+							</div>
+							{% endif %}
+						{% endif %}
+
 						{# item types #}
 						<div class="form-group">
 							<div class="row">
-
 								<label class="col-sm-12" for="title">
 									{{ form.itemTypes.label }}
 								</label>
@@ -101,12 +130,10 @@
 									{% if form.errors.itemTypes %}
 										<label class="control-label">{{ form.errors.itemTypes.as_text }}</label>
 									{% endif %}
-									
 									{{ form.itemTypes }}
 								</div>
 							</div>
 						</div> <!-- /form-group -->
-
 
 						{{ form.visibility }}
 
@@ -153,26 +180,34 @@
 {% endblock %}
 
 {% block js %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/profilePicture.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}js/formValidator.js"></script>
 <script type="text/javascript">
-
-var form = new FormValidator(
-	document.getElementById('microcosmForm'),
-	{
-		rules : {
-			'{{ form.title.name }}' 		 : ['not_empty','maxlength'],
-			'{{ form.description.name }}': ['not_empty','maxlength']
-		},
-		tests : {
-			'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
-		},
-		error_messages : {
-			'{{ form.title.name }}:not_empty' : "* {{ form.fields.title.error_messages.required }}",
-			'{{ form.title.name }}:maxlength' : "* {{ form.fields.title.error_messages.max_length }}",
-			'{{ form.description.name }}:not_empty' : "* {{ form.fields.description.error_messages.required }}",
-			'{{ form.description.name }}:maxlength' : "* {{ form.fields.description.error_messages.max_length }}",
-		}
+(function(){
+	if (typeof ProfilePicture !== 'undefined'){
+		var profilePicture = new ProfilePicture({
+			el : '.form-file-upload'
+		});
 	}
-);
+
+	var form = new FormValidator(
+		document.getElementById('microcosmForm'),
+		{
+			rules : {
+				'{{ form.title.name }}' 		 : ['not_empty','maxlength'],
+				'{{ form.description.name }}': ['not_empty','maxlength']
+			},
+			tests : {
+				'maxlength' : function(field){ var $field = $(field); return $field.val().length < parseInt($field.attr('maxlength'),10); }
+			},
+			error_messages : {
+				'{{ form.title.name }}:not_empty' : "* {{ form.fields.title.error_messages.required }}",
+				'{{ form.title.name }}:maxlength' : "* {{ form.fields.title.error_messages.max_length }}",
+				'{{ form.description.name }}:not_empty' : "* {{ form.fields.description.error_messages.required }}",
+				'{{ form.description.name }}:maxlength' : "* {{ form.fields.description.error_messages.max_length }}",
+			}
+		}
+	);
+})();
 </script>
 {% endblock %}

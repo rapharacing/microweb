@@ -3,7 +3,11 @@
 	<div class="row">
 		<div class="col-sm-7 col-md-7">
 			<div class="list-collection-row-icon">
-				<a class="sprite sprite-microcosm" title="Microcosm"></a>
+				{% if microcosm.item.logoUrl %}
+				<a href="{% url 'single-microcosm' microcosm.item.id %}"><img src="{{ microcosm.item.logoUrl | safe }}" title="Forum" style="max-width: 28px;" width="28" /></a>
+				{% else %}
+				<a href="{% url 'single-microcosm' microcosm.item.id %}" class="sprite sprite-microcosm" title="Forum"></a>
+				{% endif %}
 			</div>
 			<div class="list-collection-row-offset">
 				<h2 class="row-title">
@@ -60,6 +64,20 @@
 			</div>
 		</div>
 	</div>
+	{% if microcosm.item.children %}
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="list-collection-row-icon"> </div>
+			<div class="list-collection-row-offset row-title">
+				<ul>
+				{% for key,value in microcosm.item.children.children.iteritems %}
+					<li style="display:inline; margin-right:1em; white-space:nowrap;">{% if value.logoUrl %}<a href="{{ value.href }}"><img src="{{ value.logoUrl | safe }}" style="height:1em; vertical-align: -0.15em;" /></a> {% endif %}<a href="{{ value.href }}">{{ value.title | safe }}</a></li>
+				{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+	{% endif %}
 </li>
 
 
