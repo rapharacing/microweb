@@ -69,7 +69,7 @@
 		<div class="col-sm-12">
 			<div class="list-collection-row-icon"> </div>
 			<div class="list-collection-row-offset row-title">
-				<ul>
+				<ul style="font-size:0.8em;">
 				{% for key,value in microcosm.item.children.children.iteritems %}
 					<li style="display:inline; margin-right:1em; white-space:nowrap;">{% if value.logoUrl %}<a href="{{ value.href }}"><img src="{{ value.logoUrl | safe }}" style="height:1em; vertical-align: -0.15em;" /></a> {% endif %}<a href="{{ value.href }}">{{ value.title | safe }}</a></li>
 				{% endfor %}
