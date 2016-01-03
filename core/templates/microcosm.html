@@ -96,10 +96,9 @@
 
 	<div class="metabar-module">
 		<h5>About</h5>
-		<div class="metabar-module-title">
-			<h3>
-				{{ content.title | safe }}
-			</h3>
+		<div class="metabar-module-title" {% if content.logoUrl %}style="text-align:center;"{% endif %}>
+			{% if content.logoUrl %}<img src="{{ content.logoUrl | safe }}" style="max-width:25%;"/>{% endif %}
+			<h3>{{ content.title | safe }}</h3>
 		</div>
 		<div class="metabar-module-body">
 			<p>{{ content.description | safe }}</p>

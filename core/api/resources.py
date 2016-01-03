@@ -502,6 +502,7 @@ class Microcosm(APIResource):
         if data.get('meta'):        microcosm.meta = Meta(data['meta'])
         if data.get('items'):       microcosm.items = PaginatedList(data['items'], Item)
         if data.get('itemTypes'):   microcosm.item_types = data['itemTypes']
+        if data.get('children'):    microcosm.children = ChildLinks(data['children'])
 
         return microcosm
 
@@ -950,10 +951,24 @@ class Breadcrumb(object):
     def __init__(self, crumbs):
         self.breadcrumb = {}
         for item in crumbs:
-            if 'title' in item:
-                self.breadcrumb[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href']), 'title': item['title']}
-            else:
-                self.breadcrumb[item['rel'] + str(item['level'])] = {'href': api_url_to_gui_url(item['href'])}
+            crumb = {'href': api_url_to_gui_url(item['href'])}
+            if 'title' in item: crumb['title'] = item['title']
+            self.breadcrumb[item['rel'] + str(item['level'])] = crumb
+
+class ChildLinks(object):
+    """
+    List of links that describe children microcosms (or other items in the future)
+    """
+
+    def __init__(self, children):
+        self.children = {}
+        seq = 0
+        for item in children:
+            link = {'href': api_url_to_gui_url(item['href'])}
+            if 'title' in item: link['title'] = item['title']
+            if 'logoUrl' in item: link['logoUrl'] = item['logoUrl']
+            self.children[item['rel'] + str(seq)] = link
+            seq = seq + 1
 
 class Meta(object):
     """
