@@ -2,7 +2,8 @@
 	{# forums #}
 	{% if content.meta.permissions.admin or content.meta.permissions.moderator %}
 	<div class="metabar-admin">
-		<form class="metabar-admin-actions" action="{% url 'moderate-item' %}" method="GET">
+		<form class="metabar-admin-actions" action="{% url 'moderate-item' %}" method="POST">
+			{% csrf_token %}
 			<input type="hidden" name="item_id" value="{{ content.id }}" />
 			<input type="hidden" name="item_type" value="{{ item_type }}" />
 			<select id="metabar-admin-actions" class="cselect cselect-xs" name="action">
@@ -38,7 +39,8 @@
 	{# conversations, events, etc #}
 	{% if content.meta.permissions.admin or content.meta.permissions.moderator or content.meta.permissions.owner %}
 	<div class="metabar-admin">
-		<form class="metabar-admin-actions" action="{% url 'moderate-item' %}" method="GET">
+		<form class="metabar-admin-actions" action="{% url 'moderate-item' %}" method="POST">
+			{% csrf_token %}
 			<input type="hidden" name="item_id" value="{{ content.id }}" />
 			<input type="hidden" name="item_type" value="{{ item_type }}" />
 			<select id="metabar-admin-actions" class="cselect cselect-xs" name="action">
