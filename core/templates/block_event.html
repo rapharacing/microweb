@@ -24,7 +24,7 @@
 				<div class="cell-meta-event">
 					{% if item.when %}
 					<span>
-						<time class="plain" datetime="{{item.when|date:"c"}}" itemprop="startDate">{{ item.when|date:"N jS" }}</time>
+						<time class="plain" datetime="{{item.when|date:"c"}}" itemprop="startDate">{{ item.when|date:"M jS" }}</time>
 					</span>
 					{% else %}
 					<span>
