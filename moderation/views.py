@@ -23,37 +23,38 @@ from core.api.resources import Site
 from core.views import require_authentication
 
 @require_authentication
-@require_safe
+@require_http_methods(['POST',])
+@cache_control(must_revalidate=True, max_age=0)
 def confirm(request):
     """
     View for moderation actions on a single item.
     """
 
-    if request.method == 'GET':
-        if request.GET.get('item_type') == 'conversation':
+    if request.method == 'POST':
+        if request.POST.get('item_type') == 'conversation':
             url, params, headers = Conversation.build_request(
                 request.get_host(),
-                request.GET.get('item_id'),
+                request.POST.get('item_id'),
                 access_token=request.access_token
             )
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             content = Conversation.from_api_response(responses[url])
 
-        elif request.GET.get('item_type') == 'event':
+        elif request.POST.get('item_type') == 'event':
             url, params, headers = Event.build_request(
                 request.get_host(),
-                request.GET.get('item_id'),
+                request.POST.get('item_id'),
                 access_token=request.access_token
             )
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
             responses = response_list_to_dict(grequests.map(request.view_requests))
             content = Event.from_api_response(responses[url])
 
-        elif request.GET.get('item_type') == 'microcosm':
+        elif request.POST.get('item_type') == 'microcosm':
             url, params, headers = Microcosm.build_request(
                 request.get_host(),
-                request.GET.get('item_id'),
+                request.POST.get('item_id'),
                 access_token=request.access_token
             )
             request.view_requests.append(grequests.get(url, params=params, headers=headers))
@@ -64,18 +65,18 @@ def confirm(request):
             'user': Profile(responses[request.whoami_url], summary=False),
             'site': Site(responses[request.site_url]),
             'content': content,
-            'item_type': request.GET.get('item_type'),
-            'action': request.GET.get('action'),
+            'item_type': request.POST.get('item_type'),
+            'action': request.POST.get('action'),
         }
 
-        if request.GET.get('action') == 'move':
+        if request.POST.get('action') == 'move':
             # Fetch list of microcosms to supply in form.
             microcosms = MicrocosmList.retrieve(
                 request.get_host(),
                 access_token=request.access_token
             )
 
-            if request.GET.get('item_type') == 'microcosm':
+            if request.POST.get('item_type') == 'microcosm':
                 newlist = []
                 nuke = content.id
                 found = False

@@ -56,8 +56,11 @@
                             <input type="hidden" name="item_type" value="{{ item_type }}"/>
                             <input type="hidden" name="item_id" value="{{ content.id }}"/>
                             {% if content.microcosm_id %}
-                            <input type="hidden" name="microcosm_id" value="{{content.microcosm_id}}" />
+                                <input type="hidden" name="microcosm_id" value="{{content.microcosm_id}}" />
+                            {% else %}
+                                <input type="hidden" name="microcosm_id" value="{{content.id}}" />
                             {% endif %}
+
                             {% if action == 'delete' %}
                                 <input type="submit" value="Delete" class="btn btn-primary"/>
                             {% elif action == 'undelete' %}
