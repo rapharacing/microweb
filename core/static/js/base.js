@@ -26,41 +26,10 @@ if (jQuery && moment) {
 	updateTimes();
 }
 
-function ordinalSuffix(i) {
-	var j = i % 10, k = i % 100;
-	if (j == 1 && k != 11) {
-		return i + "st";
-	}
-	if (j == 2 && k != 12) {
-		return i + "nd";
-	}
-	if (j == 3 && k != 13) {
-		return i + "rd";
-	}
-	return i + "th";
-}
-
 $('document').ready(function() {
 	// Updates <time> to use relative times
 	updateTimes();
 	setInterval(updateTimes, 60000); // Update every minute
-
-	// Localise event start times
-	$('.cell-meta-event span time').each(function () {
-		var t = $(this);
-		var d = new Date(t.attr('datetime'));
-
-		// remove timezones
-		var userOffset = d.getTimezoneOffset()*60000;
-	    d = new Date(d.getTime()+userOffset);
-
-		var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-		
-		t.text(
-			months[d.getMonth()] + '. ' + ordinalSuffix(d.getDate())
-		);
-	});
-
 
 	// Make code look pretty
 	$('pre > code').addClass('prettyprint')
@@ -80,7 +49,7 @@ $('document').ready(function() {
 
 	// toggle <time> html -> title -> html
 	$('body').on('click', 'time', function() {
-		if ($(this).parent().parent().hasClass('pills-event')) {
+		if ($(this).parent().parent().hasClass('pills-event') || $(this).parent().parent().hasClass('cell-meta-event')) {
 			return;
 		}
 
@@ -141,7 +110,6 @@ $('document').ready(function() {
 (function(){
 
 	var btn_groups = '.btn-group';
-
 
 	var toggleButtonParent = function(e){
 		var self 				= $(e.currentTarget),
