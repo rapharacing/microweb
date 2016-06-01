@@ -308,7 +308,6 @@ onlogout: function() {
 {% block js %}{% endblock js%}
 <script type="text/javascript">
 {% if site.subdomain_key == 'dev1' or site.subdomain_key == 'dev2' %}window['ga-disable-UA-36951023-2'] = true;{% endif %}
-var ua = window.navigator.userAgent;
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','{{ STATIC_URL }}3rd/isogram/201606011835/isogram.js','ga');
 ga('create', 'UA-36951023-2', 'auto');
 {% if user %}ga('set', 'userId', {{user.id}});{% endif %}
@@ -316,10 +315,7 @@ ga(function(tracker) {
   tracker.set('sendHitTask', function(model) {
     var payLoad = model.get('hitPayload');
     var isogramRequest = new XMLHttpRequest();
-    var isogramPath = "/isogram";
-	payLoad = 'ua='+encodeURI(ua)+'&'+payLoad;
-	console.log(payLoad)
-    isogramRequest.open('get',isogramPath+'?'+payLoad,true);
+    isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
     isogramRequest.send();
   });
 });
