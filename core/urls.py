@@ -3,6 +3,7 @@ from django.conf.urls import patterns
 
 from core.views import AuthenticationView
 from core.views import ErrorView
+from core.views import IsogramView
 from core.views import FaviconView
 from core.views import RobotsView
 from core.views import LegalView
@@ -13,6 +14,7 @@ urlpatterns = patterns('',
     # Static
     url(r'^robots\.txt$', RobotsView.as_view()),
     url(r'^favicon\.ico$', FaviconView.as_view()),
+    url(r'^isogram$', IsogramView.as_view()),
 
     # Auth
     url(r'^login/$', AuthenticationView.login, name='login'),
