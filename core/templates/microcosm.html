@@ -8,8 +8,6 @@
 
 {% block description %}{{content.description | striptags}} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock description %}
 
-{% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
-
 {% block content %}
 
 <div class="content-header padded">
