@@ -2,8 +2,6 @@
 {% load huddle %}
 {% block title %}Messages{% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %} | {{ site.title }}{% endblock title %}
 
-{% block ga %},'dimension3': '{{ content.id }}'{% endblock%}
-
 {% block content %}
 
 <div class="content-header padded">
