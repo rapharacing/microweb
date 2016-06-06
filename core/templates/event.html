@@ -7,8 +7,10 @@
 {% block description %}Where: {{ content.where }}, When: {{ content.when|date:"j F Y" }}, {{ content.comments.items.0.html | striptags }} {% if pagination and pagination.page > 1 %} (page {{ pagination.page }}){% endif %}{% endblock description %}
 
 {% block css %}
+	{% if content.comments.page == 1 %}
 		<!-- Leaflet -->
 		<link href="{{ STATIC_URL }}3rd/leaflet/0.7.7/leaflet.css" rel="stylesheet" type="text/css" />
+	{% endif %}
 {% endblock %}
 
 
@@ -179,10 +181,10 @@
 
 {% if content.comments.page == 1 %}
 <script src="{{ STATIC_URL }}3rd/leaflet/0.7.7/leaflet.js"></script>
-<script src="https://maps.google.com/maps/api/js?v=3.2&key=AIzaSyAQiDoalPm41b4e-tuIecK39xoaPPV5k3E&sensor=false"></script>
+<script src="https://maps.google.com/maps/api/js?v=3.24&key=AIzaSyAQiDoalPm41b4e-tuIecK39xoaPPV5k3E"></script>
 
 <script src="{{ STATIC_URL }}js/leaflet.js"></script>
-<script src="{{ STATIC_URL }}js/eventMap.js"></script>
+<script src="{{ STATIC_URL }}js/eventMap.js?v20160606c"></script>
 
 <script type="text/javascript">
 var lat = {{ content.lat   | default:"null" }},
