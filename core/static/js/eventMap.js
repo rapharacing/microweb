@@ -22,7 +22,9 @@
       this.map.addLayer(googleLayer);
 
       //var cloudmadeLayer = new L.TileLayer("https://d1qte70nkdppk5.cloudfront.net/d6f1a0c60e9746faa7cbfaec4b92dff3/96931/256/{z}/{x}/{y}.png");
-      var osmLayer = new L.TileLayer("http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg");
+      // /var osmLayer = new L.TileLayer("http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg");
+
+      var osmLayer = new L.TileLayer("https://a.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png");
 
       this.map.addControl(new L.Control.Layers({
         'Open Street Map' : osmLayer,
