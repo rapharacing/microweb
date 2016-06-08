@@ -796,7 +796,17 @@ class RoleCriteria(APIResource):
             crit.attr_key = data['attrKey']
 
         crit.predicate = data['predicate']
-        crit.value = data['value']
+        if isinstance(data['value'], (bool)):
+            crit.isBool = True
+
+            if data['value']:
+                crit.value = True
+            else:
+                crit.value = False
+        else:
+            crit.isBool = False
+            crit.value = data['value']
+
 
         return crit
 

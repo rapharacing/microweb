@@ -353,7 +353,7 @@
 			{% if criteria.criteria.items %}
 			data : {
 				{% for crit in criteria.criteria.items %}
-					{{ crit.id }}: ["{{ crit.andor }}","{% if crit.profile_column %}{{ crit.profile_column }}{% else %}{{ crit.attr_key }}{% endif %}","{{ crit.predicate }}", "{{ crit.value }}"],
+					{{ crit.id }}: ["{{ crit.andor }}","{% if crit.profile_column %}{{ crit.profile_column }}{% else %}{{ crit.attr_key }}{% endif %}","{{ crit.predicate }}", {% if crit.isBool %}{% if crit.value %}"true"{% else %}"false"{% endif %}{% else %}"{{ crit.value }}"{% endif %}],
 				{% endfor %}
 			}
 			{% endif %}
