@@ -320,10 +320,49 @@ ga(function(tracker) {
   });
 });
 ga('send', 'pageview');
+
 {% if site.ga_web_property_id %}
 ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
 ga('{{ site.subdomain_key }}.send', 'pageview', gaData);
 {% endif %}
+
+if (window.performance) {
+	function perf() {
+		ga('create', 'UA-36951023-2', {
+			'name': 'perf', // name this tracker
+			'sampleRate': 5 // 5% sample rate
+		});
+		{% if user %}ga('set', 'userId', {{user.id}});{% endif %}
+		ga(function(tracker) {
+			tracker.set('sendHitTask', function(model) {
+			var payLoad = model.get('hitPayload');
+			var isogramRequest = new XMLHttpRequest();
+			isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
+			isogramRequest.send();
+			});
+		});
+		pt = window.performance.timing;
+		ptUnload = pt.unloadEventEnd - pt.unloadEventStart;
+		if (ptUnload > 0) {ga('perf.send', 'timing', 'Unload', 'duration', ptUnload);}
+		ptRedirect = pt.redirectEnd - pt.redirectStart;
+		if (ptRedirect > 0) {ga('perf.send', 'timing', 'Redirect', 'duration', ptRedirect);}
+		ptAppCache = pt.domainLookupStart - pt.fetchStart;
+		if (ptAppCache > 0) {ga('perf.send', 'timing', 'App Cache', 'duration', ptAppCache);}
+		ptDNS = pt.domainLookupEnd - pt.domainLookupStart;
+		if (ptDNS > 0) {ga('perf.send', 'timing', 'DNS', 'duration', ptDNS);}
+		ptTCP = pt.connectEnd - pt.connectStart;
+		if (ptTCP > 0) {ga('perf.send', 'timing', 'TCP', 'duration', ptTCP);}
+		ptRequest = pt.responseStart - pt.requestStart;
+		if (ptRequest > 0) {ga('perf.send', 'timing', 'Request', 'duration', ptRequest);}
+		ptResponse = pt.responseEnd - pt.responseStart;
+		if (ptResponse > 0) {ga('perf.send', 'timing', 'Response', 'duration', ptResponse);}
+		ptProcessing = pt.loadEventStart - pt.responseEnd;
+		if (ptProcessing > 0) {ga('perf.send', 'timing', 'Processing', 'duration', ptProcessing);}
+		ptOnload = pt.loadEventEnd - pt.loadEventStart;
+		if (ptOnload > 0) {ga('perf.send', 'timing', 'Onload', 'duration', ptOnload);}
+	}
+	window.setTimeout(perf, 5000);
+}
 </script>
 	</body>
 </html>

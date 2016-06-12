@@ -21,8 +21,13 @@
       var googleLayer = new L.Google('ROADMAP');
       this.map.addLayer(googleLayer);
 
-      var osmCycleLayer = new L.TileLayer("https://a.tile.thunderforest.com/cycle/{z}/{x}/{y}.png");
-      var osmLandscapeLayer = new L.TileLayer("https://a.tile.thunderforest.com/landscape/{z}/{x}/{y}.png");
+      var attribution = {
+        attribution: 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+        maxZoom: 22
+      }
+
+      var osmCycleLayer = new L.TileLayer("https://a.tile.thunderforest.com/cycle/{z}/{x}/{y}.png", attribution);
+      var osmLandscapeLayer = new L.TileLayer("https://a.tile.thunderforest.com/landscape/{z}/{x}/{y}.png", attribution);
 
       this.map.addControl(new L.Control.Layers({
         'Open Cycle Map' : osmCycleLayer,
