@@ -94,9 +94,10 @@ def list(request):
         offset = int(request.GET.get('offset', 0))
     except ValueError:
         offset = 0
+    unread = bool(request.GET.get('unread', False))
 
     huddle_url, params, headers = HuddleList.build_request(request.get_host(), offset=offset,
-        access_token=request.access_token)
+        unread=unread, access_token=request.access_token)
 
     request.view_requests.append(grequests.get(huddle_url, params=params, headers=headers))
     try:
@@ -105,11 +106,17 @@ def list(request):
         return respond_with_error(request, exc)
 
     huddles = HuddleList(responses[huddle_url])
+    
+    filter_name = []
+
+    if unread:
+        filter_name.append("unread")
 
     view_data = {
         'user': Profile(responses[request.whoami_url], summary=False) if request.whoami_url else None,
         'site': Site(responses[request.site_url]),
         'content': huddles,
+        'unread': unread,
         'pagination': build_pagination_links(responses[huddle_url]['huddles']['links'], huddles.huddles)
     }
     return render(request, list_template, view_data)

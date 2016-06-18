@@ -1537,9 +1537,11 @@ class HuddleList(object):
         self.meta = Meta(data['meta'])
 
     @staticmethod
-    def build_request(host, offset=None, access_token=None):
+    def build_request(host, offset=None, unread=False, access_token=None):
         url = build_url(host, [HuddleList.api_path_fragment])
-        params = {'offset': offset} if offset else {}
+        params = {}
+        if offset: params['offset'] = offset
+        if unread: params['unread'] = unread
         headers = APIResource.make_request_headers(access_token)
         return url, params, headers
 
