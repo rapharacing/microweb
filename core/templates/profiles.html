@@ -112,6 +112,14 @@
 		</ul>
 	</div>
 </div> <!-- / filters -->
+
+<div class="metabar-module">
+	<h5>Actions</h5>
+	<div class="metabar-module-body">
+		<p>{% include 'forms/subscribe.html' %}</p>
+	</div>
+</div>
+
 <div class="metabar-module">
 	<h5>About</h5>
 	<div class="metabar-module-title">
@@ -164,5 +172,16 @@
 		}
 	});
 })();
+
+var subscribe = new Subscribe({
+	el        : '.subscribe',
+	url       : '{% url 'single-watcher' %}',
+	updateType: 9,
+	type      : 'profile',
+	id        : 0,
+	token     : '{{ csrf_token }}',
+	is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
+});
 </script>
+
 {% endblock %}

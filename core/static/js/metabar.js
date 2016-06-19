@@ -17,8 +17,9 @@
       this.token = typeof opts.token !== 'undefined' ? opts.token : null;
 
       this.data = {
-        itemId    : typeof opts.id   !== 'undefined' ? opts.id   : null,
-        itemType  : typeof opts.type !== 'undefined' ? opts.type : null,
+        updateTypeId: typeof opts.updateType !== 'undefined' ? opts.updateType : 1,
+        itemId      : typeof opts.id         !== 'undefined' ? opts.id   : null,
+        itemType    : typeof opts.type       !== 'undefined' ? opts.type : null,
         csrfmiddlewaretoken: this.token
       }
 

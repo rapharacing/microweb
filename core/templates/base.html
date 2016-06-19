@@ -268,7 +268,7 @@
 		<script src="{{ STATIC_URL }}3rd/prettify/r298/prettify.js"></script>
 		<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 		<script src="{{ STATIC_URL }}js/base.js"></script>
-		<script src="{{ STATIC_URL }}js/metabar.js"></script>
+		<script src="{{ STATIC_URL }}js/metabar.js?v=20160619"></script>
 
         <!-- Persona signin -->
         <form id="signin-form" class="hidden" method="POST" action="{% url 'login' %}">
@@ -347,7 +347,7 @@ if (window.performance) {
 		ptRedirect = pt.redirectEnd - pt.redirectStart;
 		if (ptRedirect > 0) {ga('perf.send', 'timing', 'Redirect', 'duration', ptRedirect);}
 		ptAppCache = pt.domainLookupStart - pt.fetchStart;
-		if (ptAppCache > 0) {ga('perf.send', 'timing', 'App Cache', 'duration', ptAppCache);}
+		if (ptAppCache > 0 && ptAppCache < 60000) {ga('perf.send', 'timing', 'App Cache', 'duration', ptAppCache);}
 		ptDNS = pt.domainLookupEnd - pt.domainLookupStart;
 		if (ptDNS > 0) {ga('perf.send', 'timing', 'DNS', 'duration', ptDNS);}
 		ptTCP = pt.connectEnd - pt.connectStart;
@@ -355,7 +355,7 @@ if (window.performance) {
 		ptRequest = pt.responseStart - pt.requestStart;
 		if (ptRequest > 0) {ga('perf.send', 'timing', 'Request', 'duration', ptRequest);}
 		ptResponse = pt.responseEnd - pt.responseStart;
-		if (ptResponse > 0) {ga('perf.send', 'timing', 'Response', 'duration', ptResponse);}
+		if (ptResponse > 0 && ptResponse < 60000) {ga('perf.send', 'timing', 'Response', 'duration', ptResponse);}
 		ptProcessing = pt.loadEventStart - pt.responseEnd;
 		if (ptProcessing > 0) {ga('perf.send', 'timing', 'Processing', 'duration', ptProcessing);}
 		ptOnload = pt.loadEventEnd - pt.loadEventStart;

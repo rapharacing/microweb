@@ -173,11 +173,12 @@
 {% block js %}
 <script type="text/javascript">
 	var subscribe = new Subscribe({
-		el    : '.subscribe',
-		url   : '{% url 'single-watcher' %}',
-		id    : {{ content.id }},
-		type  : '{{ item_type }}',
-		token : '{{ csrf_token }}',
+		el        : '.subscribe',
+		url       : '{% url 'single-watcher' %}',
+		updateType: 8,
+		type      : '{{ item_type }}',
+		id        : {{ content.id }},
+		token     : '{{ csrf_token }}',
 		is_subscribed : {{ content.meta.flags.watched|lower|default:"false" }}
 	});
 </script>

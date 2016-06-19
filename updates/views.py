@@ -137,7 +137,7 @@ class WatcherView(object):
     @require_http_methods(['POST',])
     def single(request):
         postdata = {
-            'updateTypeId': 1,
+            'updateTypeId': int(request.POST.get('updateTypeId')), # used on create for communication defaults
             'itemType': request.POST.get('itemType'),
             'itemId': int(request.POST.get('itemId')),
             }
