@@ -115,19 +115,3 @@
 
 
 {% endblock%}
-{% block js %}
-<script type="text/javascript">
-
-$('.inline-subscribe').each(function(index,item){
-	var subscribe = new Subscribe({
-		el    : item,
-		url   : '{% url 'single-watcher' %}',
-		id    : function(){ return this.button.attr('data-content-id'); },
-		type  : function(){ return this.button.attr('data-content-type'); },
-		token : '{{ csrf_token }}',
-		is_subscribed : true
-	});
-});
-
-</script>
-{% endblock %}
