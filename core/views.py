@@ -154,11 +154,12 @@ def process_attachments(request, comment):
                                   comment_id=comment.id, access_token=request.access_token, file_name=f.name)
 
 
-def build_newest_comment_link(response, request):
+def build_newest_comment_link(response, request=None):
 
-    source = request.GET.get('utm_source', '') 
-    medium = request.GET.get('utm_medium', '')
-    campaign = request.GET.get('utm_campaign', '')
+    if request is not None:
+        source = request.GET.get('utm_source', '') 
+        medium = request.GET.get('utm_medium', '')
+        campaign = request.GET.get('utm_campaign', '')
 
     response = response['comments']['links']
     for link in response:
