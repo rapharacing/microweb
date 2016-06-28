@@ -156,6 +156,10 @@ def process_attachments(request, comment):
 
 def build_newest_comment_link(response, request=None):
 
+    source = ''
+    medium = ''
+    campaign = ''
+
     if request is not None:
         source = request.GET.get('utm_source', '') 
         medium = request.GET.get('utm_medium', '')
