@@ -216,5 +216,5 @@ def newest(request, conversation_id):
     except APIException as exc:
         return respond_with_error(request, exc)
 
-    redirect = build_newest_comment_link(response)
+    redirect = build_newest_comment_link(response, request)
     return HttpResponseRedirect(redirect)

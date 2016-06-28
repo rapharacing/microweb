@@ -183,6 +183,7 @@ def build_newest_comment_link(response, request):
         queries['utm_source'] = source
         queries['utm_medium'] = medium
         queries['utm_campaign'] = campaign
+
     queries = urlencode(queries)
     response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
     return response
