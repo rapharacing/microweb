@@ -312,12 +312,12 @@ onlogout: function() {
 ga('create', 'UA-36951023-2', 'auto');
 {% if user %}ga('set', 'userId', {{user.id}});{% endif %}
 ga(function(tracker) {
-  tracker.set('sendHitTask', function(model) {
-    var payLoad = model.get('hitPayload');
-    var isogramRequest = new XMLHttpRequest();
-    isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
-    isogramRequest.send();
-  });
+	tracker.set('sendHitTask', function(model) {
+		var payLoad = model.get('hitPayload');
+		var isogramRequest = new XMLHttpRequest();
+		isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
+		isogramRequest.send();
+	});
 });
 ga('send', 'pageview');
 
@@ -334,11 +334,12 @@ if (window.performance) {
 		});
 		{% if user %}ga('set', 'userId', {{user.id}});{% endif %}
 		ga(function(tracker) {
-			tracker.set('sendHitTask', function(model) {
-			var payLoad = model.get('hitPayload');
-			var isogramRequest = new XMLHttpRequest();
-			isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
-			isogramRequest.send();
+			tracker.set('sendHitTask',
+			function(model) {
+				var payLoad = model.get('hitPayload');
+				var isogramRequest = new XMLHttpRequest();
+				isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
+				isogramRequest.send();
 			});
 		});
 		var pt = window.performance.timing;
