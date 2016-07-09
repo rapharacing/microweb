@@ -312,12 +312,12 @@ onlogout: function() {
 ga('create', 'UA-36951023-2', 'auto');
 {% if user %}ga('set', 'userId', {{user.id}});{% endif %}
 ga(function(tracker) {
-  tracker.set('sendHitTask', function(model) {
-    var payLoad = model.get('hitPayload');
-    var isogramRequest = new XMLHttpRequest();
-    isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
-    isogramRequest.send();
-  });
+	tracker.set('sendHitTask', function(model) {
+		var payLoad = model.get('hitPayload');
+		var isogramRequest = new XMLHttpRequest();
+		isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
+		isogramRequest.send();
+	});
 });
 ga('send', 'pageview');
 
@@ -334,34 +334,35 @@ if (window.performance) {
 		});
 		{% if user %}ga('set', 'userId', {{user.id}});{% endif %}
 		ga(function(tracker) {
-			tracker.set('sendHitTask', function(model) {
-			var payLoad = model.get('hitPayload');
-			var isogramRequest = new XMLHttpRequest();
-			isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
-			isogramRequest.send();
+			tracker.set('sendHitTask',
+			function(model) {
+				var payLoad = model.get('hitPayload');
+				var isogramRequest = new XMLHttpRequest();
+				isogramRequest.open('get','/isogram?ua='+encodeURI(window.navigator.userAgent)+'&'+payLoad,true);
+				isogramRequest.send();
 			});
 		});
-		pt = window.performance.timing;
-		ptUnload = pt.unloadEventEnd - pt.unloadEventStart;
-		if (ptUnload > 0) {ga('perf.send', 'timing', 'Unload', 'duration', ptUnload);}
-		ptRedirect = pt.redirectEnd - pt.redirectStart;
-		if (ptRedirect > 0) {ga('perf.send', 'timing', 'Redirect', 'duration', ptRedirect);}
-		ptAppCache = pt.domainLookupStart - pt.fetchStart;
-		if (ptAppCache > 0 && ptAppCache < 60000) {ga('perf.send', 'timing', 'App Cache', 'duration', ptAppCache);}
-		ptDNS = pt.domainLookupEnd - pt.domainLookupStart;
-		if (ptDNS > 0) {ga('perf.send', 'timing', 'DNS', 'duration', ptDNS);}
-		ptTCP = pt.connectEnd - pt.connectStart;
-		if (ptTCP > 0) {ga('perf.send', 'timing', 'TCP', 'duration', ptTCP);}
-		ptRequest = pt.responseStart - pt.requestStart;
-		if (ptRequest > 0) {ga('perf.send', 'timing', 'Request', 'duration', ptRequest);}
-		ptResponse = pt.responseEnd - pt.responseStart;
-		if (ptResponse > 0 && ptResponse < 60000) {ga('perf.send', 'timing', 'Response', 'duration', ptResponse);}
-		ptProcessing = pt.loadEventStart - pt.responseEnd;
-		if (ptProcessing > 0) {ga('perf.send', 'timing', 'Processing', 'duration', ptProcessing);}
-		ptOnload = pt.loadEventEnd - pt.loadEventStart;
-		if (ptOnload > 0) {ga('perf.send', 'timing', 'Onload', 'duration', ptOnload);}
+		var pt = window.performance.timing;
+		var ptUnload = pt.unloadEventEnd - pt.unloadEventStart;
+		if (ptUnload > 0) {ga('perf.send', 'timing', 'window.performance', 'Unload', ptUnload);}
+		var ptRedirect = pt.redirectEnd - pt.redirectStart;
+		if (ptRedirect > 0) {ga('perf.send', 'timing', 'window.performance', 'Redirect', ptRedirect);}
+		var ptAppCache = pt.domainLookupStart - pt.fetchStart;
+		if (ptAppCache > 0 && ptAppCache < 30000) {ga('perf.send', 'timing', 'window.performance', 'App Cache', ptAppCache);}
+		var ptDNS = pt.domainLookupEnd - pt.domainLookupStart;
+		if (ptDNS > 0) {ga('perf.send', 'timing', 'window.performance', 'DNS', ptDNS);}
+		var ptTCP = pt.connectEnd - pt.connectStart;
+		if (ptTCP > 0) {ga('perf.send', 'timing', 'window.performance', 'TCP', ptTCP);}
+		var ptRequest = pt.responseStart - pt.requestStart;
+		if (ptRequest > 0) {ga('perf.send', 'timing', 'window.performance', 'Request', ptRequest);}
+		var ptResponse = pt.responseEnd - pt.responseStart;
+		if (ptResponse > 0 && ptResponse < 30000) {ga('perf.send', 'timing', 'window.performance', 'Response', ptResponse);}
+		var ptProcessing = pt.loadEventStart - pt.responseEnd;
+		if (ptProcessing > 0) {ga('perf.send', 'timing', 'window.performance', 'Processing', ptProcessing);}
+		var ptOnload = pt.loadEventEnd - pt.loadEventStart;
+		if (ptOnload > 0) {ga('perf.send', 'timing', 'window.performance', 'Onload', ptOnload);}
 	}
-	window.setTimeout(perf, 3000);
+	window.setTimeout(perf, 2000);
 }
 </script>
 	</body>

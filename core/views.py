@@ -154,7 +154,16 @@ def process_attachments(request, comment):
                                   comment_id=comment.id, access_token=request.access_token, file_name=f.name)
 
 
-def build_newest_comment_link(response):
+def build_newest_comment_link(response, request=None):
+
+    source = ''
+    medium = ''
+    campaign = ''
+
+    if request is not None:
+        source = request.GET.get('utm_source', '') 
+        medium = request.GET.get('utm_medium', '')
+        campaign = request.GET.get('utm_campaign', '')
 
     response = response['comments']['links']
     for link in response:
@@ -164,13 +173,22 @@ def build_newest_comment_link(response):
     pr = urlparse(response)
     queries = parse_qs(pr[4])
     frag = ""
+
     if queries.get('comment_id'):
         frag = 'comment' + queries['comment_id'][0]
         del queries['comment_id']
-        # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
+    
+    # queries is a dictionary of 1-item lists (as we don't re-use keys in our query string)
     # urlencode will encode the lists into the url (offset=[25]) etc.  So get the values straight.
     for (key, value) in queries.items():
         queries[key] = value[0]
+
+    # preserve utm tracking from original request
+    if source and medium and campaign:
+        queries['utm_source'] = source
+        queries['utm_medium'] = medium
+        queries['utm_campaign'] = campaign
+
     queries = urlencode(queries)
     response = urlunparse((pr[0], pr[1], pr[2], pr[3], queries, frag))
     return response
