@@ -69,14 +69,12 @@
     simpleEditor.prototype.applyFormatting = function(text, tag){
 
       // splits text into array by newlines and applies tag to each index of array.
-      var selectedTextFragments = text.split(/\n/g);
-      for(var i=0,j=selectedTextFragments.length;i<j;i++){
-          selectedTextFragments[i] = tag.replace(/%s/g, selectedTextFragments[i]);
+      var lines = text.split(/\n/g);
+      for (var i=0; i < lines.length; i++) {
+          lines[i] = tag.replace(/%s/g, lines[i]);
       }
 
-      var formattedText = selectedTextFragments.join('\n');
-
-      return formattedText;
+      return lines.join('\n');
     };
 
     simpleEditor.prototype.formattedTextWith = function(tag){
@@ -129,6 +127,10 @@
 
     simpleEditor.prototype.quote = function(){
       this.textarea.value = this.formattedTextWith("> %s");
+    };
+
+    simpleEditor.prototype.quoteAll = function(){
+      this.textarea.value = this.applyFormatting(this.textarea.value, "> %s");
     };
 
     simpleEditor.prototype.link = function(){

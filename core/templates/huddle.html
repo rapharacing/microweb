@@ -151,13 +151,13 @@
 {% block js %}
 {% if user %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.textcomplete.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/comments.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/comments.js?v=201607027"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/formValidator.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/attachments.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/Markdown.Editor.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/peopleWidget.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/simpleEditor.js?v=201607027"></script>
 <script type="text/javascript">
 (function(){
 
@@ -183,7 +183,7 @@
 		var selectedText = Comments.prototype.getWindowSelectedText();
 		if (selectedText){
 			replyBox.textarea.value = selectedText;
-			replyBox.quote();
+			replyBox.quoteAll();
 		}
 	});
 

@@ -15,7 +15,6 @@ from functools import wraps
 from django.conf import settings
 
 from django.core.exceptions import ValidationError
-
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseServerError
@@ -28,6 +27,7 @@ from django.shortcuts import render
 from django.template import RequestContext
 from django.template import loader
 
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_safe
 
@@ -345,6 +345,7 @@ class ErrorView(object):
 class AuthenticationView(object):
 
     @staticmethod
+    @csrf_exempt
     def login(request):
         """
         Log a user in. Creates an access_token using a persona
