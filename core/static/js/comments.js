@@ -102,7 +102,7 @@
         var selectedText = this.getWindowSelectedText();
         if (selectedText){
           fragment.simpleEditor.textarea.value = selectedText;
-          fragment.simpleEditor.quote();
+          fragment.simpleEditor.quoteAll();
         }
       }
 
