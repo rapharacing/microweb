@@ -1,5 +1,4 @@
 ﻿// needs Markdown.Converter.js at the moment
-
 (function () {
 
 	var util = {},
@@ -1149,14 +1148,14 @@
 			// we opt for event delegation using jQuery.on
 			// -jim
 
-			buttons.bold   	= bindCommand("doBold");
-			buttons.italic 	= bindCommand("doItalic");
-			buttons.quote  	= bindCommand("doBlockquote");
-			buttons.code   	= bindCommand("doCode");
-			buttons.heading = bindCommand("doHeading");
-			buttons.hr 			= bindCommand("doHorizontalRule");
+			buttons.bold	= bindCommand("doBold");
+			buttons.italic	= bindCommand("doItalic");
+			buttons.quote	= bindCommand("doBlockquote");
+			buttons.code	= bindCommand("doCode");
+			buttons.heading	= bindCommand("doHeading");
+			buttons.hr	= bindCommand("doHorizontalRule");
 
-			buttons.link  = bindCommand(function (chunk, postProcessing) {
+			buttons.link = bindCommand(function (chunk, postProcessing) {
 				return this.doLinkOrImage(chunk, postProcessing, false);
 			});
 			buttons.image = bindCommand(function (chunk, postProcessing) {
@@ -1177,40 +1176,39 @@
 			};
 
 			var preferredUserEvent = 'click';
-			if ('ontouchstart' in window){
-				preferredUserEvent = 'touchstart';
-			}
+			// if ('ontouchstart' in window){
+			// 	preferredUserEvent = 'touchstart';
+			// }
 
-      var events = [
-        [preferredUserEvent,    '.wmd-bold',   			buttons.bold,			'bold'],
-        [preferredUserEvent,    '.wmd-italic', 			buttons.italic,		'italic'],
-        [preferredUserEvent,    '.wmd-quote',			  buttons.quote,		'quote'],
-        [preferredUserEvent,    '.wmd-code', 				buttons.code,			'code'],
-        [preferredUserEvent,    '.wmd-link', 			  buttons.link,			'link'],
-				[preferredUserEvent,    '.wmd-image', 			buttons.image,		'image'],
-				[preferredUserEvent, 		'.wmd-ol', 					buttons.olist,		'olist'],
-				[preferredUserEvent, 		'.wmd-ul', 					buttons.ulist,		'ulist']
-      ];
+			var events = [
+				[preferredUserEvent,	'.wmd-bold',	buttons.bold,	'bold'],
+				[preferredUserEvent,	'.wmd-italic',	buttons.italic,	'italic'],
+				[preferredUserEvent,	'.wmd-quote',	buttons.quote,	'quote'],
+				[preferredUserEvent,	'.wmd-code',	buttons.code,	'code'],
+				[preferredUserEvent,	'.wmd-link',	buttons.link,	'link'],
+				[preferredUserEvent,	'.wmd-image',	buttons.image,	'image'],
+				[preferredUserEvent,	'.wmd-ol',	buttons.olist,	'olist'],
+				[preferredUserEvent,	'.wmd-ul',	buttons.ulist,	'ulist']
+			];
 
-      var returnScopedEvent = function(cmd,cmd_name){
-      	var _cmd = cmd,
-      			_cmd_name = cmd_name;
-      	return function(){
-      		var fakeButton = {};
-      		fakeButton.textOp = _cmd;
-      		fakeButton.opName = _cmd_name;
+			var returnScopedEvent = function(cmd,cmd_name){
+				var _cmd = cmd,
+				_cmd_name = cmd_name;
+				return function(){
+					var fakeButton = {};
+					fakeButton.textOp = _cmd;
+					fakeButton.opName = _cmd_name;
 					doClick(fakeButton);
 				};
-      }
+			}
 
-      for(var i in events){
-        panels.buttonBar.on(events[i][0],events[i][1],(returnScopedEvent)(events[i][2], events[i][3]));
-      }
+			for(var i in events){
+				panels.buttonBar.on(events[i][0],events[i][1],(returnScopedEvent)(events[i][2], events[i][3]));
+			}
 
-      // bind the undo and redo buttons
-      panels.buttonBar.on(preferredUserEvent, '.wmd-undo', function(){ buttons.undo.execute(undoManager) });
-      panels.buttonBar.on(preferredUserEvent, '.wmd-redo', function(){ buttons.redo.execute(undoManager) });
-
+			// bind the undo and redo buttons
+			panels.buttonBar.on(preferredUserEvent, '.wmd-undo', function(){ buttons.undo.execute(undoManager) });
+			panels.buttonBar.on(preferredUserEvent, '.wmd-redo', function(){ buttons.redo.execute(undoManager) });
 		}
 
 	}
