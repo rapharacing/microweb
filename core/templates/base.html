@@ -320,10 +320,14 @@ ga(function(tracker) {
 	});
 });
 ga('send', 'pageview');
-
 {% if site.ga_web_property_id %}
-ga('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
-ga('{{ site.subdomain_key }}.send', 'pageview', gaData);
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga2');
+ga2('create', '{{ site.ga_web_property_id }}', {'name': '{{ site.subdomain_key }}'});
+{% if user %}ga2('{{ site.subdomain_key }}.set', 'userId', {{user.id}});{% endif %}
+ga2('{{ site.subdomain_key }}.send', 'pageview');
 {% endif %}
 </script>
 	</body>
