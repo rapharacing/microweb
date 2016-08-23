@@ -232,6 +232,35 @@
 					<a href="{% url 'single-legal' 'privacy' %}">Privacy Policy</a>
 					<a href="{% url 'single-legal' 'cookies' %}">Cookie Policy</a>
 					<a href="mailto:founders@microcosm.cc">Report a problem</a>
+					{% if not user and false %}
+						<a id="auth0">auth0</a>
+						<script src="//cdn.auth0.com/js/lock-passwordless-2.min.js"></script>
+						<script type="text/javascript">
+							document.getElementById('auth0').onclick = function () {
+
+							var domain = "buro9.eu.auth0.com";
+							var clientID = "XehDa9lNMKZcMUcSbMKdbvIdbTHpz84o";
+
+							var options = {
+								"icon":"https://lfgss.microco.sm/api/v1/files/5b87bea60c7cfa61afb40dda5f5d58a8a5fe8d7c.svg",
+								"defaultLocation":"GB",
+								"primaryColor":"#1e72c4",
+								"responseType":"code",
+								"autoclose":true,
+								"focusInput":false,
+								"popup":false,
+								"socialBigButtons":true,
+								"connections":["google-oauth2","windowslive"],
+								"callbackURL": "https://www.lfgss.com/auth0login",
+							};
+
+							var lock = new Auth0LockPasswordless(clientID, domain);
+
+							lock.socialOrEmailcode(options);
+
+							}
+						</script>
+					{% endif %}
 				</p>
 			</div>
 		</div>

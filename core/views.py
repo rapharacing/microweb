@@ -348,8 +348,12 @@ class AuthenticationView(object):
     @csrf_exempt
     def login(request):
         """
-        Log a user in. Creates an access_token using a persona
-        assertion and the client secret. Sets this access token as a cookie.
+        Log a user in using Persona.
+
+        Creates an access_token using a persona assertion and the client secret.
+
+        Sets this access token as a cookie.
+
         'target_url' based as a GET parameter determines where the user is
         redirected.
         """
@@ -379,9 +383,11 @@ class AuthenticationView(object):
     @require_http_methods(["POST"])
     def logout(request):
         """
-        Log a user out. Issues a DELETE request to the backend for the
-        user's access_token, and issues a delete cookie header in response to
-        clear the user's access_token cookie.
+        Log a user out.
+
+        Issues a DELETE request to the backend for the user's access_token, and
+        issues a delete cookie header in response to clear the user's
+        access_token cookie.
         """
 
         response = redirect('/')
@@ -395,6 +401,44 @@ class AuthenticationView(object):
 
         return response
 
+class Auth0View(object):
+
+    @staticmethod
+    @csrf_exempt
+    def login(request):
+        """
+        Log a user in using auth0
+
+        Creates an access_token using an auth0 code and state.
+
+        Sets this access token as a cookie.
+
+        'target_url' based as a GET parameter determines where the user is
+        redirected.
+        """
+
+        code = request.GET.get('code')
+        #state = request.GET.get('state')
+        #target_url = request.GET.get('target_url')
+        postdata = {
+            'Code': code,
+            #'State': state,
+            'ClientSecret': settings.CLIENT_SECRET
+        }
+
+        url = build_url(request.get_host(), ['auth0'])
+        try:
+            response = requests.post(url, data=postdata, headers={})
+        except RequestException:
+            return ErrorView.server_error(request)
+        access_token = response.json()['data']
+        if access_token is None:
+            return ErrorView.server_error(request)
+
+        response = HttpResponseRedirect(target_url if target_url != '' else '/')
+        expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)
+        response.set_cookie('access_token', access_token, expires=expires, httponly=True)
+        return response
 
 def echo_headers(request):
     view_data = '<html><body><table>'
