@@ -47,7 +47,7 @@ from core.api.resources import WhoAmI
 
 from core.api.resources import build_url
 
-logger = logging.getLogger('core.views')
+logger = logging.getLogger('microcosm.views')
 
 def exception_handler(view_func):
     """
@@ -418,8 +418,10 @@ class Auth0View(object):
         """
 
         code = request.GET.get('code')
+        logger.info('code = ' + code)
         #state = request.GET.get('state')
-        #target_url = request.GET.get('target_url')
+        target_url = request.GET.get('target_url')
+        logger.info('target_url = ' + code)
         postdata = {
             'Code': code,
             #'State': state,
@@ -430,10 +432,14 @@ class Auth0View(object):
         try:
             response = requests.post(url, data=postdata, headers={})
         except RequestException:
+            logger.error('req = ' + request)
             return ErrorView.server_error(request)
         access_token = response.json()['data']
         if access_token is None:
+            logger.error('access_token = none for ' + request)
             return ErrorView.server_error(request)
+
+        logger.info('all good = ' + access_token)
 
         response = HttpResponseRedirect(target_url if target_url != '' else '/')
         expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)

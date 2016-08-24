@@ -232,7 +232,7 @@
 					<a href="{% url 'single-legal' 'privacy' %}">Privacy Policy</a>
 					<a href="{% url 'single-legal' 'cookies' %}">Cookie Policy</a>
 					<a href="mailto:founders@microcosm.cc">Report a problem</a>
-					{% if not user and false %}
+					{% if not user %}
 						<a id="auth0">auth0</a>
 						<script src="//cdn.auth0.com/js/lock-passwordless-2.min.js"></script>
 						<script type="text/javascript">
@@ -251,7 +251,8 @@
 								"popup":false,
 								"socialBigButtons":true,
 								"connections":["google-oauth2","windowslive"],
-								"callbackURL": "https://www.lfgss.com/auth0login",
+								"callbackURL": "https://www.lfgss.com/auth0login/",
+								"scopes": ["openid", "name", "email", "nickname", "picture"],
 							};
 
 							var lock = new Auth0LockPasswordless(clientID, domain);
