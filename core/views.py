@@ -47,7 +47,7 @@ from core.api.resources import WhoAmI
 
 from core.api.resources import build_url
 
-logger = logging.getLogger('microcosm.views')
+logger = logging.getLogger('core.views')
 
 def exception_handler(view_func):
     """
@@ -370,11 +370,15 @@ class AuthenticationView(object):
             response = requests.post(url, data=postdata, headers={})
         except RequestException:
             return ErrorView.server_error(request)
+
         access_token = response.json()['data']
-        if access_token is None:
+        if access_token is None or access_token == '':
             return ErrorView.server_error(request)
 
-        response = HttpResponseRedirect(target_url if target_url != '' else '/')
+        if target_url is None or target_url == '':
+            target_url = '/'
+
+        response = HttpResponseRedirect(target_url)
         expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)
         response.set_cookie('access_token', access_token, expires=expires, httponly=True)
         return response
@@ -418,13 +422,12 @@ class Auth0View(object):
         """
 
         code = request.GET.get('code')
-        logger.info('code = ' + code)
-        #state = request.GET.get('state')
+        state = request.GET.get('state')
         target_url = request.GET.get('target_url')
-        logger.info('target_url = ' + code)
+
         postdata = {
             'Code': code,
-            #'State': state,
+            'State': state,
             'ClientSecret': settings.CLIENT_SECRET
         }
 
@@ -432,16 +435,21 @@ class Auth0View(object):
         try:
             response = requests.post(url, data=postdata, headers={})
         except RequestException:
-            logger.error('req = ' + request)
             return ErrorView.server_error(request)
+
         access_token = response.json()['data']
-        if access_token is None:
-            logger.error('access_token = none for ' + request)
+        if access_token is None or access_token == '':
             return ErrorView.server_error(request)
 
-        logger.info('all good = ' + access_token)
+        if target_url is None or target_url == '':
+            target_url = state
 
-        response = HttpResponseRedirect(target_url if target_url != '' else '/')
+        if target_url is None or target_url == '':
+            target_url = '/'
+
+        logger.debug(access_token)
+
+        response = redirect(target_url)
         expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)
         response.set_cookie('access_token', access_token, expires=expires, httponly=True)
         return response
