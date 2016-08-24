@@ -245,11 +245,11 @@
 								dict: {
 									title: 'Sign in'
 								},
-								icon: 'https://lfgss.microco.sm/api/v1/files/5b87bea60c7cfa61afb40dda5f5d58a8a5fe8d7c.svg',
+								icon: '{{ site.logo_url }}',
 								defaultLocation: 'GB',
 								focusInput: false,
 								popup: false,
-								primaryColor: '#1e72c4',
+								primaryColor: '{{ site.link_color }}',
 								socialBigButtons: true,
 								authParams: {
 									state: '{{ request.get_full_path }}'

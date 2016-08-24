@@ -447,12 +447,12 @@ class Auth0View(object):
         if target_url is None or target_url == '':
             target_url = '/'
 
-        logger.debug(access_token)
+        resp = HttpResponseRedirect(target_url)
 
-        response = redirect(target_url)
         expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)
-        response.set_cookie('access_token', access_token, expires=expires, httponly=True)
-        return response
+        resp.set_cookie('access_token', access_token, expires=expires, httponly=True)
+        
+        return resp
 
 def echo_headers(request):
     view_data = '<html><body><table>'
