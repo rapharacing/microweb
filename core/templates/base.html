@@ -53,6 +53,26 @@
 				{% endif %}
 			{% endif %}
 		}
+
+		#auth0signin, #auth0signin:focus, #auth0signin:active {
+		    /* Remove all decorations to look like normal text */
+		    background: none;
+		    border: none;
+		    display: inline;
+		    font: inherit;
+		    margin: 0;
+		    padding: 0;
+		    outline: none;
+		    outline-offset: 0;
+		    /* Additional styles to look like a link */
+		    cursor: pointer;
+		    text-decoration: underline;
+		}
+		/* Remove extra space inside buttons in Firefox */
+		#auth0signin::-moz-focus-inner {
+		    border: none;
+		    padding: 0;
+		}
 		</style>
 		{% block css %}{% endblock %}
 	</head>
@@ -234,34 +254,7 @@
 					<a href="mailto:founders@microcosm.cc">Report a problem</a>
 					{% if not user %}
 						{% if site.auth0_domain and site.auth0_client_id %}
-							<a id="auth0">auth0</a>
-							<script src="{{ STATIC_URL }}3rd/auth0/lock-passwordless/2.2.3/lock-passwordless.min.js"></script>
-							<script type="text/javascript">
-							document.getElementById('auth0').onclick = function () {
-								var domain = '{{ site.auth0_domain }}';
-								var clientID = '{{ site.auth0_client_id }}';
-								var opt = {
-									autoclose: true,
-									connections: ['google-oauth2','windowslive'],
-									dict: {
-										title: 'Sign in'
-									},
-									icon: '{{ site.logo_url }}',
-									defaultLocation: 'GB',
-									focusInput: false,
-									popup: false,
-									primaryColor: '{{ site.link_color }}',
-									socialBigButtons: true,
-									authParams: {
-										state: '{{ request.get_full_path }}'
-									},
-									callbackURL: '{{ site.site_url }}/auth0login/',
-									responseType: 'code'
-								};
-								var lock = new Auth0LockPasswordless(clientID, domain);
-								lock.socialOrEmailcode(opt);
-							}
-							</script>
+							<button id="auth0signin" onclick="auth0signin();">auth0</button>
 						{% endif %}
 					{% endif %}
 				</p>
@@ -301,6 +294,39 @@
 		<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 		<script src="{{ STATIC_URL }}js/base.js"></script>
 		<script src="{{ STATIC_URL }}js/metabar.js?v=20160619"></script>
+
+
+		{% if not user %}
+			{% if site.auth0_domain and site.auth0_client_id %}
+				<script src="{{ STATIC_URL }}3rd/auth0/lock-passwordless/2.2.3/lock-passwordless.min.js"></script>
+				<script type="text/javascript">
+				function auth0signin() {
+					var domain = '{{ site.auth0_domain }}';
+					var clientID = '{{ site.auth0_client_id }}';
+					var opt = {
+						autoclose: true,
+						connections: ['google-oauth2','windowslive'],
+						dict: {
+							title: 'Sign in'
+						},
+						icon: '{{ site.logo_url }}',
+						defaultLocation: 'GB',
+						focusInput: false,
+						popup: false,
+						primaryColor: '{{ site.link_color }}',
+						socialBigButtons: true,
+						authParams: {
+							state: '{{ request.get_full_path }}'
+						},
+						callbackURL: '{{ site.site_url }}/auth0login/',
+						responseType: 'code'
+					};
+					var lock = new Auth0LockPasswordless(clientID, domain);
+					lock.socialOrEmailcode(opt);
+				}
+				</script>
+			{% endif %}
+		{% endif %}
 
         <!-- Persona signin -->
         <form id="signin-form" class="hidden" method="POST" action="{% url 'login' %}">
