@@ -233,34 +233,36 @@
 					<a href="{% url 'single-legal' 'cookies' %}">Cookie Policy</a>
 					<a href="mailto:founders@microcosm.cc">Report a problem</a>
 					{% if not user %}
-						<a id="auth0">auth0</a>
-						<script src="{{ STATIC_URL }}3rd/auth0/lock-passwordless/2.2.3/lock-passwordless.js"></script>
-						<script type="text/javascript">
-						document.getElementById('auth0').onclick = function () {
-							var domain = 'buro9.eu.auth0.com';
-							var clientID = 'XehDa9lNMKZcMUcSbMKdbvIdbTHpz84o';
-							var opt = {
-								autoclose: true,
-								connections: ['google-oauth2','windowslive'],
-								dict: {
-									title: 'Sign in'
-								},
-								icon: '{{ site.logo_url }}',
-								defaultLocation: 'GB',
-								focusInput: false,
-								popup: false,
-								primaryColor: '{{ site.link_color }}',
-								socialBigButtons: true,
-								authParams: {
-									state: '{{ request.get_full_path }}'
-								},
-								callbackURL: 'https://www.lfgss.com/auth0login/',
-								responseType: 'code'
-							};
-							var lock = new Auth0LockPasswordless(clientID, domain);
-							lock.socialOrEmailcode(opt);
-						}
-						</script>
+						{% if site.auth0_domain and site.auth0_client_id %}
+							<a id="auth0">auth0</a>
+							<script src="{{ STATIC_URL }}3rd/auth0/lock-passwordless/2.2.3/lock-passwordless.js"></script>
+							<script type="text/javascript">
+							document.getElementById('auth0').onclick = function () {
+								var domain = '{{ site.auth0_domain }}';
+								var clientID = '{{ site.auth0_client_id }}';
+								var opt = {
+									autoclose: true,
+									connections: ['google-oauth2','windowslive'],
+									dict: {
+										title: 'Sign in'
+									},
+									icon: '{{ site.logo_url }}',
+									defaultLocation: 'GB',
+									focusInput: false,
+									popup: false,
+									primaryColor: '{{ site.link_color }}',
+									socialBigButtons: true,
+									authParams: {
+										state: '{{ request.get_full_path }}'
+									},
+									callbackURL: '{{ site.site_url }}/auth0login/',
+									responseType: 'code'
+								};
+								var lock = new Auth0LockPasswordless(clientID, domain);
+								lock.socialOrEmailcode(opt);
+							}
+							</script>
+						{% endif %}
 					{% endif %}
 				</p>
 			</div>

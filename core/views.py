@@ -3,6 +3,9 @@ import datetime
 import logging
 import newrelic
 import requests
+import string
+import random
+
 from requests import RequestException
 
 from urllib import urlencode
@@ -48,6 +51,12 @@ from core.api.resources import WhoAmI
 from core.api.resources import build_url
 
 logger = logging.getLogger('core.views')
+
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    """
+    generates identifies that are used as cache busters in querystrings
+    """
+    return ''.join(random.SystemRandom().choice(chars) for _ in range(size))
 
 def exception_handler(view_func):
     """
@@ -447,11 +456,17 @@ class Auth0View(object):
         if target_url is None or target_url == '':
             target_url = '/'
 
-        resp = HttpResponseRedirect(target_url)
+        # Add cachebuster as the unauth'd page may be very aggressively cached
+        pr = urlparse(target_url)
+        qs = parse_qs(pr[4])
+        qs.update({'cachebuster': id_generator()})
+        target_url = urlunparse((pr[0], pr[1], pr[2], pr[3], urlencode(qs), pr[5]))
 
+        # Redirect and set cookie
+        resp = HttpResponseRedirect(target_url)
         expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)
         resp.set_cookie('access_token', access_token, expires=expires, httponly=True)
-        
+       
         return resp
 
 def echo_headers(request):

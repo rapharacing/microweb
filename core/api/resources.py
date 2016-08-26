@@ -233,6 +233,7 @@ class Site(object):
 
     def __init__(self, data):
         self.site_id = data['siteId']
+        self.site_url = data['siteURL']
         self.title = data['title']
         self.description = data['description']
         self.subdomain_key = data['subdomainKey']
@@ -254,6 +255,12 @@ class Site(object):
             self.background_url = data['backgroundUrl']
         if data.get('backgroundPosition'):
             self.background_position = data['backgroundPosition']
+
+        # auth configs are optional
+        if data.get('auth0Domain'):
+            self.auth0_domain = data['auth0Domain']
+        if data.get('auth0ClientId'):
+            self.auth0_client_id = data['auth0ClientId']
 
         self.menu = []
         if data.get('menu'):
