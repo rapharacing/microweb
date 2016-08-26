@@ -235,7 +235,7 @@
 					{% if not user %}
 						{% if site.auth0_domain and site.auth0_client_id %}
 							<a id="auth0">auth0</a>
-							<script src="{{ STATIC_URL }}3rd/auth0/lock-passwordless/2.2.3/lock-passwordless.js"></script>
+							<script src="{{ STATIC_URL }}3rd/auth0/lock-passwordless/2.2.3/lock-passwordless.min.js"></script>
 							<script type="text/javascript">
 							document.getElementById('auth0').onclick = function () {
 								var domain = '{{ site.auth0_domain }}';
