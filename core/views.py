@@ -309,21 +309,21 @@ class ErrorView(object):
         view_data = {}
         view_requests = []
 
-        if request.COOKIES.has_key('access_token'):
-            request.access_token = request.COOKIES['access_token']
-            whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
-            view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
+        # if request.COOKIES.has_key('access_token'):
+        #     request.access_token = request.COOKIES['access_token']
+        #     whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
+        #     view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
 
         site_url, params, headers = Site.build_request(request.get_host())
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
         responses = response_list_to_dict(grequests.map(view_requests))
-        if request.whoami_url:
-            profile = Profile(responses[whoami_url], summary=False)
-            view_data['user'] = profile
-            newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
-            newrelic.agent.add_custom_parameter('profile_id', profile.id)
-            newrelic.agent.add_custom_parameter('user_id', profile.user_id)
+        # if request.whoami_url:
+        #     profile = Profile(responses[whoami_url], summary=False)
+        #     view_data['user'] = profile
+        #     newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
+        #     newrelic.agent.add_custom_parameter('profile_id', profile.id)
+        #     newrelic.agent.add_custom_parameter('user_id', profile.user_id)
 
         site = Site(responses[site_url])
         view_data['site'] = site
