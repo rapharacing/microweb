@@ -334,6 +334,10 @@ class ErrorView(object):
             if exception.detail.has_key('errorDetail'):
                 view_data['detail'] = exception.detail['errorDetail']
 
+        # TODO: DK 2016-09-08: Remove after Persona is gone.
+        if request.COOKIES.has_key('access_token'):
+            response.set_cookie('access_token', '', expires="Thu, 01 Jan 1970 00:00:00 GMT")
+
         context = RequestContext(request, view_data)
         return HttpResponseServerError(loader.get_template('500.html').render(context))
 
