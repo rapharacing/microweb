@@ -302,7 +302,7 @@
 					var clientID = '{{ site.auth0_client_id }}';
 					var opt = {
 						autoclose: true,
-						connections: ['google-oauth2','windowslive'],
+						connections: ['google-oauth2',{% if site.auth0_domain == "espruino.eu.auth0.com" %}'github'{% else %}'windowslive'{% endif %}],
 						dict: {
 							title: 'Sign in'
 						},
