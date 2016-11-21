@@ -302,7 +302,7 @@
 					var clientID = '{{ site.auth0_client_id }}';
 					var opt = {
 						autoclose: true,
-						connections: [{% if site.auth0_domain == "rapha.auth0.com" %}{% else %}{% if site.auth0_domain == "espruino.eu.auth0.com" %}'google-oauth2','github'{% else %}'google-oauth2','windowslive'{% endif %}{% endif %}],
+						{% if site.auth0_domain == "rapha.auth0.com" %}{% else %}connections: [{% if site.auth0_domain == "espruino.eu.auth0.com" %}'google-oauth2','github'{% else %}'google-oauth2','windowslive'{% endif %}],{% endif %}
 						dict: {
 							title: 'Sign in'
 						},
@@ -319,7 +319,7 @@
 						responseType: 'code'
 					};
 					var lock = new Auth0LockPasswordless(clientID, domain);
-					lock.socialOrEmailcode(opt);
+					{% if site.auth0_domain == "rapha.auth0.com" %}lock.emailcode(opt);{% else %}lock.socialOrEmailcode(opt);{% endif %}
 				}
 				function authSignin() {
 					auth0signin();
