@@ -53,6 +53,26 @@
 				{% endif %}
 			{% endif %}
 		}
+
+		#auth0signin, #auth0signin:focus, #auth0signin:active {
+		    /* Remove all decorations to look like normal text */
+		    background: none;
+		    border: none;
+		    display: inline;
+		    font: inherit;
+		    margin: 0;
+		    padding: 0;
+		    outline: none;
+		    outline-offset: 0;
+		    /* Additional styles to look like a link */
+		    cursor: pointer;
+		    text-decoration: underline;
+		}
+		/* Remove extra space inside buttons in Firefox */
+		#auth0signin::-moz-focus-inner {
+		    border: none;
+		    padding: 0;
+		}
 		</style>
 		{% block css %}{% endblock %}
 	</head>
@@ -81,7 +101,7 @@
 								<div class="col-md-3 col-lg-3 navbar-profile">
 									{% if user %}
 										<div class="navbar-profile-row-1">
-											<span id="logout" class="navbar-profile-logout" onclick="personaSignout();"><a href="#" title="Sign out" class="sprite sprite-logout"></a></span>
+											<span id="logout" class="navbar-profile-logout" onclick="authSignout();"><a href="#" title="Sign out" class="sprite sprite-logout"></a></span>
 
 											<div class="navbar-profile-row-1-left">
 												<a href="{% url 'single-profile' user.id %}" title="View your profile" class="navbar-profile-avatar"><img src="{% if 'gravatar' in user.avatar %}{{user.avatar}}{% elif 'files' in user.avatar %}https://{{site.subdomain_key}}.microco.sm{{user.avatar}}{% else %}/static/img/avatar.gif{% endif %}" alt="Avatar for {{ user.profile_name }}" title="Edit your profile" /></a>
@@ -99,7 +119,7 @@
 										Browsing as <strong>guest</strong>.
 										</div>
 										<div class="navbar-profile-row-5">
-											<button id="login" class="btn btn-primary" onclick="personaSignin();">
+											<button id="login" class="btn btn-primary" onclick="authSignin();">
 												Sign In or Register
 											</button>
 										</div>
@@ -120,7 +140,7 @@
 							<ul class="nav navbar-nav navbar-nav-unregistered">
 								<li class="lh">Join our community</li>
 								<li>
-									<a href="#" id="loginNavbar" onclick="personaSignin();">
+									<a href="#" id="loginNavbar" onclick="authSignin();">
 										<span class="btn btn-primary btn-block">Sign in or Register</span>
 									</a>
 								</li>
@@ -196,7 +216,7 @@
 									<a href="{% url 'updates-settings' %}">Notification Settings</a>
 								</li>
 								<li>
-									<a href="#" id="logoutNavbar" onclick="personaSignout();">Sign out</a>
+									<a href="#" id="logoutNavbar" onclick="authSignout();">Sign out</a>
 								</li>
 							</ul>
 							{% endif %}
@@ -250,7 +270,7 @@
                         <p>{{ site.description | safe }}</p>
 
                         <div class="modal-buttons">
-                            <button class="btn btn-lg btn-primary" onclick="navigator.id.request({siteLogo: '{{ site.logo_url }}'})">Sign in or Register to continue</button>
+                            <button class="btn btn-lg btn-primary" onclick="authSignin();">Sign in or Register to continue</button>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -261,8 +281,6 @@
         </div>
 		{% endif %}
 
-		<!-- <script src="https://login.persona.org/include.js"></script> -->
-		<script src="{{ STATIC_URL }}js/mozpersona.js"></script>
 		<script src="{{ STATIC_URL }}3rd/jquery/1.10.2/jquery.min.js"></script>
 		<script src="{{ STATIC_URL }}3rd/moment.js/2.10.6/moment.min.js"></script>
 		<script src="{{ STATIC_URL }}3rd/prettify/r298/prettify.js"></script>
@@ -270,41 +288,91 @@
 		<script src="{{ STATIC_URL }}js/base.js"></script>
 		<script src="{{ STATIC_URL }}js/metabar.js?v=20160619"></script>
 
-        <!-- Persona signin -->
-        <form id="signin-form" class="hidden" method="POST" action="{% url 'login' %}">
-			<!-- {% csrf_token %} -->
-			<input id="Assertion" type="hidden" name="Assertion" value="" />
-			<input id="target_url" type="hidden" name="target_url" value="{{request.get_full_path}}" />
-		</form>
-
-		<!-- Persona signout -->
+		<!-- Signout form is universal to all auth methods -->
 		<form id="signout-form" class="hidden" method="POST" action="{% url 'logout' %}">
 			{% csrf_token %}
 		</form>
 
-{% if not user.meta.permissions.banned %}
-<script type="text/javascript">
-function personaSignin() {
-	navigator.id.request({"siteLogo": "{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}"});
-}
-function personaSignout() {
-	navigator.id.logout();
-	document.getElementById("signout-form").submit();
-}
-navigator.id.watch({
-loggedInUser: {% if user.email %}'{{user.email}}'{% else %}null{% endif %},
-onlogin: function(assertion) {
-	{% if user.email %}return false;{% endif %}
-	document.getElementById("Assertion").value = assertion;
-	document.getElementById("signin-form").submit();
-},
-onlogout: function() {
-	{% if user.email %}return false;{% endif %}
-	document.getElementById("signout-form").submit();
-},
-});
-</script>
-{% endif %}
+		{% if site.auth0_domain and site.auth0_client_id %}
+			{% if not user %}
+				<script src="{{ STATIC_URL }}3rd/auth0/lock-passwordless/2.2.3/lock-passwordless.min.js"></script>
+				<script type="text/javascript">
+				function auth0signin() {
+					var domain = '{{ site.auth0_domain }}';
+					var clientID = '{{ site.auth0_client_id }}';
+					var opt = {
+						autoclose: true,
+						connections: ['google-oauth2',{% if site.auth0_domain == "espruino.eu.auth0.com" %}'github'{% else %}'windowslive'{% endif %}],
+						dict: {
+							title: 'Sign in'
+						},
+						icon: '{{ site.logo_url }}',
+						defaultLocation: 'GB',
+						focusInput: false,
+						popup: false,
+						primaryColor: '{{ site.link_color }}',
+						socialBigButtons: true,
+						authParams: {
+							state: '{{ request.get_full_path }}'
+						},
+						callbackURL: '{{ site.site_url }}/auth0login/',
+						responseType: 'code'
+					};
+					var lock = new Auth0LockPasswordless(clientID, domain);
+					lock.socialOrEmailcode(opt);
+				}
+				function authSignin() {
+					auth0signin();
+				}
+				</script>
+			{% else %}
+				<script type="text/javascript">
+				function authSignout() {
+					document.getElementById("signout-form").submit();
+				}
+				</script>
+			{% endif %}
+		{% else %}
+			<!-- <script src="https://login.persona.org/include.js"></script> -->
+			<script src="{{ STATIC_URL }}js/mozpersona.js"></script>
+			<!-- Persona signin -->
+			<form id="signin-form" class="hidden" method="POST" action="{% url 'login' %}">
+				<!-- {% csrf_token %} -->
+				<input id="Assertion" type="hidden" name="Assertion" value="" />
+				<input id="target_url" type="hidden" name="target_url" value="{{request.get_full_path}}" />
+			</form>
+
+			{% if not user.meta.permissions.banned %}
+				<script type="text/javascript">
+				function personaSignin() {
+					navigator.id.request({"siteLogo": "{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}"});
+				}
+				function personaSignout() {
+					navigator.id.logout();
+					document.getElementById("signout-form").submit();
+				}
+				navigator.id.watch({
+					loggedInUser: {% if user.email %}'{{user.email}}'{% else %}null{% endif %},
+					onlogin: function(assertion) {
+						{% if user.email %}return false;{% endif %}
+						document.getElementById("Assertion").value = assertion;
+						document.getElementById("signin-form").submit();
+					},
+					onlogout: function() {
+						{% if user.email %}return false;{% endif %}
+						document.getElementById("signout-form").submit();
+					},
+				});
+				function authSignin() {
+					personaSignin();
+				}
+				function authSignout() {
+					personaSignout();
+				}
+				</script>
+			{% endif %}
+		{% endif %}
+
 {% block js %}{% endblock js%}
 <!-- RCC GA -->
 <script type="text/javascript">

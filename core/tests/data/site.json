@@ -3,6 +3,7 @@
  "status": 200,
  "data": {
   "siteId": 5,
+  "siteURL": "https://dev1.microco.sm/",
   "title": "Middle Earth",
   "description": "Middle Earth is the central continent of the world in the third age.",
   "subdomainKey": "dev1",

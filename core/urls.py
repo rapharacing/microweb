@@ -2,6 +2,7 @@ from django.conf.urls import url
 from django.conf.urls import patterns
 
 from core.views import AuthenticationView
+from core.views import Auth0View
 from core.views import ErrorView
 from core.views import IsogramView
 from core.views import FaviconView
@@ -18,6 +19,7 @@ urlpatterns = patterns('',
 
     # Auth
     url(r'^login/$', AuthenticationView.login, name='login'),
+    url(r'^auth0login/$', Auth0View.login, name='auth0login'),
     url(r'^logout/$', AuthenticationView.logout, name='logout'),
 
     # Legal

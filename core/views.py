@@ -3,6 +3,9 @@ import datetime
 import logging
 import newrelic
 import requests
+import string
+import random
+
 from requests import RequestException
 
 from urllib import urlencode
@@ -48,6 +51,12 @@ from core.api.resources import WhoAmI
 from core.api.resources import build_url
 
 logger = logging.getLogger('core.views')
+
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    """
+    generates identifies that are used as cache busters in querystrings
+    """
+    return ''.join(random.SystemRandom().choice(chars) for _ in range(size))
 
 def exception_handler(view_func):
     """
@@ -300,21 +309,21 @@ class ErrorView(object):
         view_data = {}
         view_requests = []
 
-        if request.COOKIES.has_key('access_token'):
-            request.access_token = request.COOKIES['access_token']
-            whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
-            view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
+        # if request.COOKIES.has_key('access_token'):
+        #     request.access_token = request.COOKIES['access_token']
+        #     whoami_url, params, headers = WhoAmI.build_request(request.get_host(), request.access_token)
+        #     view_requests.append(grequests.get(whoami_url, params=params, headers=headers))
 
         site_url, params, headers = Site.build_request(request.get_host())
         view_requests.append(grequests.get(request.site_url, params=params, headers=headers))
 
         responses = response_list_to_dict(grequests.map(view_requests))
-        if request.whoami_url:
-            profile = Profile(responses[whoami_url], summary=False)
-            view_data['user'] = profile
-            newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
-            newrelic.agent.add_custom_parameter('profile_id', profile.id)
-            newrelic.agent.add_custom_parameter('user_id', profile.user_id)
+        # if request.whoami_url:
+        #     profile = Profile(responses[whoami_url], summary=False)
+        #     view_data['user'] = profile
+        #     newrelic.agent.add_custom_parameter('profile_name', profile.profile_name)
+        #     newrelic.agent.add_custom_parameter('profile_id', profile.id)
+        #     newrelic.agent.add_custom_parameter('user_id', profile.user_id)
 
         site = Site(responses[site_url])
         view_data['site'] = site
@@ -324,6 +333,10 @@ class ErrorView(object):
         if hasattr(exception, 'detail'):
             if exception.detail.has_key('errorDetail'):
                 view_data['detail'] = exception.detail['errorDetail']
+
+        # TODO: DK 2016-09-08: Remove after Persona is gone.
+        if request.COOKIES.has_key('access_token'):
+            response.set_cookie('access_token', '', expires="Thu, 01 Jan 1970 00:00:00 GMT")
 
         context = RequestContext(request, view_data)
         return HttpResponseServerError(loader.get_template('500.html').render(context))
@@ -348,8 +361,12 @@ class AuthenticationView(object):
     @csrf_exempt
     def login(request):
         """
-        Log a user in. Creates an access_token using a persona
-        assertion and the client secret. Sets this access token as a cookie.
+        Log a user in using Persona.
+
+        Creates an access_token using a persona assertion and the client secret.
+
+        Sets this access token as a cookie.
+
         'target_url' based as a GET parameter determines where the user is
         redirected.
         """
@@ -366,11 +383,15 @@ class AuthenticationView(object):
             response = requests.post(url, data=postdata, headers={})
         except RequestException:
             return ErrorView.server_error(request)
+
         access_token = response.json()['data']
-        if access_token is None:
+        if access_token is None or access_token == '':
             return ErrorView.server_error(request)
 
-        response = HttpResponseRedirect(target_url if target_url != '' else '/')
+        if target_url is None or target_url == '':
+            target_url = '/'
+
+        response = HttpResponseRedirect(target_url)
         expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)
         response.set_cookie('access_token', access_token, expires=expires, httponly=True)
         return response
@@ -379,9 +400,11 @@ class AuthenticationView(object):
     @require_http_methods(["POST"])
     def logout(request):
         """
-        Log a user out. Issues a DELETE request to the backend for the
-        user's access_token, and issues a delete cookie header in response to
-        clear the user's access_token cookie.
+        Log a user out.
+
+        Issues a DELETE request to the backend for the user's access_token, and
+        issues a delete cookie header in response to clear the user's
+        access_token cookie.
         """
 
         response = redirect('/')
@@ -395,6 +418,60 @@ class AuthenticationView(object):
 
         return response
 
+class Auth0View(object):
+
+    @staticmethod
+    @csrf_exempt
+    def login(request):
+        """
+        Log a user in using auth0
+
+        Creates an access_token using an auth0 code and state.
+
+        Sets this access token as a cookie.
+
+        'target_url' based as a GET parameter determines where the user is
+        redirected.
+        """
+
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+        target_url = request.GET.get('target_url')
+
+        postdata = {
+            'Code': code,
+            'State': state,
+            'ClientSecret': settings.CLIENT_SECRET
+        }
+
+        url = build_url(request.get_host(), ['auth0'])
+        try:
+            response = requests.post(url, data=postdata, headers={})
+        except RequestException:
+            return ErrorView.server_error(request)
+
+        access_token = response.json()['data']
+        if access_token is None or access_token == '':
+            return ErrorView.server_error(request)
+
+        if target_url is None or target_url == '':
+            target_url = state
+
+        if target_url is None or target_url == '':
+            target_url = '/'
+
+        # Add cachebuster as the unauth'd page may be very aggressively cached
+        pr = urlparse(target_url)
+        qs = parse_qs(pr[4])
+        qs.update({'cachebuster': id_generator()})
+        target_url = urlunparse((pr[0], pr[1], pr[2], pr[3], urlencode(qs), pr[5]))
+
+        # Redirect and set cookie
+        resp = HttpResponseRedirect(target_url)
+        expires = datetime.datetime.fromtimestamp(2 ** 31 - 1)
+        resp.set_cookie('access_token', access_token, expires=expires, httponly=True)
+       
+        return resp
 
 def echo_headers(request):
     view_data = '<html><body><table>'

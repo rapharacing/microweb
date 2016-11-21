@@ -7,8 +7,8 @@
 <div class="content-header padded">
     <h1>Logged out</h1>
 </div>
-<p class="row-meta">It looks like your login session has expired so you've been signed out.</p>
-<p class="row-meta">You can sign in again using the button above.</p>
+<p class="row-meta">Your login session has expired.</p>
+<p class="row-meta">You can <a href="#" onclick="authSignin();">sign in again to continue</a>, or sign out to <a href="#" onclick="authSignout();">view the site as a guest</a>.</p>
 {% else %}
 <div class="content-header padded">
     <h1>Not permitted</h1>
