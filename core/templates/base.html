@@ -374,6 +374,9 @@
 		{% endif %}
 
 {% block js %}{% endblock js%}
+
+{% if site.subdomain_key == "espruino" %}<script src="//www.espruino.com/js/forum.js" type="text/javascript" async></script>{% endif %}
+
 <script type="text/javascript">
 {% if site.subdomain_key == 'dev1' or site.subdomain_key == 'dev2' %}window['ga-disable-UA-36951023-2'] = true;{% endif %}
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','{{ STATIC_URL }}3rd/isogram/201606011835/isogram.js','isogram');
@@ -396,5 +399,6 @@ ga('create', '{{ site.ga_web_property_id }}', 'auto');
 ga('send', 'pageview');
 {% endif %}
 </script>
+
 	</body>
 </html>
