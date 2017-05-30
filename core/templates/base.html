@@ -4,8 +4,6 @@
 		<meta charset="utf-8" />
 
 		<link rel="preconnect" href="https://{{ site.subdomain_key }}.microco.sm">
-		<link rel="preconnect" href="https://login.persona.org">
-		<link rel="preconnect" href="https://static.login.persona.org">
 		<link rel="preconnect" href="https://fonts.googleapis">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -332,45 +330,6 @@
 				}
 				</script>
 			{% endif %}
-		{% else %}
-			<!-- <script src="https://login.persona.org/include.js"></script> -->
-			<script src="{{ STATIC_URL }}js/mozpersona.js"></script>
-			<!-- Persona signin -->
-			<form id="signin-form" class="hidden" method="POST" action="{% url 'login' %}">
-				<!-- {% csrf_token %} -->
-				<input id="Assertion" type="hidden" name="Assertion" value="" />
-				<input id="target_url" type="hidden" name="target_url" value="{{request.get_full_path}}" />
-			</form>
-
-			{% if not user.meta.permissions.banned %}
-				<script type="text/javascript">
-				function personaSignin() {
-					navigator.id.request({"siteLogo": "{% if site.logo_url %}{{ site.logo_url }}{% else %}{{ STATIC_URL }}themes/1/logo.png{% endif %}"});
-				}
-				function personaSignout() {
-					navigator.id.logout();
-					document.getElementById("signout-form").submit();
-				}
-				navigator.id.watch({
-					loggedInUser: {% if user.email %}'{{user.email}}'{% else %}null{% endif %},
-					onlogin: function(assertion) {
-						{% if user.email %}return false;{% endif %}
-						document.getElementById("Assertion").value = assertion;
-						document.getElementById("signin-form").submit();
-					},
-					onlogout: function() {
-						{% if user.email %}return false;{% endif %}
-						document.getElementById("signout-form").submit();
-					},
-				});
-				function authSignin() {
-					personaSignin();
-				}
-				function authSignout() {
-					personaSignout();
-				}
-				</script>
-			{% endif %}
 		{% endif %}
 
 {% block js %}{% endblock js%}
@@ -398,5 +357,6 @@ ga1(function(tracker) {
 });
 ga1('send', 'pageview');
 </script>
+
 	</body>
 </html>

@@ -140,7 +140,7 @@ def process_attachments(request, comment):
     """
     For the provided request, check if files are to be attached or deleted
     from the provided comment. Raises a ValidationError if any files are larger
-    than 3MB.
+    than 30MB.
     """
 
     # Check if any existing comment attachments are to be deleted.
@@ -153,8 +153,8 @@ def process_attachments(request, comment):
     if request.FILES.has_key('attachments'):
         for f in request.FILES.getlist('attachments'):
             file_request = FileMetadata.from_create_form(f)
-            # Maximum file size is 3MB.
-            if len(file_request.file[f.name]) >= 3145728:
+            # Maximum file size is 30 MB.
+            if len(file_request.file[f.name]) >= 31457280:
                 raise ValidationError
             # Associate attachment with comment using attachments API.
             else:
@@ -331,12 +331,8 @@ class ErrorView(object):
 
         # Provide detailed error if returned in the response.
         if hasattr(exception, 'detail'):
-            if exception.detail.has_key('errorDetail'):
+            if 'errorDetail' in exception.detail:
                 view_data['detail'] = exception.detail['errorDetail']
-
-        # TODO: DK 2016-09-08: Remove after Persona is gone.
-        if request.COOKIES.has_key('access_token'):
-            response.set_cookie('access_token', '', expires="Thu, 01 Jan 1970 00:00:00 GMT")
 
         context = RequestContext(request, view_data)
         return HttpResponseServerError(loader.get_template('500.html').render(context))
