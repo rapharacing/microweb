@@ -53,7 +53,7 @@ $('document').ready(function() {
 		function(i, el) {
 			num = parseInt(el.getAttribute("stat"));
 			if (num > 999) {
-				el.title = el.parent.innerText
+				el.title = el.parentElement.innerText;
 				el.innerHTML = nFormatter(num, 2)
 			}
 		}
