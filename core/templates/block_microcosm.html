@@ -36,11 +36,11 @@
 			<div class="row-stats">
 				<ul class="list-stats">
 					<li>
-						<span>{{ microcosm.item.total_items | default:0 | intcomma }}</span>
+						<span stat="{{ microcosm.item.total_items | default:0 }}">{{ microcosm.item.total_items | default:0 | intcomma }}</span>
 						conversation{{ microcosm.item.total_items | default:0 | pluralize:",s" }}
 					</li>
 					<li>
-						<span>{{ microcosm.item.total_comments | default:0 | intcomma }}</span>
+						<span stat="{{ microcosm.item.total_comments | default:0 }}">{{ microcosm.item.total_comments | default:0 | intcomma }}</span>
 						comment{{ microcosm.item.total_comments | default:0 | pluralize:",s" }}
 					</li>
 				</ul>

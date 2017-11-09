@@ -127,11 +127,11 @@
 				<ul class="list-stats" data-toggle="modal" data-target="#modal-event-attendees">
 					<li>
 						Going
-						<span>{{ content.rsvp_attend|default:"0" }}</span>
+						<span stat="{{ content.rsvp_attend | default:"0" }}">{{ content.rsvp_attend | default:"0" | intcomma }}</span>
 					</li>
 					<li>
 						Invited
-						<span>{{ rsvp_num_invited|default:"0" }}</span>
+						<span stat="{{ rsvp_num_invited | default:"0" }}">{{ rsvp_num_invited | default:"0" | intcomma }}</span>
 					</li>
 				</ul>
 				{% if not is_expired %}
