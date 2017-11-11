@@ -31,7 +31,7 @@ $('document').ready(function() {
 	updateTimes();
 	setInterval(updateTimes, 60000); // Update every minute
 
-	// Update stats to use short numbers, i.e. 10000 becomes 10k
+	// Update stats to use short numbers, i.e. 1234567 becomes 1.23M
 	function nFormatter(num, digits) {
 		var si = [
 			{ value: 1E18, symbol: "E" },
@@ -52,10 +52,17 @@ $('document').ready(function() {
 	$('.list-stats span[stat]').each(
 		function(i, el) {
 			num = parseInt(el.getAttribute("stat"));
-			if (num > 999) {
-				el.title = el.parentElement.innerText;
-				el.innerHTML = nFormatter(num, 2)
+			if (num < 1000) {
+				return;
 			}
+			// Get the li text for the tooltip, i.e. "1,008 comments"
+			tooltip = el.parentElement.innerText;
+			// There may be a link within the stat, i.e. as a search to the items
+			while (el.hasChildNodes() && el.childNodes[0].nodeType == 1) {
+				el = el.childNodes[0];
+			}
+			el.title = tooltip;
+			el.innerText = nFormatter(num, 2);
 		}
 	);
 
