@@ -1,3 +1,4 @@
+{% load humanize %}
 <div class="item-event">
 	<div class="row">
 		<div class="col-xs-12">
@@ -131,7 +132,7 @@
 					</li>
 					<li>
 						Invited
-						<span stat="{{ rsvp_num_invited | default:"0" }}">{{ rsvp_num_invited | default:"0" | intcomma }}</span>
+						<span stat="{{ rsvp_num_invited }}">{{ rsvp_num_invited | intcomma }}</span>
 					</li>
 				</ul>
 				{% if not is_expired %}
