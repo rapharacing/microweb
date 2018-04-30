@@ -482,14 +482,6 @@ class FaviconView(RedirectView):
         return settings.STATIC_URL + 'img/favico.png'
 
 
-class IsogramView(TemplateView):
-    template_name = 'isogram.txt'
-    content_type = 'text/plain'
-
-    def get_context_data(self, **kwargs):
-        return super(IsogramView, self).get_context_data(**kwargs)
-
-
 class RobotsView(TemplateView):
     template_name = 'robots.txt'
     content_type = 'text/plain'
