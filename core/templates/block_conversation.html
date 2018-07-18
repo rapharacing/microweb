@@ -40,13 +40,13 @@
 				<ul class="list-stats list-stats-sm">
 					{% if item.total_comments >= 0 %}
 					<li>
-						<span>{{ item.total_comments | default:0 | intcomma }}</span>
+						<span stat="{{ item.total_comments | default:0 }}">{{ item.total_comments | default:0 | intcomma }}</span>
 						comment{{ item.total_comments | pluralize:",s" }}
 					</li>
 					{% endif %}
 					{% if item.total_views >= 0 %}
 					<li>
-						<span>{{ item.total_views | default:0 | intcomma }}</span>
+						<span stat="{{ item.total_views | default:0 }}">{{ item.total_views | default:0 | intcomma }}</span>
 						view{{ item.total_views | pluralize:",s" }}
 					</li>
 					{% endif %}

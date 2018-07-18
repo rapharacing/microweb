@@ -33,11 +33,11 @@
 							</div>
 							 <ul class="list-stats profile-header-stats">
 									<li>
-										<span>{%if content.item_count > 0 %}<a href="/search?type=conversation&amp;authorId={{content.id}}">{{content.item_count | intcomma }}</a>{% else %}0{% endif %}</span>
+										<span stat="{{ content.item_count | default:"0" }}">{%if content.item_count > 0 %}<a href="/search?type=conversation&amp;authorId={{content.id}}">{{content.item_count | intcomma }}</a>{% else %}0{% endif %}</span>
 										conversations
 									</li>
 									<li>
-										<span>{%if content.comment_count > 0 %}<a href="/search?type=comment&amp;authorId={{content.id}}">{{content.comment_count | intcomma }}</a>{% else %}0{% endif %}</span>
+										<span stat="{{ content.comment_count | default:"0" }}">{%if content.comment_count > 0 %}<a href="/search?type=comment&amp;authorId={{content.id}}">{{content.comment_count | intcomma }}</a>{% else %}0{% endif %}</span>
 										comments
 									</li>
 								</ul>

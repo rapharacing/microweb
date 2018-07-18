@@ -38,7 +38,7 @@
 			<div class="cell-stats">
 				<ul class="list-stats list-stats-sm">
 					<li>
-						<span>{{ item.total_comments | default:0 | intcomma }}</span>
+						<span stat="{{ item.total_comments | default:0 }}">{{ item.total_comments | default:0 | intcomma }}</span>
 						comment{{ item.total_comments | pluralize:",s" }}
 					</li>
 				</ul>

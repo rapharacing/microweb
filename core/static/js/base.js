@@ -31,6 +31,41 @@ $('document').ready(function() {
 	updateTimes();
 	setInterval(updateTimes, 60000); // Update every minute
 
+	// Update stats to use short numbers, i.e. 1234567 becomes 1.23M
+	function nFormatter(num, digits) {
+		var si = [
+			{ value: 1E18, symbol: "E" },
+			{ value: 1E15, symbol: "P" },
+			{ value: 1E12, symbol: "T" },
+			{ value: 1E9,  symbol: "G" },
+			{ value: 1E6,  symbol: "M" },
+			{ value: 1E3,  symbol: "k" }
+			], rx = /\.0+$|(\.[0-9]*[1-9])0+$/, i;
+		for (i = 0; i < si.length; i++) {
+			if (num >= si[i].value) {
+				return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
+			}
+		}
+		return num.toFixed(digits).replace(rx, "$1");
+	}
+
+	$('.list-stats span[stat]').each(
+		function(i, el) {
+			num = parseInt(el.getAttribute("stat"));
+			if (num < 1000) {
+				return;
+			}
+			// Get the li text for the tooltip, i.e. "1,008 comments"
+			tooltip = el.parentElement.innerText;
+			// There may be a link within the stat, i.e. as a search to the items
+			while (el.hasChildNodes() && el.childNodes[0].nodeType == 1) {
+				el = el.childNodes[0];
+			}
+			el.title = tooltip;
+			el.innerText = nFormatter(num, 2);
+		}
+	);
+
 	// Make code look pretty
 	$('pre > code').addClass('prettyprint')
 			.parent().addClass('prettyprint').addClass('linenums');
